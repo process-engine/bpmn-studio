@@ -73,7 +73,14 @@ export class ProcessDefList {
     if (this._processes === undefined) {
       return [];
     }
-    return this._processes.data;
+    return this._processes.data.sort((a: IProcessDefEntity, b: IProcessDefEntity) => {
+      if (a.key < b.key) {
+        return -1;
+      } else if (a.key > b.key) {
+        return 1;
+      }
+      return 0;
+    });
   }
 
   public async createProcess(): Promise<void> {
