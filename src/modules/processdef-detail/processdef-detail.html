@@ -10,7 +10,7 @@
           <button disabled.bind="process.latest" click.delegate="publishDraft()" class="btn btn-primary">
             <i class="glyphicon glyphicon-tag"></i> Publish Draft
           </button>
-          <button disabled.bind="process.draft" click.delegate="startProcess()" class="btn btn-success">
+          <button ref="startButton" disabled.bind="process.draft" click.delegate="startProcess()" class="btn btn-success">
             <i class="glyphicon glyphicon-play"></i> Start
           </button>
           <div class="action-dropdown-content">
