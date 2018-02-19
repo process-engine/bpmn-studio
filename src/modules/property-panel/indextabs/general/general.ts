@@ -49,15 +49,19 @@ export class General implements IIndextab {
   public checkElement(element: IModdleElement): boolean {
     return true;
   }
+
   public activate(model: IPageModel): void {
     this.eventBus = model.modeler.get('eventBus');
 
-    this.eventBus.on(['element.click', 'shape.changed'], (event: IEvent) => {
+    this.eventBus.on(['element.click', 'shape.changed', 'selection.changed'], (event: IEvent) => {
       if (event.type === 'element.click') {
         this.elementInPanel = event.element.businessObject;
       }
       if (event.type === 'shape.changed' && event.element.type !== 'label') {
         this.elementInPanel = event.element.businessObject;
+      }
+      if (event.type === 'selection.changed' && event.newSelection.length !== 0) {
+        this.elementInPanel = event.newSelection[0].businessObject;
       }
       if (this.elementInPanel) {
         this.sections.forEach((section: ISection) => {
