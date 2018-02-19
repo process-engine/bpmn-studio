@@ -48,7 +48,7 @@
     "@essential-projects/core_contracts": "^1.0.0-rc3",
     "@essential-projects/event_aggregator": "^1.0.0-rc3",
     "@process-engine/bpmn-js-custom-bundle": "^1.0.0-rc6",
-    "@process-engine/consumer_client": "^1.0.0-rc7",
+    "@process-engine/consumer_client": "^1.0.0-rc8",
     "@process-engine/process_engine_contracts": "^1.0.0-rc4",
     "@types/jasmine": "^2.2.0",
     "@types/node": "^6.0.45",

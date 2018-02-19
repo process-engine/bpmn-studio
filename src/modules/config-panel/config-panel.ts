@@ -21,6 +21,12 @@ export class ConfigPanel {
   public updateSettings(): void {
     environment.consumerClient.baseRoute = this.config.baseRoute;
     window.localStorage.setItem('baseRoute', this.config.baseRoute);
+    environment.processengine.routes.processes = `${this.config.baseRoute}/datastore/ProcessDef`;
+    environment.processengine.routes.iam = `${this.config.baseRoute}/iam`;
+    environment.processengine.routes.messageBus = `${this.config.baseRoute}/mb`;
+    environment.processengine.routes.processInstances = `${this.config.baseRoute}/datastore/Process`;
+    environment.processengine.routes.startProcess = `${this.config.baseRoute}/processengine/start`;
+    environment.processengine.routes.userTasks =  `${this.config.baseRoute}/datastore/UserTask`;
     this.consumerClient.updateConfig(this.config);
     toastr.success('Sucessfully saved settings!');
     this.router.navigate('');
