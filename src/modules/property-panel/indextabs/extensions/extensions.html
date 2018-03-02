@@ -1,9 +1,0 @@
-<template>
-  <require from="./extensions.css"></require>
-  <require from="../../styles/registers.css"></require>
-  <h3>Properties</h3>
-    <compose repeat.for="section of sections"
-      view-model=".${section.path}"
-      view=".${section.path}.html"
-      model.bind="{modeler: modeler, elementInPanel: elementInPanel}"></compose>
-</template>

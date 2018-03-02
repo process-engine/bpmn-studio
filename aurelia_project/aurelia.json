@@ -308,6 +308,58 @@
             "resources": [
               "styles/*.css"
             ]
+          },
+          {
+            "name": "bpmn-studio_property-panel",
+            "main": "property-panel-plugin",
+            "path": "../node_modules/bpmn-studio_property-panel/dist/amd",
+            "resources": [
+              "property-panel/resources/property-panel.html",
+              "property-panel/resources/property-panel.js",
+              "property-panel/resources/property-panel.css",
+              "property-panel/resources/styles/registers.css",
+              "property-panel/resources/styles/sections.css",
+              "property-panel/resources/indextabs/general/general.html",
+              "property-panel/resources/indextabs/general/general.js",
+              "property-panel/resources/indextabs/general/general.css",
+              "property-panel/resources/indextabs/general/service/general.service.js",
+              "property-panel/resources/indextabs/general/sections/basics/basics.html",
+              "property-panel/resources/indextabs/general/sections/basics/basics.js",
+              "property-panel/resources/indextabs/general/sections/basics/basics.css",
+              "property-panel/resources/indextabs/general/sections/call-activity/call-activity.html",
+              "property-panel/resources/indextabs/general/sections/call-activity/call-activity.js",
+              "property-panel/resources/indextabs/general/sections/call-activity/call-activity.css",
+              "property-panel/resources/indextabs/general/sections/escalation-event/escalation-event.html",
+              "property-panel/resources/indextabs/general/sections/escalation-event/escalation-event.js",
+              "property-panel/resources/indextabs/general/sections/escalation-event/escalation-event.css",
+              "property-panel/resources/indextabs/general/sections/flow/flow.html",
+              "property-panel/resources/indextabs/general/sections/flow/flow.js",
+              "property-panel/resources/indextabs/general/sections/flow/flow.css",
+              "property-panel/resources/indextabs/general/sections/message-event/message-event.html",
+              "property-panel/resources/indextabs/general/sections/message-event/message-event.js",
+              "property-panel/resources/indextabs/general/sections/message-event/message-event.css",
+              "property-panel/resources/indextabs/general/sections/pool/pool.html",
+              "property-panel/resources/indextabs/general/sections/pool/pool.js",
+              "property-panel/resources/indextabs/general/sections/pool/pool.css",
+              "property-panel/resources/indextabs/general/sections/script-task/script-task.html",
+              "property-panel/resources/indextabs/general/sections/script-task/script-task.js",
+              "property-panel/resources/indextabs/general/sections/script-task/script-task.css",
+              "property-panel/resources/indextabs/general/sections/signal-event/signal-event.html",
+              "property-panel/resources/indextabs/general/sections/signal-event/signal-event.js",
+              "property-panel/resources/indextabs/general/sections/signal-event/signal-event.css",
+              "property-panel/resources/indextabs/forms/forms.html",
+              "property-panel/resources/indextabs/forms/forms.js",
+              "property-panel/resources/indextabs/forms/forms.css",
+              "property-panel/resources/indextabs/forms/sections/basics/basics.html",
+              "property-panel/resources/indextabs/forms/sections/basics/basics.js",
+              "property-panel/resources/indextabs/forms/sections/basics/basics.css",
+              "property-panel/resources/indextabs/extensions/extensions.html",
+              "property-panel/resources/indextabs/extensions/extensions.js",
+              "property-panel/resources/indextabs/extensions/extensions.css",
+              "property-panel/resources/indextabs/extensions/sections/basics/basics.html",
+              "property-panel/resources/indextabs/extensions/sections/basics/basics.js",
+              "property-panel/resources/indextabs/extensions/sections/basics/basics.css"
+            ]
           }
         ]
       }
