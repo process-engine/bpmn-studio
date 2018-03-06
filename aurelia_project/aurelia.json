@@ -322,7 +322,7 @@
               "property-panel/resources/indextabs/general/general.html",
               "property-panel/resources/indextabs/general/general.js",
               "property-panel/resources/indextabs/general/general.css",
-              "property-panel/resources/service/general.service.js",
+              "property-panel/resources/indextabs/general/service/general.service.js",
               "property-panel/resources/indextabs/general/sections/basics/basics.html",
               "property-panel/resources/indextabs/general/sections/basics/basics.js",
               "property-panel/resources/indextabs/general/sections/basics/basics.css",
