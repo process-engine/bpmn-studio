@@ -5,7 +5,6 @@ import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {bindable, computedFrom, inject} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 import {ValidateEvent, ValidationController} from 'aurelia-validation';
-import {CoreConfigService} from 'bpmn-studio_core_plugin/core-config.service';
 import {BpmnStudioCore} from 'bpmn-studio_core_plugin/dist/amd/resources/bpmn-studio-core/bpmn-studio-core';
 import * as canvg from 'canvg-browser';
 import * as download from 'downloadjs';
@@ -13,6 +12,7 @@ import * as $ from 'jquery';
 import * as spectrum from 'spectrum-colorpicker';
 import 'spectrum-colorpicker/spectrum';
 import * as toastr from 'toastr';
+import {ICoreAPIService} from '../../contracts/core/ICoreApiService';
 import {AuthenticationStateEvent,
         ElementDistributeOptions,
         IExtensionElement,
@@ -42,7 +42,7 @@ interface BpmnStudioColorPickerSettings {
   move?(color: spectrum.tinycolorInstance): void;
 }
 
-@inject('ProcessEngineService', EventAggregator, 'BpmnStudioClient', Router, ValidationController, CoreConfigService)
+@inject('ProcessEngineService', EventAggregator, 'BpmnStudioClient', Router, ValidationController, 'CoreAPIService')
 export class ProcessDefDetail {
 
   private processEngineService: IProcessEngineService;
@@ -61,7 +61,8 @@ export class ProcessDefDetail {
   private fillColor: string;
   private borderColor: string;
   private showXMLView: boolean = false;
-  private coreConfigService: CoreConfigService;
+
+  private coreAPIService: ICoreAPIService;
 
   public colorPickerBorder: HTMLInputElement;
   public colorPickerFill: HTMLInputElement;
@@ -80,13 +81,13 @@ export class ProcessDefDetail {
               bpmnStudioClient: BpmnStudioClient,
               router: Router,
               validationController: ValidationController,
-              coreConfigService: CoreConfigService) {
+              coreAPIService: ICoreAPIService) {
     this.processEngineService = processEngineService;
     this.eventAggregator = eventAggregator;
     this.bpmnStudioClient = bpmnStudioClient;
     this.router = router;
     this.validationController = validationController;
-    this.coreConfigService = coreConfigService;
+    this.coreAPIService = coreAPIService;
   }
 
   public activate(routeParameters: RouteParameters): void {
@@ -163,6 +164,7 @@ export class ProcessDefDetail {
       .then((result: any) => {
         if (result && !result.error) {
           this._process = result;
+          this.coreAPIService.setXML(this._process.xml);
         } else {
           this._process = null;
         }
