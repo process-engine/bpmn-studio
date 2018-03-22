@@ -4,15 +4,14 @@
   <require from="./bpmn-io.css"></require>
   <div class="modeler">
     <div ref="canvasModel" class="canvasModel">
+  </div>
+  <div>
+    <div class="resize_div" ref="resizeButton">
+      <button show.bind="!toggled" class="resize_button" title="Resize" click.delegate="resize()">Resize</button>
     </div>
-    <div>
-      <div class="resize_div" ref="resizeButton">
-        <button show.bind="!toggled" class="resize_button" title="Resize" click.delegate="resize()">Resize</button>
-      </div>
-      <div class="toggle_div" ref="toggleButton">
-        <button class="toggle_panel" title="Toggle PropertyPanel" click.delegate="togglePanel()">${ !toggled ? 'Hide' : 'Show'}</button>
-      </div>
-      <property-panel ref="panel" id="js-properties-panel" modeler.bind="modeler" xml.bind="xml"></property-panel>
+    <div class="toggle_div" ref="toggleButton">
+      <button class="toggle_panel" title="Toggle PropertyPanel" click.delegate="togglePanel()">${ !toggled ? 'Hide' : 'Show'}</button>
     </div>
+    <property-panel ref="panel" id="js-properties-panel" modeler.bind="modeler" xml.bind="xml"></property-panel>
   </div>
 </template>
