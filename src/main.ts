@@ -1,6 +1,6 @@
+import {ICoreConfiguration} from '@process-engine/bpmn-studio_core_contracts';
 import {Aurelia} from 'aurelia-framework';
 import {CoreConfig} from './config/core-config';
-import {ICoreConfiguration} from './contracts/core/ICoreConfig';
 import environment from './environment';
 import {TokenRepository} from './modules/token-repository/token.repository';
 

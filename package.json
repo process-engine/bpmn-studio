@@ -41,6 +41,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@process-engine/bpmn-studio_core_contracts": "^1.0.0",
     "@process-engine/skeleton-electron": "^1.0.0",
     "aurelia-validation": "^1.1.2",
     "electron-is-dev": "^0.3.0",

@@ -364,8 +364,7 @@
               "resources/property-panel/indextabs/extensions/sections/basics/basics.css",
               "resources/bpmn-studio-core/bpmn-studio-core.html",
               "resources/bpmn-studio-core/bpmn-studio-core.js",
-              "resources/bpmn-studio-core/bpmn-studio-core.css",
-              "core-config.service.js"
+              "resources/bpmn-studio-core/bpmn-studio-core.css"
             ]
           }
         ]

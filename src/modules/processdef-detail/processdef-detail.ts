@@ -1,18 +1,17 @@
 import {BpmnStudioClient} from '@process-engine/bpmn-studio_client';
+import {ICoreAPIService} from '@process-engine/bpmn-studio_core_contracts';
 import {IProcessDefEntity} from '@process-engine/process_engine_contracts';
 import {bindingMode} from 'aurelia-binding';
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {bindable, computedFrom, inject} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 import {ValidateEvent, ValidationController} from 'aurelia-validation';
-import {BpmnStudioCore} from 'bpmn-studio_core_plugin/dist/amd/resources/bpmn-studio-core/bpmn-studio-core';
 import * as canvg from 'canvg-browser';
 import * as download from 'downloadjs';
 import * as $ from 'jquery';
 import * as spectrum from 'spectrum-colorpicker';
 import 'spectrum-colorpicker/spectrum';
 import * as toastr from 'toastr';
-import {ICoreAPIService} from '../../contracts/core/ICoreApiService';
 import {AuthenticationStateEvent,
         ElementDistributeOptions,
         IExtensionElement,
@@ -21,7 +20,6 @@ import {AuthenticationStateEvent,
         IProcessEngineService,
         IShape} from '../../contracts/index';
 import environment from '../../environment';
-import {BpmnIo} from '../bpmn-io/bpmn-io';
 
 interface RouteParameters {
   processDefId: string;
@@ -50,7 +48,6 @@ export class ProcessDefDetail {
   private subscriptions: Array<Subscription>;
   private processId: string;
   private _process: IProcessDefEntity;
-  private bpmn: BpmnStudioCore;
   private exportButton: HTMLButtonElement;
   private exportDropdown: HTMLButtonElement;
   private exportSpinner: HTMLElement;

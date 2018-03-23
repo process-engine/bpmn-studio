@@ -1,8 +1,6 @@
+import {ICoreConfiguration, IPropertyPanelConfig, IRoutes} from '@process-engine/bpmn-studio_core_contracts';
 import {inject} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
-import {ICoreConfiguration} from '../contracts/core/ICoreConfig';
-import {IPropertyPanelConfig} from '../contracts/core/IPropertyPanelConfig';
-import {IRoutes} from '../contracts/core/Iroutes';
 
 @inject(Router)
 export class CoreConfig implements ICoreConfiguration {
@@ -19,8 +17,4 @@ export class CoreConfig implements ICoreConfiguration {
     maxWidth: 150,
   };
   public appRouter: Router;
-
-  constructor(router?: Router) {
-    this.appRouter = router;
-  }
 }
