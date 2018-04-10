@@ -4,6 +4,7 @@
   <require from="./processdef-detail.css"></require>
   <require from="spectrum-colorpicker/spectrum.css"></require>
   <require from="../bpmn-xml-view/bpmn-xml-view"></require>
+  <require from="bpmn-studio_core_plugin/resources/bpmn-studio-core/bpmn-studio-core"></require>
 
   <div if.bind="process">
     <div class="bpmn-toolbar-holder">
@@ -102,8 +103,9 @@
         </div>
       </div>
     </div>
-    <bpmn-io show.bind="!showXMLView" view-model.ref="bpmn" xml.bind="process.xml"></bpmn-io>
-    <bpmn-xml-view if.bind="initialLoadingFinished" show.bind="showXMLView" xml.bind="process.xml"></bpmn-xml-view>
+    <bpmn-studio-core view-model.ref="bpmn"></bpmn-studio-core>
+    <!--<bpmn-io show.bind="!showXMLView" view-model.ref="bpmn" xml.bind="process.xml"></bpmn-io>
+    <bpmn-xml-view if.bind="initialLoadingFinished" show.bind="showXMLView" xml.bind="process.xml"></bpmn-xml-view>-->
   </div>
 
   <div class="container" if.bind="!process">

@@ -1,4 +1,6 @@
+import {ICoreConfiguration} from '@process-engine/bpmn-studio_core_contracts';
 import {Aurelia} from 'aurelia-framework';
+import {CoreConfig} from './config/core-config';
 import environment from './environment';
 import {TokenRepository} from './modules/token-repository/token.repository';
 
@@ -24,6 +26,8 @@ export function configure(aurelia: Aurelia): void {
     environment.processengine.routes.userTasks =  `${baseRoute}/datastore/UserTask`;
   }
 
+  const coreConfig: ICoreConfiguration = new CoreConfig();
+
   aurelia.use
     .standardConfiguration()
     .feature('modules/dynamic-ui')
@@ -32,7 +36,8 @@ export function configure(aurelia: Aurelia): void {
     .feature('modules/bpmn-studio_client', tokenRepository)
     .feature('resources')
     .plugin('aurelia-bootstrap')
-    .plugin('aurelia-validation');
+    .plugin('aurelia-validation')
+    .plugin('bpmn-studio_core_plugin', coreConfig);
 
   if (environment.debug) {
     aurelia.use.developmentLogging();
