@@ -23,6 +23,7 @@ export class BpmnIo {
   private canvasModel: HTMLDivElement;
   private refresh: boolean = true;
   private isResizeClicked: boolean = false;
+  private resizeEventListener: boolean = false;
 
   private toggleButtonRight: number = 337;
   private resizeButtonRight: number = 331;
@@ -193,32 +194,36 @@ export class BpmnIo {
   }
 
   public resize(): void {
-    this.isResizeClicked = true;
-    document.addEventListener('mousemove', (event: any) => {
-      if (this.isResizeClicked === false) {
-        return;
-      }
-      let currentWidth: number = document.body.clientWidth - event.clientX;
+    if (!this.isResizeClicked) {
+      this.isResizeClicked = true;
+      document.addEventListener('mousemove', (event: any) => {
+          if (this.isResizeClicked === false) {
+            return;
+          }
+          let currentWidth: number = document.body.clientWidth - event.clientX;
 
-      if (currentWidth < this.minWidth) {
-        currentWidth = this.minWidth;
-      } else if (currentWidth > this.maxWidth) {
-        currentWidth = this.maxWidth;
-      }
+          if (currentWidth < this.minWidth) {
+            currentWidth = this.minWidth;
+          } else if (currentWidth > this.maxWidth) {
+            currentWidth = this.maxWidth;
+          }
 
-      this.toggleButtonRight = currentWidth - toggleButtonWidth;
-      this.resizeButtonRight = currentWidth - resizeButtonWidth;
-      this.canvasRight = currentWidth;
+          this.toggleButtonRight = currentWidth - toggleButtonWidth;
+          this.resizeButtonRight = currentWidth - resizeButtonWidth;
+          this.canvasRight = currentWidth;
 
-      this.panel.style.width = `${currentWidth}px`;
-      this.toggleButton.style.right = `${this.toggleButtonRight}px`;
-      this.resizeButton.style.right = `${this.resizeButtonRight}px`;
-      this.canvasModel.style.right = `${this.canvasRight}px`;
-    });
+          this.panel.style.width = `${currentWidth}px`;
+          this.toggleButton.style.right = `${this.toggleButtonRight}px`;
+          this.resizeButton.style.right = `${this.resizeButtonRight}px`;
+          this.canvasModel.style.right = `${this.canvasRight}px`;
+        });
 
-    document.addEventListener('click', (event: any) => {
-      this.isResizeClicked = false;
-    }, {once: true});
+      document.addEventListener('click', (event: any) => {
+        this.isResizeClicked = false;
+      }, {once: true});
+    } else {
+      this.panel.click();
+    }
 
   }
 
