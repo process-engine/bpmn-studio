@@ -5,6 +5,7 @@ const app = electron.app;
 const notifier = require('electron-notifications');
 const isDev = require('electron-is-dev');
 const getPort = require('get-port');
+const prereleaseRegex = /\d+\.\d+\.\d+-pre-b\d+/;
 
 if (!isDev) {
   const userDataFolder = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : '/var/local');
@@ -47,6 +48,13 @@ getPort({port: 8000, host: '0.0.0.0'})
     });
 
     autoUpdater.checkForUpdates();
+
+    const currentVersion = electron.app.getVersion();
+    const currentVersionIsPrerelease = prereleaseRegex.test(currentVersion);
+
+    autoUpdater.allowPrerelease = currentVersionIsPrerelease;
+
+    console.log(`CurrentVersion: ${currentVersion}, CurrentVersionIsPrerelease: ${currentVersionIsPrerelease}`);
 
     autoUpdater.addListener('error', (error) => {
       const notification = notifier.notify('Update error', {

@@ -2,8 +2,8 @@ const octokit = require('@octokit/rest')();
 const fs = require('fs');
 const mime = require('mime-types')
 
-if (process.argv.length != 6) {
-  console.error('Please supply arguments: <version_to_release> <target_commit> <release_is_draft> <release_is_prerelease>');
+if (process.argv.length != 7) {
+  console.error('Please supply arguments: <version_to_release> <version_for_filenames> <target_commit> <release_is_draft> <release_is_prerelease>');
   process.exit(1);
 }
 
@@ -16,22 +16,25 @@ if (!process.env['RELEASE_GH_TOKEN']
 }
 
 const version_to_release = process.argv[2];
-const target_commit = process.argv[3];
-const release_is_draft = process.argv[4] === 'true';
-const release_is_prerelease = process.argv[5] === 'true';
+const version_for_filenames = process.argv[3];
+const target_commit = process.argv[4];
+const release_is_draft = process.argv[5] === 'true';
+const release_is_prerelease = process.argv[6] === 'true';
 
 const github_auth_token = process.env['RELEASE_GH_TOKEN'];
+const github_repo_namespace = process.env['RELEASE_GH_NAMESPACE'] || 'process-engine';
+const github_repo_name = process.env['RELEASE_GH_NAMESPACE'] || 'bpmn-studio';
 
 const version_tag = `v${version_to_release}`;
 
 const files_to_upload = [
-  `dist/bpmn-studio Setup ${version_to_release}.exe`,
-  `dist/bpmn-studio Setup ${version_to_release}.exe.blockmap`,
-  `dist/bpmn-studio-${version_to_release}-mac.zip`,
-  `dist/bpmn-studio-${version_to_release}-x86_64.AppImage`,
-  `dist/bpmn-studio-${version_to_release}.dmg`,
-  `dist/bpmn-studio-${version_to_release}.dmg.blockmap`,
-  `dist/bpmn-studio_${version_to_release}_amd64.snap`,
+  `dist/bpmn-studio Setup ${version_for_filenames}.exe`,
+  `dist/bpmn-studio Setup ${version_for_filenames}.exe.blockmap`,
+  `dist/bpmn-studio-${version_for_filenames}-mac.zip`,
+  `dist/bpmn-studio-${version_for_filenames}-x86_64.AppImage`,
+  `dist/bpmn-studio-${version_for_filenames}.dmg`,
+  `dist/bpmn-studio-${version_for_filenames}.dmg.blockmap`,
+  `dist/bpmn-studio_${version_for_filenames}_amd64.snap`,
   `dist/github/latest-mac.json`,
   `dist/latest-linux.yml`,
   `dist/latest-mac.yml`,
@@ -48,8 +51,8 @@ async function authenticate() {
 async function check_for_existing_release() {
   try {
     await octokit.repos.getReleaseByTag({
-      owner: 'process-engine',
-      repo: 'bpmn-studio',
+      owner: github_repo_namespace,
+      repo: github_repo_name,
       tag: version_tag,
     });
   } catch(error) {
@@ -61,8 +64,8 @@ async function check_for_existing_release() {
 async function create_release() {
   console.log('Creating GitHub Release');
   return octokit.repos.createRelease({
-    owner: 'process-engine',
-    repo: 'bpmn-studio',
+    owner: github_repo_namespace,
+    repo: github_repo_name,
     tag_name: version_tag,
     target_commitish: target_commit,
     name: version_to_release,
