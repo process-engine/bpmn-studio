@@ -196,7 +196,7 @@ export class BpmnIo {
     if (!this.isInResizeMode) {
       this.isInResizeMode = true;
 
-      document.addEventListener('mousemove', (event: any) => {
+      const mousemoveFunction: EventListenerOrEventListenerObject =  (event: any): void => {
         let currentWidth: number = document.body.clientWidth - event.clientX;
 
         if (currentWidth < this.minWidth) {
@@ -213,11 +213,16 @@ export class BpmnIo {
         this.toggleButton.style.right = `${this.toggleButtonRight}px`;
         this.resizeButton.style.right = `${this.resizeButtonRight}px`;
         this.canvasModel.style.right = `${this.canvasRight}px`;
-      });
+      };
 
-      document.addEventListener('click', (event: any) => {
+      const clickFunction: EventListenerOrEventListenerObject = (event: any): void => {
+        document.removeEventListener('mousemove', mousemoveFunction);
+        document.removeEventListener('click', clickFunction);
         this.isInResizeMode = false;
-      }, {once: true});
+      };
+
+      document.addEventListener('mousemove', mousemoveFunction);
+      document.addEventListener('click', clickFunction, {once: true});
     } else {
       this.panel.click();
     }
