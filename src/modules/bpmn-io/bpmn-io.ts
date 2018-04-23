@@ -22,8 +22,7 @@ export class BpmnIo {
   private panel: HTMLElement;
   private canvasModel: HTMLDivElement;
   private refresh: boolean = true;
-  private isResizeClicked: boolean = false;
-  private resizeEventListener: boolean = false;
+  private isInResizeMode: boolean = false;
 
   private toggleButtonRight: number = 337;
   private resizeButtonRight: number = 331;
@@ -194,12 +193,9 @@ export class BpmnIo {
   }
 
   public resize(): void {
-    if (!this.isResizeClicked) {
-      this.isResizeClicked = true;
+    if (!this.isInResizeMode) {
+      this.isInResizeMode = true;
       document.addEventListener('mousemove', (event: any) => {
-          if (this.isResizeClicked === false) {
-            return;
-          }
           let currentWidth: number = document.body.clientWidth - event.clientX;
 
           if (currentWidth < this.minWidth) {
@@ -219,7 +215,7 @@ export class BpmnIo {
         });
 
       document.addEventListener('click', (event: any) => {
-        this.isResizeClicked = false;
+        this.isInResizeMode = false;
       }, {once: true});
     } else {
       this.panel.click();
