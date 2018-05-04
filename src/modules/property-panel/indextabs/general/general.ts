@@ -1,6 +1,7 @@
 import {IIndextab, IPageModel, ISection, IShape} from '../../../../contracts';
 import {BasicsSection} from './sections/basics/basics';
 import {CallActivitySection} from './sections/call-activity/call-activity';
+import {ConditionalEventSection} from './sections/conditional-event/conditional-event';
 import {ErrorEventSection} from './sections/error-event/error-event';
 import {EscalationEventSection} from './sections/escalation-event/escalation-event';
 import {FlowSection} from './sections/flow/flow';
@@ -23,6 +24,7 @@ export class General implements IIndextab {
   public flowSection: ISection = new FlowSection();
   public errorEventSection: ISection = new ErrorEventSection();
   public escalationEventSection: ISection = new EscalationEventSection();
+  public conditionalEventSection: ISection = new ConditionalEventSection();
 
   public sections: Array<ISection> = [
     this.basicsSection,
@@ -34,6 +36,7 @@ export class General implements IIndextab {
     this.flowSection,
     this.errorEventSection,
     this.escalationEventSection,
+    this.conditionalEventSection,
   ];
 
   public canHandleElement: boolean = true;
