@@ -1,0 +1,40 @@
+<template>
+  <require from="./conditional-event.css"></require>
+  <require from="../../../../styles/sections.css"></require>
+  <div class="panel panel--grow">
+    <div class="panel__heading">
+      Conditional Event
+    </div>
+    <div class="panel__content">
+      <table class="props-table">
+        <tr>
+          <th>Condition</th>
+          <td>
+            <input type="text" class="props-input" value.bind="conditionalElement.body" change.delegate="updateConditionalElement()">
+          </td>
+          <td>
+            <span class="glyphicon glyphicon-remove-circle props-table--clear-button" click.delegate="clearCondition()"></span>
+          </td>
+        </tr>
+        <tr>
+          <th>Variable Name</th>
+          <td>
+            <input type="text" class="props-input" value.bind="variableName" change.delegate="updateVariableName()">
+          </td>
+          <td>
+            <span class="glyphicon glyphicon-remove-circle props-table--clear-button" click.delegate="clearVariableName()"></span>
+          </td>
+        </tr>
+        <tr>
+          <th>Variable Event</th>
+          <td>
+            <input type="text" class="props-input" value.bind="variableEvent" change.delegate="updateVariableEvent()">
+          </td>
+          <td>
+            <span class="glyphicon glyphicon-remove-circle props-table--clear-button" click.delegate="clearVariableEvent()"></span>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</template>
