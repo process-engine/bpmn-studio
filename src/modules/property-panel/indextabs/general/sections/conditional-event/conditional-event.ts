@@ -31,27 +31,14 @@ export class ConditionalEventSection implements ISection {
 
     const {variableName, variableEvent} = this.businessObjInPanel.eventDefinitions[0];
 
-    if (variableEvent !== undefined) {
-      this.variableEvent = this.businessObjInPanel.eventDefinitions[0].variableEvent;
-    } else {
-      this.variableEvent = '';
-    }
-
-    if (variableName !== undefined) {
-      this.variableName = this.businessObjInPanel.eventDefinitions[0].variableName;
-    } else {
-      this.variableName = '';
-    }
-
+    this.variableEvent = (variableEvent === undefined) ? '' : variableEvent;
+    this.variableName = (variableName === undefined) ? '' : variableName;
   }
 
   private _getConditionalElement(): IModdleElement {
-    if (this.businessObjInPanel.eventDefinitions[0].condition !== undefined) {
-      return this.businessObjInPanel.eventDefinitions[0].condition;
-    } else {
-      const conditionalEventDefinition: IModdleElement = this.moddle.create('bpmn:FormalExpression', {body: ''});
-      return conditionalEventDefinition;
-    }
+    const {condition} = this.businessObjInPanel.eventDefinitions[0];
+    const conditionalEventDefinition: IModdleElement = this.moddle.create('bpmn:FormalExpression', {body: ''});
+    return (condition === undefined) ? conditionalEventDefinition : condition;
   }
 
   public isSuitableForElement(element: IShape): boolean {
