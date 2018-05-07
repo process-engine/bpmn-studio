@@ -24,4 +24,7 @@ export interface IModdleElement {
   body?: string;
   variableName?: string;
   variableEvent?: string;
+  timeDuration?: IModdleElement;
+  timeCycle?: IModdleElement;
+  timeDate?: IModdleElement;
 }

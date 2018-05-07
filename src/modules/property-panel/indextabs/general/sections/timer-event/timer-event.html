@@ -1,0 +1,34 @@
+<template>
+  <require from="./timer-event.css"></require>
+  <require from="../../../../styles/sections.css"></require>
+  <div class="panel panel--grow">
+    <div class="panel__heading">
+      Timer Event
+    </div>
+    <div class="panel__content">
+      <table class="props-table">
+        <tr>
+          <td>
+            <select class="props-input" value.bind="timerType" change.delegate="updateTimerType()">
+              <option model.bind="undefined">-Choose Option-</option>
+              <option model.bind="TimerType.Date">Date</option>
+              <option model.bind="TimerType.Duration">Duration</option>
+              <option model.bind="TimerType.Cycle">Cycle</option>
+            </select>
+          </td>
+        </tr>
+      </table>
+      <table show.bind="timerType !== undefined" class="props-table probs-table--details">
+        <tr>
+          <th>Timer Definition</th>
+          <td>
+            <input type="text" class="props-input" value.bind="timerElement.body" change.delegate="updateTimerDefinition()">
+          </td>
+          <td>
+            <span class="glyphicon glyphicon-remove-circle props-table--clear-button" click.delegate="clearDefinition()"></span>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</template>
