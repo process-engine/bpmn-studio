@@ -14,8 +14,6 @@ export class ConditionalEventSection implements ISection {
   private businessObjInPanel: IModdleElement;
   private moddle: IBpmnModdle;
 
-  private isBoundaryEvent: boolean = true;
-
   public conditionalElement: IModdleElement;
   public variableName: string;
   public variableEvent: string;
@@ -31,16 +29,15 @@ export class ConditionalEventSection implements ISection {
   private _init(): void {
     this.conditionalElement = this._getConditionalElement();
 
-    const elementHasVariableName: boolean = this.businessObjInPanel.eventDefinitions[0].variableName !== undefined;
-    const elementHasVariableEvent: boolean = this.businessObjInPanel.eventDefinitions[0].variableEvent !== undefined;
+    const {variableName, variableEvent} = this.businessObjInPanel.eventDefinitions[0];
 
-    if (elementHasVariableEvent) {
+    if (variableEvent !== undefined) {
       this.variableEvent = this.businessObjInPanel.eventDefinitions[0].variableEvent;
     } else {
       this.variableEvent = '';
     }
 
-    if (elementHasVariableName) {
+    if (variableName !== undefined) {
       this.variableName = this.businessObjInPanel.eventDefinitions[0].variableName;
     } else {
       this.variableName = '';
@@ -58,24 +55,10 @@ export class ConditionalEventSection implements ISection {
   }
 
   public isSuitableForElement(element: IShape): boolean {
-    if (this._elementIsConditionalEvent(element)) {
-      this.isBoundaryEvent = this._elementIsBoundaryEvent(element);
-      return true;
-    }
-    return false;
-  }
-
-  private _elementIsConditionalEvent(element: IShape): boolean {
     return element !== undefined
         && element.businessObject !== undefined
         && element.businessObject.eventDefinitions !== undefined
         && element.businessObject.eventDefinitions[0].$type === 'bpmn:ConditionalEventDefinition';
-  }
-
-  private _elementIsBoundaryEvent(element: IShape): boolean {
-    return element !== undefined
-        && element.businessObject !== undefined
-        && element.businessObject.$type === 'bpmn:BoundaryEvent';
   }
 
   public updateConditionalElement(): void {
@@ -97,9 +80,11 @@ export class ConditionalEventSection implements ISection {
 
   public clearVariableName(): void {
     this.variableName = '';
+    this.updateVariableName();
   }
 
   public clearVariableEvent(): void {
     this.variableEvent = '';
+    this.updateVariableEvent();
   }
 }
