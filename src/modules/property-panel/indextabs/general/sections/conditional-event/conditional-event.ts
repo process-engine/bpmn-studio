@@ -14,7 +14,7 @@ export class ConditionalEventSection implements ISection {
   private businessObjInPanel: IModdleElement;
   private moddle: IBpmnModdle;
 
-  public conditionalElement: IModdleElement;
+  public conditionBody: string;
   public variableName: string;
   public variableEvent: string;
 
@@ -27,18 +27,15 @@ export class ConditionalEventSection implements ISection {
   }
 
   private _init(): void {
-    this.conditionalElement = this._getConditionalElement();
-
-    const {variableName, variableEvent} = this.businessObjInPanel.eventDefinitions[0];
+    const {variableName, variableEvent, condition} = this.businessObjInPanel.eventDefinitions[0];
 
     this.variableEvent = (variableEvent === undefined) ? '' : variableEvent;
     this.variableName = (variableName === undefined) ? '' : variableName;
+    this.conditionBody = (condition === undefined) ? '' : condition.body;
   }
 
-  private _getConditionalElement(): IModdleElement {
-    const {condition} = this.businessObjInPanel.eventDefinitions[0];
-    const conditionalEventDefinition: IModdleElement = this.moddle.create('bpmn:FormalExpression', {body: ''});
-    return (condition === undefined) ? conditionalEventDefinition : condition;
+  private _createCondition(): IModdleElement {
+    return this.moddle.create('bpmn:FormalExpression', {body: ''});
   }
 
   public isSuitableForElement(element: IShape): boolean {
@@ -49,8 +46,9 @@ export class ConditionalEventSection implements ISection {
   }
 
   public updateConditionalElement(): void {
-    const conditionalElement: IModdleElement = this._getConditionalElement();
-    conditionalElement.body = this.conditionalElement.body;
+    const condition: IModdleElement = this._createCondition();
+    condition.body = this.conditionBody;
+    this.businessObjInPanel.eventDefinitions[0].condition = condition;
   }
 
   public updateVariableName(): void {
@@ -62,7 +60,8 @@ export class ConditionalEventSection implements ISection {
   }
 
   public clearCondition(): void {
-    this.conditionalElement.body = '';
+    this.conditionBody = '';
+    this.updateConditionalElement();
   }
 
   public clearVariableName(): void {
