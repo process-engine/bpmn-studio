@@ -13,6 +13,7 @@ export class ConditionalEventSection implements ISection {
 
   private businessObjInPanel: IModdleElement;
   private moddle: IBpmnModdle;
+  private conditionObject: IModdleElement;
 
   public conditionBody: string;
   public variableName: string;
@@ -32,10 +33,9 @@ export class ConditionalEventSection implements ISection {
     this.variableEvent = (variableEvent === undefined) ? '' : variableEvent;
     this.variableName = (variableName === undefined) ? '' : variableName;
     this.conditionBody = (condition === undefined) ? '' : condition.body;
-  }
 
-  private _createCondition(): IModdleElement {
-    return this.moddle.create('bpmn:FormalExpression', {body: ''});
+    this.conditionObject = this.moddle.create('bpmn:FormalExpression', {body: this.conditionBody});
+    this.businessObjInPanel.eventDefinitions[0].condition = this.conditionObject;
   }
 
   public isSuitableForElement(element: IShape): boolean {
@@ -45,10 +45,8 @@ export class ConditionalEventSection implements ISection {
         && element.businessObject.eventDefinitions[0].$type === 'bpmn:ConditionalEventDefinition';
   }
 
-  public updateConditionalElement(): void {
-    const condition: IModdleElement = this._createCondition();
-    condition.body = this.conditionBody;
-    this.businessObjInPanel.eventDefinitions[0].condition = condition;
+  public updateCondition(): void {
+    this.businessObjInPanel.eventDefinitions[0].condition.body = this.conditionBody;
   }
 
   public updateVariableName(): void {
@@ -61,7 +59,7 @@ export class ConditionalEventSection implements ISection {
 
   public clearCondition(): void {
     this.conditionBody = '';
-    this.updateConditionalElement();
+    this.updateCondition();
   }
 
   public clearVariableName(): void {
