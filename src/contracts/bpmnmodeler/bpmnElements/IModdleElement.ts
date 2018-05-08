@@ -20,8 +20,11 @@ export interface IModdleElement {
   lanes?: Array<IModdleElement>;
   participants?: Array<IModdleElement>;
   default?: IModdleElement;
+  condition?: IModdleElement;
+  body?: string;
+  variableName?: string;
+  variableEvent?: string;
   timeDuration?: IModdleElement;
   timeCycle?: IModdleElement;
   timeDate?: IModdleElement;
-  body?: string;
 }
