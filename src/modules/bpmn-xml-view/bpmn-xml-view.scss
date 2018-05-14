@@ -16,9 +16,13 @@ pre {
 
 .xml-view {
   display: flex;
-  overflow-y: scroll;
-  overflow-x: scroll;
+  overflow-y: hidden;
+  overflow-x: hidden;
   height: 100%;
+}
+
+.xml-view__pre {
+  width: unset;
 }
 
 .hljs-tag {
