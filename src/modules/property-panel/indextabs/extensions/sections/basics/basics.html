@@ -10,7 +10,7 @@
     </div>
     <div class="panel__content">
       <table>
-        <tr repeat.for="property of properties" index.bind="$index">
+        <tr repeat.for="property of properties" index.bind="$index" class="key-value-row">
           <td class="key-value-column">
             <input type="text" class="key-value-input" value.bind="newNames[$index]" placeholder="Name" change.delegate="changeName($index)">
           </td>
@@ -18,7 +18,7 @@
             <input type="text" class="key-value-input" value.bind="newValues[$index]" placeholder="Value" change.delegate="changeValue($index)">
           </td>
           <td>
-            <button class="extensions-remove" click.delegate="removeProperty($index)">x</button>
+            <button class="extensions-remove-button" click.delegate="removeProperty($index)">x</button>
           </td>
         </tr>
       </table>
