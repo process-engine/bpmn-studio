@@ -8,6 +8,7 @@
 }
 
 .diagramm {
+  position: relative;
   height: 100%;
   padding-right: 0;
   flex: 1;
@@ -166,6 +167,14 @@
 
 .bpmn-io-layout__main {
   flex: 1 100%;
+}
+
+.slack_help-icon{
+  position: absolute;
+  padding: 5px;
+  right: 85px;
+  bottom: 23px;
+  font-size: 26px;
 }
 
 /*
