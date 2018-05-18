@@ -10,16 +10,29 @@
       </a>
     </div>
     <div class="status-bar__center-bar"></div>
-    <div class="status-bar__right-bar" if.bind="showXMLButton">
-      <div class="status-bar__element" if.bind="!xmlIsShown">
-        <button class="status-bar__show-xml-button" click.delegate="toggleXMLView()">
-          <i class="fa fa-file-code-o"></i> Show XML
-        </button>
+    <div class="status-bar__right-bar">
+      <div if.bind="showXMLButton">
+        <div class="status-bar__element" if.bind="!xmlIsShown">
+          <button class="status-bar__show-xml-button" click.delegate="toggleXMLView()">
+            <i class="fa fa-file-code-o"></i> Show XML
+          </button>
+        </div>
+        <div class="status-bar__element" if.bind="xmlIsShown">
+          <button class="status-bar__show-xml-button" click.delegate="toggleXMLView()">
+            <i class="fa fa-file-code-o"></i> Show Diagramm
+          </button>
+        </div>
       </div>
-      <div class="status-bar__element" if.bind="xmlIsShown">
-        <button class="status-bar__show-xml-button" click.delegate="toggleXMLView()">
-          <i class="fa fa-file-code-o"></i> Show Diagramm
-        </button>
+      <div class="help_dropup status-bar__element">
+        <button class="status-bar__help-menu">
+            <i class="fa fa-medkit"></i> Need help?
+          </button>
+        <div class="help_dropup-content">
+          <a target="_blank" href="https://github.com/process-engine/bpmn-studio"><i class="fa fa-github"></i> Github</a>
+          <a target="_blank" href="#"><i class="fa fa-slack"></i> Slack</a>
+          <a target="_blank" href="https://twitter.com/process_engine"><i class="fa fa-twitter"></i> Twitter</a>
+          <a href="mailto:hello@process-engine.io"><i class="fa fa-envelope"></i> Mail</a>
+        </div>
       </div>
     </div>
   </div>
