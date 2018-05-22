@@ -16,7 +16,7 @@
 }
 
 .panel__heading {
-  padding: 5px 10px;
+  padding: 10px 10px 15px 10px;
   font-weight: 400;
   color: #a5a5a5;
 }
@@ -69,9 +69,8 @@
   color: black;
   float: right;
   border-radius: 2px;
-  background-color: whitesmoke;
   border: 1px solid darkgray;
-  padding: 2px 7px;
+  padding: 4px 7px;
 }
 
 .remove-context-button:disabled {

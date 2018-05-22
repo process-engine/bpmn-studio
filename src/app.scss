@@ -1,7 +1,10 @@
+@import './resources/scss/reset.scss';
+
 html,
 body {
   height: 100%;
   font-size: 14px;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 a:focus,
