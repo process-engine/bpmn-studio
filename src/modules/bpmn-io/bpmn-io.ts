@@ -56,6 +56,7 @@ export class BpmnIo {
   private lastCanvasRight: number = 350;
   private lastPpWidth: number = this.ppWidth;
   private _ppHiddenBecauseLackOfSpace: boolean = false;
+  private _propertyPanelHasNoSpace: boolean = false;
 
   private toggleMinimap: boolean = false;
   private minimapToggle: any;
@@ -218,7 +219,7 @@ export class BpmnIo {
 
   public togglePanel(): void {
     if (this.toggled === true) {
-      if (this._ppHiddenBecauseLackOfSpace) {
+      if (this._propertyPanelHasNoSpace) {
         this.notificationService.showNotification(NotificationType.ERROR, 'There is not enough space for the property panel!');
         return;
       }
@@ -311,16 +312,29 @@ export class BpmnIo {
 
     const notEnoughSpaceForPp: boolean = this.maxWidth < this.minWidth;
     if (notEnoughSpaceForPp) {
-      this._ppHiddenBecauseLackOfSpace = true;
-      this.toggled = false;
-      this.togglePanel();
+      if (this._propertyPanelHasNoSpace) {
+        return;
+      }
+
+      this._propertyPanelHasNoSpace = true;
+
+      if (this.toggled === false) {
+        this._ppHiddenBecauseLackOfSpace = true;
+        this.togglePanel();
+      }
+
       return;
     }
 
-    if (this._ppHiddenBecauseLackOfSpace) {
-      this._ppHiddenBecauseLackOfSpace = false;
-      this.toggled = true;
-      this.togglePanel();
+    if (this._propertyPanelHasNoSpace) {
+      this._propertyPanelHasNoSpace = false;
+
+      if (this._ppHiddenBecauseLackOfSpace) {
+        this.toggled = true;
+        this._ppHiddenBecauseLackOfSpace = false;
+        this.togglePanel();
+      }
+
       return;
     }
 
