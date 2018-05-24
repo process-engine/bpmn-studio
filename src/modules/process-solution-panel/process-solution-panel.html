@@ -3,7 +3,7 @@
   <div class="process-explorer__solution-explorer">
     <div class="process-explorer__heading">Process Solution Explorer</div>
     <div repeat.for="process of processes.data" class="process-explorer__structure-item">
-      <a href="#/processdef/${process.id}/detail"><i class="fa fa-sitemap process-explorer__icon"></i>${process.name}</a>
+      <a click.delegate="changeProcess(process)"><i class="fa fa-sitemap process-explorer__icon"></i>${process.name}</a>
     </div>
   </div>
 </template>

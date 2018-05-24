@@ -49,4 +49,8 @@ export class ProcessSolutionPanel {
       subscription.dispose();
     }
   }
+
+  public changeProcess(process: IProcessDefEntity): void {
+    this._router.navigate(`#/processdef/${process.id}/detail`);
+  }
 }
