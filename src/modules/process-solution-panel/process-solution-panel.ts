@@ -51,6 +51,7 @@ export class ProcessSolutionPanel {
   }
 
   public changeProcess(process: IProcessDefEntity): void {
+    this._eventAggregator.publish(environment.events.navBar.updateProcess, process);
     this._router.navigate(`#/processdef/${process.id}/detail`);
   }
 }
