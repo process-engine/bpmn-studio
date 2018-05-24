@@ -57,7 +57,9 @@ export class CallActivitySection implements ISection {
       const processDef: IProcessDefEntity = this.allProcesses.data.find((process: IProcessDefEntity) => {
         return processId === process.id;
       });
+
       await this.generalService.updateProcessDef(processDef, xml);
+
       this.router.navigate(`/processdef/${this.selectedProcess.id}/detail`);
     });
   }
