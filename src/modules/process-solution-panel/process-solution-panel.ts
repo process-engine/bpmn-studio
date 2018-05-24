@@ -6,20 +6,23 @@ import {
   IProcessDefEntity,
 } from '@process-engine/bpmn-studio_client';
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
+import { Router } from 'aurelia-router';
 import {AuthenticationStateEvent} from '../../contracts/index';
 import environment from '../../environment';
 
-@inject('BpmnStudioClient', EventAggregator)
+@inject('BpmnStudioClient', EventAggregator, Router)
 export class ProcessSolutionPanel {
   private _bpmnStudioClient: BpmnStudioClient;
   private _subscriptions: Array<Subscription>;
   private _eventAggregator: EventAggregator;
+  private _router: Router;
 
   public processes: IPagination<IProcessDefEntity>;
 
-  constructor(bpmnStudioClient: BpmnStudioClient, eventAggregator: EventAggregator) {
+  constructor(bpmnStudioClient: BpmnStudioClient, eventAggregator: EventAggregator, router: Router) {
     this._bpmnStudioClient = bpmnStudioClient;
     this._eventAggregator = eventAggregator;
+    this._router = router;
     this._refreshProcesslist();
   }
 
@@ -45,5 +48,10 @@ export class ProcessSolutionPanel {
     for (const subscription of this._subscriptions) {
       subscription.dispose();
     }
+  }
+
+  public changeProcess(process: IProcessDefEntity): void {
+    this._eventAggregator.publish(environment.events.navBar.updateProcess, process);
+    this._router.navigate(`#/processdef/${process.id}/detail`);
   }
 }

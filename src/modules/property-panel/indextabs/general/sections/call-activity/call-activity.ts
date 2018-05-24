@@ -1,4 +1,5 @@
 import {IPagination, IProcessDefEntity} from '@process-engine/bpmn-studio_client';
+import { EventAggregator } from 'aurelia-event-aggregator';
 import {inject} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 import {
@@ -8,9 +9,10 @@ import {
   ISection,
   IShape,
 } from '../../../../../../contracts';
+import environment from '../../../../../../environment';
 import {GeneralService} from '../../service/general.service';
 
-@inject(GeneralService, Router)
+@inject(GeneralService, Router, EventAggregator)
 export class CallActivitySection implements ISection {
 
   public path: string = '/sections/call-activity/call-activity';
@@ -23,10 +25,12 @@ export class CallActivitySection implements ISection {
   private businessObjInPanel: ICallActivityElement;
   private generalService: GeneralService;
   private router: Router;
+  private _eventAggregator: EventAggregator;
 
-  constructor(generalService?: GeneralService, router?: Router) {
+  constructor(generalService?: GeneralService, router?: Router, eventAggregator?: EventAggregator) {
     this.generalService = generalService;
     this.router = router;
+    this._eventAggregator = eventAggregator;
   }
 
   public async activate(model: IPageModel): Promise<void> {
@@ -53,7 +57,10 @@ export class CallActivitySection implements ISection {
       const processDef: IProcessDefEntity = this.allProcesses.data.find((process: IProcessDefEntity) => {
         return processId === process.id;
       });
+
       await this.generalService.updateProcessDef(processDef, xml);
+
+      this._eventAggregator.publish(environment.events.navBar.updateProcess, this.selectedProcess);
       this.router.navigate(`/processdef/${this.selectedProcess.id}/detail`);
     });
   }

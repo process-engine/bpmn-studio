@@ -18,6 +18,8 @@ export class NavBar {
   public exportSpinner: HTMLElement;
   public exportIcon: HTMLElement;
 
+  private _lastProcess: IProcessDefEntity;
+
   constructor(router: Router, eventAggregator: EventAggregator) {
     this._router = router;
     this._eventAggregator = eventAggregator;
@@ -32,6 +34,7 @@ export class NavBar {
 
     this._eventAggregator.subscribe(environment.events.navBar.showTools, (process: IProcessDefEntity) => {
       this.showTools = true;
+      this._lastProcess = this.process;
       this.process = process;
     });
 
@@ -40,6 +43,7 @@ export class NavBar {
     });
 
     this._eventAggregator.subscribe(environment.events.navBar.updateProcess, (process: IProcessDefEntity) => {
+      this._lastProcess = this.process;
       this.process = process;
     });
 
@@ -61,6 +65,7 @@ export class NavBar {
   }
 
   public navigateBack(): void {
+    this._eventAggregator.publish(environment.events.navBar.updateProcess, this._lastProcess);
     this._router.navigateBack();
   }
 
