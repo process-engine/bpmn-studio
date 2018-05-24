@@ -60,6 +60,7 @@ export class CallActivitySection implements ISection {
 
       await this.generalService.updateProcessDef(processDef, xml);
 
+      this._eventAggregator.publish(environment.events.navBar.updateProcess, this.selectedProcess);
       this.router.navigate(`/processdef/${this.selectedProcess.id}/detail`);
     });
   }
