@@ -1,26 +1,25 @@
 <template>
   <require from="./user-login.css"></require>
-  <div class="btn-group user-login">
-    <a href="#" class="dropdown-toggle dropdown-toggle--user-login" data-toggle="dropdown">
+  <div class="user-login">
+    <a href="#" class="user-login-dropdown__toggle" click.delegate="toggleDropdown()">
       <span>${identity ? identity.name : 'Guest'} </span>
       <i class="fa fa-caret-down"></i>
     </a>
-    <div class="dropdown-menu dropdown-menu-right user-profile-dropdown">
-      <div class="user-profile-dropdown-content clearfix">
-        <form if.bind="!isLoggedIn" submit.delegate="login()" role="form">
-          <div class="form-group">
-            <label for="loginUsername">Username</label>
-            <input id="loginUsername" class="form-control" type="text" value.bind="username" placeholder="Username" />
-          </div>
-          <div class="form-group">
-            <label for="loginPassword">Password</label>
-            <input id="loginPassword" class="form-control" type="password" value.bind="password" placeholder="Password" />
-          </div>
-          <p if.bind="loginError" class="text-danger"><b>Error</b>: ${loginError}</p>
-          <button class="btn btn-success pull-right" type="submit">Login</button>
-        </form>
-        <button if.bind="isLoggedIn" class="btn btn-danger pull-right" click.delegate="logout()">Logout</button>
+  </div>
+  <div class="user-login-dropdown" if.bind="dropdownIsOpen">
+    <div class="user-login-dropdown__content">
+      <div if.bind="!isLoggedIn">
+        <label for="loginUsername">Username</label>
+        <input id="loginUsername" class="form-control" type="text" value.bind="username" placeholder="Username" />
+
+        <label for="loginPassword">Password</label>
+        <input id="loginPassword" class="form-control" type="password" value.bind="password" placeholder="Password" />
+
+        <p if.bind="loginError" class="text-danger"><b>Error</b>: ${loginError}</p>
+        <button class="login-button" click.delegate="login()">Login</button>
       </div>
+      <button if.bind="isLoggedIn" class="btn btn-danger pull-right" click.delegate="logout()">Logout</button>
     </div>
   </div>
+
 </template>
