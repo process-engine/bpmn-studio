@@ -14,15 +14,14 @@ export class UserLogin {
   @bindable()
   private loginError: string;
 
+  public dropdownIsOpen: boolean = false;
+
   constructor(authenticationService: IAuthenticationService) {
     this.authenticationService = authenticationService;
-    this.windowClickListener = (event: MouseEvent): void => {
-      const node: Node = event.target as Node;
-      if (this.dropdown.contains(node)) {
-        return;
-      }
-      this.closeDropdown();
-    };
+  }
+
+  public toggleDropdown(): void {
+    this.dropdownIsOpen = !this.dropdownIsOpen;
   }
 
   public get hasValidInput(): boolean {
@@ -34,10 +33,10 @@ export class UserLogin {
   public async login(): Promise<void> {
     try {
       await this.authenticationService.login(this.username, this.password);
-      this.closeDropdown();
       this.username = null;
       this.password = null;
       this.loginError = null;
+      this.toggleDropdown();
     } catch (error) {
       this.loginError = error.message;
     }
@@ -45,27 +44,7 @@ export class UserLogin {
 
   public logout(): void {
     this.authenticationService.logout();
-    this.closeDropdown();
-  }
-
-  public toggleDropdown(): void {
-    if (this.dropdown.classList.contains('open')) {
-      this.closeDropdown();
-    } else {
-      this.openDropdown();
-    }
-  }
-
-  public openDropdown(): void {
-    this.dropdown.classList.add('open');
-    setTimeout(() => {
-      window.addEventListener('click', this.windowClickListener);
-    });
-  }
-
-  public closeDropdown(): void {
-    this.dropdown.classList.remove('open');
-    window.removeEventListener('click', this.windowClickListener);
+    this.toggleDropdown();
   }
 
   @computedFrom('authenticationService.tokenRepository.token')

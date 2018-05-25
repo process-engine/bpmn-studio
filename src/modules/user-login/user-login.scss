@@ -1,18 +1,22 @@
-.user-profile-image {
-  height: 20px;
-  border-radius: 50%;
-}
-
 .user-profile-dropdown {
-  top: 27px;
-  right: -16px;
+  position: absolute;
+  background-color: whitesmoke;
+  top: 40px;
+  right: 33px;
   width: 250px;
   border: 2px solid #dcdbdb;
   border-radius: 0;
+  z-index: 1;
 }
 
 .user-profile-dropdown-content {
   padding: 10px;
+}
+
+.user-profile-dropdown-content
+label {
+  float: left;
+  margin: 10px 0 0 0;
 }
 
 .user-login a {
@@ -22,4 +26,15 @@
 .dropdown-toggle--user-login {
   padding: 13px;
   cursor: pointer;
+}
+
+.login-button {
+  margin: 10px 0;
+  float: right;
+  background-color: whitesmoke
+}
+
+.login-button:focus {
+  outline: 1px dotted #212121;
+  outline: 5px auto -webkit-focus-ring-color;
 }
