@@ -1,13 +1,13 @@
 <template>
   <require from="./user-login.css"></require>
   <div class="user-login">
-    <a href="#" class="dropdown-toggle--user-login" click.delegate="toggleDropdown()">
+    <a href="#" class="user-login-dropdown__toggle" click.delegate="toggleDropdown()">
       <span>${identity ? identity.name : 'Guest'} </span>
       <i class="fa fa-caret-down"></i>
     </a>
   </div>
-  <div class="user-profile-dropdown" if.bind="dropdownIsOpen">
-    <div class="user-profile-dropdown-content">
+  <div class="user-login-dropdown" if.bind="dropdownIsOpen">
+    <div class="user-login-dropdown__content">
       <div if.bind="!isLoggedIn">
         <label for="loginUsername">Username</label>
         <input id="loginUsername" class="form-control" type="text" value.bind="username" placeholder="Username" />

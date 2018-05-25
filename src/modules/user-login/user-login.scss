@@ -1,4 +1,4 @@
-.user-profile-dropdown {
+.user-login-dropdown {
   position: absolute;
   background-color: whitesmoke;
   top: 40px;
@@ -9,11 +9,11 @@
   z-index: 1;
 }
 
-.user-profile-dropdown-content {
+.user-login-dropdown__content {
   padding: 10px;
 }
 
-.user-profile-dropdown-content
+.user-profile-dropdown__content
 label {
   float: left;
   margin: 10px 0 0 0;
@@ -23,7 +23,7 @@ label {
  color: #5c5c5c;
 }
 
-.dropdown-toggle--user-login {
+.user-login-dropdown__toggle {
   padding: 13px;
   cursor: pointer;
 }
