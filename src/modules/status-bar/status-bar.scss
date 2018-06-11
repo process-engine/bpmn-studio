@@ -71,26 +71,26 @@
 }
 
 .status-bar__help-menu {
-  background: inherit;
-  border: none;
   padding: 0;
+  border: none;
+  background: inherit;
 }
 
 .help_dropup-content {
-  display: none;
   position: absolute;
-  background-color: #f1f1f1;
-  min-width: 160px;
   bottom: 20px;
   z-index: 1;
+  display: none;
+  min-width: 160px;
+  background-color: #f1f1f1;
 }
 
 .help_dropup-content a {
+  padding: 12px 16px;
+  display: block;
   color: black;
   font-size: 12px;
-  padding: 12px 16px;
   text-decoration: none;
-  display: block;
 }
 
 .help_dropup-content a:hover {
