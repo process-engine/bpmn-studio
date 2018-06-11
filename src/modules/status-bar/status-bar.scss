@@ -76,7 +76,7 @@
   background: inherit;
 }
 
-.help_dropup-content {
+.help-dropup__content {
   position: absolute;
   bottom: 20px;
   z-index: 1;
@@ -85,7 +85,7 @@
   background-color: #f1f1f1;
 }
 
-.help_dropup-content a {
+.help-dropup__content a {
   padding: 12px 16px;
   display: block;
   color: black;
@@ -93,10 +93,10 @@
   text-decoration: none;
 }
 
-.help_dropup-content a:hover {
+.help-dropup__content a:hover {
   background-color: #ccc
 }
 
-.help_dropup:hover .help_dropup-content {
+.help_dropup:hover .help-dropup__content {
   display: block;
 }
