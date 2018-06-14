@@ -45,7 +45,7 @@ pipeline {
         }
         nodejs(configId: env.NPM_RC_FILE, nodeJSInstallationName: env.NODE_JS_VERSION) {
           sh('node --version')
-          sh('pnpm install')
+          sh('pnpm install --shamefully-flatten')
           sh('npm rebuild node-sass')
         }
       }
@@ -97,7 +97,7 @@ pipeline {
             // we copy the node_modules folder from the main slave
             // which runs linux. Some dependencies may not be installed
             // if they have a os restriction in their package.json
-            sh('pnpm install')
+            sh('pnpm install --shamefully-flatten')
             sh('npm run jenkins-electron-install-app-deps')
             sh('npm run jenkins-electron-rebuild-native')
 
@@ -197,7 +197,7 @@ pipeline {
         unstash('windows_results')
         nodejs(configId: env.NPM_RC_FILE, nodeJSInstallationName: env.NODE_JS_VERSION) {
           dir('.ci-tools') {
-            sh('pnpm install')
+            sh('pnpm install --shamefully-flatten')
           }
           withCredentials([
             string(credentialsId: 'process-engine-ci_token', variable: 'RELEASE_GH_TOKEN')
