@@ -61,7 +61,7 @@ pipeline {
         sh('node --version')
         sh('npm run build')
         sh("npm version ${full_electron_release_version_string} --allow-same-version --force --no-git-tag-version")
-        stash(includes: 'node_modules/, scripts/, package.json', name: 'post_build')
+        stash(includes: 'scripts/, package.json', name: 'post_build')
       }
     }
     stage('build electron') {
@@ -76,6 +76,7 @@ pipeline {
           steps {
             unstash('post_build')
             sh('node --version')
+            sh('pnpm install --shamefully-flatten --force')
             sh('npm run jenkins-electron-install-app-deps')
             sh('npm run jenkins-electron-rebuild-native')
             sh('npm run jenkins-electron-build-linux')
@@ -121,6 +122,7 @@ pipeline {
           steps {
             unstash('post_build')
             sh('node --version')
+            sh('pnpm install --shamefully-flatten --force')
             sh('npm run jenkins-electron-install-app-deps')
             sh('npm run jenkins-electron-rebuild-native')
             sh('npm run jenkins-electron-build-windows')
