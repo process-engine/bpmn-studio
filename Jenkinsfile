@@ -97,7 +97,7 @@ pipeline {
             // we copy the node_modules folder from the main slave
             // which runs linux. Some dependencies may not be installed
             // if they have a os restriction in their package.json
-            sh('pnpm install --shamefully-flatten')
+            sh('pnpm install --shamefully-flatten --force')
             sh('npm run jenkins-electron-install-app-deps')
             sh('npm run jenkins-electron-rebuild-native')
 
