@@ -416,13 +416,25 @@ export class ProcessDefDetail {
   private async _exportPNG(): Promise<void> {
     const svg: string = await this.bpmnio.getSVG();
 
-    download(this._generateImageFromSVG('png', svg), `${this.process.name}.png`, 'image/png');
+    try {
+      const imageURL: string = await this._generateImageFromSVG('png', svg);
+      download(imageURL, `${this.process.name}.png`, 'image/png');
+    } catch (error) {
+      this._notificationService.showNotification(NotificationType.ERROR,
+        `An error occurred while processing the image for exporting.`);
+    }
   }
 
   private async _exportJPEG(): Promise<void> {
     const svg: string = await this.bpmnio.getSVG();
 
-    download(this._generateImageFromSVG('jpeg', svg), `${this.process.name}.jpeg`, 'image/jpeg');
+    try {
+      const imageURL: string = await this._generateImageFromSVG('jpeg', svg);
+      download(imageURL, `${this.process.name}.jpeg`, 'image/jpeg');
+    } catch (error) {
+      this._notificationService.showNotification(NotificationType.ERROR,
+        `An error occurred while processing the image for exporting.`);
+    }
   }
 
   /**
