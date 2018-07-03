@@ -434,9 +434,15 @@ export class ProcessDefDetail {
    */
   public async _printDiagram(): Promise<void> {
     const svg: string = await this.bpmnio.getSVG();
-    const png: string = await this._generateImageFromSVG('png', svg);
 
-    print.default({printable: png, type: 'image'});
+    try {
+      const png: string = await this._generateImageFromSVG('png', svg);
+      print.default({printable: png, type: 'image'});
+    } catch (error) {
+      this._notificationService.showNotification(
+        NotificationType.ERROR,
+        `An error occurred while processing the image for printing.`);
+    }
   }
 
   private async _generateImageFromSVG(desiredImageType: string, svg: any): Promise<string> {
