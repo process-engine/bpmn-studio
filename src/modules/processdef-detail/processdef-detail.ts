@@ -434,12 +434,12 @@ export class ProcessDefDetail {
    */
   public async _printDiagram(): Promise<void> {
     const svg: string = await this.bpmnio.getSVG();
-    const png: string = this._generateImageFromSVG('png', svg);
+    const png: string = await this._generateImageFromSVG('png', svg);
 
     print.default({printable: png, type: 'image'});
   }
 
-  private _generateImageFromSVG(desiredImageType: string, svg: any): string {
+  private async _generateImageFromSVG(desiredImageType: string, svg: any): Promise<string> {
     const encoding: string = `image/${desiredImageType}`;
     const canvas: HTMLCanvasElement = document.createElement('canvas');
     const context: CanvasRenderingContext2D = canvas.getContext('2d');
@@ -461,22 +461,50 @@ export class ProcessDefDetail {
     canvas.width = svgWidth * pixelRatio;
     canvas.height = svgHeight * pixelRatio;
 
-    const canvgOptions: ICanvgOptions = {
-      ignoreDimensions: true,
-      scaleWidth: canvas.width,
-      scaleHeight: canvas.height,
-    };
+    const imgDOMElement: HTMLImageElement = document.createElement('img');
+    imgDOMElement.setAttribute('src', 'data:image/svg+xml;base64,' + btoa(svg));
 
-    canvg(canvas, svg, canvgOptions);
+    // Draw the image to the canvas
+    const imageDataURL: string = await this._drawImageToCanvas(imgDOMElement, canvas, context, encoding);
 
     // make the background white for every format
     context.globalCompositeOperation = 'destination-over';
     context.fillStyle = 'white';
     context.fillRect(0, 0, canvas.width, canvas.height);
 
-    // get image as base64 datastring
-    const image: string = canvas.toDataURL(encoding);
-    return image;
+    return imageDataURL;
+  }
+
+  /**
+   * Draws a given image Element into a canvas and returns a base64
+   * encoded DataURL that points to the drawn image.
+   *
+   * @param imageElement Image element, that should be drawn to the Canvas.
+   * @param canvas Canvas element, in which the image should be drawn.
+   * @param context Context of the canvas element.
+   * @param encoding Encoding of the drawn image.
+   */
+  private async _drawImageToCanvas(
+    imageElement: HTMLImageElement, canvas: HTMLCanvasElement,
+    context: CanvasRenderingContext2D, encoding: string): Promise<string> {
+
+    const returnPromise: Promise<string> = new Promise((resolve: any, reject: any): void => {
+      imageElement.onload = (): void => {
+        context.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
+        const encodedImage: string = canvas.toDataURL(encoding);
+        resolve(encodedImage);
+      };
+
+      imageElement.onerror = (): void => {
+        /*
+         * TODO: Find out if we can reject the promise with a more specify
+         * error here.
+         */
+        reject();
+      };
+    });
+
+    return returnPromise;
   }
 
   /**
