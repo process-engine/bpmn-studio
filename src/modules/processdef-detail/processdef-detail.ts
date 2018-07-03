@@ -461,11 +461,8 @@ export class ProcessDefDetail {
     canvas.width = svgWidth * pixelRatio;
     canvas.height = svgHeight * pixelRatio;
 
-    const imgDOMElement: HTMLImageElement = document.createElement('img');
-    imgDOMElement.setAttribute('src', 'data:image/svg+xml;base64,' + btoa(svg));
-
     // Draw the image to the canvas
-    const imageDataURL: string = await this._drawImageToCanvas(imgDOMElement, canvas, context, encoding);
+    const imageDataURL: string = await this._drawSVGToCanvas(svg, canvas, context, encoding);
 
     // make the background white for every format
     context.globalCompositeOperation = 'destination-over';
@@ -475,18 +472,23 @@ export class ProcessDefDetail {
     return imageDataURL;
   }
 
-  /**
-   * Draws a given image Element into a canvas and returns a base64
-   * encoded DataURL that points to the drawn image.
-   *
-   * @param imageElement Image element, that should be drawn to the Canvas.
-   * @param canvas Canvas element, in which the image should be drawn.
-   * @param context Context of the canvas element.
-   * @param encoding Encoding of the drawn image.
-   */
-  private async _drawImageToCanvas(
-    imageElement: HTMLImageElement, canvas: HTMLCanvasElement,
-    context: CanvasRenderingContext2D, encoding: string): Promise<string> {
+/**
+ * Draws a given SVG image to a Canvas and converts it to an image.
+ *
+ * @param svgContent SVG Content that should be drawn to the image.
+ * @param canvas Canvas, in which the SVG image should be drawn.
+ * @param context Context of the Canvas.
+ * @param encoding Encoding of the output image.
+ * @returns The URL which points to the rendered image.
+ */
+  private async _drawSVGToCanvas(
+    svgContent: string,
+    canvas: HTMLCanvasElement,
+    context: CanvasRenderingContext2D,
+    encoding: string): Promise<string> {
+
+    const imageElement: HTMLImageElement = document.createElement('img');
+    imageElement.setAttribute('src', `data:image/svg+xml;base64, ${btoa(svgContent)}`);
 
     const returnPromise: Promise<string> = new Promise((resolve: any, reject: any): void => {
       imageElement.onload = (): void => {
@@ -495,12 +497,12 @@ export class ProcessDefDetail {
         resolve(encodedImage);
       };
 
-      imageElement.onerror = (): void => {
+      imageElement.onerror = (cause: any): void => {
         /*
          * TODO: Find out if we can reject the promise with a more specify
          * error here.
          */
-        reject();
+        reject(cause);
       };
     });
 
