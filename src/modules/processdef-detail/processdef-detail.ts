@@ -495,8 +495,8 @@ export class ProcessDefDetail {
     const returnPromise: Promise<string> = new Promise((resolve: any, reject: any): void => {
       imageElement.onload = (): void => {
         context.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
-        const encodedImage: string = canvas.toDataURL(encoding);
-        resolve(encodedImage);
+        const encodedImageURL: string = canvas.toDataURL(encoding);
+        resolve(encodedImageURL);
       };
 
       imageElement.onerror = (cause: any): void => {
