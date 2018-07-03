@@ -400,6 +400,10 @@ export class ProcessDefDetail {
   }
 
   //  Exporting Functions - Probably an ExportService is a better idea {{{ //
+
+  /**
+   * Exports the current diagramm as a *.bpmn xml file.
+   */
   private async _exportBPMN(): Promise<void> {
     const xml: string = await this.bpmnio.getXML();
     const formattedXml: string = beautify(xml);
@@ -407,12 +411,20 @@ export class ProcessDefDetail {
     download(formattedXml, `${this.process.name}.bpmn`, 'application/bpmn20-xml');
   }
 
+  /**
+   * Exports the current Diagram as a SVG file and prompts the user to save
+   * the exported file.
+   */
   private async _exportSVG(): Promise<void> {
     const svg: string = await this.bpmnio.getSVG();
 
     download(svg, `${this.process.name}.svg`, 'image/svg+xml');
   }
 
+  /**
+   * Exports the current Diagram as a PNG file and prompts the user to save
+   * the exported file.
+   */
   private async _exportPNG(): Promise<void> {
     const svg: string = await this.bpmnio.getSVG();
 
@@ -425,6 +437,10 @@ export class ProcessDefDetail {
     }
   }
 
+  /**
+   * Exports the current Diagram as a JPEG file and prompts the user to save
+   * the exported file.
+   */
   private async _exportJPEG(): Promise<void> {
     const svg: string = await this.bpmnio.getSVG();
 
