@@ -488,7 +488,9 @@ export class ProcessDefDetail {
     encoding: string): Promise<string> {
 
     const imageElement: HTMLImageElement = document.createElement('img');
-    imageElement.setAttribute('src', `data:image/svg+xml;base64, ${btoa(svgContent)}`);
+    const encodedSVG: string = btoa(svgContent);
+
+    imageElement.setAttribute('src', `data:image/svg+xml;base64, ${encodedSVG}`);
 
     const returnPromise: Promise<string> = new Promise((resolve: any, reject: any): void => {
       imageElement.onload = (): void => {
