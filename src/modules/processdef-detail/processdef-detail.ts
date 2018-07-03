@@ -439,8 +439,7 @@ export class ProcessDefDetail {
       const png: string = await this._generateImageFromSVG('png', svg);
       print.default({printable: png, type: 'image'});
     } catch (error) {
-      this._notificationService.showNotification(
-        NotificationType.ERROR,
+      this._notificationService.showNotification(NotificationType.ERROR,
         `An error occurred while processing the image for printing.`);
     }
   }
