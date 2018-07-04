@@ -4,14 +4,12 @@ import {Redirect, Router} from 'aurelia-router';
 import {ValidateEvent, ValidationController} from 'aurelia-validation';
 
 import {IProcessDefEntity} from '@process-engine/process_engine_contracts';
-import * as canvg from 'canvg-browser';
 import * as download from 'downloadjs';
 import * as print from 'print-js';
 import * as beautify from 'xml-beautifier';
 
 import {
   AuthenticationStateEvent,
-  ICanvgOptions,
   IExtensionElement,
   IFormElement,
   IModdleElement,
@@ -400,6 +398,10 @@ export class ProcessDefDetail {
   }
 
   //  Exporting Functions - Probably an ExportService is a better idea {{{ //
+
+  /**
+   * Exports the current diagramm as a *.bpmn xml file.
+   */
   private async _exportBPMN(): Promise<void> {
     const xml: string = await this.bpmnio.getXML();
     const formattedXml: string = beautify(xml);
@@ -407,22 +409,46 @@ export class ProcessDefDetail {
     download(formattedXml, `${this.process.name}.bpmn`, 'application/bpmn20-xml');
   }
 
+  /**
+   * Exports the current Diagram as a SVG file and prompts the user to save
+   * the exported file.
+   */
   private async _exportSVG(): Promise<void> {
     const svg: string = await this.bpmnio.getSVG();
 
     download(svg, `${this.process.name}.svg`, 'image/svg+xml');
   }
 
+  /**
+   * Exports the current Diagram as a PNG file and prompts the user to save
+   * the exported file.
+   */
   private async _exportPNG(): Promise<void> {
     const svg: string = await this.bpmnio.getSVG();
 
-    download(this._generateImageFromSVG('png', svg), `${this.process.name}.png`, 'image/png');
+    try {
+      const imageURL: string = await this._generateImageFromSVG('png', svg);
+      download(imageURL, `${this.process.name}.png`, 'image/png');
+    } catch (error) {
+      this._notificationService.showNotification(NotificationType.ERROR,
+        `An error occurred while processing the image for exporting.`);
+    }
   }
 
+  /**
+   * Exports the current Diagram as a JPEG file and prompts the user to save
+   * the exported file.
+   */
   private async _exportJPEG(): Promise<void> {
     const svg: string = await this.bpmnio.getSVG();
 
-    download(this._generateImageFromSVG('jpeg', svg), `${this.process.name}.jpeg`, 'image/jpeg');
+    try {
+      const imageURL: string = await this._generateImageFromSVG('jpeg', svg);
+      download(imageURL, `${this.process.name}.jpeg`, 'image/jpeg');
+    } catch (error) {
+      this._notificationService.showNotification(NotificationType.ERROR,
+        `An error occurred while processing the image for exporting.`);
+    }
   }
 
   /**
@@ -434,12 +460,17 @@ export class ProcessDefDetail {
    */
   public async _printDiagram(): Promise<void> {
     const svg: string = await this.bpmnio.getSVG();
-    const png: string = this._generateImageFromSVG('png', svg);
 
-    print.default({printable: png, type: 'image'});
+    try {
+      const png: string = await this._generateImageFromSVG('png', svg);
+      print.default({printable: png, type: 'image'});
+    } catch (error) {
+      this._notificationService.showNotification(NotificationType.ERROR,
+        `An error occurred while processing the image for printing.`);
+    }
   }
 
-  private _generateImageFromSVG(desiredImageType: string, svg: any): string {
+  private async _generateImageFromSVG(desiredImageType: string, svg: string): Promise<string> {
     const encoding: string = `image/${desiredImageType}`;
     const canvas: HTMLCanvasElement = document.createElement('canvas');
     const context: CanvasRenderingContext2D = canvas.getContext('2d');
@@ -461,22 +492,69 @@ export class ProcessDefDetail {
     canvas.width = svgWidth * pixelRatio;
     canvas.height = svgHeight * pixelRatio;
 
-    const canvgOptions: ICanvgOptions = {
-      ignoreDimensions: true,
-      scaleWidth: canvas.width,
-      scaleHeight: canvas.height,
-    };
-
-    canvg(canvas, svg, canvgOptions);
-
-    // make the background white for every format
-    context.globalCompositeOperation = 'destination-over';
+    // Make the background white for every format
     context.fillStyle = 'white';
     context.fillRect(0, 0, canvas.width, canvas.height);
 
-    // get image as base64 datastring
-    const image: string = canvas.toDataURL(encoding);
-    return image;
+    // Draw the image to the canvas
+    const imageDataURL: string = await this._drawSVGToCanvas(svg, canvas, context, encoding);
+
+    return imageDataURL;
+  }
+
+/**
+ * Draws a given SVG image to a Canvas and converts it to an image.
+ *
+ * @param svgContent SVG Content that should be drawn to the image.
+ * @param canvas Canvas, in which the SVG image should be drawn.
+ * @param context Context of the Canvas.
+ * @param encoding Encoding of the output image.
+ * @returns The URL which points to the rendered image.
+ */
+  private async _drawSVGToCanvas(
+    svgContent: string,
+    canvas: HTMLCanvasElement,
+    context: CanvasRenderingContext2D,
+    encoding: string): Promise<string> {
+
+    const imageElement: HTMLImageElement = document.createElement('img');
+
+    /*
+     * This makes sure, that the base64 encoded SVG does not contain any
+     * escaped html characters (such as &lt; instead of <).
+     *
+     * TODO: The unescape Method is marked as deprecated.
+     * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/unescape
+     *
+     * The problem is, that the replacement method decodeURI does not work in this case
+     * (it behaves kinda different in some situations).
+     * Event the MDN use the unescape method to solve this kind of problem:
+     * https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/btoa#Unicode_strings
+     *
+     * There is an npm packet that implements the original unescape function.
+     * Maybe we can use this to make sure that this won't cause any
+     * problems in the future.
+     */
+    const encodedSVG: string = btoa(unescape(encodeURIComponent(svgContent)));
+    imageElement.setAttribute('src', `data:image/svg+xml;base64, ${encodedSVG}`);
+
+    const loadImagePromise: Promise<string> = new Promise((resolve: Function, reject: Function): void => {
+      imageElement.onload = (): void => {
+        context.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
+        const encodedImageURL: string = canvas.toDataURL(encoding);
+        resolve(encodedImageURL);
+      };
+
+      imageElement.onerror = (errorEvent: ErrorEvent): void => {
+        /*
+         * TODO: Find out if we can reject the promise with a more specific
+         * error here.
+         */
+        reject(errorEvent);
+      };
+    });
+
+    return loadImagePromise;
   }
 
   /**
