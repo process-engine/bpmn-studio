@@ -538,7 +538,7 @@ export class ProcessDefDetail {
     const encodedSVG: string = btoa(unescape(encodeURIComponent(svgContent)));
     imageElement.setAttribute('src', `data:image/svg+xml;base64, ${encodedSVG}`);
 
-    const returnPromise: Promise<string> = new Promise((resolve: Function, reject: Function): void => {
+    const loadImagePromise: Promise<string> = new Promise((resolve: Function, reject: Function): void => {
       imageElement.onload = (): void => {
         context.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
         const encodedImageURL: string = canvas.toDataURL(encoding);
@@ -554,7 +554,7 @@ export class ProcessDefDetail {
       };
     });
 
-    return returnPromise;
+    return loadImagePromise;
   }
 
   /**
