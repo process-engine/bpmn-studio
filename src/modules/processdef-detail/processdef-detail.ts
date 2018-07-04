@@ -472,7 +472,7 @@ export class ProcessDefDetail {
     }
   }
 
-  private async _generateImageFromSVG(desiredImageType: string, svg: any): Promise<string> {
+  private async _generateImageFromSVG(desiredImageType: string, svg: string): Promise<string> {
     const encoding: string = `image/${desiredImageType}`;
     const canvas: HTMLCanvasElement = document.createElement('canvas');
     const context: CanvasRenderingContext2D = canvas.getContext('2d');
@@ -540,19 +540,19 @@ export class ProcessDefDetail {
     const encodedSVG: string = btoa(unescape(encodeURIComponent(svgContent)));
     imageElement.setAttribute('src', `data:image/svg+xml;base64, ${encodedSVG}`);
 
-    const returnPromise: Promise<string> = new Promise((resolve: any, reject: any): void => {
+    const returnPromise: Promise<string> = new Promise((resolve: Function, reject: Function): void => {
       imageElement.onload = (): void => {
         context.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
         const encodedImageURL: string = canvas.toDataURL(encoding);
         resolve(encodedImageURL);
       };
 
-      imageElement.onerror = (cause: any): void => {
+      imageElement.onerror = (errorEvent: ErrorEvent): void => {
         /*
          * TODO: Find out if we can reject the promise with a more specify
          * error here.
          */
-        reject(cause);
+        reject(errorEvent);
       };
     });
 
