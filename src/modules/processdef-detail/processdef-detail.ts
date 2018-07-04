@@ -521,8 +521,24 @@ export class ProcessDefDetail {
     encoding: string): Promise<string> {
 
     const imageElement: HTMLImageElement = document.createElement('img');
-    const encodedSVG: string = btoa(svgContent);
 
+    /*
+     * This makes sure, that the base64 encoded SVG does not contain any
+     * escaped html characters (such as &lt; instead of <).
+     *
+     * TODO: The unescape Method is marked as deprecated.
+     * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/unescape
+     *
+     * The problem is, that the replacement method decodeURI does not work in this case
+     * (it behaves kinda different in some situations).
+     * Event the MDN use the unescape method to solve this kind of problem:
+     * https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/btoa#Unicode_strings
+     *
+     * There is an npm packet that implements the original unescape function.
+     * Maybe we can use this to make sure that this won't cause any
+     * problems in the future.
+     */
+    const encodedSVG: string = btoa(unescape(encodeURIComponent(svgContent)));
     imageElement.setAttribute('src', `data:image/svg+xml;base64, ${encodedSVG}`);
 
     const returnPromise: Promise<string> = new Promise((resolve: any, reject: any): void => {
