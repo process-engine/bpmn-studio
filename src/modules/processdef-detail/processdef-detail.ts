@@ -494,13 +494,12 @@ export class ProcessDefDetail {
     canvas.width = svgWidth * pixelRatio;
     canvas.height = svgHeight * pixelRatio;
 
-    // Draw the image to the canvas
-    const imageDataURL: string = await this._drawSVGToCanvas(svg, canvas, context, encoding);
-
-    // make the background white for every format
-    context.globalCompositeOperation = 'destination-over';
+    // Make the background white for every format
     context.fillStyle = 'white';
     context.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw the image to the canvas
+    const imageDataURL: string = await this._drawSVGToCanvas(svg, canvas, context, encoding);
 
     return imageDataURL;
   }
