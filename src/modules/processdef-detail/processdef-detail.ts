@@ -4,14 +4,12 @@ import {Redirect, Router} from 'aurelia-router';
 import {ValidateEvent, ValidationController} from 'aurelia-validation';
 
 import {IProcessDefEntity} from '@process-engine/process_engine_contracts';
-import * as canvg from 'canvg-browser';
 import * as download from 'downloadjs';
 import * as print from 'print-js';
 import * as beautify from 'xml-beautifier';
 
 import {
   AuthenticationStateEvent,
-  ICanvgOptions,
   IExtensionElement,
   IFormElement,
   IModdleElement,
