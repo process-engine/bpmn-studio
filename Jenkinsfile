@@ -45,7 +45,7 @@ pipeline {
         }
         nodejs(configId: env.NPM_RC_FILE, nodeJSInstallationName: env.NODE_JS_VERSION) {
           sh('node --version')
-          sh('npm install')
+          sh('pnpm install --shamefully-flatten')
           sh('npm rebuild node-sass')
         }
       }
@@ -61,13 +61,13 @@ pipeline {
         sh('node --version')
         sh('npm run build')
         sh("npm version ${full_electron_release_version_string} --allow-same-version --force --no-git-tag-version")
-        stash(includes: 'node_modules/, scripts/, package.json', name: 'post_build')
+        stash(includes: 'scripts/, package.json', name: 'post_build')
       }
     }
     stage('build electron') {
-      when {
-        expression { branch_is_master || branch_is_develop }
-      }
+      // when {
+      //   expression { branch_is_master || branch_is_develop }
+      // }
       parallel {
         stage('Build on Linux') {
           agent {
@@ -76,6 +76,7 @@ pipeline {
           steps {
             unstash('post_build')
             sh('node --version')
+            sh('pnpm install --shamefully-flatten --force')
             sh('npm run jenkins-electron-install-app-deps')
             sh('npm run jenkins-electron-rebuild-native')
             sh('npm run jenkins-electron-build-linux')
@@ -97,7 +98,7 @@ pipeline {
             // we copy the node_modules folder from the main slave
             // which runs linux. Some dependencies may not be installed
             // if they have a os restriction in their package.json
-            sh('npm install')
+            sh('pnpm install --shamefully-flatten --force')
             sh('npm run jenkins-electron-install-app-deps')
             sh('npm run jenkins-electron-rebuild-native')
 
@@ -121,6 +122,7 @@ pipeline {
           steps {
             unstash('post_build')
             sh('node --version')
+            sh('pnpm install --shamefully-flatten --force')
             sh('npm run jenkins-electron-install-app-deps')
             sh('npm run jenkins-electron-rebuild-native')
             sh('npm run jenkins-electron-build-windows')
@@ -197,7 +199,7 @@ pipeline {
         unstash('windows_results')
         nodejs(configId: env.NPM_RC_FILE, nodeJSInstallationName: env.NODE_JS_VERSION) {
           dir('.ci-tools') {
-            sh('npm install')
+            sh('pnpm install --shamefully-flatten')
           }
           withCredentials([
             string(credentialsId: 'process-engine-ci_token', variable: 'RELEASE_GH_TOKEN')
