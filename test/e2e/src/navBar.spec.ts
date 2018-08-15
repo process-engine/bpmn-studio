@@ -1,7 +1,7 @@
 import * as path from 'path';
-import {browser, by, element, ElementArrayFinder, ElementFinder, protractor, ProtractorExpectedConditions} from 'protractor';
+import {browser, by, element, ElementFinder, protractor, ProtractorExpectedConditions} from 'protractor';
 
-describe('nav-bar', () => {
+fdescribe('nav-bar', () => {
   const aureliaUrl: string = browser.params.aureliaUrl;
   const defaultTimeoutMS: number = browser.params.defaultTimeoutMS;
 
@@ -32,39 +32,46 @@ describe('nav-bar', () => {
   });
 
   it('should contain login button', () => {
-    const loginButton: ElementFinder = navBar.element(by.tagName('user-login'))
-                                             .element(by.className('user-login'))
-                                             .element(by.buttonText('login'));
+    const loginButton: ElementFinder = navBar.element(by.id('userLoginButton'));
     loginButton.isDisplayed().then((result: boolean) => {
       expect(result).toBeTruthy();
     });
   });
 
   it('should contain solution explorer button', () => {
-    const navBarButtons: ElementArrayFinder = navBar.all(by.className('menu__menu-tabbed-link'));
+    const navbarSolutionExplorerButton: ElementFinder = navBar.element(by.id('navbarSolutionExplorerButton'));
 
-    // check if at least 1 button is available (solution-explorer)
-    navBarButtons.count().then((result: number) => {
-      expect(result).toBeGreaterThanOrEqual(1);
+    // check if button is available
+    navbarSolutionExplorerButton.isDisplayed().then((result: boolean) => {
+      expect(result).toBeTruthy();
     });
 
-    // check if solution explorer button is highlighted
-    navBarButtons.all(by.tagName('button')).get(0).click().then(() => {
+    // check if solution explorer button is enabled
+    navbarSolutionExplorerButton.getAttribute('class').then((attribute: Object) => {
+      expect(attribute).not.toContain('menu-tabbed-link--disabled');
+    });
+
+    // check if solution explorer button is highlighted when clicked
+    navbarSolutionExplorerButton.click().then(() => {
       expect(navBar.element(by.className('solution-explorer--active')).element.length).toBe(1);
     });
   });
 
-    // @TODO Add IDs in frontend !!!
   it('should contain plan button', () => {
-    const navBarButtons: ElementArrayFinder = navBar.all(by.className('menu__menu-tabbed-link'));
+    const navbarPlanLink: ElementFinder = navBar.element(by.id('navbarPlanLink'));
 
-    // check if at least 2 buttons are available (solution-explorer, plan)
-    navBarButtons.count().then((result: number) => {
-      expect(result).toBeGreaterThanOrEqual(2);
+    // check if button is available
+    navbarPlanLink.isDisplayed().then((result: boolean) => {
+      expect(result).toBeTruthy();
+    });
+
+    // check if plan view is enabled
+    navbarPlanLink.getAttribute('class').then((attribute: Object) => {
+      expect(attribute).not.toContain('menu-tabbed-link--disabled');
     });
 
     // check if plan view opens
-    navBarButtons.all(by.tagName('a')).get(0).click().then(() => {
+    navbarPlanLink.click().then(() => {
       browser.getCurrentUrl().then((url: string) => {
         expect(url).toMatch('processdef');
       });
@@ -72,39 +79,52 @@ describe('nav-bar', () => {
   });
 
   it('should contain design button', () => {
-    const navBarButtons: ElementArrayFinder = navBar.all(by.className('menu__menu-tabbed-link'));
+    const navbarDesignLink: ElementFinder = navBar.element(by.id('navbarDesignLink'));
 
-    // check if at least 3 buttons are available (solution-explorer, plan, design)
-    navBarButtons.count().then((result: number) => {
-      expect(result).toBeGreaterThanOrEqual(3);
+    // check if button is available
+    navbarDesignLink.isDisplayed().then((result: boolean) => {
+      expect(result).toBeTruthy();
     });
 
     // check if design view is disabled
-    expect(navBarButtons.all(by.tagName('a')).get(1).element(by.className('menu-tabbed-link--disabled')).element.length).toBe(1);
+    navbarDesignLink.getAttribute('class').then((attribute: Object) => {
+      expect(attribute).toContain('menu-tabbed-link--disabled');
+    });
   });
 
   it('should contain publish button', () => {
-    const navBarButtons: ElementArrayFinder = navBar.all(by.className('menu__menu-tabbed-link'));
+    const navbarPublishLink: ElementFinder = navBar.element(by.id('navbarPublishLink'));
 
-    // check if at least 3 buttons are available (solution-explorer, plan, design, publish)
-    navBarButtons.count().then((result: number) => {
-      expect(result).toBeGreaterThanOrEqual(4);
-    });
-
-    // check if publish view is disabled
-    expect(navBarButtons.all(by.tagName('a')).get(2).element(by.className('menu-tabbed-link--disabled')).element.length).toBe(1);
-  });
-
-  it('should contain dashboard button', () => {
-    const navBarButtons: ElementArrayFinder = navBar.all(by.className('menu__menu-tabbed-link'));
-
-    // check if at least 3 buttons are available (solution-explorer, plan, design, publish, dashboard)
-    navBarButtons.count().then((result: number) => {
-      expect(result).toBeGreaterThanOrEqual(5);
+    // check if button is available
+    navbarPublishLink.isDisplayed().then((result: boolean) => {
+      expect(result).toBeTruthy();
     });
 
     // check if design view is disabled
-    expect(navBarButtons.all(by.tagName('a')).get(3).element(by.className('menu-tabbed-link--disabled')).element.length).toBe(1);
+    navbarPublishLink.getAttribute('class').then((attribute: Object) => {
+      expect(attribute).toContain('menu-tabbed-link--disabled');
+    });
+  });
+
+  it('should contain dashboard button', () => {
+    const navbarDashboardLink: ElementFinder = navBar.element(by.id('navbarDashboardLink'));
+
+    // check if button is available
+    navbarDashboardLink.isDisplayed().then((result: boolean) => {
+      expect(result).toBeTruthy();
+    });
+
+    // check if design view is enabled
+    navbarDashboardLink.getAttribute('class').then((attribute: Object) => {
+      expect(attribute).not.toContain('menu-tabbed-link--disabled');
+    });
+
+    // check if dashboard view opens
+    navbarDashboardLink.click().then(() => {
+      browser.getCurrentUrl().then((url: string) => {
+        expect(url).toMatch('dashboard');
+      });
+    });
   });
 
   afterEach(() => {
