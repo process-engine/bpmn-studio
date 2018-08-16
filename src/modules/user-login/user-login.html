@@ -1,10 +1,10 @@
 <template>
   <require from="./user-login.css"></require>
   <div class="user-login" ref="userLogin">
-    <button show.bind="!isLoggedIn" click.delegate="login()">login</button>
+    <button id="userLoginButton" show.bind="!isLoggedIn" click.delegate="login()">login</button>
     <div show.bind="isLoggedIn">
       <span>${username}</span>
-      <button click.delegate="logout()">logout</button>
+      <button id="userLogoutButton" click.delegate="logout()">logout</button>
     </div>
   </div>
 </template>
