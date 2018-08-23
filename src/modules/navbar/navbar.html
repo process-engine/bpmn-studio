@@ -5,7 +5,8 @@
     <div class="menu-bar__menu menu-bar__menu--left">
       <div class="menu__menu-tabbed-link">
         <button class="menu-tabbed-link action-button" class.bind="solutionExplorerIsActive ? 'solution-explorer--active' : ''" click.delegate="toggleSolutionExplorer()" title="Toggle visibility of the Solution Explorer">
-          <i class="fas fa-project-diagram"></i>
+          <span if.bind="solutionExplorerIsActive"><i class="fas fa-caret-left"></i><i class="far fa-window-maximize solution-explorer__main-icon"></i></span>
+          <span else><i class="far fa-window-maximize solution-explorer__main-icon"></i><i class="fas fa-caret-right"></i></span>
         </button>
       </div>
       <div class="menu__menu-tabbed-link"
