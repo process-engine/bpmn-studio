@@ -57,6 +57,7 @@ export function configure(aurelia: Aurelia): void {
     .feature('modules/diagram-validation-service')
     .feature('modules/management-api_client')
     .feature('modules/authentication')
+    .feature('modules/inspect-correlation')
     .feature('modules/solution-explorer-services')
     .plugin('aurelia-bootstrap')
     .plugin('aurelia-validation')

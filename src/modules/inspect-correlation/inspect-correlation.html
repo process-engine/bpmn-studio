@@ -1,0 +1,9 @@
+<template>
+  <require from="./inspect-correlation.css"></require>
+  <div class="inspect-correlation__correlation-list">
+    <div class="inspect-correlation__heading">Correlations</div>
+    <div repeat.for="correlation of processModelCorrelations" class="inspect-correlation__correlation-item">
+      <a>${correlation.id}</a>
+    </div>
+  </div>
+</template>

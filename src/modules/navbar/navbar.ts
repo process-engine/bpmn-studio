@@ -106,6 +106,10 @@ export class NavBar {
     this._router.navigateBack();
   }
 
+  public navigateToInspect(): void {
+    this._router.navigateToRoute('inspect', {processModelId: this.process.id});
+  }
+
   public toggleSolutionExplorer(): void {
     this.solutionExplorerIsActive = !this.solutionExplorerIsActive;
     this._eventAggregator.publish(environment.events.processSolutionPanel.toggleProcessSolutionExplorer);

@@ -185,6 +185,12 @@ export class App {
         name: 'waiting-room',
         moduleId: 'modules/waiting-room/waiting-room',
       },
+      {
+        route: 'process/:processModelId/inspect',
+        title: 'Inspect',
+        name: 'inspect',
+        moduleId: 'modules/inspect-correlation/inspect-correlation',
+      },
     ]);
 
     this._openIdConnect.configure(config);

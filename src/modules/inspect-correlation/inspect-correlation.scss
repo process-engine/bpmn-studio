@@ -1,0 +1,35 @@
+.inspect-correlation__correlation-list {
+  position: absolute;
+  top: 50%;
+  width: 220px;
+  height: 75%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: #f7f7f7;
+  border-top: 2px solid #dcdbdb;
+  border-right: 2px solid #dcdbdb;
+  border-bottom: 2px solid #dcdbdb;
+  transform: translateY(-50%);
+  user-select: none;
+}
+
+.inspect-correlation__heading {
+  padding: 8px;
+  margin-bottom: 10px;
+  cursor: default;
+  font-weight: 500;
+  color: #a5a5a5;
+}
+
+.inspect-correlation__correlation-item {
+  padding: 2px 10px;
+  overflow: hidden;
+  cursor: pointer;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.inspect-correlation__correlation-item a {
+  padding-left: 10px;
+  color: #5c5c5c;
+}

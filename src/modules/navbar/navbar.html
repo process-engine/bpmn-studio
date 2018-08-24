@@ -52,6 +52,9 @@
         <button class="menu-bar__menu-center--action-button" click.delegate="printDiagram()" title="Print Diagram">
           <i class="fas fa-print"></i>
         </button>
+        <button class="menu-bar__menu-center--action-button" click.delegate="navigateToInspect()" title="Inspect">
+          <i class="fas fa-search"></i>
+        </button>
       </template>
       <template if.bind="showTools">
         <button class="menu-bar__menu-center--action-button" click.delegate="uploadProcess()" disabled.bind="validationError || disableDiagramUploadButton" title="Upload to ProcessEngine">
