@@ -24,6 +24,9 @@ export class InspectCorrelation {
   public canvasModel: HTMLElement;
   public currentToken: string;
   public currentLog: string;
+  public showToken: boolean;
+  public showLog: boolean;
+  public showDiagram: boolean;
 
   private _inspectCorrelationService: IInspectCorrelationService;
   private _notificationService: NotificationService;
@@ -93,6 +96,18 @@ export class InspectCorrelation {
 
     this.currentToken = `Token: ${lorem}`;
     this.currentLog = `Log ${lorem}`;
+  }
+
+  public toggleTokenVisibility(): void {
+    this.showToken = !this.showToken;
+  }
+
+  public toggleLogVisibility(): void {
+    this.showLog = !this.showLog;
+  }
+
+  public toggleDiagramVisibility(): void {
+    this.showDiagram = !this.showDiagram;
   }
 
   private async _importXml(xml: string): Promise <void> {

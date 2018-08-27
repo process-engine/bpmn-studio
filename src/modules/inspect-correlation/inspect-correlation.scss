@@ -49,23 +49,25 @@
 .inspect-correlation__canvas {
   width: 100%;
   height: 100%;
-  border: 1px solid #ccc;
 }
 
 .inspect-correlation__diagramViewer {
   height: calc(50% - 24px);
   margin-bottom: 36px;
+  border: 1px solid #ccc;
 }
 
 .inspect-correlation__tokenViewer {
   position: relative;
   height: calc(25% - 24px);
   margin-bottom: 36px;
+  border: 1px solid #ccc;
 }
 
 .inspect-correlation__logViewer {
   position: relative;
   height: calc(25% - 24px);
+  border: 1px solid #ccc;
 }
 
 .inspect-correlation__viewer-headline {
@@ -78,5 +80,8 @@
   bottom: 0px;
   top: 25px;
   overflow: auto;
-  border: 1px solid #ccc;
+}
+
+.inspect-correlation__viewer__hide {
+  height: 25px;
 }

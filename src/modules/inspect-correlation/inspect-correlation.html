@@ -8,15 +8,21 @@
       </div>
     </div>
     <div class="inspect-correlation__correlation-data" show.bind="correlationSelected">
-      <div class="inspect-correlation__diagramViewer">
+      <div class="inspect-correlation__diagramViewer"  class.bind="showDiagram ? '' : 'inspect-correlation__viewer__hide'">
+        <span class="inspect-correlation__viewer-headline" click.delegate="toggleDiagramVisibility()">
+          <i class="fas" class.bind="showDiagram ? 'fa-caret-down' : 'fa-caret-right inspect-correlation__viewer__hide'"></i> Diagram</span>
         <div ref="canvasModel" class="inspect-correlation__canvas"></div>
       </div>
-      <div class="inspect-correlation__tokenViewer">
-        <span class="inspect-correlation__viewer-headline">Token</span>
+      <div class="inspect-correlation__tokenViewer" class.bind="showToken ? '' : 'inspect-correlation__viewer__hide'">
+        <span class="inspect-correlation__viewer-headline" click.delegate="toggleTokenVisibility()">
+          <i class="fas" class.bind="showToken ? 'fa-caret-down' : 'fa-caret-right inspect-correlation__viewer__hide'"></i> Token
+        </span>
         <div class="inspect-correlation__viewer-body">${currentToken}</div>
       </div>
-      <div class="inspect-correlation__logViewer">
-        <span class="inspect-correlation__viewer-headline">Log</span>
+      <div class="inspect-correlation__logViewer" class.bind="showLog ? '' : 'inspect-correlation__viewer__hide'">
+        <span class="inspect-correlation__viewer-headline"  click.delegate="toggleLogVisibility()">
+          <i class="fas" class.bind="showLog ? 'fa-caret-down' : 'fa-caret-right inspect-correlation__viewer__hide'"></i> Log
+        </span>
         <div class="inspect-correlation__viewer-body">${currentLog}</div>
       </div>
     </div>
