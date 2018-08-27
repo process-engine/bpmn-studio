@@ -1,15 +1,23 @@
 <template>
   <require from="./inspect-correlation.css"></require>
-  <div style="width: 100%; height: 100%;">
-    <div class="inspect-correlation__correlation-list" style="float: left;">
+  <div class="inspect-correlation__view">
+    <div class="inspect-correlation__correlation-list">
       <div class="inspect-correlation__heading">Correlations</div>
       <div repeat.for="correlation of processModelCorrelations" class="inspect-correlation__correlation-item">
         <a click.delegate="selectCorrelation(correlation.processModelId)">${correlation.id}</a>
       </div>
     </div>
-    <div class="inspect-correlation__corelation-data">
-      <div class="diagramViewer">
+    <div class="inspect-correlation__correlation-data" show.bind="correlationSelected">
+      <div class="inspect-correlation__diagramViewer">
         <div ref="canvasModel" class="inspect-correlation__canvas"></div>
+      </div>
+      <div class="inspect-correlation__tokenViewer">
+        <span class="inspect-correlation__viewer-headline">Token</span>
+        <div class="inspect-correlation__viewer-body">${currentToken}</div>
+      </div>
+      <div class="inspect-correlation__logViewer">
+        <span class="inspect-correlation__viewer-headline">Log</span>
+        <div class="inspect-correlation__viewer-body">${currentLog}</div>
       </div>
     </div>
   </div>

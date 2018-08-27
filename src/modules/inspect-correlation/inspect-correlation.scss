@@ -1,15 +1,20 @@
+.inspect-correlation__view {
+  width: 100%;
+  height: 100%;
+  padding-bottom: 22px;
+}
+
 .inspect-correlation__correlation-list {
   position: relative;
   float: left;
+  left: 20px;
   top: 50%;
   width: 220px;
-  height: 75%;
+  height: 90.5%;
   overflow-x: hidden;
   overflow-y: auto;
   background-color: #f7f7f7;
-  border-top: 2px solid #dcdbdb;
-  border-right: 2px solid #dcdbdb;
-  border-bottom: 2px solid #dcdbdb;
+  border: 2px solid #dcdbdb;
   transform: translateY(-50%);
   user-select: none;
 }
@@ -35,19 +40,43 @@
   color: #5c5c5c;
 }
 
-.diagramViewer {
-  height: 300px;
-  border: 1px solid #ccc;
-}
-
-.inspect-correlation__corelation-data {
+.inspect-correlation__correlation-data {
   overflow: hidden;
-  padding-right: 35px;
-  padding-top: 35px;
-  padding-left: 35px;
+  padding: 35px;
+  height: 100%;
 }
 
 .inspect-correlation__canvas {
   width: 100%;
   height: 100%;
+  border: 1px solid #ccc;
+}
+
+.inspect-correlation__diagramViewer {
+  height: calc(50% - 24px);
+  margin-bottom: 36px;
+}
+
+.inspect-correlation__tokenViewer {
+  position: relative;
+  height: calc(25% - 24px);
+  margin-bottom: 36px;
+}
+
+.inspect-correlation__logViewer {
+  position: relative;
+  height: calc(25% - 24px);
+}
+
+.inspect-correlation__viewer-headline {
+  font-weight: 900;
+  font-size: 16px;
+}
+
+.inspect-correlation__viewer-body {
+  position: absolute;
+  bottom: 0px;
+  top: 25px;
+  overflow: auto;
+  border: 1px solid #ccc;
 }
