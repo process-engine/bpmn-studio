@@ -11,7 +11,7 @@
       <div class="inspect-correlation__diagramViewer"  class.bind="showDiagram ? '' : 'inspect-correlation__viewer__hide-data'">
         <span class="inspect-correlation__viewer-headline" click.delegate="toggleDiagramVisibility()">
           <i class="fas" class.bind="showDiagram ? 'fa-caret-down' : 'fa-caret-right'"></i> Diagram</span>
-        <div ref="canvasModel" class="inspect-correlation__canvas"></div>
+        <div ref="canvasModel" class="inspect-correlation__canvas" class.bind="showDiagram ? '' : 'inspect-correlation__canvas__hide'"></div>
       </div>
       <div class="inspect-correlation__tokenViewer" class.bind="showToken ? '' : 'inspect-correlation__viewer__hide-data'">
         <span class="inspect-correlation__viewer-headline" click.delegate="toggleTokenVisibility()">
