@@ -67,8 +67,9 @@ export class InspectCorrelation {
     this.correlationSelected = false;
   }
 
-  public async selectCorrelation(processModelId: string): Promise<void> {
+  public async selectCorrelation(selectedCorrelation: Correlation): Promise<void> {
     const managementContext: ManagementContext = this._getManagementContext();
+    const processModelId: string = selectedCorrelation.processModelId;
 
     this.correlationSelected = true;
 

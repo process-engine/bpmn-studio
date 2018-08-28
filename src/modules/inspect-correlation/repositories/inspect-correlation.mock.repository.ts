@@ -19,11 +19,11 @@ export class InspectCorrelationMockRepository implements IInspectCorrelationRepo
     },
     {
       id: 'heatmapSample4',
-      processModelId: '123124142',
+      processModelId: 'heatmap_sample',
     },
     {
       id: 'heatmapSample5',
-      processModelId: 'adalmvdfff',
+      processModelId: 'heatmap_sample',
     },
     {
       id: 'heatmapSample6',
@@ -31,11 +31,11 @@ export class InspectCorrelationMockRepository implements IInspectCorrelationRepo
     },
     {
       id: 'heatmapSample7',
-      processModelId: 'delgre123',
+      processModelId: 'heatmap_sample',
     },
     {
       id: 'heatmapSample8',
-      processModelId: 'asldkvfd',
+      processModelId: 'heatmap_sample',
     },
     {
       id: 'heatmapSample9',
@@ -43,7 +43,7 @@ export class InspectCorrelationMockRepository implements IInspectCorrelationRepo
     },
     {
       id: 'heatmapSample10',
-      processModelId: 'ok',
+      processModelId: 'heatmap_sample',
     },
   ];
 

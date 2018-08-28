@@ -1,11 +1,25 @@
 <template>
   <require from="./inspect-correlation.css"></require>
   <div class="inspect-correlation__view">
-    <div class="inspect-correlation__correlation-list">
-      <div class="inspect-correlation__heading">Correlations</div>
-      <div repeat.for="correlation of processModelCorrelations" class="inspect-correlation__correlation-item">
-        <a click.delegate="selectCorrelation(correlation.processModelId)">${correlation.id}</a>
-      </div>
+    <div class="inspect-correlation__correlations">
+      <table class="inspect-correlation__correlation-table">
+        <thead>
+          <tr class="inspect-correlation__correlation-table-headlines">
+            <th>Number</th>
+            <th>Started at</th>
+            <th>Status</th>
+            <th>User</th>
+          </tr>
+        </thead>
+        <tbody class="inspect-correlation__correlation-table-body">
+          <tr repeat.for="correlation of processModelCorrelations"click.delegate="selectCorrelation(correlation)">
+            <td>${correlation.id}</td>
+            <td>00.00.0000 00:00</td>
+            <td>Finished</td>
+            <td>No User</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
     <div class="inspect-correlation__correlation-data" show.bind="correlationSelected">
       <div class="inspect-correlation__diagramViewer"  class.bind="showDiagram ? '' : 'inspect-correlation__viewer__hide-data'">
