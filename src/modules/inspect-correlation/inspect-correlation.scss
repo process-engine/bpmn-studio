@@ -75,14 +75,17 @@
 }
 
 .inspect-correlation__viewer-headline {
-  font-weight: 900;
+  margin-left: 10px;
   font-size: 16px;
+  font-weight: 900;
 }
 
 .inspect-correlation__viewer-body {
   position: absolute;
-  bottom: 0px;
+  left: 5px;
   top: 25px;
+  bottom: 0px;
+  right: 5px;
   overflow: auto;
 }
 
