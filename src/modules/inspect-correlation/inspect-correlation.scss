@@ -85,9 +85,8 @@
 }
 
 .inspect-correlation__correlation-data {
-  overflow: hidden;
+  height: calc(100% - 175px - 20px);
   padding: 20px;
-  height: 100%;
 }
 
 .inspect-correlation__canvas {
