@@ -45,6 +45,14 @@ export class InspectCorrelationMockRepository implements IInspectCorrelationRepo
       id: 'heatmapSample10',
       processModelId: 'heatmap_sample',
     },
+    {
+      id: 'heatmapSample11',
+      processModelId: 'heatmap_sample',
+    },
+    {
+      id: 'heatmapSample12',
+      processModelId: 'heatmap_sample',
+    },
   ];
 
   public getAllCorrelationsForProcessModelId(processModelId: string): Promise<Array<Correlation>> {
