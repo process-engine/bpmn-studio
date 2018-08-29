@@ -21,19 +21,46 @@
   height: 100%;
 }
 
+.inspect-correlation__table-header {
+  position: relative;
+  display: block;
+}
+
 .inspect-correlation__correlation-table-headlines {
-  height: 30px;
+  width: 100%;
+  display: flex;
 }
 
 .inspect-correlation__correlation-table-headlines > th {
   font-weight: 900;
+  padding: 5px;
+  width: 25% !important;
+  text-overflow: ellipsis;
+  border: 1px solid #ccc;
   font-size: 18px;
-  border: 2px solid #ccc;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .inspect-correlation__correlation-table-body {
-  height: 20px;
+  height: 100%;
+  display: block;
+  overflow: auto;
+  height: 100%;
   cursor: pointer;
+}
+
+.inspect-correlation__correlation-table-body > tr {
+  display: flex;
+  width: 100%;
+}
+
+.inspect-correlation__correlation-table-body > tr > td{
+  width: 25% !important;
+  padding: 5px;
+  text-overflow: ellipsis;
+  border-bottom: 1px solid #ccc;
+  overflow: hidden;
 }
 
 .inspect-correlation__heading {
