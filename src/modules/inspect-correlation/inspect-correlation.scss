@@ -89,14 +89,6 @@
   padding: 20px;
 }
 
-.inspect-correlation__canvas {
-  position: absolute;
-  top: 25px;
-  left: 0px;
-  bottom: 0px;
-  right: 0px;
-}
-
 .inspect-correlation__diagramViewer {
   position: relative;
   height: calc(50% - 14px);
@@ -130,17 +122,21 @@
 
 .inspect-correlation__viewer-body {
   position: absolute;
-  left: 5px;
   top: 25px;
+  left: 0px;
   bottom: 0px;
   right: 5px;
   overflow: auto;
+}
+
+.inspect-correlation__viewer-body__left-space {
+  left: 5px;
 }
 
 .inspect-correlation__viewer__hide-data {
   height: 25px;
 }
 
-.inspect-correlation__canvas__hide {
+.inspect-correlation__diagram-canvas__hide {
   display: none;
 }
