@@ -91,7 +91,7 @@
 
 .inspect-correlation__canvas {
   position: absolute;
-  top: 0px;
+  top: 25px;
   left: 0px;
   bottom: 0px;
   right: 0px;
@@ -121,9 +121,6 @@
 }
 
 .inspect-correlation__viewer-headline {
-  position: absolute;
-  z-index: 1;
-  background: #f7f7f7;
   margin-left: 10px;
   font-size: 16px;
   font-weight: 900;
