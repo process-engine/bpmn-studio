@@ -102,6 +102,7 @@
   height: calc(50% - 14px);
   margin-bottom: 21px;
   border: 1px solid #ccc;
+  background: #f7f7f7;
 }
 
 .inspect-correlation__tokenViewer {
@@ -109,18 +110,20 @@
   height: calc(25% - 14px);
   margin-bottom: 21px;
   border: 1px solid #ccc;
+  background: #f7f7f7;
 }
 
 .inspect-correlation__logViewer {
   position: relative;
   height: calc(25% - 14px);
   border: 1px solid #ccc;
+  background: #f7f7f7;
 }
 
 .inspect-correlation__viewer-headline {
   position: absolute;
   z-index: 1;
-  background: white;
+  background: #f7f7f7;
   margin-left: 10px;
   font-size: 16px;
   font-weight: 900;
