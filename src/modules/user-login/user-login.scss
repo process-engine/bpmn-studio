@@ -17,6 +17,10 @@
   white-space: nowrap;
 }
 
+.user-login span {
+  padding-right:8px;
+}
+
 .user-login-dropdown__toggle {
   padding: 13px;
   cursor: pointer;
@@ -31,4 +35,17 @@
 
 .custom-button:focus {
   border-color: black;
+}
+
+.user-nav-button {
+  padding: 3px 10px;
+  background: #f7f7f7;
+  border: none;
+  font-weight: 400;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.user-nav-button:hover {
+  background: #5e5e5e;
+  color: #fff;
 }
