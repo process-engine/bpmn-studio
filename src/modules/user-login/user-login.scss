@@ -17,7 +17,7 @@
   white-space: nowrap;
 }
 
-.user-login span {
+.user-login__greeting {
   padding-right: 8px;
 }
 
@@ -37,7 +37,7 @@
   border-color: black;
 }
 
-.user-nav-button {
+.navbar__login-button, .navbar__logout-button {
   padding: 3px 10px;
   background: #f7f7f7;
   border: none;
@@ -45,7 +45,7 @@
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-.user-nav-button:hover {
+.navbar__login-button:hover, .navbar__logout-button:hover {
   background: #5e5e5e;
   color: #fff;
 }

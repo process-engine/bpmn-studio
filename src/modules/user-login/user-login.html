@@ -1,10 +1,10 @@
 <template>
   <require from="./user-login.css"></require>
   <div class="user-login" ref="userLogin">
-    <button class="user-nav-button" id="userLoginButton" show.bind="!isLoggedIn" click.delegate="login()"><i class="fa fa-sign-in-alt"></i> Login</button>
+    <button class="navbar__login-button" id="userLoginButton" show.bind="!isLoggedIn" click.delegate="login()"><i class="fa fa-sign-in-alt"></i> Login</button>
     <div show.bind="isLoggedIn">
-      <span><i class="fa fa-user-circle"></i> Hello, ${username}</span> |
-      <button class="user-nav-button" id="userLogoutButton" click.delegate="logout()"><i class="fa fa-sign-out-alt"></i> Logout</button>
+      <span class="user-login__greeting"><i class="fa fa-user-circle"></i> Hello, ${username}</span> |
+      <button class="navbar__logout-button" id="userLogoutButton" click.delegate="logout()"><i class="fa fa-sign-out-alt"></i> Logout</button>
     </div>
   </div>
 </template>
