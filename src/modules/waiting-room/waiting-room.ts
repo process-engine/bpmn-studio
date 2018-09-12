@@ -108,7 +108,9 @@ export class WaitingRoom {
       return activeCorrelation.id === this._correlationId;
     });
 
-    if (correlationIsNotActive && currentRetryAttempt >= this._maxPollingRetries) {
+    const stopRetrying: boolean = currentRetryAttempt >= this._maxPollingRetries;
+
+    if (correlationIsNotActive && stopRetrying) {
       this._correlationEndCallback();
     }
 
