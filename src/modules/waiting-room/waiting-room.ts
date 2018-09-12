@@ -26,7 +26,7 @@ export class WaitingRoom {
   private _managementApiClient: IManagementApiService;
   private _pollingTimer: NodeJS.Timer;
   private _processModelId: string;
-  private _maxPollingRetryCount: number = 5;
+  private _maxPollingRetries: number = 5;
 
   constructor(router: Router,
               notificationService: NotificationService,
@@ -62,18 +62,18 @@ export class WaitingRoom {
     });
   }
 
-  private async _startPolling(retryCount: number): Promise<void> {
+  private async _startPolling(currentRetryAttempt: number): Promise<void> {
     this._pollingTimer = setTimeout(async() => {
       const userTaskFound: boolean = await this._pollUserTasksForCorrelation();
-      const correlationIsStillActive: boolean = await this._pollIsCorrelationStillActive(retryCount);
+      const correlationIsStillActive: boolean = await this._pollIsCorrelationStillActive(currentRetryAttempt);
 
       if (userTaskFound) {
         return;
       }
 
-      retryCount = correlationIsStillActive ? 0 : retryCount + 1;
+      currentRetryAttempt = correlationIsStillActive ? 0 : currentRetryAttempt + 1;
 
-      this._startPolling(retryCount);
+      this._startPolling(currentRetryAttempt);
 
     }, environment.processengine.waitingRoomPollingIntervalInMs);
   }
@@ -99,7 +99,7 @@ export class WaitingRoom {
     return true;
   }
 
-  private async _pollIsCorrelationStillActive(retryCount: number): Promise<boolean> {
+  private async _pollIsCorrelationStillActive(currentRetryAttempt: number): Promise<boolean> {
 
     const managementContext: ManagementContext = this._getManagementContext();
     const allActiveCorrelations: Array<Correlation> = await this._managementApiClient.getAllActiveCorrelations(managementContext);
@@ -108,7 +108,7 @@ export class WaitingRoom {
       return activeCorrelation.id === this._correlationId;
     });
 
-    if (correlationIsNotActive && retryCount >= this._maxPollingRetryCount) {
+    if (correlationIsNotActive && currentRetryAttempt >= this._maxPollingRetries) {
       this._correlationEndCallback();
     }
 
