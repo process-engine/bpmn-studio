@@ -126,7 +126,7 @@ export class WaitingRoom {
     });
   }
 
-  private _correlationEndCallback: (() => void) = (): void => {
+  private _correlationEndCallback(): void {
     this._notificationService.showNotification(NotificationType.INFO, 'Process stopped.');
 
     this._router.navigateToRoute('dashboard');
