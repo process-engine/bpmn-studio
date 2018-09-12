@@ -26,6 +26,7 @@ export class WaitingRoom {
   private _managementApiClient: IManagementApiService;
   private _pollingTimer: NodeJS.Timer;
   private _processModelId: string;
+  private _maxPollingRetries: number = 5;
 
   constructor(router: Router,
               notificationService: NotificationService,
@@ -44,7 +45,7 @@ export class WaitingRoom {
   }
 
   public attached(): void {
-    this._startPolling();
+    this._startPolling(0);
   }
 
   public detached(): void {
@@ -61,14 +62,19 @@ export class WaitingRoom {
     });
   }
 
-  private async _startPolling(): Promise<void> {
+  private async _startPolling(currentRetryAttempt: number): Promise<void> {
     this._pollingTimer = setTimeout(async() => {
-      const noUserTaskFound: boolean = !(await this._pollUserTasksForCorrelation());
-      const correlationIsStillActive: boolean = await this._pollIsCorrelationStillActive();
+      const userTaskFound: boolean = await this._pollUserTasksForCorrelation();
+      const correlationIsStillActive: boolean = await this._pollIsCorrelationStillActive(currentRetryAttempt);
 
-      if (noUserTaskFound && correlationIsStillActive) {
-        this._startPolling();
+      if (userTaskFound) {
+        return;
       }
+
+      currentRetryAttempt = correlationIsStillActive ? 0 : currentRetryAttempt + 1;
+
+      this._startPolling(currentRetryAttempt);
+
     }, environment.processengine.waitingRoomPollingIntervalInMs);
   }
 
@@ -93,7 +99,7 @@ export class WaitingRoom {
     return true;
   }
 
-  private async _pollIsCorrelationStillActive(): Promise<boolean> {
+  private async _pollIsCorrelationStillActive(currentRetryAttempt: number): Promise<boolean> {
 
     const managementContext: ManagementContext = this._getManagementContext();
     const allActiveCorrelations: Array<Correlation> = await this._managementApiClient.getAllActiveCorrelations(managementContext);
@@ -102,8 +108,10 @@ export class WaitingRoom {
       return activeCorrelation.id === this._correlationId;
     });
 
-    if (correlationIsNotActive) {
-      this._correlationEndCallback(this._correlationId);
+    const stopRetrying: boolean = currentRetryAttempt >= this._maxPollingRetries;
+
+    if (correlationIsNotActive && stopRetrying) {
+      this._correlationEndCallback();
     }
 
     return !correlationIsNotActive;
@@ -118,7 +126,7 @@ export class WaitingRoom {
     });
   }
 
-  private _correlationEndCallback: ((correlationId: string) => void) = (correlationId: string): void => {
+  private _correlationEndCallback(): void {
     this._notificationService.showNotification(NotificationType.INFO, 'Process stopped.');
 
     this._router.navigateToRoute('dashboard');
