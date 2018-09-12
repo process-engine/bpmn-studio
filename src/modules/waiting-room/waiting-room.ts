@@ -26,6 +26,7 @@ export class WaitingRoom {
   private _managementApiClient: IManagementApiService;
   private _pollingTimer: NodeJS.Timer;
   private _processModelId: string;
+  private _maxPollingRetryCount: number = 5;
 
   constructor(router: Router,
               notificationService: NotificationService,
@@ -44,7 +45,7 @@ export class WaitingRoom {
   }
 
   public attached(): void {
-    this._startPolling();
+    this._startPolling(0);
   }
 
   public detached(): void {
@@ -61,14 +62,19 @@ export class WaitingRoom {
     });
   }
 
-  private async _startPolling(): Promise<void> {
+  private async _startPolling(retryCount: number): Promise<void> {
     this._pollingTimer = setTimeout(async() => {
-      const noUserTaskFound: boolean = !(await this._pollUserTasksForCorrelation());
-      const correlationIsStillActive: boolean = await this._pollIsCorrelationStillActive();
+      const userTaskFound: boolean = await this._pollUserTasksForCorrelation();
+      const correlationIsStillActive: boolean = await this._pollIsCorrelationStillActive(retryCount);
 
-      if (noUserTaskFound && correlationIsStillActive) {
-        this._startPolling();
+      if (userTaskFound) {
+        return;
       }
+
+      retryCount = correlationIsStillActive ? 0 : retryCount + 1;
+
+      this._startPolling(retryCount);
+
     }, environment.processengine.waitingRoomPollingIntervalInMs);
   }
 
@@ -93,7 +99,7 @@ export class WaitingRoom {
     return true;
   }
 
-  private async _pollIsCorrelationStillActive(): Promise<boolean> {
+  private async _pollIsCorrelationStillActive(retryCount: number): Promise<boolean> {
 
     const managementContext: ManagementContext = this._getManagementContext();
     const allActiveCorrelations: Array<Correlation> = await this._managementApiClient.getAllActiveCorrelations(managementContext);
@@ -102,8 +108,8 @@ export class WaitingRoom {
       return activeCorrelation.id === this._correlationId;
     });
 
-    if (correlationIsNotActive) {
-      this._correlationEndCallback(this._correlationId);
+    if (correlationIsNotActive && retryCount >= this._maxPollingRetryCount) {
+      this._correlationEndCallback();
     }
 
     return !correlationIsNotActive;
