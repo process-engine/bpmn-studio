@@ -122,6 +122,7 @@ export class SignalEventSection implements ISection {
     return element !== undefined
         && element.businessObject !== undefined
         && element.businessObject.eventDefinitions !== undefined
+        && element.businessObject.eventDefinitions[0] !== undefined
         && element.businessObject.eventDefinitions[0].$type === 'bpmn:SignalEventDefinition';
   }
 
