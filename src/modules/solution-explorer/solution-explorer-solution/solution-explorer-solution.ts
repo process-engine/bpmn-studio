@@ -190,6 +190,10 @@ export class SolutionExplorerSolution {
     return false;
   }
 
+  public shouldUnsavedIconBeShown(): boolean {
+    return false;
+  }
+
   public canRenameDiagram(): boolean {
     return false;
   }
