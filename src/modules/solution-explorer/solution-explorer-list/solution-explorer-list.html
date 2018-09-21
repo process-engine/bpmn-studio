@@ -3,16 +3,16 @@
   <require from="../solution-explorer-solution/solution-explorer-solution"></require>
 
   <div class="solution-explorer-list">
-    
+
     <div class="solution-list">
-      <div repeat.for="solutionEntry of openedSolutions" class="solution-entry">
+      <div repeat.for="solutionEntry of openedSolutions" class="solution-entry" click.delegate="moveSelection($event, solutionEntry)">
 
         <div class="solution-entry__header" title="${solutionEntry.uri}">
-          
+
           <i class="fa ${solutionEntry.fontAwesomeIconClass} solution-entry__header__icon"></i>
-          
+
           <span class="solution-entry__header__name">${solutionEntry.uri}</span>
-      
+
           <div class="solution-entry__header__actions">
               <button
                 if.bind="solutionEntry.canCreateNewDiagramsInSolution"
@@ -29,7 +29,7 @@
                 <i class="fa fa-times"></i>
               </button>
           </div>
-        
+
         </div>
 
         <solution-explorer-solution

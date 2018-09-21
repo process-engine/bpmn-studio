@@ -45,6 +45,9 @@ export class SolutionExplorerList {
    * This service is also put inside the map.
    */
   private _singleDiagramService: SingleDiagramsSolutionExplorerService;
+
+  private _clickedSolutionIndices: Array<number> = [];
+
   /*
    * Keep a seperate map of all viewmodels for the solutions entries.
    * The uri maps to the viewmodel. The contents of this map get set by aurelia
@@ -68,6 +71,21 @@ export class SolutionExplorerList {
 
     // Allows us to debug the solution explorer list.
     (window as any).solutionList = this;
+  }
+
+  public moveSelection(event: Event, solutionEntry: ISolutionEntry): void {
+    const clickedSolutionIndex: number = this._getIndexOfSolution(solutionEntry.uri);
+    this._clickedSolutionIndices.push(clickedSolutionIndex);
+
+    /*tslint:disable:no-magic-numbers*/
+    const userClickedOnTwoSolutions: boolean = this._clickedSolutionIndices.length === 2;
+
+    if (userClickedOnTwoSolutions) {
+      const firstClickedSolutionIndex: number = this._clickedSolutionIndices[0];
+      const secondClickedSolutionIndex: number = this._clickedSolutionIndices[1];
+      this._swapSolutions(firstClickedSolutionIndex, secondClickedSolutionIndex);
+      this._clickedSolutionIndices = [];
+    }
   }
 
   /**
@@ -293,4 +311,9 @@ export class SolutionExplorerList {
     return identity;
   }
 
+  private _swapSolutions(firstIndex: number, secondIndex: number): void {
+    const tempSolution: ISolutionEntry = this._openedSolutions[firstIndex];
+    this._openedSolutions[firstIndex] = this._openedSolutions[secondIndex];
+    this._openedSolutions[secondIndex] = tempSolution;
+  }
 }
