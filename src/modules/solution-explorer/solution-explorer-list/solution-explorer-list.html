@@ -5,7 +5,7 @@
   <div class="solution-explorer-list">
 
     <div class="solution-list">
-      <div repeat.for="solutionEntry of openedSolutions" class="solution-entry" click.delegate="moveSelection($event, solutionEntry)">
+      <div repeat.for="solutionEntry of openedSolutions" class="solution-entry" click.delegate="moveSelection(solutionEntry)">
 
         <div class="solution-entry__header" title="${solutionEntry.uri}">
 

@@ -73,7 +73,7 @@ export class SolutionExplorerList {
     (window as any).solutionList = this;
   }
 
-  public moveSelection(event: Event, solutionEntry: ISolutionEntry): void {
+  public moveSelection(solutionEntry: ISolutionEntry): void {
     const clickedSolutionIndex: number = this._getIndexOfSolution(solutionEntry.uri);
     this._clickedSolutionIndices.push(clickedSolutionIndex);
 
