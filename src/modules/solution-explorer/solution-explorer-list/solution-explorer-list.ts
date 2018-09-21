@@ -70,6 +70,14 @@ export class SolutionExplorerList {
     (window as any).solutionList = this;
   }
 
+  public shouldUnsaveCountShown(): boolean {
+    return true;
+  }
+
+  public countUnsavedSolutions(): number {
+    return 4;
+  }
+
   /**
    * Reopen all currently opened solutions to reload the identity
    * used to open the solution.
