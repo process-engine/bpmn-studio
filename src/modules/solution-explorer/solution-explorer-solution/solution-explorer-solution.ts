@@ -41,6 +41,27 @@ interface DiagramCreationState {
 )
 export class SolutionExplorerSolution {
 
+  @computedFrom('_validationController.errors.length')
+  public get diagramCreationErrors(): Array<ValidateResult> {
+    return this._validationController.errors;
+  }
+
+  @computedFrom('_validationController.errors.length')
+  public get hasDiagramCreationErrors(): boolean {
+    return this._validationController.errors && this._validationController.errors.length > 0;
+  }
+  public get solutionIsNotLoaded(): boolean {
+    return this._openedSolution === null || this._openedSolution === undefined;
+  }
+
+  public get openedDiagrams(): Array<IDiagram> {
+    if (this._openedSolution) {
+      return this._openedSolution.diagrams;
+    } else {
+      return [];
+    }
+  }
+
   private _router: Router;
   private _eventAggregator: EventAggregator;
   private _validationController: ValidationController;
@@ -81,6 +102,7 @@ export class SolutionExplorerSolution {
   @bindable
   public solutionIsSingleDiagrams: boolean;
   public createNewDiagramInput: HTMLInputElement;
+public v;
 
   constructor(
     router: Router,
@@ -176,22 +198,12 @@ export class SolutionExplorerSolution {
     return this._diagramCreationState.isCreateDiagramInputShown;
   }
 
-  @computedFrom('_validationController.errors.length')
-  public get diagramCreationErrors(): Array<ValidateResult> {
-    return this._validationController.errors;
-  }
-
-  @computedFrom('_validationController.errors.length')
-  public get hasDiagramCreationErrors(): boolean {
-    return this._validationController.errors && this._validationController.errors.length > 0;
-  }
-
   public shouldFileIconBeShown(): boolean {
     return false;
   }
 
   public shouldUnsavedIconBeShown(): boolean {
-    return true;
+    return false;
   }
 
   public canRenameDiagram(): boolean {
@@ -200,18 +212,6 @@ export class SolutionExplorerSolution {
 
   public canDeleteDiagram(): boolean {
     return false;
-  }
-
-  public get solutionIsNotLoaded(): boolean {
-    return this._openedSolution === null || this._openedSolution === undefined;
-  }
-
-  public get openedDiagrams(): Array<IDiagram> {
-    if (this._openedSolution) {
-      return this._openedSolution.diagrams;
-    } else {
-      return [];
-    }
   }
 
   // TODO: This method is copied all over the place.

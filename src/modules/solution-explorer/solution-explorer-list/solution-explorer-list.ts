@@ -71,7 +71,7 @@ export class SolutionExplorerList {
   }
 
   public shouldUnsaveCountShown(): boolean {
-    return true;
+    return false;
   }
 
   public countUnsavedSolutions(): number {

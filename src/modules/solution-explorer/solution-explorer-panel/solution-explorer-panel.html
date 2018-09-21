@@ -7,7 +7,7 @@
 
       <div class="solution-explorer-panel__header">
         <span class="solution-explorer-panel__header__name">Solution Explorer</span>
-        
+
         <div class="solution-explorer-panel__actions">
           <button
             if.bind="canReadFromFileSystem()"
@@ -15,7 +15,7 @@
             title="Open a diagram">
 
             <i class="fa fa-file"></i>
-          </button>  
+          </button>
 
           <button
             if.bind="canReadFromFileSystem()"
@@ -30,12 +30,34 @@
             title="Refresh solutions">
 
             <i class="fa fa-sync"></i>
-          </button>    
+          </button>
         </div>
       </div>
 
       <input class="solution-explorer-panel__input" ref="solutionInput" type="file" change.delegate="onSolutionInputChange($event)" webkitdirectory>
       <input class="solution-explorer-panel__input" ref="singleDiagramInput" type="file" change.delegate="onSingleDiagramInputChange($event)" accept=".xml, application/xml, .bpmn, application/bpmn20-xml">
+
+      <div>
+        <div class="solution-explorer-panel__open-diagrams__header">
+          <div>
+            <i class="fas fa-book-open solution-explorer-panel__open-diagrams__icon"></i> <span class="solution-explorer-panel__open-diagrams__text">Open diagrams</span>
+          </div>
+          <div class="solution-explorer-panel__open-diagrams__unsaved-count" show.bind="shouldUnsaveCountShown()">
+            ${countUnsavedSolutions()} UNSAVED
+          </div>
+        </div>
+        <div class="solution-explorer-panel__open-diagrams__list">
+          <div class="dummy_solution">
+            <i class="fas fa-times dummy_solution_saved__icon"></i>
+            <span>Dummy Diagram saved</span>
+          </div>
+          <div class="dummy_solution">
+            <i class="fas fa-circle dummy_solution_unsaved__icon"></i>
+            Dummy Diagram unsaved
+          </div>
+        </div>
+      </div>
+
 
       <solution-explorer-list view-model.ref="solutionExplorerList"></solution-explorer-list>
 

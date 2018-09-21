@@ -28,9 +28,60 @@
   flex: 1;
 }
 
+.solution-explorer-panel__open-diagrams__header {
+  padding-left: 5px;
+  padding-top: 5px;
+  display:flex;
+  color: darkgray;
+  font-size: 14px;
+}
+
+.solution-explorer-panel__open-diagrams__list {
+  margin-top: 2px;
+}
+
+.dummy_solution_saved__icon {
+  font-size: inherit;
+}
+
+.dummy_solution_unsaved__icon {
+  font-size: 8px;
+  padding-top: 2px;
+}
+
+.dummy_solution_unsaved__icon:hover {
+  color: green;
+
+}
+
+.solution-explorer-panel__open-diagrams__unsaved-count {
+  margin-left: 10px;
+  margin-right: 5px;
+
+  padding: 0 4px 0 4px;
+
+  align-self: center;
+  background-color: darkgray;
+  color: whitesmoke;
+  font-size: 70%;
+}
+
+.solution-explorer-panel__open-diagrams__icon {
+  padding-top: 2px;
+}
+
+.solution-explorer-panel__open-diagrams__text {
+  padding-left: 5px;
+}
+
 .solution-explorer-panel__actions {
   display: flex;
 }
+
+.dummy_solution {
+  padding-left: 8px;
+}
+
 
 .solution-explorer-panel__actions button {
   padding: 0 2px;

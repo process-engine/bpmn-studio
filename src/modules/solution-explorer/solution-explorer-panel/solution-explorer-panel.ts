@@ -83,6 +83,14 @@ export class SolutionExplorerPanel {
     ];
   }
 
+  public shouldUnsaveCountShown(): boolean {
+    return true;
+  }
+
+  public countUnsavedSolutions(): number {
+    return 1;
+  }
+
   public detached(): void {
     if (this.canReadFromFileSystem()) {
 
