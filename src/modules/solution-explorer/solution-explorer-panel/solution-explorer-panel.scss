@@ -51,7 +51,6 @@
 
 .dummy_solution_unsaved__icon:hover {
   color: green;
-
 }
 
 .solution-explorer-panel__open-diagrams__unsaved-count {
@@ -72,6 +71,17 @@
 
 .solution-explorer-panel__open-diagrams__text {
   padding-left: 5px;
+}
+
+.solution-explorer-panel__open-solutions {
+  margin-top: 5px;
+  border-top: 2px dashed #dcdbdb;
+  padding-top: 5px;
+}
+
+.solution-explorer-panel__open-solutions__header {
+  padding-left: 5px;
+  color: darkgray;
 }
 
 .solution-explorer-panel__actions {
