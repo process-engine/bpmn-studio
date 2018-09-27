@@ -86,7 +86,10 @@ export class SolutionExplorerList {
       clickedElementClassList.contains('solution-entry__header__name')
     || clickedElementClassList.contains('solution-entry__header__icon');
 
-    if (!userClickedOnHeader) {
+    /*tslint:disable:no-magic-numbers*/
+    const oneSolutionOpened: boolean = this._openedSolutions.length === 2;
+
+    if (!userClickedOnHeader || oneSolutionOpened) {
       this._shouldDisplaySwapIcon = false;
       return;
     }
