@@ -73,7 +73,17 @@ export class SolutionExplorerList {
     (window as any).solutionList = this;
   }
 
-  public moveSelection(solutionEntry: ISolutionEntry): void {
+  public moveSelection(solutionEntry: ISolutionEntry, event: Event): void {
+    const clickedElement: HTMLElement = event.target as HTMLElement;
+    const clickedElementClassList: DOMTokenList = clickedElement.classList;
+    const userClickedOnHeader: boolean =
+      clickedElementClassList.contains('solution-entry__header__name')
+      || clickedElementClassList.contains('solution-entry__header__icon');
+
+    if (!userClickedOnHeader) {
+      return;
+    }
+
     const clickedSolutionIndex: number = this._getIndexOfSolution(solutionEntry.uri);
     const userSelectsFirstCard: boolean = this._lastClickedSolutionIndex === -1;
 
