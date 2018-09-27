@@ -47,6 +47,7 @@ export class SolutionExplorerList {
   private _singleDiagramService: SingleDiagramsSolutionExplorerService;
 
   private _lastClickedSolutionIndex: number = -1;
+  @observable private _shouldDisplaySwapIcon: boolean = false;
 
   /*
    * Keep a seperate map of all viewmodels for the solutions entries.
@@ -73,14 +74,20 @@ export class SolutionExplorerList {
     (window as any).solutionList = this;
   }
 
+  @computedFrom('_shouldDisplaySwapIcon')
+  public get shouldDisplaySwapIcon(): boolean {
+    return this._shouldDisplaySwapIcon;
+  }
+
   public moveSelection(solutionEntry: ISolutionEntry, event: Event): void {
     const clickedElement: HTMLElement = event.target as HTMLElement;
     const clickedElementClassList: DOMTokenList = clickedElement.classList;
     const userClickedOnHeader: boolean =
       clickedElementClassList.contains('solution-entry__header__name')
-      || clickedElementClassList.contains('solution-entry__header__icon');
+    || clickedElementClassList.contains('solution-entry__header__icon');
 
     if (!userClickedOnHeader) {
+      this._shouldDisplaySwapIcon = false;
       return;
     }
 
@@ -89,9 +96,11 @@ export class SolutionExplorerList {
 
     if (userSelectsFirstCard) {
       this._lastClickedSolutionIndex = clickedSolutionIndex;
+      this._shouldDisplaySwapIcon = true;
     } else {
       this._swapSolutions(this._lastClickedSolutionIndex, clickedSolutionIndex);
       this._lastClickedSolutionIndex = -1;
+      this._shouldDisplaySwapIcon = false;
     }
   }
 

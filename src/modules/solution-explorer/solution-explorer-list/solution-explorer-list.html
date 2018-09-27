@@ -9,6 +9,7 @@
 
         <div class="solution-entry__header" title="${solutionEntry.uri}">
 
+          <i show.bind="shouldDisplaySwapIcon" class="fas fa-arrows-alt-v solution-entry__header__swap-icon"></i>
           <i class="fa ${solutionEntry.fontAwesomeIconClass} solution-entry__header__icon"></i>
 
           <span class="solution-entry__header__name">${solutionEntry.uri}</span>
