@@ -1,4 +1,4 @@
-import {computedFrom, inject} from 'aurelia-framework';
+import {computedFrom, inject, observable} from 'aurelia-framework';
 
 import {IDiagram, ISolution} from '@process-engine/solutionexplorer.contracts';
 import {ISolutionExplorerService} from '@process-engine/solutionexplorer.service.contracts';
@@ -39,7 +39,7 @@ export class SolutionExplorerList {
   /*
    * Contains all opened solutions.
    */
-  private _openedSolutions: Array<ISolutionEntry> = [];
+  @observable private _openedSolutions: Array<ISolutionEntry> = [];
   /**
    * Reference on the service used to open single diagrams.
    * This service is also put inside the map.
@@ -309,8 +309,9 @@ export class SolutionExplorerList {
   }
 
   private _swapSolutions(firstIndex: number, secondIndex: number): void {
-    const tempSolution: ISolutionEntry = this._openedSolutions[firstIndex];
-    this._openedSolutions[firstIndex] = this._openedSolutions[secondIndex];
-    this._openedSolutions[secondIndex] = tempSolution;
+    const tempSolution: ISolutionEntry = this._openedSolutions[secondIndex];
+
+    this._openedSolutions.splice(secondIndex, 1, this._openedSolutions[firstIndex]);
+    this._openedSolutions.splice(firstIndex, 1, tempSolution);
   }
 }
