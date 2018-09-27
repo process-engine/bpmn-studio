@@ -46,7 +46,7 @@ export class SolutionExplorerList {
    */
   private _singleDiagramService: SingleDiagramsSolutionExplorerService;
 
-  private _clickedSolutionIndices: Array<number> = [];
+  private _lastClickedSolutionIndex: number = -1;
 
   /*
    * Keep a seperate map of all viewmodels for the solutions entries.
@@ -75,16 +75,13 @@ export class SolutionExplorerList {
 
   public moveSelection(solutionEntry: ISolutionEntry): void {
     const clickedSolutionIndex: number = this._getIndexOfSolution(solutionEntry.uri);
-    this._clickedSolutionIndices.push(clickedSolutionIndex);
+    const userSelectsFirstCard: boolean = this._lastClickedSolutionIndex === -1;
 
-    /*tslint:disable:no-magic-numbers*/
-    const userClickedOnTwoSolutions: boolean = this._clickedSolutionIndices.length === 2;
-
-    if (userClickedOnTwoSolutions) {
-      const firstClickedSolutionIndex: number = this._clickedSolutionIndices[0];
-      const secondClickedSolutionIndex: number = this._clickedSolutionIndices[1];
-      this._swapSolutions(firstClickedSolutionIndex, secondClickedSolutionIndex);
-      this._clickedSolutionIndices = [];
+    if (userSelectsFirstCard) {
+      this._lastClickedSolutionIndex = clickedSolutionIndex;
+    } else {
+      this._swapSolutions(this._lastClickedSolutionIndex, clickedSolutionIndex);
+      this._lastClickedSolutionIndex = -1;
     }
   }
 
