@@ -1,4 +1,4 @@
-import {computedFrom, inject} from 'aurelia-framework';
+import {computedFrom, inject, observable} from 'aurelia-framework';
 
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {IDiagram, ISolution} from '@process-engine/solutionexplorer.contracts';
@@ -39,12 +39,16 @@ export class SolutionExplorerList {
   /*
    * Contains all opened solutions.
    */
-  private _openedSolutions: Array<ISolutionEntry> = [];
+  @observable private _openedSolutions: Array<ISolutionEntry> = [];
   /**
    * Reference on the service used to open single diagrams.
    * This service is also put inside the map.
    */
   private _singleDiagramService: SingleDiagramsSolutionExplorerService;
+
+  private _lastClickedSolutionIndex: number = -1;
+  @observable private _shouldDisplaySwapIcon: boolean = false;
+
   /*
    * Keep a seperate map of all viewmodels for the solutions entries.
    * The uri maps to the viewmodel. The contents of this map get set by aurelia
@@ -68,6 +72,39 @@ export class SolutionExplorerList {
 
     // Allows us to debug the solution explorer list.
     (window as any).solutionList = this;
+  }
+
+  @computedFrom('_shouldDisplaySwapIcon')
+  public get shouldDisplaySwapIcon(): boolean {
+    return this._shouldDisplaySwapIcon;
+  }
+
+  public moveSelection(solutionEntry: ISolutionEntry, event: Event): void {
+    const clickedElement: HTMLElement = event.target as HTMLElement;
+    const clickedElementClassList: DOMTokenList = clickedElement.classList;
+    const userClickedOnHeader: boolean =
+      clickedElementClassList.contains('solution-entry__header__name')
+    || clickedElementClassList.contains('solution-entry__header__icon');
+
+    /*tslint:disable:no-magic-numbers*/
+    const oneSolutionOpened: boolean = this._openedSolutions.length === 2;
+
+    if (!userClickedOnHeader || oneSolutionOpened) {
+      this._shouldDisplaySwapIcon = false;
+      return;
+    }
+
+    const clickedSolutionIndex: number = this._getIndexOfSolution(solutionEntry.uri);
+    const userSelectsFirstCard: boolean = this._lastClickedSolutionIndex === -1;
+
+    if (userSelectsFirstCard) {
+      this._lastClickedSolutionIndex = clickedSolutionIndex;
+      this._shouldDisplaySwapIcon = true;
+    } else {
+      this._swapSolutions(this._lastClickedSolutionIndex, clickedSolutionIndex);
+      this._lastClickedSolutionIndex = -1;
+      this._shouldDisplaySwapIcon = false;
+    }
   }
 
   /**
@@ -290,4 +327,10 @@ export class SolutionExplorerList {
     return identity;
   }
 
+  private _swapSolutions(firstIndex: number, secondIndex: number): void {
+    const tempSolution: ISolutionEntry = this._openedSolutions[secondIndex];
+
+    this._openedSolutions.splice(secondIndex, 1, this._openedSolutions[firstIndex]);
+    this._openedSolutions.splice(firstIndex, 1, tempSolution);
+  }
 }
