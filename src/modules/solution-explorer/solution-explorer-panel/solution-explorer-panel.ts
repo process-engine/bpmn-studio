@@ -4,7 +4,7 @@ import {PipelineResult, Router} from 'aurelia-router';
 
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 
-import {IFile, IInputEvent} from '../../../contracts';
+import {IFile, IInputEvent, IProcessdefDetailRouteParameters} from '../../../contracts';
 import {AuthenticationStateEvent, NotificationType} from '../../../contracts/index';
 import environment from '../../../environment';
 import {NotificationService} from '../../notification/notification.service';
@@ -242,9 +242,12 @@ export class SolutionExplorerPanel {
     const diagramIsOpenedFromRemote: boolean = diagram.uri.startsWith('http');
 
     if (diagramIsOpenedFromRemote) {
-      await this._router.navigateToRoute('processdef-detail', {
+      const routeParameters: IProcessdefDetailRouteParameters = {
         processModelId: diagram.id,
-      });
+        diagramFilename: diagram.name,
+      };
+
+      await this._router.navigateToRoute('processdef-detail', routeParameters);
 
     } else {
 

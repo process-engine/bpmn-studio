@@ -375,22 +375,41 @@ export class ProcessDefDetail {
     });
   }
 
+  /**
+   * Returns the updated ProcessModel from the ProcessEngine.
+   *
+   * If the given name for the diagram file is not set, this method falls back
+   * to retrieve a diagram with a given ProcessID from the ProcessEngine.
+   *
+   * @param identity identity which is used, to retrieve the ProcessModels.
+   */
+  private async _getUpdatedProcessModel(identity: IIdentity): Promise<ProcessModelExecution.ProcessModel> {
+    const diagramFilenameIsSet: boolean = this._diagramFilename !== undefined;
+    if (diagramFilenameIsSet) {
+        const processModels: ProcessModelExecution.ProcessModelList = await this._managementApiClient.getProcessModels(identity);
+
+        /**
+          * As long as this is not implemented in the backend, we have to
+          * filter out the process models by name manually.
+          */
+        const processModelWithName: ProcessModelExecution.ProcessModel = processModels.processModels.find(
+          (currentProcessModel: ProcessModelExecution.ProcessModel) => {
+            return currentProcessModel.name === this._diagramFilename;
+          });
+
+        return processModelWithName;
+      } else {
+        const processModelWithId: ProcessModelExecution.ProcessModel = await this._managementApiClient.getProcessModelById(identity,
+          this._processModelId);
+
+        return processModelWithId;
+      }
+  }
+
   private async _refreshProcess(): Promise<ProcessModelExecution.ProcessModel> {
     const identity: IIdentity = this._getIdentity();
 
-    /*const updatedProcessModel: ProcessModelExecution.ProcessModel = await this._managementApiClient.getProcessModelById(identity,
-                                                                                                                        this._processModelId);*/
-
-    const processModels: ProcessModelExecution.ProcessModelList = await this._managementApiClient.getProcessModels(identity);
-
-    /**
-     * As long as this is not implemented in the backend, we have to
-     * filter out the process models by name manually.
-     */
-    const updatedProcessModel: ProcessModelExecution.ProcessModel = processModels.processModels.find(
-      (currentProcessModel: ProcessModelExecution.ProcessModel) => {
-        return currentProcessModel.name === this._diagramFilename;
-      });
+    const updatedProcessModel: ProcessModelExecution.ProcessModel = await this._getUpdatedProcessModel(identity);
 
     this.process = updatedProcessModel;
 
