@@ -191,13 +191,14 @@ export class DiagramDetail {
       return definition.$type === 'bpmn:Process';
     });
     const processModelId: string = processModel.id;
+    const diagramFilename: string = this.diagram.name;
 
     const identity: IIdentity = this._getIdentity();
 
     try {
       await this
         ._managementClient
-        .updateProcessDefinitionsByName(identity, processModelId, payload);
+        .updateProcessDefinitionsByName(identity, diagramFilename, payload);
 
       this._notificationService
           .showNotification(NotificationType.SUCCESS, 'Diagram was successfully uploaded to the connected ProcessEngine.');
@@ -207,6 +208,7 @@ export class DiagramDetail {
 
       this._router.navigateToRoute('processdef-detail', {
         processModelId: processModelId,
+        diagramFilename: diagramFilename,
       });
     } catch (error) {
       this._notificationService

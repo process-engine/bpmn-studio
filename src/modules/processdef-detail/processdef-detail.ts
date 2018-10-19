@@ -27,6 +27,7 @@ import {NotificationService} from '../notification/notification.service';
 
 interface RouteParameters {
   processModelId: string;
+  diagramFilename: string;
 }
 
 @inject(
@@ -63,6 +64,7 @@ export class ProcessDefDetail {
   private _diagramIsInvalid: boolean = false;
   private _managementApiClient: IManagementApi;
   private _ipcRenderer: any;
+  private _diagramFilename: string;
 
   constructor(eventAggregator: EventAggregator,
               router: Router,
@@ -81,6 +83,7 @@ export class ProcessDefDetail {
 
   public async activate(routeParameters: RouteParameters): Promise<void> {
     this._processModelId = routeParameters.processModelId;
+    this._diagramFilename = routeParameters.diagramFilename;
     this._diagramHasChanged = false;
     await this._refreshProcess();
     const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
@@ -378,8 +381,19 @@ export class ProcessDefDetail {
   private async _refreshProcess(): Promise<ProcessModelExecution.ProcessModel> {
     const identity: IIdentity = this._getIdentity();
 
-    const updatedProcessModel: ProcessModelExecution.ProcessModel = await this._managementApiClient.getProcessModelById(identity,
-                                                                                                                        this._processModelId);
+    /*const updatedProcessModel: ProcessModelExecution.ProcessModel = await this._managementApiClient.getProcessModelById(identity,
+                                                                                                                        this._processModelId);*/
+
+    const processModels: ProcessModelExecution.ProcessModelList = await this._managementApiClient.getProcessModels(identity);
+
+    /**
+     * As long as this is not implemented in the backend, we have to
+     * filter out the process models by name manually.
+     */
+    const updatedProcessModel: ProcessModelExecution.ProcessModel = processModels.processModels.find(
+      (currentProcessModel: ProcessModelExecution.ProcessModel) => {
+        return currentProcessModel.name === this._diagramFilename;
+      });
 
     this.process = updatedProcessModel;
 
@@ -442,7 +456,7 @@ export class ProcessDefDetail {
         xml: xml,
       };
 
-      await this._managementApiClient.updateProcessDefinitionsByName(identity, this.process.id, payload);
+      await this._managementApiClient.updateProcessDefinitionsByName(identity, this.process.name, payload);
       this._notificationService.showNotification(NotificationType.SUCCESS, 'File saved.');
       this._eventAggregator.publish(environment.events.navBar.diagramSuccessfullySaved);
     } catch (error) {
