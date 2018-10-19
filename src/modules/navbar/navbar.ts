@@ -2,7 +2,7 @@ import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {bindable, computedFrom, inject} from 'aurelia-framework';
 import {RouteConfig, Router} from 'aurelia-router';
 
-import {NotificationType} from '../../contracts/index';
+import {IProcessdefDetailRouteParameters, NotificationType} from '../../contracts/index';
 import environment from '../../environment';
 import {NotificationService} from '../notification/notification.service';
 

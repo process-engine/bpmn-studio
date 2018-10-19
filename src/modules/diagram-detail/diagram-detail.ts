@@ -9,7 +9,7 @@ import {ProcessModelExecution} from '@process-engine/management_api_contracts';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 import {ISolutionExplorerService} from '@process-engine/solutionexplorer.service.contracts';
 
-import {IAuthenticationService, IModdleElement, NotificationType} from '../../contracts/index';
+import {IAuthenticationService, IModdleElement, IProcessdefDetailRouteParameters, NotificationType} from '../../contracts/index';
 import environment from '../../environment';
 import {BpmnIo} from '../bpmn-io/bpmn-io';
 import {NotificationService} from '../notification/notification.service';
@@ -206,10 +206,12 @@ export class DiagramDetail {
       // Since a new processmodel was uploaded, we need to refresh any processmodel lists.
       this._eventAggregator.publish(environment.events.refreshProcessDefs);
 
-      this._router.navigateToRoute('processdef-detail', {
+      const routeParameters: IProcessdefDetailRouteParameters = {
         processModelId: processModelId,
         diagramFilename: diagramFilename,
-      });
+      };
+
+      this._router.navigateToRoute('processdef-detail', routeParameters);
     } catch (error) {
       this._notificationService
           .showNotification(NotificationType.ERROR, `Unable to update diagram: ${error}.`);
