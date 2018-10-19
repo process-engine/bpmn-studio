@@ -18,3 +18,4 @@ export * from './propertypanel/index';
 export * from './form-fields/index';
 export * from './user-input-validation/index';
 export * from './inspect-correlation/index';
+export * from './route-parameters';

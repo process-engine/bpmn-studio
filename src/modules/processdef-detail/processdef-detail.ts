@@ -18,17 +18,13 @@ import {
   IExtensionElement,
   IFormElement,
   IModdleElement,
+  IProcessdefDetailRouteParameters,
   IShape,
   NotificationType,
 } from '../../contracts/index';
 import environment from '../../environment';
 import {BpmnIo} from '../bpmn-io/bpmn-io';
 import {NotificationService} from '../notification/notification.service';
-
-interface RouteParameters {
-  processModelId: string;
-  diagramFilename: string;
-}
 
 @inject(
   EventAggregator,
@@ -81,9 +77,10 @@ export class ProcessDefDetail {
     this._managementApiClient = managementApiClient;
   }
 
-  public async activate(routeParameters: RouteParameters): Promise<void> {
+  public async activate(routeParameters: IProcessdefDetailRouteParameters): Promise<void> {
     this._processModelId = routeParameters.processModelId;
     this._diagramFilename = routeParameters.diagramFilename;
+
     this._diagramHasChanged = false;
     await this._refreshProcess();
     const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
