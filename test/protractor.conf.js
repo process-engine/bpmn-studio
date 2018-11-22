@@ -11,6 +11,7 @@ exports.config = {
           "--no-sandbox",
           "--disable-dev-shm-usage",
           "--window-size=1920,1080",
+          "--reduce-security-for-testing",
         ],
       },
     },
