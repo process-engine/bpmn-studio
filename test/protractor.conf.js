@@ -49,8 +49,7 @@ exports.config = {
     browser.manage().window().maximize();
 
     afterEach(() => {
-      browser.get('javascript:window.localStorage.clear();');
-      browser.get('javascript:window.sessionStorage.clear();');
+      browser.restart();
       
       //browser.executeScript('window.localStorage.clear();');
       //browser.executeScript('window.sessionStorage.clear();');
