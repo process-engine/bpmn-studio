@@ -12,6 +12,7 @@ exports.config = {
           "--disable-dev-shm-usage",
           "--window-size=1920,1080",
           "--reduce-security-for-testing",
+          "--disable-web-security",
         ],
       },
     },
