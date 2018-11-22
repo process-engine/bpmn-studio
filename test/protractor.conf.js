@@ -49,8 +49,11 @@ exports.config = {
     browser.manage().window().maximize();
 
     afterEach(() => {
-      browser.executeScript('window.localStorage.clear();');
-      browser.executeScript('window.sessionStorage.clear();');
+      browser.get('javascript:window.localStorage.clear();');
+      browser.get('javascript:window.sessionStorage.clear();');
+      
+      //browser.executeScript('window.localStorage.clear();');
+      //browser.executeScript('window.sessionStorage.clear();');
       browser.driver.manage().deleteAllCookies();
     });
   }
