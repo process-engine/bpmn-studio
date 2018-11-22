@@ -13,7 +13,7 @@ import {
 export class Dashboard {
 
   // Define Links, Urls, Classes
-  public dashboardLink: string = '/dashboard';
+  public dashboardLink: string = 'dashboard';
   public inspectLink: string = '/inspect';
   private _domProcessIdPrefix: string = 'processList-';
   private _domProcessClassName: string = 'process-list-item';
