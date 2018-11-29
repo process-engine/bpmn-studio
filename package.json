@@ -156,7 +156,7 @@
     "electron": "^1.7.9",
     "electron-builder": "20.14.7",
     "electron-rebuild": "^1.7.3",
-    "event-stream": "^3.3.3",
+    "event-stream": "3.3.4",
     "eventemitter2": "^4.1.2",
     "fetch-ponyfill": "^4.1.0",
     "gulp": "4.0.0",
