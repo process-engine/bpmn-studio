@@ -15,4 +15,5 @@ export interface ISolutionEntry {
   canCloseSolution: boolean;
   canCreateNewDiagramsInSolution: boolean;
   identity: IIdentity;
+  openedDiagrams?: Array<any>;
 }

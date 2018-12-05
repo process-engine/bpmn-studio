@@ -81,12 +81,11 @@ export class DiagramDetail {
 
     this.activeDiagram = await this._activeSolutionEntry.service.loadDiagram(routeParameters.diagramName);
 
-    this._eventAggregator.publish(environment.events.navBar.updateActiveSolutionAndDiagram,
-      {
-        solutionEntry: this._activeSolutionEntry,
-        diagram: this.activeDiagram,
-      });
+    if (this.activeDiagram === undefined) {
+      this.activeDiagram = this._solutionService.getActiveDiagram();
+    }
 
+    this._solutionService.setActiveDiagram(this.activeDiagram);
     this._diagramHasChanged = false;
 
     const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
@@ -96,6 +95,8 @@ export class DiagramDetail {
   }
 
   public attached(): void {
+
+    this._eventAggregator.publish(environment.events.navBar.updateActiveSolutionAndDiagram);
 
     this._eventAggregator.publish(environment.events.navBar.showTools);
 
@@ -176,6 +177,8 @@ export class DiagramDetail {
   }
 
   public detached(): void {
+    // this._solutionService.setActiveDiagram(this.activeDiagram);
+
     for (const subscription of this._subscriptions) {
       subscription.dispose();
     }
@@ -469,14 +472,34 @@ export class DiagramDetail {
       const xml: string = await this.bpmnio.getXML();
       this.activeDiagram.xml = xml;
 
-      const activeSolution: ISolutionEntry = this._solutionService.getActiveSolutionEntry();
-      await activeSolution.service.saveDiagram(this.activeDiagram);
+      const connectedProcessEngineRoute: string = window.localStorage.getItem('processEngineRoute');
+      const solutionToDeployTo: ISolutionEntry = this._solutionService.getSolutionEntryForUri(connectedProcessEngineRoute);
+
+      if (this.activeDiagram.uri.startsWith('http')) {
+        this._activeSolutionEntry = solutionToDeployTo;
+        await this._activeSolutionEntry.service.saveDiagram(this.activeDiagram, connectedProcessEngineRoute);
+
+      } else {
+        await this._activeSolutionEntry.service.saveDiagram(this.activeDiagram);
+      }
+      // this.activeDiagram.id = processModelId;
+
+      this._solutionService.setActiveSolutionEntry(this._activeSolutionEntry);
+      // this.activeDiagram = await this._activeSolutionEntry.service.loadDiagram(processModelId);
+      this._solutionService.setActiveDiagram(this.activeDiagram);
+
+      // const activeSolution: ISolutionEntry = this._solutionService.getActiveSolutionEntry();
+      // await this._activeSolutionEntry.service.saveDiagram(this.activeDiagram, this._activeSolutionEntry.uri);
+      // this._solutionService.setActiveSolutionEntry(this._activeSolutionEntry);
+
+      // this._solutionService.setActiveDiagram(this.activeDiagram);
 
       this._diagramHasChanged = false;
       this._notificationService
           .showNotification(NotificationType.SUCCESS, `File saved!`);
       this._eventAggregator.publish(environment.events.navBar.diagramChangesResolved);
     } catch (error) {
+      console.log(error);
       this._notificationService
           .showNotification(NotificationType.ERROR, `Unable to save the file: ${error}.`);
     }

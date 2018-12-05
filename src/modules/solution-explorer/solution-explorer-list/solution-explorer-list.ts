@@ -18,7 +18,13 @@ interface IUriToViewModelMap {
   [key: string]: SolutionExplorerSolution;
 }
 
-@inject('SolutionExplorerServiceFactory', 'AuthenticationService', 'DiagramValidationService', 'SolutionService')
+@inject(
+ 'SolutionExplorerServiceFactory',
+ 'AuthenticationService',
+ 'DiagramValidationService',
+ 'SolutionService',
+ 'LocalStorageSolutionsAndActiveDiagram',
+ )
 export class SolutionExplorerList {
 
   private _solutionExplorerServiceFactory: SolutionExplorerServiceFactory;
@@ -46,6 +52,7 @@ export class SolutionExplorerList {
     authenticationService: IAuthenticationService,
     diagramValidationService: IDiagramValidationService,
     solutionService: ISolutionService,
+    localStorageSolutionsAndActiveDiagram: object,
   ) {
     this._solutionExplorerServiceFactory = solutionExplorerServiceFactory;
     this._authenticationService = authenticationService;
@@ -59,6 +66,20 @@ export class SolutionExplorerList {
 
     // Allows us to debug the solution explorer list.
     (window as any).solutionList = this;
+
+    localStorageSolutionsAndActiveDiagram.solutions.forEach(async(solution: ISolutionEntry) => {
+      const solutionsIsFromFileSystem: boolean = solution.uri.startsWith('http') === false;
+      const solutionIsSingleDiagramSolution: boolean = solution.uri === 'Single Diagrams';
+
+      if (solutionsIsFromFileSystem && !solutionIsSingleDiagramSolution) {
+        await this.openSolution(solution.uri);
+      } else if (solutionIsSingleDiagramSolution) {
+        solution.openedDiagrams.forEach(async(diagram: IDiagram) => {
+          await this._createSingleDiagramServiceEntry();
+          await this.openSingleDiagram(diagram.uri);
+        });
+      }
+    });
   }
 
   /**
@@ -119,6 +140,7 @@ export class SolutionExplorerList {
 
     let solutionExplorer: ISolutionExplorerService;
     if (uriIsRemote) {
+      insertAtBeginning = true;
       solutionExplorer = await this._solutionExplorerServiceFactory.newManagementApiSolutionExplorer();
     } else {
       solutionExplorer = await this._solutionExplorerServiceFactory.newFileSystemSolutionExplorer();
@@ -176,6 +198,8 @@ export class SolutionExplorerList {
   public get openedSolutions(): Array<ISolutionEntry> {
     const filteredEntries: Array<ISolutionEntry> = this._openedSolutions
       .filter(this._shouldDisplaySolution);
+
+    window.localStorage.setItem('AllSolutionEntries', JSON.stringify(filteredEntries));
 
     return filteredEntries;
   }
@@ -266,6 +290,8 @@ export class SolutionExplorerList {
     const canCloseSolution: boolean = this._canCloseSolution(service, uri);
     const canCreateNewDiagramsInSolution: boolean = this._canCreateNewDiagramsInSolution(service, uri);
 
+    const openedDiagrams: Array<any> = service._openedDiagrams;
+
     const entry: ISolutionEntry = {
       uri,
       service,
@@ -274,15 +300,16 @@ export class SolutionExplorerList {
       canCreateNewDiagramsInSolution,
       isSingleDiagramService,
       identity,
+      openedDiagrams,
     };
 
     this._solutionService.addSolutionEntry(entry);
 
     const entryIsRemoteSolution: boolean = entry.uri.startsWith('http');
 
-    if (entryIsRemoteSolution) {
-      this._solutionService.setActiveSolution(entry);
-    }
+    // if (entryIsRemoteSolution) {
+    this._solutionService.setActiveSolutionEntry(entry);
+    // }
 
     if (insertAtBeginning) {
       this._openedSolutions.splice(1, 0, entry);

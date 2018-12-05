@@ -1,5 +1,5 @@
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
-import {inject} from 'aurelia-framework';
+import {Aurelia, inject} from 'aurelia-framework';
 import {Router, RouterConfiguration} from 'aurelia-router';
 /**
  * This import statement loads bootstrap. Its required because otherwise
@@ -9,21 +9,26 @@ import 'bootstrap';
 
 import {OpenIdConnect} from 'aurelia-open-id-connect';
 
-import {NotificationType} from './contracts/index';
+import {ISolutionEntry, NotificationType} from './contracts/index';
 import environment from './environment';
 import {AuthenticationService} from './modules/authentication/authentication.service';
 import {NotificationService} from './modules/notification/notification.service';
 
+import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 import {oidcConfig} from './open-id-connect-configuration';
-@inject(OpenIdConnect, 'AuthenticationService', 'NotificationService', EventAggregator)
+
+@inject(OpenIdConnect, 'AuthenticationService', 'NotificationService', EventAggregator, Aurelia)
 export class App {
   public showSolutionExplorer: boolean = false;
+  public solutions: Array<ISolutionEntry> = [];
+  public activeSolution: ISolutionEntry;
 
   private _openIdConnect: OpenIdConnect | any;
   private _authenticationService: AuthenticationService;
   private _router: Router;
   private _notificationService: NotificationService;
   private _eventAggregator: EventAggregator;
+  private _aurelia: Aurelia;
   private _subscriptions: Array<Subscription>;
 
   private _preventDefaultBehaviour: EventListener;
@@ -31,11 +36,13 @@ export class App {
   constructor(openIdConnect: OpenIdConnect,
               authenticationService: AuthenticationService,
               notificationService: NotificationService,
-              eventAggregator: EventAggregator) {
+              eventAggregator: EventAggregator,
+              aurelia: Aurelia) {
     this._openIdConnect = openIdConnect;
     this._authenticationService = authenticationService;
     this._notificationService = notificationService;
     this._eventAggregator = eventAggregator;
+    this._aurelia = aurelia;
   }
 
   public activate(): void {
@@ -52,6 +59,15 @@ export class App {
     };
 
     this.showSolutionExplorer = window.localStorage.getItem('SolutionExplorerVisibility') === 'true';
+
+    this.solutions =  JSON.parse(window.localStorage.getItem('AllSolutionEntries'));
+    this.activeSolution = JSON.parse(window.localStorage.getItem('ActiveSolutionEntry'));
+    const test: object = {
+      solutions: this.solutions,
+      activeSolution: this.activeSolution,
+    };
+
+    this._aurelia.container.registerInstance('LocalStorageSolutionsAndActiveDiagram', test);
 
     this._subscriptions = [
       this._eventAggregator.subscribe(environment.events.processSolutionPanel.toggleProcessSolutionExplorer, () => {
