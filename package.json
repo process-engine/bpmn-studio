@@ -78,16 +78,13 @@
       ]
     },
     "linux": {
-      "target": [
-        "snap"
-      ],
+      "target": "snap",
       "fileAssociations": [
         {
           "ext": [
             "bpmn"
           ],
-          "name": "BPMN",
-          "mimeType": "application/bpmn-xml"
+          "name": "BPMN"
         }
       ]
     }
