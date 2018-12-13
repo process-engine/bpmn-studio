@@ -72,7 +72,22 @@
           "ext": [
             "bpmn"
           ],
-          "name": "BPMN"
+          "name": "BPMN",
+          "role": "Editor"
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        "snap"
+      ],
+      "fileAssociations": [
+        {
+          "ext": [
+            "bpmn"
+          ],
+          "name": "BPMN",
+          "mimeType": "application/bpmn-xml"
         }
       ]
     }
