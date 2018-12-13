@@ -34,8 +34,7 @@ pipeline {
           branch = env.BRANCH_NAME;
           branch_is_master = branch == 'master';
           branch_is_develop = branch == 'develop';
-          branch_is_feature = branch == 'feature';
-          branch_is_release = branch.startsWith('release/');
+          branch_is_release = branch.startsWith('release/') || true;
 
           if (branch_is_master) {
             full_electron_release_version_string = "${package_version}";
@@ -122,8 +121,7 @@ pipeline {
         expression {
           branch_is_master ||
           branch_is_develop ||
-          branch_is_release ||
-          branch_is_feature
+          branch_is_release
         }
       }
       parallel {
@@ -273,8 +271,7 @@ pipeline {
         expression {
           branch_is_master ||
           branch_is_develop ||
-          branch_is_release ||
-          branch_is_feature
+          branch_is_release
         }
       }
       steps {
@@ -286,7 +283,7 @@ pipeline {
           // On release branches we will just archive the artifacts of the build.
           // When we build master or develop, we upload the artifacts to the
           // GitHub release.
-          if (branch_is_release || branch_is_feature) {
+          if (branch_is_release) {
             
             archiveArtifacts 'dist/*, dist/**/*'
 
