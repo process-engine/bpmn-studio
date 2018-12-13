@@ -34,6 +34,7 @@ pipeline {
           branch = env.BRANCH_NAME;
           branch_is_master = branch == 'master';
           branch_is_develop = branch == 'develop';
+          branch_is_feature = branch == 'feature';
           branch_is_release = branch.startsWith('release/');
 
           if (branch_is_master) {
@@ -121,7 +122,8 @@ pipeline {
         expression {
           branch_is_master ||
           branch_is_develop ||
-          branch_is_release
+          branch_is_release ||
+          branch_is_feature
         }
       }
       parallel {
@@ -152,63 +154,63 @@ pipeline {
             }
           }
         }
-        stage('Build on MacOS') {
-          agent {
-            label "macos"
-          }
-          steps {
-            unstash('post_build')
-            unstash('post_build_node_modules')
+        // stage('Build on MacOS') {
+        //   agent {
+        //     label "macos"
+        //   }
+        //   steps {
+        //     unstash('post_build')
+        //     unstash('post_build_node_modules')
 
-            sh('node --version')
+        //     sh('node --version')
             
-            // We copy the node_modules folder from the slave running
-            // prepare and install steps. That slave may run another OS
-            // than macos. Some dependencies may not be installed if
-            // they have an os restriction in their package.json.
-            sh('npm install')
+        //     // We copy the node_modules folder from the slave running
+        //     // prepare and install steps. That slave may run another OS
+        //     // than macos. Some dependencies may not be installed if
+        //     // they have an os restriction in their package.json.
+        //     sh('npm install')
 
-            sh('npm run jenkins-electron-install-app-deps')
-            sh('npm run jenkins-electron-rebuild-native')
+        //     sh('npm run jenkins-electron-install-app-deps')
+        //     sh('npm run jenkins-electron-rebuild-native')
 
-            withCredentials([
-              string(credentialsId: 'apple-mac-developer-certifikate', variable: 'CSC_LINK'),
-            ]) {
-              sh('npm run jenkins-electron-build-macos')
-            }
-            stash(includes: 'dist/*.*, dist/mac/*', excludes: 'electron-builder-effective-config.yaml', name: 'macos_results')
-          }
-          post {
-            always {
-              cleanup_workspace()
-            }
-          }
-        }
-        stage('Build on Windows') {
-          agent {
-            node {
-              label "windows"
-              customWorkspace "ws/b${System.currentTimeMillis()}"
-            }
-          }
-          steps {
-            unstash('post_build')
-            bat('node --version')
+        //     withCredentials([
+        //       string(credentialsId: 'apple-mac-developer-certifikate', variable: 'CSC_LINK'),
+        //     ]) {
+        //       sh('npm run jenkins-electron-build-macos')
+        //     }
+        //     stash(includes: 'dist/*.*, dist/mac/*', excludes: 'electron-builder-effective-config.yaml', name: 'macos_results')
+        //   }
+        //   post {
+        //     always {
+        //       cleanup_workspace()
+        //     }
+        //   }
+        // }
+        // stage('Build on Windows') {
+        //   agent {
+        //     node {
+        //       label "windows"
+        //       customWorkspace "ws/b${System.currentTimeMillis()}"
+        //     }
+        //   }
+        //   steps {
+        //     unstash('post_build')
+        //     bat('node --version')
 
-            // On windows a complete reinstall is required.
-            bat('npm install')
+        //     // On windows a complete reinstall is required.
+        //     bat('npm install')
 
-            bat('npm run jenkins-electron-rebuild-native')
-            bat('npm run jenkins-electron-build-windows')
+        //     bat('npm run jenkins-electron-rebuild-native')
+        //     bat('npm run jenkins-electron-build-windows')
 
-            stash(includes: 'dist/*.*', excludes: 'electron-builder-effective-config.yaml', name: 'windows_results')
-          }
-          post {
-            always {
-              cleanup_workspace()
-            }
-          }
-        }
+        //     stash(includes: 'dist/*.*', excludes: 'electron-builder-effective-config.yaml', name: 'windows_results')
+        //   }
+        //   post {
+        //     always {
+        //       cleanup_workspace()
+        //     }
+        //   }
+        // }
       }
     }
     stage('publish') {
@@ -276,8 +278,8 @@ pipeline {
       }
       steps {
         unstash('linux_results')
-        unstash('macos_results')
-        unstash('windows_results')
+        // unstash('macos_results')
+        // unstash('windows_results')
         
         script {
           // On release branches we will just archive the artifacts of the build.
