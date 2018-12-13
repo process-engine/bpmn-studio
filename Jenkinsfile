@@ -273,7 +273,8 @@ pipeline {
         expression {
           branch_is_master ||
           branch_is_develop ||
-          branch_is_release
+          branch_is_release ||
+          branch_is_feature
         }
       }
       steps {
@@ -285,7 +286,7 @@ pipeline {
           // On release branches we will just archive the artifacts of the build.
           // When we build master or develop, we upload the artifacts to the
           // GitHub release.
-          if (branch_is_release) {
+          if (branch_is_release || branch_is_feature) {
             
             archiveArtifacts 'dist/*, dist/**/*'
 
