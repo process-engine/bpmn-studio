@@ -372,10 +372,6 @@ export class SolutionExplorerSolution {
     }
   }
 
-  /** public currentOpenedRootSolutionUriChanged(newVal, old) {
-    console.log(newVal);
-  }*/
-
   // TODO: This method is copied all over the place.
   public async navigateToDetailView(diagram: IDiagram): Promise<void> {
     const diagramIsNoRemoteDiagram: boolean = !diagram.uri.startsWith('http');
@@ -429,7 +425,7 @@ export class SolutionExplorerSolution {
    * error message and replace the messages content with the acutal
    * message and returns a reference to a new array with the mod
    *
-   * TODO: This method should create a deep copy of an arra< that contains
+   * TODO: This method should create a deep copy of an array that contains
    * errors and return it instead of just modifying the reference.
    *
    */
