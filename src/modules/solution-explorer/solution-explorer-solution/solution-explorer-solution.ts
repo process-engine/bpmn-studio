@@ -402,11 +402,13 @@ export class SolutionExplorerSolution {
       return undefined;
     }
 
-    if (!this.activeDiagram.uri.includes(this.currentOpenedRootSolutionUri)) {
+    const activeDiagUri: string = this.activeDiagram.uri;
+    const currentSolutionIsNotActive: boolean = !activeDiagUri.includes(this.currentOpenedRootSolutionUri);
+    if (currentSolutionIsNotActive) {
       return;
     }
 
-    return this.activeDiagram.uri;
+    return activeDiagUri;
   }
 
   private async _isDiagramDetailViewOfDiagramOpen(diagramUriToCheck: string): Promise<boolean> {
