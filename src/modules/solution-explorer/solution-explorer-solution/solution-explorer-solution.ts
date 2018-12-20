@@ -130,6 +130,8 @@ export class SolutionExplorerSolution {
   @bindable public solutionService: ISolutionExplorerService;
   @bindable public solutionIsSingleDiagrams: boolean;
   @bindable public displayedSolutionEntry: ISolutionEntry;
+  @bindable public currentOpenedRootSolutionUri: string;
+
   public createNewDiagramInput: HTMLInputElement;
   public _renameDiagramInput: HTMLInputElement;
 
@@ -167,7 +169,6 @@ export class SolutionExplorerSolution {
         this._diagramRoute = 'diagram-detail';
         this._inspectView = undefined;
       }),
-
       this._eventAggregator.subscribe('router:navigation:success', () => {
         this._updateSolutionExplorer();
       }),
@@ -371,9 +372,14 @@ export class SolutionExplorerSolution {
     }
   }
 
+  /** public currentOpenedRootSolutionUriChanged(newVal, old) {
+    console.log(newVal);
+  }*/
+
   // TODO: This method is copied all over the place.
   public async navigateToDetailView(diagram: IDiagram): Promise<void> {
     const diagramIsNoRemoteDiagram: boolean = !diagram.uri.startsWith('http');
+
     if (diagramIsNoRemoteDiagram) {
       this._inspectView = 'dashboard';
       this._eventAggregator.publish(environment.events.navBar.inspectNavigateToDashboard);
@@ -398,6 +404,10 @@ export class SolutionExplorerSolution {
     const activeDiagramIsNotSet: boolean = this.activeDiagram === undefined;
     if (activeDiagramIsNotSet) {
       return undefined;
+    }
+
+    if (!this.activeDiagram.uri.includes(this.currentOpenedRootSolutionUri)) {
+      return;
     }
 
     return this.activeDiagram.uri;

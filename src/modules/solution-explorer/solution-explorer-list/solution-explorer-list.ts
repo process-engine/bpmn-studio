@@ -34,6 +34,8 @@ export class SolutionExplorerList {
    * This service is also put inside the map.
    */
   private _singleDiagramService: SingleDiagramsSolutionExplorerService;
+
+  public currentOpenedRootSolutionUri: string = '';
   /*
    * Keep a seperate map of all viewmodels for the solutions entries.
    * The uri maps to the viewmodel. The contents of this map get set by aurelia
@@ -112,6 +114,15 @@ export class SolutionExplorerList {
     return this._openedSolutions.find((entry: ISolutionEntry) => {
       return entry.uri === 'Single Diagrams';
     });
+  }
+
+  public setNewRootSolutionId(clickedSolution: ISolutionEntry): void {
+    const clickedSolutionUriNotDefined: boolean = clickedSolution.uri === undefined;
+    if (clickedSolutionUriNotDefined) {
+      return;
+    }
+
+    this.currentOpenedRootSolutionUri = clickedSolution.uri;
   }
 
   public async openSolution(uri: string, insertAtBeginning: boolean = false): Promise<void> {

@@ -38,7 +38,9 @@
           displayed-solution-entry.bind="solutionEntry"
           solution-service.bind="solutionEntry.service"
           solution-is-single-diagrams.bind="solutionEntry.isSingleDiagramService"
-          view-model.ref="solutionEntryViewModels[solutionEntry.uri]">
+          current-opened-root-solution-uri.bind="currentOpenedRootSolutionUri"
+          view-model.ref="solutionEntryViewModels[solutionEntry.uri]"
+          click.delegate="setNewRootSolutionId(solutionEntry)">
         </solution-explorer-solution>
       </div>
     </div>
