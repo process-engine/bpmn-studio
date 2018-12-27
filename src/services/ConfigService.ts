@@ -7,22 +7,22 @@ export class ConfigService implements IConfigService {
     this._recoverSolutionExplorerVisibility();
   }
 
-  public setSolutionExplorerVisibility(solutionExplorerIsVisible: boolean): void {
+  public set solutionExplorerIsVisible(solutionExplorerIsVisible: boolean) {
     this._solutionExplorerIsVisible = solutionExplorerIsVisible;
 
     window.localStorage.setItem('SolutionExplorerVisibility', JSON.stringify(solutionExplorerIsVisible));
   }
 
-  public getSolutionExplrorerVisibility(): boolean {
+  public get solutionExplorerIsVisible(): boolean {
     return this._solutionExplorerIsVisible;
   }
 
   private _recoverSolutionExplorerVisibility(): void {
     this._solutionExplorerIsVisible = JSON.parse(window.localStorage.getItem('SolutionExplorerVisibility'));
 
-    const solutionExplorerVisibilityIsNotSet: boolean = this._solutionExplorerIsVisible ===  null;
+    const solutionExplorerVisibilityIsNotSet: boolean = this._solutionExplorerIsVisible === null;
     if (solutionExplorerVisibilityIsNotSet) {
-      this.setSolutionExplorerVisibility(true);
+      this.solutionExplorerIsVisible = true;
     }
   }
 }
