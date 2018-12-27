@@ -62,8 +62,6 @@ describe('Minimap view', () => {
         return getRouterViewContainer;
       });
 
-    // You have to open the solution explorer before clicking on a link
-    await navBar.openSolutionExplorerByButtonClick();
     await solutionExplorer.openProcessModelByClick(processModelId);
 
     const bpmnIoTag: ElementFinder = bpmnIo.bpmnIoTag;

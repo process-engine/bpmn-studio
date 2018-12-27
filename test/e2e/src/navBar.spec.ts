@@ -97,11 +97,7 @@ describe('Navigation bar', () => {
     expect(navBarSolutionExplorerButtonAttributes).toBeTruthy();
   });
 
-  it('should contain an highlighted solution explorer button when clicked.', async() => {
-    const navBarSolutionExplorerButton: ElementFinder = navBar.navBarSolutionExplorerButton;
-
-    await navBarSolutionExplorerButton.click();
-
+  it('should contain an highlighted solution explorer button.', async() => {
     const navBarActiveSolutionExplorer: ElementArrayFinder = navBar.navBarActiveSolutionExplorer;
     const numberOfActiveSolutionExplorers: number = await navBarActiveSolutionExplorer.count();
 

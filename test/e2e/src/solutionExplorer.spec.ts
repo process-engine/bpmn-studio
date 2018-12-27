@@ -52,9 +52,6 @@ describe('Solution Explorer', () => {
         return navBarTag;
       });
 
-    // Click on solution explorer icon
-    await navBar.openSolutionExplorerByButtonClick();
-
     // Wait until solutions are loaded
     await browser.driver.wait(() => {
       browser.wait(expectedConditions.visibilityOf(solutionExplorer.solutionExplorerListItemsId(processModelId)), defaultTimeoutMS);
