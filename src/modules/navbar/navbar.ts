@@ -3,11 +3,11 @@ import {bindable, computedFrom, inject} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
-import {ISolutionEntry, ISolutionService, NotificationType} from '../../contracts/index';
+import {IConfigService, ISolutionEntry, ISolutionService, NotificationType} from '../../contracts/index';
 import environment from '../../environment';
 import {NotificationService} from '../notification/notification.service';
 
-@inject(Router, EventAggregator, 'NotificationService', 'SolutionService')
+@inject(Router, EventAggregator, 'NotificationService', 'SolutionService', 'ConfigService')
 export class NavBar {
 
   @bindable() public activeRouteName: string;
@@ -39,11 +39,16 @@ export class NavBar {
   private _notificationService: NotificationService;
   private _solutionService: ISolutionService;
 
-  constructor(router: Router, eventAggregator: EventAggregator, notificationService: NotificationService, solutionService: ISolutionService) {
+  constructor(router: Router,
+              eventAggregator: EventAggregator,
+              notificationService: NotificationService,
+              solutionService: ISolutionService,
+              configService: IConfigService) {
     this._router = router;
     this._eventAggregator = eventAggregator;
     this._notificationService = notificationService;
     this._solutionService = solutionService;
+    this._configService = configService;
   }
 
   public attached(): void {
