@@ -56,11 +56,6 @@ export class App {
     this._subscriptions = [
       this._eventAggregator.subscribe(environment.events.processSolutionPanel.toggleProcessSolutionExplorer, () => {
         this.showSolutionExplorer = !this.showSolutionExplorer;
-        if (this.showSolutionExplorer) {
-          window.localStorage.setItem('SolutionExplorerVisibility', 'true');
-        } else {
-          window.localStorage.setItem('SolutionExplorerVisibility', 'false');
-        }
       }),
     ];
 
