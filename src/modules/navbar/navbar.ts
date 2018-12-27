@@ -38,6 +38,7 @@ export class NavBar {
   private _subscriptions: Array<Subscription>;
   private _notificationService: NotificationService;
   private _solutionService: ISolutionService;
+  private _configService: IConfigService;
 
   constructor(router: Router,
               eventAggregator: EventAggregator,
@@ -53,7 +54,7 @@ export class NavBar {
 
   public attached(): void {
 
-    this.solutionExplorerIsActive = window.localStorage.getItem('SolutionExplorerVisibility') === 'true';
+    this.solutionExplorerIsActive = this._configService.getSolutionExplrorerVisibility();
 
     this._updateNavbar();
 
@@ -234,6 +235,7 @@ export class NavBar {
   public toggleSolutionExplorer(): void {
     this.solutionExplorerIsActive = !this.solutionExplorerIsActive;
     this._eventAggregator.publish(environment.events.processSolutionPanel.toggleProcessSolutionExplorer);
+    this._configService.setSolutionExplorerVisibility(this.solutionExplorerIsActive);
   }
 
   public saveDiagram(): void {
