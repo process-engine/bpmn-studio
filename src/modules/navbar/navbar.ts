@@ -54,7 +54,7 @@ export class NavBar {
 
   public attached(): void {
 
-    this.solutionExplorerIsActive = this._configService.getSolutionExplrorerVisibility();
+    this.solutionExplorerIsActive = this._configService.solutionExplorerIsVisible;
 
     this._updateNavbar();
 
@@ -235,7 +235,7 @@ export class NavBar {
   public toggleSolutionExplorer(): void {
     this.solutionExplorerIsActive = !this.solutionExplorerIsActive;
     this._eventAggregator.publish(environment.events.processSolutionPanel.toggleProcessSolutionExplorer);
-    this._configService.setSolutionExplorerVisibility(this.solutionExplorerIsActive);
+    this._configService.solutionExplorerIsVisible = this.solutionExplorerIsActive;
   }
 
   public saveDiagram(): void {

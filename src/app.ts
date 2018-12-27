@@ -1,5 +1,5 @@
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
-import {inject} from 'aurelia-framework';
+import {computedFrom, inject} from 'aurelia-framework';
 import {Router, RouterConfiguration} from 'aurelia-router';
 /**
  * This import statement loads bootstrap. Its required because otherwise
@@ -17,7 +17,6 @@ import {NotificationService} from './modules/notification/notification.service';
 import {oidcConfig} from './open-id-connect-configuration';
 @inject(OpenIdConnect, 'AuthenticationService', 'NotificationService', EventAggregator, 'ConfigService')
 export class App {
-  public showSolutionExplorer: boolean = false;
 
   private _openIdConnect: OpenIdConnect | any;
   private _authenticationService: AuthenticationService;
@@ -41,6 +40,11 @@ export class App {
     this._configService = configService;
   }
 
+  @computedFrom('_configService.solutionExplorerIsVisible')
+  public get showSolutionExplorer(): boolean {
+    return this._configService.solutionExplorerIsVisible;
+  }
+
   public activate(): void {
     this._preventDefaultBehaviour = (event: Event): boolean => {
       event.preventDefault();
@@ -53,14 +57,6 @@ export class App {
 
       return false;
     };
-
-    this.showSolutionExplorer = this._configService.getSolutionExplrorerVisibility();
-
-    this._subscriptions = [
-      this._eventAggregator.subscribe(environment.events.processSolutionPanel.toggleProcessSolutionExplorer, () => {
-        this.showSolutionExplorer = !this.showSolutionExplorer;
-      }),
-    ];
 
     /*
     * These EventListeners are used to prevent the BPMN-Studio from redirecting after
