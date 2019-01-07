@@ -10,7 +10,7 @@ import {IConfigService} from '../contracts';
  *
  * Every setting will be implemented via a "getter" to make it easier for
  * components to get and work with the settings. And a setter to set the value
- * of the setting and automatically persist it in the localstorage.
+ * business code. Especially persisting them in the local storage and getting
  */
 export class ConfigService implements IConfigService {
   private _solutionExplorerIsVisible: boolean = true;
