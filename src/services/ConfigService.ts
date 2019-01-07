@@ -2,7 +2,7 @@ import {IConfigService} from '../contracts';
 
 /**
  * The goal of this service is to keep most configurations out of the normal
- * business code. Especially persisting them in the localstorage and getting
+ * business code. Especially persisting them in the local storage and getting
  * them back at the launch of the application are the main tasks of this service.
  *
  * This will keep all configurations in one place and will prevent setting and
