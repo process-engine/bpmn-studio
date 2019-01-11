@@ -354,6 +354,20 @@
             "name": "dom-event-dispatch",
             "path": "../node_modules/dom-event-dispatch/dist",
             "main": "dom-event-dispatch"
+          },
+          {
+            "name": "@process-engine/dynamic_ui_core",
+            "path": "../node_modules/@process-engine/dynamic_ui_core/dist/commonjs",
+            "main": "index.js",
+            "deps":[
+              "@process-engine/consumer_api_contracts",
+              "handlebars"
+            ]
+          },
+          {
+            "name": "handlebars",
+            "path": "../node_modules/handlebars/dist",
+            "main": "handlebars"
           }
         ]
       }
