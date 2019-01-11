@@ -2,6 +2,9 @@
   <require from="./task-dynamic-ui.css"></require>
   <require from="../dynamic-ui-wrapper/dynamic-ui-wrapper"></require>
   <div class="dynamic-ui-wrapper">
+
+    <iframe src="${dynamicUiSrc}"></iframe>
+
     <div class="dynamic-ui">
       <template if.bind="userTask || manualTask">
         <h3>${taskName}</h3>
