@@ -6,10 +6,12 @@ import {domEventDispatch} from 'dom-event-dispatch';
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {ManualTask, UserTask} from '@process-engine/management_api_contracts';
 
-import {AuthenticationStateEvent, IDynamicUiService, NotificationType} from '../../contracts/index';
+import {AuthenticationStateEvent, NotificationType} from '../../contracts/index';
 import {AuthenticationService} from '../authentication/authentication.service';
 import {DynamicUiWrapper} from '../dynamic-ui-wrapper/dynamic-ui-wrapper';
 import {NotificationService} from '../notification/notification.service';
+
+import {DynamicUIService} from '@process-engine/dynamic_ui_core';
 
 interface RouteParameters {
   diagramName: string;
@@ -18,7 +20,7 @@ interface RouteParameters {
   taskId: string;
 }
 
-@inject(EventAggregator, 'DynamicUiService', Router, 'NotificationService', 'AuthenticationService', Element)
+@inject(EventAggregator, Router, 'NotificationService', 'AuthenticationService', Element, DynamicUIService)
 export class TaskDynamicUi {
 
   public dynamicUiWrapper: DynamicUiWrapper;
@@ -34,21 +36,25 @@ export class TaskDynamicUi {
   private _router: Router;
   private _notificationService: NotificationService;
   private _authenticationService: AuthenticationService;
-  private _dynamicUiService: IDynamicUiService;
+
   private _subscriptions: Array<Subscription>;
   private _userTask: UserTask;
   private _manualTask: ManualTask;
   private _element: Element;
 
+  private _dynamicUiSrc: any;
+  private _dynamicUi: DynamicUIService;
+
   constructor(eventAggregator: EventAggregator,
-              dynamicUiService: IDynamicUiService,
+
               router: Router,
               notificationService: NotificationService,
               authenticationService: AuthenticationService,
-              element: Element) {
+              element: Element,
+              dynamicUi: DynamicUIService) {
 
     this._eventAggregator = eventAggregator;
-    this._dynamicUiService = dynamicUiService;
+
     this._router = router;
     this._notificationService = notificationService;
     this._authenticationService = authenticationService;
@@ -114,11 +120,17 @@ export class TaskDynamicUi {
     return this._manualTask;
   }
 
+  @computedFrom('_dynamicUiSrc')
+  public get dynamicUiSrc(): any {
+    return this._dynamicUiSrc;
+  }
+
   @computedFrom('_userTask', '_manualTask')
   public get taskName(): string {
     const nonWhiteSpaceRegex: RegExp = /\S/;
     const task: UserTask | ManualTask = this._userTask === undefined ? this._manualTask : this._userTask;
 
+    // this._dynamicUiSrc = this._dynamicUi.getDialog('', '', task.correlationId, '', task.id);
     const noTaskIsSet: boolean = task === undefined;
     if (noTaskIsSet) {
       return;
@@ -168,16 +180,16 @@ export class TaskDynamicUi {
         throw Error(`Invalid ProcessModel ID: ${this.processModelId}`);
       }
 
-      this.userTask = await this._dynamicUiService
-                                  .getUserTask(identity, this.correlationId, this.processModelId, this.taskId);
+      // this.userTask = await this._dynamicUiService
+      //                            .getUserTask(identity, this.correlationId, this.processModelId, this.taskId);
 
       const userTaskFound: boolean = this._userTask !== undefined;
       if (userTaskFound) {
         return;
       }
 
-      this.manualTask = await this._dynamicUiService
-                                    .getManualTask(identity, this.correlationId, this.processModelId, this.taskId);
+      // this.manualTask = await this._dynamicUiService
+      //                              .getManualTask(identity, this.correlationId, this.processModelId, this.taskId);
 
       const manualTaskFound: boolean = this._manualTask !== undefined;
       if (manualTaskFound) {
