@@ -329,11 +329,6 @@
             "main": "index.js"
           },
           {
-            "name": "handlebars",
-            "path": "../node_modules/handlebars/dist",
-            "main": "handlebars.js"
-          },
-          {
             "name": "@process-engine/management_api_contracts",
             "path": "../node_modules/@process-engine/management_api_contracts/dist/amd",
             "main": "index.js",
