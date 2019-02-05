@@ -1,6 +1,6 @@
 const electron = require('electron');
 
-const {ipcMain, dialog, app} = electron;
+const { ipcMain, dialog, app } = electron;
 
 const autoUpdater = require('electron-updater').autoUpdater;
 const CancellationToken = require('electron-updater').CancellationToken;
@@ -12,6 +12,14 @@ const openAboutWindow = require('about-window').default;
 
 const electronOidc = require('./electron-oidc');
 const oidcConfig = require('./oidc-config');
+
+const Bluebird = require('bluebird');
+
+// By default, Promise-Cancellation is deactivated.
+// We need to activate it here in order to be able to use it.
+Bluebird.config({
+  cancellation: true,
+});
 
 // If BPMN-Studio was opened by double-clicking a .bpmn file, then the
 // following code tells the frontend the name and content of that file;
@@ -113,7 +121,7 @@ Main._initializeApplication = function () {
 
     const prereleaseRegex = /\d+\.\d+\.\d+-pre-b\d+/;
 
-    electron.ipcMain.on('app_ready', async(event) => {
+    electron.ipcMain.on('app_ready', async (event) => {
       autoUpdater.autoDownload = false;
 
       autoUpdater.checkForUpdates();
@@ -200,8 +208,8 @@ Main._initializeApplication = function () {
       // for non-windows
       app.on('open-file', (event, path) => {
         filePath = isInitialized
-                   ? undefined
-                   : path;
+          ? undefined
+          : path;
 
         if (isInitialized) {
           answerOpenFileEvent(path);
@@ -372,8 +380,8 @@ Main._createMainWindow = function () {
       return {
         label: "BPMN-Studio",
         submenu: [{
-            label: "About BPMN-Studio",
-            click: () =>
+          label: "About BPMN-Studio",
+          click: () =>
             openAboutWindow({
               icon_path: isDev ? path.join(__dirname, '..', 'build/icon.png') : path.join(__dirname, '../../../build/icon.png'),
               product_name: 'BPMN-Studio',
@@ -387,14 +395,14 @@ Main._createMainWindow = function () {
               },
               package_json_dir: __dirname,
             }),
-          },
-          {
-            type: "separator",
-          },
-          {
-            label: "Quit",
-            role: "quit",
-          },
+        },
+        {
+          type: "separator",
+        },
+        {
+          label: "Quit",
+          role: "quit",
+        },
         ],
       };
     };
@@ -432,38 +440,38 @@ Main._createMainWindow = function () {
       return {
         label: "Edit",
         submenu: [{
-            label: "Undo",
-            accelerator: "CmdOrCtrl+Z",
-            selector: "undo:",
-          },
-          {
-            label: "Redo",
-            accelerator: "CmdOrCtrl+Shift+Z",
-            selector: "redo:",
-          },
-          {
-            type: "separator",
-          },
-          {
-            label: "Cut",
-            accelerator: "CmdOrCtrl+X",
-            selector: "cut:",
-          },
-          {
-            label: "Copy",
-            accelerator: "CmdOrCtrl+C",
-            selector: "copy:",
-          },
-          {
-            label: "Paste",
-            accelerator: "CmdOrCtrl+V",
-            selector: "paste:",
-          },
-          {
-            label: "Select All",
-            accelerator: "CmdOrCtrl+A",
-            selector: "selectAll:",
-          },
+          label: "Undo",
+          accelerator: "CmdOrCtrl+Z",
+          selector: "undo:",
+        },
+        {
+          label: "Redo",
+          accelerator: "CmdOrCtrl+Shift+Z",
+          selector: "redo:",
+        },
+        {
+          type: "separator",
+        },
+        {
+          label: "Cut",
+          accelerator: "CmdOrCtrl+X",
+          selector: "cut:",
+        },
+        {
+          label: "Copy",
+          accelerator: "CmdOrCtrl+C",
+          selector: "copy:",
+        },
+        {
+          label: "Paste",
+          accelerator: "CmdOrCtrl+V",
+          selector: "paste:",
+        },
+        {
+          label: "Select All",
+          accelerator: "CmdOrCtrl+A",
+          selector: "selectAll:",
+        },
         ],
       };
     };
@@ -506,11 +514,11 @@ Main._createMainWindow = function () {
           }
         }, {
           label: "Release Notes for Current Version",
-            click: () => {
-              const currentVersion = electron.app.getVersion();
-              const currentReleaseNotesUrl = `https://github.com/process-engine/bpmn-studio/releases/tag/v${currentVersion}`
-              electron.shell.openExternal(currentReleaseNotesUrl);
-            }
+          click: () => {
+            const currentVersion = electron.app.getVersion();
+            const currentReleaseNotesUrl = `https://github.com/process-engine/bpmn-studio/releases/tag/v${currentVersion}`
+            electron.shell.openExternal(currentReleaseNotesUrl);
+          }
         }]
       };
     };

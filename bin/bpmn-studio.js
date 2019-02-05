@@ -4,6 +4,9 @@ const open = require('open');
 const argv = require('minimist')(process.argv.slice(2));
 const pushserve = require('pushserve');
 
+// This will make Bluebird the default Promise implementation throughout the core package.
+global.Promise = Bluebird;
+
 const defaultPort = 17290;
 const defaultHost = '127.0.0.1';
 const portUsed = _applicationPortIsValid(argv.port) ? argv.port : defaultPort;
@@ -57,7 +60,7 @@ function _applicationHostIsValid(host) {
     return false;
   }
   if (!host.match(/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/)) {
-    console.log("The specified host: '"+ host +"' is not a valid IP address, like: '0.0.0.0'.\n");
+    console.log("The specified host: '" + host + "' is not a valid IP address, like: '0.0.0.0'.\n");
     return false;
   };
   return true;
