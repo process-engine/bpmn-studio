@@ -21,6 +21,7 @@ export class DynamicUiWrapper {
   public confirmButtonText: string = 'Continue';
   public declineButtonText: string = 'Decline';
   public onButtonClick: (action: 'cancel' | 'proceed' | 'decline') => void;
+  public dynamicUsertaskComponent: any;
   @bindable({changeHandler: 'userTaskChanged'}) public currentUserTask: DataModels.UserTasks.UserTask;
   @bindable({changeHandler: 'manualTaskChanged'}) public currentManualTask: DataModels.ManualTasks.ManualTask;
   @bindable() public isConfirmUserTask: boolean = false;
@@ -42,6 +43,10 @@ export class DynamicUiWrapper {
     this._element = element;
 
     this.isModal = false;
+  }
+
+  public get currentUserTaskJson(): string {
+    return JSON.stringify(this.currentUserTask);
   }
 
   public set identity(identity: IIdentity) {
@@ -113,6 +118,8 @@ export class DynamicUiWrapper {
       this.confirmButtonText = 'Continue';
       this.declineButtonText = '';
     }
+
+    this.dynamicUsertaskComponent.userTask = newUserTask;
   }
 
   public manualTaskChanged(newManualTask: DataModels.ManualTasks.ManualTask): void {
@@ -161,10 +168,10 @@ export class DynamicUiWrapper {
     const userTaskResult: DataModels.UserTasks.UserTaskResult = this._getUserTaskResults();
 
     this._dynamicUiService.finishUserTask(this._identity,
-                                          processInstanceId,
-                                          correlationId,
-                                          userTaskInstanceId,
-                                          userTaskResult);
+      processInstanceId,
+      correlationId,
+      userTaskInstanceId,
+      userTaskResult);
 
     this.currentUserTask = undefined;
 
@@ -186,9 +193,9 @@ export class DynamicUiWrapper {
     const manualTaskInstanceId: string = this.currentManualTask.flowNodeInstanceId;
 
     this._dynamicUiService.finishManualTask(this._identity,
-                                            processInstanceId,
-                                            correlationId,
-                                            manualTaskInstanceId);
+      processInstanceId,
+      correlationId,
+      manualTaskInstanceId);
 
     this.currentManualTask = undefined;
 

@@ -4,8 +4,6 @@ const open = require('open');
 const argv = require('minimist')(process.argv.slice(2));
 const pushserve = require('pushserve');
 
-// This will make Bluebird the default Promise implementation throughout the core package.
-global.Promise = Bluebird;
 
 const defaultPort = 17290;
 const defaultHost = '127.0.0.1';
