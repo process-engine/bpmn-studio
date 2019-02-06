@@ -21,7 +21,6 @@ export class DynamicUiWrapper {
   public confirmButtonText: string = 'Continue';
   public declineButtonText: string = 'Decline';
   public onButtonClick: (action: 'cancel' | 'proceed' | 'decline') => void;
-  public dynamicUsertaskComponent: any;
   @bindable({changeHandler: 'userTaskChanged'}) public currentUserTask: DataModels.UserTasks.UserTask;
   @bindable({changeHandler: 'manualTaskChanged'}) public currentManualTask: DataModels.ManualTasks.ManualTask;
   @bindable() public isConfirmUserTask: boolean = false;
@@ -118,8 +117,6 @@ export class DynamicUiWrapper {
       this.confirmButtonText = 'Continue';
       this.declineButtonText = '';
     }
-
-    this.dynamicUsertaskComponent.userTask = newUserTask;
   }
 
   public manualTaskChanged(newManualTask: DataModels.ManualTasks.ManualTask): void {
