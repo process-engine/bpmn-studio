@@ -106,7 +106,7 @@
     "@essential-projects/errors_ts": "1.4.3",
     "@essential-projects/http_contracts": "2.3.6",
     "@process-engine/consumer_api_contracts": "4.1.1",
-    "@process-engine/dynamic_ui_core": "feature~use_for_botintegration",
+    "@process-engine/dynamic_ui_core": "feature~support_confirm_dialog",
     "@process-engine/kpi_api_contracts": "1.2.3",
     "@process-engine/management_api_client": "3.2.2",
     "@process-engine/management_api_contracts": "4.2.1",
