@@ -1,208 +1,208 @@
 {
-  "name": "bpmn-studio",
-  "description": "An Aurelia application for designing BPMN diagrams, which can also be connected to a process engine to execute these diagrams.",
-  "version": "4.21.0",
-  "author": {
-    "name": "process-engine",
-    "email": "hello@process-engine.io",
-    "url": "http://process-engine.io"
-  },
-  "main": "electron_app/electron.js",
-  "scripts": {
-    "start": "./bin/bpmn-studio.js",
-    "postinstall": "npm rebuild && electron-builder install-app-deps",
-    "start_dev": "au run --watch",
-    "build": "au build",
-    "reset": "bash dev_tooling/scripts/reset_setup.bash",
-    "reinstall": "OLD_PATH=$PATH bash dev_tooling/scripts/reinstall_setup.bash && unset OLD_PATH",
-    "deploy": "npm run build && npm publish",
-    "test-init": "npm rebuild && (process-engine & (webdriver-manager update && webdriver-manager start))",
-    "test": "au e2e",
-    "test-docker": "bash test/start_docker_bundle.sh && au e2eDocker",
-    "test-crossbrowser": "au e2eCrossbrowser",
-    "lint": "tslint --project .",
-    "electron-start-dev": "npm run build && electron electron_app/electron.js",
-    "electron-build-windows": "electron-rebuild && npm run build && build --publish never --windows",
-    "electron-build-macos": "electron-rebuild && npm run build && build --publish never --macos",
-    "electron-build-linux": "electron-rebuild && npm run build && build --publish never --linux",
-    "electron-shipit": "npm run build && build --publish always",
-    "jenkins-electron-install-app-deps": "electron-builder install-app-deps",
-    "jenkins-electron-rebuild-native": "electron-rebuild --force",
-    "jenkins-electron-build-windows": "build --publish never --windows",
-    "jenkins-electron-build-macos": "build --publish never --macos",
-    "jenkins-electron-build-linux": "build --publish never --linux",
-    "jenkins-run-end-to-end-tests": "au e2eDocker",
-    "jenkins-start-process-engine": "process-engine"
-  },
-  "build": {
-    "extraFiles": [
-      "config/**/*",
-      "build/**"
+    "name": "bpmn-studio",
+    "description": "An Aurelia application for designing BPMN diagrams, which can also be connected to a process engine to execute these diagrams.",
+    "version": "4.21.0",
+    "author": {
+        "name": "process-engine",
+        "email": "hello@process-engine.io",
+        "url": "http://process-engine.io"
+    },
+    "main": "electron_app/electron.js",
+    "scripts": {
+        "start": "./bin/bpmn-studio.js",
+        "postinstall": "npm rebuild && electron-builder install-app-deps",
+        "start_dev": "au run --watch",
+        "build": "au build",
+        "reset": "bash dev_tooling/scripts/reset_setup.bash",
+        "reinstall": "OLD_PATH=$PATH bash dev_tooling/scripts/reinstall_setup.bash && unset OLD_PATH",
+        "deploy": "npm run build && npm publish",
+        "test-init": "npm rebuild && (process-engine & (webdriver-manager update && webdriver-manager start))",
+        "test": "au e2e",
+        "test-docker": "bash test/start_docker_bundle.sh && au e2eDocker",
+        "test-crossbrowser": "au e2eCrossbrowser",
+        "lint": "tslint --project .",
+        "electron-start-dev": "npm run build && electron electron_app/electron.js",
+        "electron-build-windows": "electron-rebuild && npm run build && build --publish never --windows",
+        "electron-build-macos": "electron-rebuild && npm run build && build --publish never --macos",
+        "electron-build-linux": "electron-rebuild && npm run build && build --publish never --linux",
+        "electron-shipit": "npm run build && build --publish always",
+        "jenkins-electron-install-app-deps": "electron-builder install-app-deps",
+        "jenkins-electron-rebuild-native": "electron-rebuild --force",
+        "jenkins-electron-build-windows": "build --publish never --windows",
+        "jenkins-electron-build-macos": "build --publish never --macos",
+        "jenkins-electron-build-linux": "build --publish never --linux",
+        "jenkins-run-end-to-end-tests": "au e2eDocker",
+        "jenkins-start-process-engine": "process-engine"
+    },
+    "build": {
+        "extraFiles": [
+            "config/**/*",
+            "build/**"
+        ],
+        "extraResources": [
+            "node_modules/@process-engine/process_engine_runtime/sequelize/migrations/**/*"
+        ],
+        "nsis": {
+            "perMachine": false,
+            "oneClick": false,
+            "allowToChangeInstallationDirectory": true,
+            "runAfterFinish": false
+        },
+        "win": {
+            "target": "nsis",
+            "fileAssociations": [
+                {
+                    "ext": [
+                        "bpmn"
+                    ],
+                    "name": "BPMN",
+                    "description": "BPMN diagram extension"
+                }
+            ],
+            "artifactName": "bpmn-studio-setup-${version}.${ext}"
+        },
+        "mac": {
+            "target": [
+                "dmg",
+                "zip"
+            ],
+            "fileAssociations": [
+                {
+                    "ext": [
+                        "bpmn"
+                    ],
+                    "name": "BPMN"
+                }
+            ]
+        },
+        "linux": {
+            "target": "snap",
+            "fileAssociations": [
+                {
+                    "ext": [
+                        "bpmn"
+                    ],
+                    "name": "BPMN"
+                }
+            ],
+            "category": "Development"
+        }
+    },
+    "files": [
+        "scripts",
+        "index.html",
+        "bin",
+        "bootstrap",
+        "src/resources",
+        "@fortawesome"
     ],
-    "extraResources": [
-      "node_modules/@process-engine/process_engine_runtime/sequelize/migrations/**/*"
-    ],
-    "nsis": {
-      "perMachine": false,
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "runAfterFinish": false
+    "bin": "./bin/bpmn-studio.js",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/process-engine/bpmn-studio"
     },
-    "win": {
-      "target": "nsis",
-      "fileAssociations": [
-        {
-          "ext": [
-            "bpmn"
-          ],
-          "name": "BPMN",
-          "description": "BPMN diagram extension"
-        }
-      ],
-      "artifactName": "bpmn-studio-setup-${version}.${ext}"
+    "license": "MIT",
+    "dependencies": {
+        "@essential-projects/errors_ts": "1.4.3",
+        "@essential-projects/http_contracts": "2.3.6",
+        "@process-engine/consumer_api_contracts": "4.1.1",
+        "@process-engine/dynamic_ui_core": "feature~use_for_botintegration",
+        "@process-engine/kpi_api_contracts": "1.2.3",
+        "@process-engine/management_api_client": "3.2.2",
+        "@process-engine/management_api_contracts": "4.2.1",
+        "@process-engine/process_engine_runtime": "6.0.0",
+        "@process-engine/solutionexplorer.contracts": "1.0.1",
+        "@process-engine/solutionexplorer.repository.contracts": "4.0.0",
+        "@process-engine/solutionexplorer.repository.filesystem": "4.0.1",
+        "@process-engine/solutionexplorer.repository.management_api": "3.0.0",
+        "@process-engine/solutionexplorer.service": "4.0.0",
+        "@process-engine/solutionexplorer.service.contracts": "4.0.0",
+        "about-window": "1.12.1",
+        "aurelia-open-id-connect": "1.0.3",
+        "aurelia-validation": "1.3.2",
+        "bpmn-js-differ": "2.0.2",
+        "clipboard-polyfill": "2.7.0",
+        "dom-event-dispatch": "1.0.0",
+        "electron-is-dev": "^0.3.0",
+        "electron-notifications": "1.0.0",
+        "electron-updater": "4.0.6",
+        "get-port": "^3.2.0",
+        "highlight.js": "^9.12.0",
+        "highlightjs-line-numbers.js": "^2.2.0",
+        "minimist": "^1.2.0",
+        "node-fetch": "2.3.0",
+        "open": "0.0.5",
+        "print-js": "1.0.47",
+        "proxy-polyfill": "0.3.0",
+        "pushserve": "^1.0.2",
+        "socket.io-client": "2.1.1",
+        "spectrum-colorpicker": "1.8.0",
+        "sqlite3": "4.0.6"
     },
-    "mac": {
-      "target": [
-        "dmg",
-        "zip"
-      ],
-      "fileAssociations": [
-        {
-          "ext": [
-            "bpmn"
-          ],
-          "name": "BPMN"
-        }
-      ]
-    },
-    "linux": {
-      "target": "snap",
-      "fileAssociations": [
-        {
-          "ext": [
-            "bpmn"
-          ],
-          "name": "BPMN"
-        }
-      ],
-      "category": "Development"
+    "peerDependencies": {},
+    "devDependencies": {
+        "@essential-projects/iam_contracts": "~3.4.1",
+        "@fortawesome/fontawesome-free": "^5.1.0",
+        "@process-engine/bpmn-js-custom-bundle": "2.4.1",
+        "@process-engine/process_engine_contracts": "39.0.0",
+        "@stencil/core": "~0.16.2",
+        "@types/jasmine": "^2.2.0",
+        "@types/node": "^6.0.45",
+        "@types/spectrum": "^1.5.29",
+        "@types/toastr": "^2.1.35",
+        "aurelia-animator-css": "^1.0.2",
+        "aurelia-bootstrap": "^0.1.20",
+        "aurelia-bootstrapper": "^2.3.0",
+        "aurelia-cli": "^0.30.1",
+        "aurelia-fetch-client": "^1.1.2",
+        "aurelia-protractor-plugin": "^1.0.6",
+        "aurelia-route-recognizer": "1.2.0",
+        "aurelia-templating-resources": "1.7.1",
+        "aurelia-testing": "^1.0.0-beta.3.0.1",
+        "aurelia-tools": "^1.0.0",
+        "bluebird": "^3.5.1",
+        "bootstrap": "^4.1.3",
+        "browser-sync": "^2.13.0",
+        "connect-history-api-fallback": "^1.2.0",
+        "debounce": "^1.0.2",
+        "debug": "^3.1.0",
+        "downloadjs": "1.4.4",
+        "electron": "4.0.2",
+        "electron-builder": "20.38.5",
+        "electron-rebuild": "^1.8.2",
+        "event-stream": "3.3.4",
+        "eventemitter2": "^4.1.2",
+        "fetch-ponyfill": "^4.1.0",
+        "gulp": "4.0.0",
+        "gulp-changed-in-place": "^2.0.3",
+        "gulp-notify": "^2.2.0",
+        "gulp-plumber": "^1.1.0",
+        "gulp-protractor": "^4.1.0",
+        "gulp-rename": "^1.2.2",
+        "gulp-sass": "^3.0.0",
+        "gulp-sourcemaps": "^2.0.0-alpha",
+        "gulp-tslint": "^5.0.0",
+        "gulp-typescript": "^3.2.4",
+        "gulp-watch": "^4.3.11",
+        "jasmine-core": "^2.4.1",
+        "jquery": "^3.0.0",
+        "minimatch": "^3.0.2",
+        "ms": "^2.0.0",
+        "popper.js": "^1.11.0",
+        "protractor": "^5.4.0",
+        "protractor-http-client": "^1.0.4",
+        "requirejs": "^2.3.2",
+        "tether": "^1.4.0",
+        "text": "github:requirejs/text#latest",
+        "through2": "^2.0.1",
+        "toastr": "^2.1.4",
+        "tslint": "^5.1.0 ",
+        "tslint-config-5minds": "^1.0.6",
+        "typescript": "^2.9.2",
+        "uglify-js": "^2.6.3",
+        "velocity-animate": "^1.5.0",
+        "vinyl-fs": "^2.4.3",
+        "webdriver-manager": "^12.0.6",
+        "whatwg-fetch": "^2.0.3"
     }
-  },
-  "files": [
-    "scripts",
-    "index.html",
-    "bin",
-    "bootstrap",
-    "src/resources",
-    "@fortawesome"
-  ],
-  "bin": "./bin/bpmn-studio.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/process-engine/bpmn-studio"
-  },
-  "license": "MIT",
-  "dependencies": {
-    "@essential-projects/errors_ts": "1.4.3",
-    "@essential-projects/http_contracts": "2.3.6",
-    "@process-engine/consumer_api_contracts": "4.1.1",
-    "@process-engine/dynamic_ui_core": "feature~stencil_poc",
-    "@process-engine/kpi_api_contracts": "1.2.3",
-    "@process-engine/management_api_client": "3.2.2",
-    "@process-engine/management_api_contracts": "4.2.1",
-    "@process-engine/process_engine_runtime": "6.0.0",
-    "@process-engine/solutionexplorer.contracts": "1.0.1",
-    "@process-engine/solutionexplorer.repository.contracts": "4.0.0",
-    "@process-engine/solutionexplorer.repository.filesystem": "4.0.1",
-    "@process-engine/solutionexplorer.repository.management_api": "3.0.0",
-    "@process-engine/solutionexplorer.service": "4.0.0",
-    "@process-engine/solutionexplorer.service.contracts": "4.0.0",
-    "about-window": "1.12.1",
-    "aurelia-open-id-connect": "1.0.3",
-    "aurelia-validation": "1.3.2",
-    "bpmn-js-differ": "2.0.2",
-    "clipboard-polyfill": "2.7.0",
-    "dom-event-dispatch": "1.0.0",
-    "electron-is-dev": "^0.3.0",
-    "electron-notifications": "1.0.0",
-    "electron-updater": "4.0.6",
-    "get-port": "^3.2.0",
-    "highlight.js": "^9.12.0",
-    "highlightjs-line-numbers.js": "^2.2.0",
-    "minimist": "^1.2.0",
-    "node-fetch": "2.3.0",
-    "open": "0.0.5",
-    "print-js": "1.0.47",
-    "proxy-polyfill": "0.3.0",
-    "pushserve": "^1.0.2",
-    "socket.io-client": "2.1.1",
-    "spectrum-colorpicker": "1.8.0",
-    "sqlite3": "4.0.6"
-  },
-  "peerDependencies": {},
-  "devDependencies": {
-    "@essential-projects/iam_contracts": "~3.4.1",
-    "@fortawesome/fontawesome-free": "^5.1.0",
-    "@process-engine/bpmn-js-custom-bundle": "2.4.1",
-    "@process-engine/process_engine_contracts": "39.0.0",
-    "@stencil/core": "~0.16.2",
-    "@types/jasmine": "^2.2.0",
-    "@types/node": "^6.0.45",
-    "@types/spectrum": "^1.5.29",
-    "@types/toastr": "^2.1.35",
-    "aurelia-animator-css": "^1.0.2",
-    "aurelia-bootstrap": "^0.1.20",
-    "aurelia-bootstrapper": "^2.3.0",
-    "aurelia-cli": "^0.30.1",
-    "aurelia-fetch-client": "^1.1.2",
-    "aurelia-protractor-plugin": "^1.0.6",
-    "aurelia-route-recognizer": "1.2.0",
-    "aurelia-templating-resources": "1.7.1",
-    "aurelia-testing": "^1.0.0-beta.3.0.1",
-    "aurelia-tools": "^1.0.0",
-    "bluebird": "^3.5.1",
-    "bootstrap": "^4.1.3",
-    "browser-sync": "^2.13.0",
-    "connect-history-api-fallback": "^1.2.0",
-    "debounce": "^1.0.2",
-    "debug": "^3.1.0",
-    "downloadjs": "1.4.4",
-    "electron": "4.0.2",
-    "electron-builder": "20.38.5",
-    "electron-rebuild": "^1.8.2",
-    "event-stream": "3.3.4",
-    "eventemitter2": "^4.1.2",
-    "fetch-ponyfill": "^4.1.0",
-    "gulp": "4.0.0",
-    "gulp-changed-in-place": "^2.0.3",
-    "gulp-notify": "^2.2.0",
-    "gulp-plumber": "^1.1.0",
-    "gulp-protractor": "^4.1.0",
-    "gulp-rename": "^1.2.2",
-    "gulp-sass": "^3.0.0",
-    "gulp-sourcemaps": "^2.0.0-alpha",
-    "gulp-tslint": "^5.0.0",
-    "gulp-typescript": "^3.2.4",
-    "gulp-watch": "^4.3.11",
-    "jasmine-core": "^2.4.1",
-    "jquery": "^3.0.0",
-    "minimatch": "^3.0.2",
-    "ms": "^2.0.0",
-    "popper.js": "^1.11.0",
-    "protractor": "^5.4.0",
-    "protractor-http-client": "^1.0.4",
-    "requirejs": "^2.3.2",
-    "tether": "^1.4.0",
-    "text": "github:requirejs/text#latest",
-    "through2": "^2.0.1",
-    "toastr": "^2.1.4",
-    "tslint": "^5.1.0 ",
-    "tslint-config-5minds": "^1.0.6",
-    "typescript": "^2.9.2",
-    "uglify-js": "^2.6.3",
-    "velocity-animate": "^1.5.0",
-    "vinyl-fs": "^2.4.3",
-    "webdriver-manager": "^12.0.6",
-    "whatwg-fetch": "^2.0.3"
-  }
 }
