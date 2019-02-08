@@ -91,6 +91,7 @@ export class DynamicUiWrapper {
     this.isConfirmUserTask = preferredControlSet
       ? newUserTask.data.preferredControl.toLowerCase() === 'confirm'
       : false;
+    console.log('isConfirm taskchanged', this.isConfirmUserTask);
 
     this.isFormUserTask = !this.isConfirmUserTask;
 

@@ -103,6 +103,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "handlebars": "^4.0.12",
     "@essential-projects/errors_ts": "1.4.3",
     "@essential-projects/http_contracts": "2.3.6",
     "@process-engine/consumer_api_contracts": "4.1.1",
@@ -141,11 +142,11 @@
   },
   "peerDependencies": {},
   "devDependencies": {
+    "@stencil/core": "~0.16.2",
     "@essential-projects/iam_contracts": "~3.4.1",
     "@fortawesome/fontawesome-free": "^5.1.0",
     "@process-engine/bpmn-js-custom-bundle": "2.4.1",
     "@process-engine/process_engine_contracts": "39.0.0",
-    "@stencil/core": "~0.16.2",
     "@types/jasmine": "^2.2.0",
     "@types/node": "^6.0.45",
     "@types/spectrum": "^1.5.29",
