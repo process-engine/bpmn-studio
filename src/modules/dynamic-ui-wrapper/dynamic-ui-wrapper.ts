@@ -44,7 +44,7 @@ export class DynamicUiWrapper {
     this.isModal = false;
   }
 
-  private finishUserTaskListener(): any {
+  private finishUserTaskListener(): void {
     const component: any = document.getElementById('test');
     component.addEventListener('submitted', (event: any) => {
           const userTask: any = event.detail;
