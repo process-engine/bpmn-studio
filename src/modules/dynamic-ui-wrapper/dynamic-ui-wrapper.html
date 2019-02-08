@@ -3,7 +3,7 @@
   <require from="../form-widget/form-widget"></require>
   <require from="../confirm-widget/confirm-widget"></require>
   <template if.bind="isHandlingUserTask">
-    <dynamic-usertask-component id="test" usertask.bind="currentUserTask" change.delegate="testFunc()"></dynamic-usertask-component>
+    <dynamic-usertask-component id="test" usertask.bind="currentUserTask" change.delegate="finishUserTaskListener()"></dynamic-usertask-component>
   </template>
   <template if.bind="isHandlingManualTask">
     <div class="dynamic-ui__button--wrapper">

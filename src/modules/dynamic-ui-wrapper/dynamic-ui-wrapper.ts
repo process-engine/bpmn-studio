@@ -44,16 +44,12 @@ export class DynamicUiWrapper {
     this.isModal = false;
   }
 
-  private testFunc(): any {
-    console.log('identity');
-    console.log('identity', this._identity);
+  private finishUserTaskListener(): any {
     const component: any = document.getElementById('test');
     component.addEventListener('submitted', (event: any) => {
           const userTask: any = event.detail;
-          console.log('userTask', userTask);
           this._finishUserTask('proceed', userTask);
         });
-    console.log('component', component );
   }
 
   public get currentUserTaskJson(): string {
@@ -71,8 +67,6 @@ export class DynamicUiWrapper {
   public async handleUserTaskButtonClick(action: 'cancel' | 'proceed' | 'decline'): Promise<void> {
     const actionCanceled: boolean = action === 'cancel';
 
-    console.log('handleUserTaskButtonClick');
-
     if (actionCanceled) {
       this._cancelTask();
 
@@ -81,20 +75,18 @@ export class DynamicUiWrapper {
 
     this.isConfirmUserTask = true;
     if (this.isConfirmUserTask) {
-      console.log('Right Way');
       const formFields: Array<DataModels.UserTasks.UserTaskFormField> = this._testUserTask.data.formFields;
 
       const booleanFormFieldIndex: number = formFields.findIndex((formField: DataModels.UserTasks.UserTaskFormField) => {
         return formField.type === DataModels.UserTasks.UserTaskFormFieldType.boolean;
       });
 
-      const hasBooleanFormField: boolean = true; // formFields[booleanFormFieldIndex] !== undefined;
+      const hasBooleanFormField: boolean = formFields[booleanFormFieldIndex] !== undefined;
 
       if (hasBooleanFormField) {
         (formFields[booleanFormFieldIndex] as IBooleanFormField).value = action === 'proceed';
       }
 
-      console.log('now calling _finishUserTask()');
       this._finishUserTask(action);
     } else if (this.isFormUserTask) {
       console.log('Wrong Way');
@@ -115,7 +107,6 @@ export class DynamicUiWrapper {
   }
 
   public userTaskChanged(newUserTask: DataModels.UserTasks.UserTask): void {
-    console.log('userTaskChanged');
     const isUserTaskEmpty: boolean = newUserTask === undefined;
     if (isUserTaskEmpty) {
       return;
@@ -182,9 +173,7 @@ export class DynamicUiWrapper {
     const processInstanceId: string = userTask.processInstanceId;
     const userTaskInstanceId: string = userTask.userTaskInstanceId;
     const userTaskResult: DataModels.UserTasks.UserTaskResult = userTask.results;
-    console.log('_finishUserTask');
-    console.log('_finishUserTask identity', this._identity);
-    console.log('UserTaskID: ', userTask.userTaskInstanceId);
+
     this._dynamicUiService.finishUserTask(this._identity,
       processInstanceId,
       correlationId,
