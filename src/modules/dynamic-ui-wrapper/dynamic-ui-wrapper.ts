@@ -153,6 +153,8 @@ export class DynamicUiWrapper {
       userTaskInstanceId,
       userTaskResult);
 
+    this.currentUserTask = undefined;
+
     const buttonClickHandlerExists: boolean = this.onButtonClick !== undefined;
     if (buttonClickHandlerExists) {
       this.onButtonClick(action);
