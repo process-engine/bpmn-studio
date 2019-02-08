@@ -1,9 +1,0 @@
-<template>
-  <require from="./dynamic-ui-dropdown-element.css"></require>
-  <div class="form-group">
-    <label for="dynamic-${field.id}">${field.label}</label>
-    <select class="form-control" id="dynamic-${field.id}" value.bind="field.value">
-      <option repeat.for="value of field.enumValues" model.bind="value.name">${value.name}</option>
-    </select>
-  </div>
-</template>
