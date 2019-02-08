@@ -3,7 +3,13 @@
   <require from="../form-widget/form-widget"></require>
   <require from="../confirm-widget/confirm-widget"></require>
   <template if.bind="isHandlingUserTask">
-    <dynamic-usertask-component id="test" usertask.bind="currentUserTask" change.delegate="finishUserTaskListener()"></dynamic-usertask-component>
+    <confirm-widget if.bind="isConfirmUserTask" user-task-config.bind="currentUserTask.data"></confirm-widget>
+    <dynamic-usertask-component id="test" usertask.bind="currentUserTask" change.delegate="finishUserTaskListener('proceed')"></dynamic-usertask-component>
+    <div class="dynamic-ui__button--wrapper">
+      <button if.bind="cancelButtonText" class="btn btn-default dynamic-ui__button" click.delegate="finishUserTaskListener('cancel')">${cancelButtonText}</button>
+      <button if.bind="confirmButtonText" class="btn btn-success dynamic-ui__button" click.delegate="finishUserTaskListener('proceed')" id="dynamic-ui-wrapper-continue-button">${confirmButtonText}</button>
+      <button if.bind="declineButtonText" class="btn btn-danger dynamic-ui__button dynamic-ui__button--decline" click.delegate="finishUserTaskListener('decline')">${declineButtonText}</button>
+    </div>
   </template>
   <template if.bind="isHandlingManualTask">
     <div class="dynamic-ui__button--wrapper">

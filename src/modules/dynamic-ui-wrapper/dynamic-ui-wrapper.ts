@@ -44,12 +44,41 @@ export class DynamicUiWrapper {
     this.isModal = false;
   }
 
-  private finishUserTaskListener(): void {
+  private finishUserTaskListener(action: 'cancel' | 'proceed' | 'decline'): void {
     const component: any = document.getElementById('test');
+
     component.addEventListener('submitted', (event: any) => {
           const userTask: any = event.detail;
-          this._finishUserTask('proceed', userTask);
+          this.handleUserTaskButtonClick(action, userTask);
         });
+  }
+
+  public async handleUserTaskButtonClick(action: 'cancel' | 'proceed' | 'decline', userTask: any): Promise<void> {
+    const actionCanceled: boolean = action === 'cancel';
+
+    if (actionCanceled) {
+      this._cancelTask();
+
+      return;
+    }
+
+    if (this.isConfirmUserTask) {
+      const formFields: Array<DataModels.UserTasks.UserTaskFormField> = userTask.data.formFields;
+
+      const booleanFormFieldIndex: number = formFields.findIndex((formField: DataModels.UserTasks.UserTaskFormField) => {
+        return formField.type === DataModels.UserTasks.UserTaskFormFieldType.boolean;
+      });
+
+      const hasBooleanFormField: boolean = formFields[booleanFormFieldIndex] !== undefined;
+
+      if (hasBooleanFormField) {
+        (formFields[booleanFormFieldIndex] as IBooleanFormField).value = action === 'proceed';
+      }
+
+      this._finishUserTask(action, userTask);
+    } else if (this.isFormUserTask) {
+      this._finishUserTask(action, userTask);
+    }
   }
 
   public get currentUserTaskJson(): string {
@@ -83,10 +112,11 @@ export class DynamicUiWrapper {
     }
 
     const preferredControlSet: boolean = newUserTask.data.preferredControl !== undefined;
-
+    console.log('preferredControl: ' , newUserTask.data.preferredControl);
     this.isConfirmUserTask = preferredControlSet
       ? newUserTask.data.preferredControl.toLowerCase() === 'confirm'
       : false;
+    console.log('isConfirm taskchanged', this.isConfirmUserTask);
 
     this.isFormUserTask = !this.isConfirmUserTask;
 
