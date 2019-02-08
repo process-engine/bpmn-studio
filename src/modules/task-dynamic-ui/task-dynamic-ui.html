@@ -3,9 +3,6 @@
   <require from="../dynamic-ui-wrapper/dynamic-ui-wrapper"></require>
   <div class="dynamic-ui-wrapper">
     <div class="dynamic-ui">
-      <template if.bind="userTask || manualTask">
-        <h3>${taskName}</h3>
-      </template>
       <dynamic-ui-wrapper view-model.ref="dynamicUiWrapper" is-modal.bind="isModal" close-modal.trigger="clearTasks()"></dynamic-ui-wrapper>
       <template if.bind="!userTask && !manualTask">
         <h3>Task not found</h3>
