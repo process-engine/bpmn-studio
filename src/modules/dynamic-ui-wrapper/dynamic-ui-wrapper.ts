@@ -48,8 +48,6 @@ export class DynamicUiWrapper {
   public async handleUserTaskButtonClick(action: 'cancel' | 'proceed', userTask: any): Promise<void> {
     const actionCanceled: boolean = action === 'cancel';
 
-    console.log('handleUserTaskButtonClick');
-
     if (actionCanceled) {
       this._cancelTask();
 
@@ -84,7 +82,6 @@ export class DynamicUiWrapper {
   }
 
   public userTaskChanged(newUserTask: DataModels.UserTasks.UserTask): void {
-    console.log('userTaskChanged');
     const isUserTaskEmpty: boolean = newUserTask === undefined;
     if (isUserTaskEmpty) {
       return;
