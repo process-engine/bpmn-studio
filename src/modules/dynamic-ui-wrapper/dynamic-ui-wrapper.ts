@@ -48,6 +48,8 @@ export class DynamicUiWrapper {
   public async handleUserTaskButtonClick(action: 'cancel' | 'proceed', userTask: any): Promise<void> {
     const actionCanceled: boolean = action === 'cancel';
 
+    console.log('handleUserTaskButtonClick');
+
     if (actionCanceled) {
       this._cancelTask();
 
@@ -82,6 +84,7 @@ export class DynamicUiWrapper {
   }
 
   public userTaskChanged(newUserTask: DataModels.UserTasks.UserTask): void {
+    console.log('userTaskChanged');
     const isUserTaskEmpty: boolean = newUserTask === undefined;
     if (isUserTaskEmpty) {
       return;
@@ -147,14 +150,11 @@ export class DynamicUiWrapper {
     const processInstanceId: string = userTask.processInstanceId;
     const userTaskInstanceId: string = userTask.userTaskInstanceId;
     const userTaskResult: DataModels.UserTasks.UserTaskResult = userTask.results;
-
     this._dynamicUiService.finishUserTask(this._identity,
       processInstanceId,
       correlationId,
       userTaskInstanceId,
       userTaskResult);
-
-    this.currentUserTask = undefined;
 
     const buttonClickHandlerExists: boolean = this.onButtonClick !== undefined;
     if (buttonClickHandlerExists) {
