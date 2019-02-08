@@ -64,36 +64,6 @@ export class DynamicUiWrapper {
     this._activeSolutionEntry = solutionEntry;
   }
 
-  public async handleUserTaskButtonClick(action: 'cancel' | 'proceed' | 'decline'): Promise<void> {
-    const actionCanceled: boolean = action === 'cancel';
-
-    if (actionCanceled) {
-      this._cancelTask();
-
-      return;
-    }
-
-    this.isConfirmUserTask = true;
-    if (this.isConfirmUserTask) {
-      const formFields: Array<DataModels.UserTasks.UserTaskFormField> = this._testUserTask.data.formFields;
-
-      const booleanFormFieldIndex: number = formFields.findIndex((formField: DataModels.UserTasks.UserTaskFormField) => {
-        return formField.type === DataModels.UserTasks.UserTaskFormFieldType.boolean;
-      });
-
-      const hasBooleanFormField: boolean = formFields[booleanFormFieldIndex] !== undefined;
-
-      if (hasBooleanFormField) {
-        (formFields[booleanFormFieldIndex] as IBooleanFormField).value = action === 'proceed';
-      }
-
-      this._finishUserTask(action);
-    } else if (this.isFormUserTask) {
-      console.log('Wrong Way');
-      this._finishUserTask(action);
-    }
-  }
-
   public async handleManualTaskButtonClick(action: 'cancel' | 'proceed'): Promise<void> {
     const actionCanceled: boolean = action === 'cancel';
 
@@ -179,6 +149,8 @@ export class DynamicUiWrapper {
       correlationId,
       userTaskInstanceId,
       userTaskResult);
+
+    this.currentUserTask = undefined;
 
     const buttonClickHandlerExists: boolean = this.onButtonClick !== undefined;
     if (buttonClickHandlerExists) {
