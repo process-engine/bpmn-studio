@@ -44,6 +44,18 @@ export class DynamicUiWrapper {
     this.isModal = false;
   }
 
+  private testFunc(): any {
+    console.log('identity');
+    console.log('identity', this._identity);
+    const component: any = document.getElementById('test');
+    component.addEventListener('submitted', (event: any) => {
+          const userTask: any = event.detail;
+          console.log('userTask', userTask);
+          this._finishUserTask('proceed', userTask);
+        });
+    console.log('component', component );
+  }
+
   public get currentUserTaskJson(): string {
     return JSON.stringify(this.currentUserTask);
   }
@@ -59,27 +71,33 @@ export class DynamicUiWrapper {
   public async handleUserTaskButtonClick(action: 'cancel' | 'proceed' | 'decline'): Promise<void> {
     const actionCanceled: boolean = action === 'cancel';
 
+    console.log('handleUserTaskButtonClick');
+
     if (actionCanceled) {
       this._cancelTask();
 
       return;
     }
 
+    this.isConfirmUserTask = true;
     if (this.isConfirmUserTask) {
-      const formFields: Array<DataModels.UserTasks.UserTaskFormField> = this.currentUserTask.data.formFields;
+      console.log('Right Way');
+      const formFields: Array<DataModels.UserTasks.UserTaskFormField> = this._testUserTask.data.formFields;
 
       const booleanFormFieldIndex: number = formFields.findIndex((formField: DataModels.UserTasks.UserTaskFormField) => {
         return formField.type === DataModels.UserTasks.UserTaskFormFieldType.boolean;
       });
 
-      const hasBooleanFormField: boolean = formFields[booleanFormFieldIndex] !== undefined;
+      const hasBooleanFormField: boolean = true; // formFields[booleanFormFieldIndex] !== undefined;
 
       if (hasBooleanFormField) {
         (formFields[booleanFormFieldIndex] as IBooleanFormField).value = action === 'proceed';
       }
 
+      console.log('now calling _finishUserTask()');
       this._finishUserTask(action);
     } else if (this.isFormUserTask) {
+      console.log('Wrong Way');
       this._finishUserTask(action);
     }
   }
@@ -97,6 +115,7 @@ export class DynamicUiWrapper {
   }
 
   public userTaskChanged(newUserTask: DataModels.UserTasks.UserTask): void {
+    console.log('userTaskChanged');
     const isUserTaskEmpty: boolean = newUserTask === undefined;
     if (isUserTaskEmpty) {
       return;
@@ -152,25 +171,25 @@ export class DynamicUiWrapper {
     });
   }
 
-  private _finishUserTask(action: 'cancel' | 'proceed' | 'decline'): Promise<void> {
+  private _finishUserTask(action: 'cancel' | 'proceed' | 'decline', userTask: any): Promise<void> {
     const noUserTaskKnown: boolean = !this.isHandlingUserTask;
 
     if (noUserTaskKnown) {
       return;
     }
 
-    const correlationId: string = this.currentUserTask.correlationId;
-    const processInstanceId: string = this.currentUserTask.processInstanceId;
-    const userTaskInstanceId: string = this.currentUserTask.flowNodeInstanceId;
-    const userTaskResult: DataModels.UserTasks.UserTaskResult = this._getUserTaskResults();
-
+    const correlationId: string = userTask.correlationId;
+    const processInstanceId: string = userTask.processInstanceId;
+    const userTaskInstanceId: string = userTask.userTaskInstanceId;
+    const userTaskResult: DataModels.UserTasks.UserTaskResult = userTask.results;
+    console.log('_finishUserTask');
+    console.log('_finishUserTask identity', this._identity);
+    console.log('UserTaskID: ', userTask.userTaskInstanceId);
     this._dynamicUiService.finishUserTask(this._identity,
       processInstanceId,
       correlationId,
       userTaskInstanceId,
       userTaskResult);
-
-    this.currentUserTask = undefined;
 
     const buttonClickHandlerExists: boolean = this.onButtonClick !== undefined;
     if (buttonClickHandlerExists) {
@@ -178,7 +197,7 @@ export class DynamicUiWrapper {
     }
   }
 
-  private _finishManualTask(): Promise<void> {
+  private _finishManualTask(): Promise < void > {
     const noManualTaskKnown: boolean = !this.isHandlingManualTask;
 
     if (noManualTaskKnown) {
