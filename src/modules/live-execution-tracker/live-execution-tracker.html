@@ -7,49 +7,45 @@
     <div class="let__main-view">
       <div class="let__diagram-viewer">
         <div ref="canvasModel" class="let__diagram-viewer-canvas"></div>
-        <button if.bind="hasPreviousProcess" class="btn btn-default let__parent-process-button" click.delegate="navigateBackToPreviousProcess()">Back to previous process</button>
+        <button if.bind="hasPreviousProcess" class="btn btn-default let__parent-process-button"
+          click.delegate="navigateBackToPreviousProcess()">Back to previous process</button>
+        <button class="btn btn-default let__back-button" click.delegate="navigateBack()">Back</button>
       </div>
       <div show.bind="showTokenViewer" class="let__token-viewer-resize-div" ref="tokenViewerResizeDiv"></div>
-      <token-viewer show.bind="showTokenViewer"
-                    ref="tokenViewer"
-                    class="let__token-viewer"
-                    css="width: ${tokenViewerWidth}px;"
-                    correlation.bind="correlation"
-                    active-diagram.bind="activeDiagram"
-                    flow-node.bind="selectedFlowNode"
-                    active-solution-entry.bind="activeSolutionEntry">
+      <token-viewer show.bind="showTokenViewer" ref="tokenViewer" class="let__token-viewer"
+        css="width: ${tokenViewerWidth}px;" correlation.bind="correlation" active-diagram.bind="activeDiagram"
+        flow-node.bind="selectedFlowNode">
       </token-viewer>
     </div>
   </div>
   <div class="let__right-toolbar">
     <div class="tool-list tool-list--vertical">
-      <div class="let__tool"
-           class.bind="showTokenViewer ? 'let__tool--active' : ''"
-           title.bind="showTokenViewer ? 'Hide token viewer' : 'Show token viewer'"
-           click.delegate="toggleShowTokenViewer()">
+      <div class="let__tool" class.bind="showTokenViewer ? 'let__tool--active' : ''"
+        title.bind="showTokenViewer ? 'Hide token viewer' : 'Show token viewer'"
+        click.delegate="toggleShowTokenViewer()">
         <i class="fas fa-book"></i>
       </div>
     </div>
   </div>
 
-  <modal if.bind="showDynamicUiModal"
-         modal-style.bind="modalStyleString"
-         css="display: ${showDynamicUiModal ? 'block' : 'none'};"
-         body-style="overflow: auto;"
-         origin.bind="liveExecutionTracker">
-    <template replace-part="modal-header">
-      <btn class="button close-dynamic-ui-button"><i class="fas fa-times" click.delegate="closeDynamicUiModal()"></i></btn>
-    </template>
-    <template replace-part="modal-body">
-      <task-dynamic-ui correlation-id.bind="correlationId"
-                        view-model.ref="origin.dynamicUi"
-                        process-instance-id.bind="processInstanceId"
-                        process-model-id.bind="processModelId"
-                        task-id.bind="taskId"
-                        is-modal="true"
-                        close-modal.trigger="closeDynamicUiModal()"
-                        active-solution-entry.bind="activeSolutionEntry">
-      </task-dynamic-ui>
-    </template>
-  </modal>
+  <!-- Task-Dynamic-UI Modal -->
+  <div if.bind="showDynamicUiModal">
+    <div class="modal show-modal" css="display: ${showDynamicUiModal ? 'block' : 'none'};" tabindex="-1" role="dialog"
+      id="dynamicUiModal">
+      <div class="modal-dialog dynamic-ui-modal-dialog" role="document">
+        <div class="modal-content dynamic-ui-modal-content">
+          <div class="dynamic-ui-modal-body">
+            <btn class="button close-dynamic-ui-button"><i class="fas fa-times"
+                click.delegate="closeDynamicUiModal()"></i></btn>
+            <task-dynamic-ui correlation-id.bind="correlationId" view-model.ref="dynamicUi"
+              process-instance-id="processInstanceId" process-model-id.bind="processModelId" task-id.bind="taskId"
+              is-modal="true" close-modal.trigger="closeDynamicUiModal()"
+              active-solution-entry.bind="activeSolutionEntry">
+            </task-dynamic-ui>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-backdrop fade in"></div>
+  </div>
 </template>

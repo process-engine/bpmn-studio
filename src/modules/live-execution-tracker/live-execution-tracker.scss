@@ -55,8 +55,9 @@
 .close-dynamic-ui-button {
   position: absolute;
   top: 5px;
-  right: 20px;
+  right: 10px;
   cursor: pointer;
+  z-index: 100;
 }
 
 .let__token-viewer {

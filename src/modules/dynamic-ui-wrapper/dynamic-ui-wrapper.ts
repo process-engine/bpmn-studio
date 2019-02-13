@@ -20,6 +20,7 @@ export class DynamicUiWrapper {
   public cancelButtonText: string = 'Cancel';
   public confirmButtonText: string = 'Continue';
   public declineButtonText: string = 'Decline';
+  public userTaskComponent: any;
   public onButtonClick: (action: 'cancel' | 'proceed' | 'decline') => void;
   @bindable({changeHandler: 'userTaskChanged'}) public currentUserTask: DataModels.UserTasks.UserTask;
   @bindable({changeHandler: 'manualTaskChanged'}) public currentManualTask: DataModels.ManualTasks.ManualTask;
@@ -42,15 +43,6 @@ export class DynamicUiWrapper {
     this._element = element;
 
     this.isModal = false;
-  }
-
-  private finishUserTaskListener(action: 'cancel' | 'proceed' | 'decline'): void {
-    const component: any = document.getElementById('test');
-
-    component.addEventListener('submitted', (event: any) => {
-          const userTask: any = event.detail;
-          this.handleUserTaskButtonClick(action, userTask);
-        });
   }
 
   public async handleUserTaskButtonClick(action: 'cancel' | 'proceed' | 'decline', userTask: any): Promise<void> {
@@ -112,7 +104,7 @@ export class DynamicUiWrapper {
     }
 
     const preferredControlSet: boolean = newUserTask.data.preferredControl !== undefined;
-    console.log('preferredControl: ' , newUserTask.data.preferredControl);
+    console.log('preferredControl: ', newUserTask.data.preferredControl);
     this.isConfirmUserTask = preferredControlSet
       ? newUserTask.data.preferredControl.toLowerCase() === 'confirm'
       : false;
@@ -188,7 +180,7 @@ export class DynamicUiWrapper {
     }
   }
 
-  private _finishManualTask(): Promise < void > {
+  private _finishManualTask(): Promise<void> {
     const noManualTaskKnown: boolean = !this.isHandlingManualTask;
 
     if (noManualTaskKnown) {
