@@ -27,6 +27,7 @@ export class NavBar {
   public disableDashboardButton: boolean = false;
   public disableInspectCorrelationButton: boolean = false;
   public diagramContainsUnsavedChanges: boolean = false;
+  public saveTargetIsProcessEngine: boolean = false;
 
   public inspectView: string = 'dashboard';
   public designView: string = 'detail';
@@ -214,7 +215,7 @@ export class NavBar {
   }
 
   public saveDiagram(): void {
-    if (this.validationError) {
+    if (this.validationError && this.saveTargetIsProcessEngine) {
       return;
     }
 
@@ -302,6 +303,7 @@ export class NavBar {
       this.showTools = true;
       this.showInspectTools = false;
       this.showExportOnInspectCorrelation = false;
+      this.saveTargetIsProcessEngine = activeSolutionIsRemoteSolution;
 
     } else if (activeRouteIsInspect) {
       const inspectView: string = this.router.currentInstruction.params.view;

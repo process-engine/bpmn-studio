@@ -23,7 +23,7 @@
         <button class="button menu-bar__menu-center--action-button menu-bar__menu-center--back-button back-button" click.delegate="navigateBack()" title="Navigate back">
           <i class="fas fa-arrow-circle-left"></i>
         </button>
-        <button class="button menu-bar__menu-center--action-button" class.bind="validationError ? 'button--disabled' : ''" click.delegate="saveDiagram()" disabled.bind="validationError" title="Save Diagram">
+        <button class="button menu-bar__menu-center--action-button" class.bind="validationError && saveTargetIsProcessEngine ? 'button--disabled' : ''" click.delegate="saveDiagram()" disabled.bind="validationError && saveTargetIsProcessEngine" title="Save Diagram">
           <i class="fas fa-save"></i>
         </button>
       </template>
