@@ -1,13 +1,26 @@
 <template>
   <require from="./dynamic-ui-wrapper.css"></require>
+<<<<<<< HEAD
+=======
+  <require from="../form-widget/form-widget"></require>
+>>>>>>> :lipstick: improve styling of dynamic ui
   <template if.bind="isHandlingUserTask">
     <dynamic-usertask-component submitted.delegate="handleUserTaskButtonClick('proceed', $event.detail)"
       canceled.delegate="handleUserTaskButtonClick('cancel')" usertask.bind="currentUserTask">
     </dynamic-usertask-component>
   </template>
   <template if.bind="isHandlingManualTask">
+<<<<<<< HEAD
     <manualtask-component manualtask.bind="currentManualTask"
       continued.delegate="handleManualTaskButtonClick('proceed')"
       canceled.delegate="handleManualTaskButtonClick('cancel')"></manualtask-component>
+=======
+    <div class="dynamic-ui__button--wrapper">
+      <button class="btn btn-default dynamic-ui__button"
+        click.delegate="handleManualTaskButtonClick('cancel')">Cancel</button>
+      <button class="btn btn-success dynamic-ui__button"
+        click.delegate="handleManualTaskButtonClick('proceed')">Continue</button>
+    </div>
+>>>>>>> :lipstick: improve styling of dynamic ui
   </template>
 </template>
