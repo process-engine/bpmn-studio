@@ -45,7 +45,7 @@ export class DynamicUiWrapper {
     this.isModal = false;
   }
 
-  public async handleUserTaskButtonClick(action: 'cancel' | 'proceed' | 'decline', userTask: any): Promise<void> {
+  public async handleUserTaskButtonClick(action: 'cancel' | 'proceed', userTask: any): Promise<void> {
     const actionCanceled: boolean = action === 'cancel';
 
     if (actionCanceled) {
@@ -54,23 +54,7 @@ export class DynamicUiWrapper {
       return;
     }
 
-    if (this.isConfirmUserTask) {
-      const formFields: Array<DataModels.UserTasks.UserTaskFormField> = userTask.data.formFields;
-
-      const booleanFormFieldIndex: number = formFields.findIndex((formField: DataModels.UserTasks.UserTaskFormField) => {
-        return formField.type === DataModels.UserTasks.UserTaskFormFieldType.boolean;
-      });
-
-      const hasBooleanFormField: boolean = formFields[booleanFormFieldIndex] !== undefined;
-
-      if (hasBooleanFormField) {
-        (formFields[booleanFormFieldIndex] as IBooleanFormField).value = action === 'proceed';
-      }
-
-      this._finishUserTask(action, userTask);
-    } else if (this.isFormUserTask) {
-      this._finishUserTask(action, userTask);
-    }
+    this._finishUserTask(action, userTask);
   }
 
   public get currentUserTaskJson(): string {
