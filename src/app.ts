@@ -50,7 +50,7 @@ export class App {
     };
 
     this.showSolutionExplorer = window.localStorage.getItem('SolutionExplorerVisibility') === 'true'
-                              || window.localStorage.getItem('SolutionExplorerVisibility') === null;
+      || window.localStorage.getItem('SolutionExplorerVisibility') === null;
 
     this._subscriptions = [
       this._eventAggregator.subscribe(environment.events.processSolutionPanel.toggleProcessSolutionExplorer, () => {
@@ -73,8 +73,8 @@ export class App {
     const openIdConnectRoute: string = window.localStorage.getItem('openIdRoute');
 
     const openIdConnectRouteIsCustom: boolean = openIdConnectRoute !== null
-                                             && openIdConnectRoute !== undefined
-                                             && openIdConnectRoute !== '';
+      && openIdConnectRoute !== undefined
+      && openIdConnectRoute !== '';
 
     if (openIdConnectRouteIsCustom) {
       /*

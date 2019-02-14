@@ -1,6 +1,5 @@
 <template>
   <require from="./dynamic-ui-wrapper.css"></require>
-  <require from="../form-widget/form-widget"></require>
   <template if.bind="isHandlingUserTask">
     <dynamic-usertask-component submitted.delegate="handleUserTaskButtonClick('proceed', $event.detail)"
       canceled.delegate="handleUserTaskButtonClick('cancel')" usertask.bind="currentUserTask">

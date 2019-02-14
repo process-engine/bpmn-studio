@@ -23,11 +23,11 @@ import {NotificationService} from '../../notification/notification.service';
 import {BpmnIo} from '../bpmn-io/bpmn-io';
 
 @inject('ManagementApiClientService',
-        'NotificationService',
-        'SolutionService',
-        EventAggregator,
-        Router,
-        ValidationController)
+  'NotificationService',
+  'SolutionService',
+  EventAggregator,
+  Router,
+  ValidationController)
 export class DiagramDetail {
 
   @bindable() public activeDiagram: IDiagram;
@@ -228,13 +228,13 @@ export class DiagramDetail {
       });
 
       this._notificationService
-          .showNotification(NotificationType.SUCCESS, 'Diagram was successfully uploaded to the connected ProcessEngine.');
+        .showNotification(NotificationType.SUCCESS, 'Diagram was successfully uploaded to the connected ProcessEngine.');
 
       this._eventAggregator.publish(environment.events.diagramDetail.onDiagramDeployed, processModelId);
 
     } catch (error) {
       this._notificationService
-          .showNotification(NotificationType.ERROR, `Unable to update diagram: ${error}.`);
+        .showNotification(NotificationType.ERROR, `Unable to update diagram: ${error}.`);
     }
   }
 
@@ -278,11 +278,11 @@ export class DiagramDetail {
     try {
       const response: DataModels.ProcessModels.ProcessStartResponsePayload = await this._managementApiClient
         .startProcessInstance(this.activeSolutionEntry.identity,
-                              this.activeDiagram.id,
-                              this.selectedStartEventId,
-                              startRequestPayload,
-                              undefined,
-                              undefined);
+          this.activeDiagram.id,
+          this.selectedStartEventId,
+          startRequestPayload,
+          undefined,
+          undefined);
 
       const {correlationId, processInstanceId} = response;
 
@@ -333,11 +333,11 @@ export class DiagramDetail {
 
       this.diagramHasChanged = false;
       this._notificationService
-          .showNotification(NotificationType.SUCCESS, `File saved!`);
+        .showNotification(NotificationType.SUCCESS, `File saved!`);
       this._eventAggregator.publish(environment.events.navBar.diagramChangesResolved);
     } catch (error) {
       this._notificationService
-          .showNotification(NotificationType.ERROR, `Unable to save the file: ${error}.`);
+        .showNotification(NotificationType.ERROR, `Unable to save the file: ${error}.`);
       throw error;
     }
   }
@@ -425,7 +425,7 @@ export class DiagramDetail {
       const associationText: string = connection.target.businessObject.text;
 
       const associationTextIsEmpty: boolean = associationText === undefined
-                                           || associationText === null;
+        || associationText === null;
       if (associationTextIsEmpty) {
         return undefined;
       }
@@ -447,14 +447,14 @@ export class DiagramDetail {
       }
 
       const initialToken: string = untrimmedInitialToken
-                                    .replace('StartToken:', '')
-                                    .trim();
+        .replace('StartToken:', '')
+        .trim();
 
-       /**
-       * This Regex replaces all single quotes with double quotes and adds double
-       * quotes to non quotet keys.
-       * This way we make sure that JSON.parse() can handle the given string.
-       */
+      /**
+      * This Regex replaces all single quotes with double quotes and adds double
+      * quotes to non quotet keys.
+      * This way we make sure that JSON.parse() can handle the given string.
+      */
       this.initialToken = initialToken.replace(/(\s*?{\s*?|\s*?,\s*?)(['"])?([a-zA-Z0-9]+)(['"])?:/g, '$1"$3":');
 
       return;

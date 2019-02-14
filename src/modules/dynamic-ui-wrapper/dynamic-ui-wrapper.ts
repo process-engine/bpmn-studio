@@ -88,11 +88,9 @@ export class DynamicUiWrapper {
     }
 
     const preferredControlSet: boolean = newUserTask.data.preferredControl !== undefined;
-    console.log('preferredControl: ', newUserTask.data.preferredControl);
     this.isConfirmUserTask = preferredControlSet
       ? newUserTask.data.preferredControl.toLowerCase() === 'confirm'
       : false;
-    console.log('isConfirm taskchanged', this.isConfirmUserTask);
 
     this.isFormUserTask = !this.isConfirmUserTask;
 

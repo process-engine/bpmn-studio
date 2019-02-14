@@ -33,7 +33,8 @@ type RouteParameters = {
   diagramName: string,
   solutionUri: string,
   correlationId: string,
-  processInstanceId: string;
+  processInstanceId: string,
+  taskId: string,
 };
 
 enum RequestError {
@@ -107,6 +108,14 @@ export class LiveExecutionTracker {
     this.processInstanceId = routeParameters.processInstanceId;
 
     this._parentProcessInstanceId = await this._getParentProcessInstanceId();
+    const hasTaskId: boolean = routeParameters.taskId !== undefined
+      && routeParameters.taskId !== null && routeParameters.taskId !== '';
+
+    if (hasTaskId) {
+      this.taskId = routeParameters.taskId;
+      this.showDynamicUiModal = true;
+    }
+
     this._parentProcessModelId = await this._getParentProcessModelId();
 
     this.correlation = await this._managementApiClient.getCorrelationById(this.activeSolutionEntry.identity, this.correlationId);
@@ -118,11 +127,11 @@ export class LiveExecutionTracker {
     this._diagramModeler = new bundle.modeler();
     this._diagramViewer = new bundle.viewer({
       additionalModules:
-      [
-        bundle.ZoomScrollModule,
-        bundle.MoveCanvasModule,
-        bundle.MiniMap,
-      ],
+        [
+          bundle.ZoomScrollModule,
+          bundle.MoveCanvasModule,
+          bundle.MiniMap,
+        ],
     });
 
     this._modeling = this._diagramModeler.get('modeling');
@@ -150,7 +159,7 @@ export class LiveExecutionTracker {
     const colorizingFailed: boolean = colorizedXml === undefined;
     if (colorizingFailed) {
       const notificationMessage: string = 'Could not get tokens. '
-                                        + 'Please try reopening the Live Execution Tracker or restarting the process.';
+        + 'Please try reopening the Live Execution Tracker or restarting the process.';
 
       this._notificationService.showNotification(NotificationType.ERROR, notificationMessage);
 
@@ -228,7 +237,7 @@ export class LiveExecutionTracker {
     }
 
     const parentProcessModel: DataModels.Correlations.CorrelationProcessModel =
-     await this._getProcessModelByProcessInstanceId(this._parentProcessInstanceId);
+      await this._getProcessModelByProcessInstanceId(this._parentProcessInstanceId);
 
     const parentProcessModelNotFound: boolean = parentProcessModel === undefined;
     if (parentProcessModelNotFound) {
@@ -245,10 +254,10 @@ export class LiveExecutionTracker {
     // Get all elements that can have a token
     const allElements: Array<IShape> = this._elementRegistry.filter((element: IShape): boolean => {
       const elementCanHaveAToken: boolean = element.type !== 'bpmn:SequenceFlow'
-                                         && element.type !== 'bpmn:Collaboration'
-                                         && element.type !== 'bpmn:Participant'
-                                         && element.type !== 'bpmn:Lane'
-                                         && element.type !== 'label';
+        && element.type !== 'bpmn:Collaboration'
+        && element.type !== 'bpmn:Participant'
+        && element.type !== 'bpmn:Lane'
+        && element.type !== 'label';
 
       return elementCanHaveAToken;
     });
@@ -301,12 +310,12 @@ export class LiveExecutionTracker {
 
     const activeManualAndUserTasks: Array<IShape> = elements.filter((element: IShape) => {
       const elementIsAUserOrManualTask: boolean = element.type === 'bpmn:UserTask'
-                                               || element.type === 'bpmn:ManualTask';
+        || element.type === 'bpmn:ManualTask';
 
       return elementIsAUserOrManualTask;
     });
 
-    const activeManualAndUserTaskIds: Array<string> =  activeManualAndUserTasks.map((element: IShape) => element.id).sort();
+    const activeManualAndUserTaskIds: Array<string> = activeManualAndUserTasks.map((element: IShape) => element.id).sort();
 
     const elementsWithActiveTokenDidNotChange: boolean = activeManualAndUserTaskIds.toString() === this._previousElementIdsWithActiveToken.toString();
     const allActiveElementsHaveAnOverlay: boolean = activeManualAndUserTaskIds.length === Object.keys(this._overlays._overlays).length;
@@ -353,7 +362,7 @@ export class LiveExecutionTracker {
       return elementIsCallActivity;
     });
 
-    const activeCallActivityIds: Array<string> =  activeCallActivities.map((element: IShape) => element.id).sort();
+    const activeCallActivityIds: Array<string> = activeCallActivities.map((element: IShape) => element.id).sort();
 
     const elementsWithActiveTokenDidNotChange: boolean = activeCallActivityIds.toString() === this._previousElementIdsWithActiveToken.toString();
     const allActiveElementsHaveAnOverlay: boolean = activeCallActivityIds.length === Object.keys(this._overlays._overlays).length;
@@ -443,7 +452,7 @@ export class LiveExecutionTracker {
     const callActivityTarget: CorrelationProcessModel = correlation.processModels
       .find((correlationProcessModel: CorrelationProcessModel): boolean => {
         const targetProcessModelFound: boolean = correlationProcessModel.parentProcessInstanceId === this.processInstanceId
-                                              && correlationProcessModel.processModelId === callActivityTargetId;
+          && correlationProcessModel.processModelId === callActivityTargetId;
 
         return targetProcessModelFound;
       });
@@ -457,7 +466,7 @@ export class LiveExecutionTracker {
     this.selectedFlowNode = event.element;
 
     const clickedElementIsNotAUserOrManualTask: boolean = clickedElement.type !== 'bpmn:UserTask'
-                                                       && clickedElement.type !== 'bpmn:ManualTask';
+      && clickedElement.type !== 'bpmn:ManualTask';
 
     if (clickedElementIsNotAUserOrManualTask) {
       return;
@@ -519,7 +528,7 @@ export class LiveExecutionTracker {
       return null;
     };
 
-    const tokenHistoryGroups: DataModels.TokenHistory.TokenHistoryGroup =  await getTokenHistoryGroup();
+    const tokenHistoryGroups: DataModels.TokenHistory.TokenHistoryGroup = await getTokenHistoryGroup();
 
     const couldNotGetTokenHistory: boolean = tokenHistoryGroups === null;
     if (couldNotGetTokenHistory) {
@@ -734,7 +743,7 @@ export class LiveExecutionTracker {
   }
 
   private async _exportXmlFromDiagramModeler(): Promise<string> {
-    const saveXmlPromise: Promise<string> = new Promise((resolve: Function, reject: Function): void =>  {
+    const saveXmlPromise: Promise<string> = new Promise((resolve: Function, reject: Function): void => {
       const xmlSaveOptions: IBpmnXmlSaveOptions = {
         format: true,
       };
@@ -754,7 +763,7 @@ export class LiveExecutionTracker {
   }
 
   private async _exportXmlFromDiagramViewer(): Promise<string> {
-    const saveXmlPromise: Promise<string> = new Promise((resolve: Function, reject: Function): void =>  {
+    const saveXmlPromise: Promise<string> = new Promise((resolve: Function, reject: Function): void => {
       const xmlSaveOptions: IBpmnXmlSaveOptions = {
         format: true,
       };
@@ -781,7 +790,7 @@ export class LiveExecutionTracker {
       const couldNotGetXml: boolean = xml === undefined;
       if (couldNotGetXml) {
         const notificationMessage: string = 'XML could not be found. If the error persists, '
-                                          + 'try reopening the Live Execution Tracker or restarting the process.';
+          + 'try reopening the Live Execution Tracker or restarting the process.';
 
         this._notificationService.showNotification(NotificationType.ERROR, notificationMessage);
 
@@ -799,7 +808,7 @@ export class LiveExecutionTracker {
       const colorizingFailed: boolean = colorizedXml === undefined;
       if (colorizingFailed) {
         const notificationMessage: string = 'Could not get tokens. If the error persists, '
-                                          + 'try reopening the Live Execution Tracker or restarting the process.';
+          + 'try reopening the Live Execution Tracker or restarting the process.';
 
         this._notificationService.showNotification(NotificationType.ERROR, notificationMessage);
 
@@ -873,7 +882,7 @@ export class LiveExecutionTracker {
     const allActiveCorrelationsOrRequestError: Array<DataModels.Correlations.Correlation> | RequestError = await getActiveCorrelations();
 
     const couldNotGetCorrelation: boolean = allActiveCorrelationsOrRequestError === RequestError.ConnectionLost
-                                         || allActiveCorrelationsOrRequestError === RequestError.OtherError;
+      || allActiveCorrelationsOrRequestError === RequestError.OtherError;
     if (couldNotGetCorrelation) {
       const requestError: RequestError = (allActiveCorrelationsOrRequestError as RequestError);
 
@@ -892,7 +901,7 @@ export class LiveExecutionTracker {
     }
 
     return !correlationIsNotActive;
- }
+  }
 
   private _correlationEnded(): void {
     this._notificationService.showNotification(NotificationType.INFO, 'Process stopped.');
