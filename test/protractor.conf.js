@@ -43,7 +43,7 @@ exports.config = {
     defaultTimeoutInterval: 30000,
   },
 
-  onPrepare: function() {
+  onPrepare: function () {
     browser.manage().window().maximize();
 
     afterEach(() => {

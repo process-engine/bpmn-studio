@@ -46,12 +46,12 @@ describe('Dashboard view', () => {
 
     await browser.get(aureliaUrl);
     await browser.driver
-    .wait(() => {
-      browser
-        .wait(visibilityOfRouterViewContainer, defaultTimeoutMS);
+      .wait(() => {
+        browser
+          .wait(visibilityOfRouterViewContainer, defaultTimeoutMS);
 
-      return routerViewContainer;
-    });
+        return routerViewContainer;
+      });
 
     const dashboardLink: string = dashboard.dashboardLink;
 
@@ -133,7 +133,7 @@ describe('Dashboard view', () => {
           .wait(visibilityOfHyperlinkOfProcessRunningListItemByCorrelationId, defaultTimeoutMS);
 
         return hyperlinkOfProcessRunningListItemByCorrelationId;
-     });
+      });
 
     await dashboard.openProcessModelByClickOnModelIdInProcessRunningList(correlationId);
 
@@ -234,10 +234,11 @@ describe('Dashboard view', () => {
 
     const correlationId: string = processModel.getCorrelationId();
     const processInstanceId: string = processModel.getProcessInstanceId();
-    const userTasksInputUrl: string = ProcessModel.userTasksInputUrl(correlationId, processModelId, processInstanceId);
+    const liveExcecutionTrackerUrl: string =
+      ProcessModel.liveExecutionTrackerUrlWithTaskPreselection(correlationId, processModelId, processInstanceId);
     const currentBrowserUrl: string = await browser.getCurrentUrl();
 
-    expect(currentBrowserUrl).toContain(userTasksInputUrl);
+    expect(currentBrowserUrl).toContain(liveExcecutionTrackerUrl);
   });
 
   it('should be possible to click continue in an opened user task.', async() => {
