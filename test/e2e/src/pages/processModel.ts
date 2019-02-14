@@ -35,10 +35,6 @@ export class ProcessModel {
     return `/correlation/${correlationId}/diagram/${processModelId}/instance/${processInstanceId}/live-execution-tracker`;
   }
 
-  public static liveExecutionTrackerUrlWithTaskPreselection(correlationId: string, processModelId: string, processInstanceId: string): string {
-    return `/correlation/${correlationId}/diagram/${processModelId}/instance/${processInstanceId}/live-execution-tracker`;
-  }
-
   public getProcessModelId(): string {
     return this._processModelId;
   }

@@ -235,7 +235,7 @@ describe('Dashboard view', () => {
     const correlationId: string = processModel.getCorrelationId();
     const processInstanceId: string = processModel.getProcessInstanceId();
     const liveExcecutionTrackerUrl: string =
-      ProcessModel.liveExecutionTrackerUrlWithTaskPreselection(correlationId, processModelId, processInstanceId);
+      ProcessModel.liveExecutionTrackerUrl(processModelId, correlationId, processInstanceId);
     const currentBrowserUrl: string = await browser.getCurrentUrl();
 
     expect(currentBrowserUrl).toContain(liveExcecutionTrackerUrl);
