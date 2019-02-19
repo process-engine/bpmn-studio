@@ -144,7 +144,6 @@ export class BasicsSection implements ISection {
 
     const bpmnFormObject: IForm =  {
       id: `Form_${this._generateRandomId()}`,
-      type: null,
       label: '',
       defaultValue: '',
     };
@@ -250,7 +249,6 @@ export class BasicsSection implements ISection {
 
     const bpmnFormFieldObject: IForm = {
       id: `Form_${this._generateRandomId()}`,
-      type: null,
       label: '',
       defaultValue: '',
     };
