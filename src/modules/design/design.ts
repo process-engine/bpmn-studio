@@ -282,7 +282,7 @@ export class Design {
     /**
      * Dirty quickfix: Because of this issue https://github.com/process-engine/bpmn-studio/issues/1384
      * we need to discard every routing instruction whose target uri/fragment contains
-     * an already escaped character.
+     * an already encoded character.
      */
     const instructionFragment: string = destinationInstruction.fragment;
     const instructionFragmentContainsUnescapedSpace: boolean = instructionFragment.includes('%');
