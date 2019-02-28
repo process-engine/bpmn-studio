@@ -5,7 +5,7 @@
 */
 
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
-import {bindable, bindingMode, inject} from 'aurelia-framework';
+import {bindable, bindingMode, inject, observable} from 'aurelia-framework';
 import {activationStrategy, NavigationInstruction, Redirect, Router} from 'aurelia-router';
 
 import {IDiagram, ISolution} from '@process-engine/solutionexplorer.contracts';
@@ -277,7 +277,20 @@ export class Design {
     this._eventAggregator.publish(environment.events.bpmnio.togglePropertyPanel);
   }
 
-  public async canDeactivate(destinationInstruction: NavigationInstruction): Promise<Redirect> {
+  public async canDeactivate(destinationInstruction: NavigationInstruction): Promise<Redirect | boolean> {
+
+    /**
+     * Dirty quickfix: Because of this issue https://github.com/process-engine/bpmn-studio/issues/1384
+     * we need to discard every routing instruction whose target uri/fragment contains
+     * a character which needs to be escaped.
+     */
+    const instructionFragment: string = destinationInstruction.fragment;
+    const instructionFragmentContainsUnescapedSpace: boolean = instructionFragment.includes('%20');
+    if (instructionFragmentContainsUnescapedSpace) {
+
+      return false;
+    }
+
     const userCanNotDeactivateRoute: boolean = !(await this.canDeactivateModal(destinationInstruction));
     if (userCanNotDeactivateRoute) {
 
@@ -287,6 +300,7 @@ export class Design {
       * the router directly to navigate back, which results in staying on this
       * component-- and this is the desired behaviour.
       */
+
       return new Redirect(redirectUrl, {trigger: false, replace: false});
     }
   }
