@@ -524,7 +524,10 @@ export class SolutionExplorerSolution {
       return;
     }
 
-    this.updateSolution();
+    this.openedDiagrams.push(emptyDiagram);
+    this._globalSolutionService.addSingleDiagram(emptyDiagram);
+    this._globalSolutionService.persistSolutionsInLocalStorage();
+    await this.updateSolution();
     this._resetDiagramCreation();
     this.navigateToDetailView(emptyDiagram);
   }
@@ -546,7 +549,10 @@ export class SolutionExplorerSolution {
         return;
       }
 
-      this.updateSolution();
+      this.openedDiagrams.push(emptyDiagram);
+      this._globalSolutionService.addSingleDiagram(emptyDiagram);
+      this._globalSolutionService.persistSolutionsInLocalStorage();
+      await this.updateSolution();
       this._resetDiagramCreation();
       this.navigateToDetailView(emptyDiagram);
 
