@@ -110,8 +110,8 @@ export class SolutionExplorerPanel {
     }
 
     this._subscriptions = [
-      this._eventAggregator.subscribe(environment.events.diagramDetail.onDiagramDeployed, () => {
-        this._refreshSolutions();
+      this._eventAggregator.subscribe(environment.events.diagramDetail.onDiagramDeployed, async() => {
+        await this.solutionExplorerList.refreshSolutions();
       }),
       this._eventAggregator.subscribe(environment.events.startPage.openLocalSolution, () => {
         this.openSolution();
@@ -122,8 +122,8 @@ export class SolutionExplorerPanel {
       this._eventAggregator.subscribe(environment.events.startPage.createSingleDiagram, () => {
         this._createNewDiagram();
       }),
-      this._eventAggregator.subscribe(AuthenticationStateEvent.LOGOUT, () => {
-        this.solutionExplorerList.refreshSolutions();
+      this._eventAggregator.subscribe(AuthenticationStateEvent.LOGOUT, async() => {
+        await this.solutionExplorerList.refreshSolutions();
       }),
     ];
   }
@@ -256,10 +256,6 @@ export class SolutionExplorerPanel {
 
   public canReadFromFileSystem(): boolean {
     return (window as any).nodeRequire;
-  }
-
-  private async _refreshSolutions(): Promise<void> {
-    return this.solutionExplorerList.refreshSolutions();
   }
 
   private async _openSolutionOrDisplayError(uri: string): Promise<void> {
