@@ -319,6 +319,7 @@ export class SolutionExplorerPanel {
                         : 'Single Diagrams';
 
     this.solutionExplorerList.createDiagram(uri);
+    this.solutionExplorerList.refreshSolutions();
   }
 
   private _registerElectronHooks(): void {
