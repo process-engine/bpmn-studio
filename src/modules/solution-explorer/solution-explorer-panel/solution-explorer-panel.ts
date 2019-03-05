@@ -312,12 +312,11 @@ export class SolutionExplorerPanel {
     const activeSolution: ISolutionEntry = this._solutionService.getSolutionEntryForUri(activeSolutionUri);
 
     const activeSolutionCanCreateDiagrams: boolean = activeSolution !== undefined
-                                                  && !activeSolution.uri.startsWith('http')
-                                                  && activeSolution.canCreateNewDiagramsInSolution;
+                                                  && !activeSolution.uri.startsWith('http');
 
     const uri: string = activeSolutionCanCreateDiagrams
                         ? activeSolutionUri
-                        : path.join(os.homedir(), 'Desktop');
+                        : 'Single Diagrams';
 
     this.solutionExplorerList.createDiagram(uri);
   }
