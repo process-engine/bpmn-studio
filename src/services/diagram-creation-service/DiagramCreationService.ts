@@ -1,4 +1,4 @@
-import {IDiagram, ISolution} from '@process-engine/solutionexplorer.contracts';
+import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 import {IDiagramCreationService} from '../../contracts';
 
 export class DiagramCreationService implements IDiagramCreationService {
@@ -6,7 +6,11 @@ export class DiagramCreationService implements IDiagramCreationService {
   public createNewDiagram(solutionBaseUri: string, withName: string): IDiagram {
 
     const processName: string = withName.trim();
-    const diagramUri: string = `${solutionBaseUri}/${processName}.bpmn`;
+    const homeFolder: string = this._getUserTempFolder();
+    const solutionBaseUriIsSingleDiagrams: boolean = solutionBaseUri === 'Single Diagrams';
+    const diagramUri: string = solutionBaseUriIsSingleDiagrams
+                            ? `${homeFolder}/${processName}.bpmn`
+                            : `${solutionBaseUri}/${processName}.bpmn`;
     const processXML: string = this._getInitialProcessXML(processName);
 
     const diagram: IDiagram = {
@@ -79,5 +83,42 @@ export class DiagramCreationService implements IDiagramCreationService {
             </bpmndi:BPMNPlane>
         </bpmndi:BPMNDiagram>
     </bpmn:definitions>`;
+  }
+
+  private _getUserTempFolder(): string {
+    const os: any = (window as any).nodeRequire('os');
+    const path: any = (window as any).nodeRequire('path');
+    const fs: any = (window as any).nodeRequire('fs');
+    const userHomeDir: string = os.homedir();
+
+    switch (process.platform) {
+      case 'darwin':
+        const bpmnStudioTempDarwin: string = path.join(userHomeDir, 'Library', 'Application Support', 'bpmn-studio', 'temp-diagrams');
+        const bpmnStudioTempDarwinDoesNotExist: boolean = !fs.existsSync(bpmnStudioTempDarwin);
+
+        if (bpmnStudioTempDarwinDoesNotExist) {
+          fs.mkdirSync(bpmnStudioTempDarwin);
+        }
+
+        return bpmnStudioTempDarwin;
+      case 'win32':
+        const bpmnStudioTempWin32: string = path.join(userHomeDir, 'AppData', 'Roaming', 'bpmn-studio', 'temp-diagrams');
+        const bpmnStudioTempWin32DoesNotExist: boolean = !fs.existsSync(bpmnStudioTempWin32);
+
+        if (bpmnStudioTempWin32DoesNotExist) {
+          fs.mkdirSync(bpmnStudioTempWin32);
+        }
+
+        return bpmnStudioTempWin32;
+      default:
+        const bpmnStudioTempLinux: string = path.join(userHomeDir, '.config', 'bpmn-studio', 'temp-diagrams');
+        const bpmnStudioTempLinuxDoesNotExist: boolean = !fs.existsSync(bpmnStudioTempLinux);
+
+        if (bpmnStudioTempLinuxDoesNotExist) {
+          fs.mkdirSync(bpmnStudioTempLinux);
+        }
+
+        return bpmnStudioTempLinux;
+    }
   }
 }
