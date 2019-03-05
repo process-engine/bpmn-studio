@@ -105,7 +105,7 @@
   "dependencies": {
     "@essential-projects/errors_ts": "1.4.4",
     "@fortawesome/fontawesome-free": "^5.1.0",
-    "@process-engine/bpmn-js-custom-bundle": "2.5.1",
+    "@process-engine/bpmn-js-custom-bundle": "2.5.1-1c2639c0-b1",
     "@process-engine/bpmn-lint_rules": "1.3.0",
     "@process-engine/management_api_client": "4.1.0",
     "@process-engine/process_engine_runtime": "7.1.0-bf2d1c95-b275",
