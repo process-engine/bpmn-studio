@@ -19,11 +19,10 @@ import {ISolutionExplorerService} from '@process-engine/solutionexplorer.service
 import {join} from 'path';
 
 import {
-        IDiagramCreationService,
-        ISolutionEntry,
-        ISolutionService,
-        IUserInputValidationRule,
-        NotificationType,
+  IDiagramCreationService,
+  ISolutionEntry,
+  ISolutionService,
+  NotificationType,
 } from '../../../contracts/index';
 import environment from '../../../environment';
 import {NotificationService} from '../../../services/notification-service/notification.service';
