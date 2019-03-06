@@ -347,6 +347,9 @@ export class SolutionExplorerSolution {
     const indexBeforeFoldername: number = Math.max(lastIndexOfSlash, lastIndexOfBackSlash);
 
     const diagramFolder: string = diagramLocation.slice(indexBeforeFoldername, diagramLocation.length);
+    if (diagramFolder.includes('temp-diagrams')) {
+      return '';
+    }
 
     return diagramFolder;
   }
