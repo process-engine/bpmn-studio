@@ -321,7 +321,7 @@ export class DiagramDetail {
   /**
    * Saves the current diagram.
    */
-  public async saveDiagram(): Promise<void> {
+  public async saveDiagram(diagramPath?: string): Promise<void> {
 
     const savingTargetIsRemoteSolution: boolean = this.activeSolutionEntry.uri.startsWith('http');
 
@@ -336,7 +336,27 @@ export class DiagramDetail {
       const xml: string = await this.bpmnio.getXML();
       this.activeDiagram.xml = xml;
 
-      await this.activeSolutionEntry.service.saveDiagram(this.activeDiagram);
+      const activeDiagramIsUnsavedDiagram: boolean = this.activeDiagram.uri.includes('temp-diagrams');
+      if (activeDiagramIsUnsavedDiagram && diagramPath) {
+        const path: any = (window as any).nodeRequire('path');
+        const fullPath: string = path.join(diagramPath, `${this.activeDiagram.name}.bpmn`);
+
+        console.log(fullPath);
+        try {
+          await this.activeSolutionEntry.service.saveDiagram(this.activeDiagram, fullPath);
+
+        } catch (error) {
+          console.log(error);
+        }
+      } else if (activeDiagramIsUnsavedDiagram) {
+        await this._openDirectory();
+
+        return;
+      } else {
+
+        await this.activeSolutionEntry.service.saveDiagram(this.activeDiagram);
+      }
+
       this.bpmnio.saveCurrentXML();
 
       this.diagramHasChanged = false;
@@ -348,6 +368,28 @@ export class DiagramDetail {
           .showNotification(NotificationType.ERROR, `Unable to save the file: ${error}.`);
       throw error;
     }
+  }
+
+  private async _openDirectory(): Promise<string> {
+    const canNotReadFromFileSystem: boolean = !this._canReadFromFileSystem();
+    if (canNotReadFromFileSystem) {
+      return;
+    }
+
+    this._ipcRenderer.send('save_single_diagram');
+
+    this._ipcRenderer.once('send_diagram_to_path', async(event: Event, openedFolder: File) => {
+      const noFolderSelected: boolean = openedFolder === null;
+      if (noFolderSelected) {
+        return;
+      }
+
+      await this.saveDiagram(openedFolder[0]);
+    });
+  }
+
+  private _canReadFromFileSystem(): boolean {
+    return (window as any).nodeRequire;
   }
 
   /**

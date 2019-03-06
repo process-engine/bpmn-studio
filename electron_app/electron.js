@@ -290,6 +290,7 @@ Main._createMainWindow = function () {
 
   setOpenSingleDiagram();
   setOpenSolutions();
+  setSaveSingleDiagram();
 
   const platformIsWindows = process.platform === 'win32';
   if (platformIsWindows) {
@@ -356,6 +357,19 @@ Main._createMainWindow = function () {
       });
 
       event.sender.send('import_opened_solution', openedFile);
+    });
+  }
+
+  function setSaveSingleDiagram() {
+    electron.ipcMain.on('save_single_diagram', (event) => {
+      const openedDirectory = dialog.showOpenDialog({
+        properties: [
+          'openDirectory',
+          'createDirectory'
+        ]
+      });
+
+      event.sender.send('send_diagram_to_path', openedDirectory);
     });
   }
 
