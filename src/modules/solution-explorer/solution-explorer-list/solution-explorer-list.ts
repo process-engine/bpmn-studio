@@ -13,6 +13,7 @@ import {
   ISolutionEntry,
   ISolutionService,
   IUserIdentity,
+  SolutionStatus,
 } from '../../../contracts';
 import {SingleDiagramsSolutionExplorerService} from '../../../services/solution-explorer-services/SingleDiagramsSolutionExplorerService';
 import {SolutionExplorerServiceFactory} from '../../../services/solution-explorer-services/SolutionExplorerServiceFactory';
@@ -361,18 +362,18 @@ export class SolutionExplorerList {
     this._addSolutionEntry(uriOfSingleDiagramService, this._singleDiagramService, identity, true);
   }
 
-  private _getFontAwesomeIconForSolution(service: ISolutionExplorerService, uri: string): string {
+  private _getSolutionStatus(service: ISolutionExplorerService, uri: string): SolutionStatus {
     const solutionIsOpenedFromRemote: boolean = uri.startsWith('http');
     if (solutionIsOpenedFromRemote) {
-      return 'fa-database';
+      return 'remote';
     }
 
     const solutionIsSingleDiagrams: boolean = service === this._singleDiagramService;
     if (solutionIsSingleDiagrams) {
-      return 'fa-copy';
+      return 'singleDiagram';
     }
 
-    return 'fa-folder';
+    return 'folder';
   }
 
   private _canCreateNewDiagramsInSolution(service: ISolutionExplorerService, uri: string): boolean {
@@ -429,7 +430,7 @@ export class SolutionExplorerList {
     processEngineVersion?: string,
     ): Promise<void> {
     const isSingleDiagramService: boolean = this._isSingleDiagramService(service);
-    const fontAwesomeIconClass: string = this._getFontAwesomeIconForSolution(service, uri);
+    const status: SolutionStatus = this._getSolutionStatus(service, uri);
     const canCloseSolution: boolean = this._canCloseSolution(service, uri);
     const canCreateNewDiagramsInSolution: boolean = this._canCreateNewDiagramsInSolution(service, uri);
     const authority: string = await this._getAuthorityForSolution(uri);
@@ -450,7 +451,7 @@ export class SolutionExplorerList {
     const entry: ISolutionEntry = {
       uri,
       service,
-      fontAwesomeIconClass,
+      status,
       canCloseSolution,
       canCreateNewDiagramsInSolution,
       isSingleDiagramService,

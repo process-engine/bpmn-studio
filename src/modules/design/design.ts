@@ -10,7 +10,7 @@ import {activationStrategy, NavigationInstruction, Redirect, Router} from 'aurel
 
 import {IDiagram, ISolution} from '@process-engine/solutionexplorer.contracts';
 
-import {ISolutionEntry, ISolutionService, NotificationType} from '../../contracts/index';
+import {ISolutionEntry, ISolutionService, NotificationType, SolutionStatus} from '../../contracts/index';
 import environment from '../../environment';
 import {NotificationService} from '../../services/notification-service/notification.service';
 import {DiagramDetail} from './diagram-detail/diagram-detail';
@@ -376,7 +376,7 @@ export class Design {
     const remoteSolutions: Array<ISolutionEntry> = this._solutionService.getRemoteSolutionEntries();
 
     const remoteSolutionsWithoutActive: Array<ISolutionEntry> = remoteSolutions.filter((remoteSolution: ISolutionEntry) => {
-      return remoteSolution.uri !== this.activeSolutionEntry.uri && remoteSolution.fontAwesomeIconClass !== 'fa-bolt';
+      return remoteSolution.uri !== this.activeSolutionEntry.uri && remoteSolution.status !== 'disconnected';
     });
 
     return remoteSolutionsWithoutActive;

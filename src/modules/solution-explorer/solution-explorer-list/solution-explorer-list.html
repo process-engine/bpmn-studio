@@ -1,4 +1,5 @@
 <template>
+  <require from="./status-to-icon"></require>
   <require from="./solution-explorer-list.css"></require>
   <require from="../solution-explorer-solution/solution-explorer-solution"></require>
 
@@ -9,7 +10,7 @@
 
         <div class="solution-entry__header" title.bind="solutionEntry.processEngineVersion ? `${solutionEntry.uri} | Version: ${solutionEntry.processEngineVersion}` : solutionEntry.uri">
 
-          <i class="fa ${solutionEntry.fontAwesomeIconClass} solution-entry__solution-icon" title.bind="solutionEntry.fontAwesomeIconClass === 'fa-bolt' ? 'ProcessEngine Disconnected!' : ''"></i>
+          <i class="fa ${solutionEntry.status | statusToIcon} solution-entry__solution-icon" title.bind="solutionEntry.status === SolutionStatus.Disconnected ? 'ProcessEngine Disconnected!' : ''"></i>
 
           <span class="solution-entry__solution-name">${getSolutionName(solutionEntry.uri)}</span>
           <div class="solution-entry__solution-path">

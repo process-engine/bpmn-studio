@@ -19,11 +19,12 @@ import {ISolutionExplorerService} from '@process-engine/solutionexplorer.service
 import {join} from 'path';
 
 import {
-        IDiagramCreationService,
-        ISolutionEntry,
-        ISolutionService,
-        IUserInputValidationRule,
-        NotificationType,
+  IDiagramCreationService,
+  ISolutionEntry,
+  ISolutionService,
+  IUserInputValidationRule,
+  NotificationType,
+  SolutionStatus,
 } from '../../../contracts/index';
 import environment from '../../../environment';
 import {NotificationService} from '../../../services/notification-service/notification.service';
@@ -85,14 +86,14 @@ export class SolutionExplorerSolution {
   @bindable public solutionService: ISolutionExplorerService;
   @bindable public solutionIsSingleDiagrams: boolean;
   @bindable public displayedSolutionEntry: ISolutionEntry;
-  @bindable public fontAwesomeIconClass: string;
+  @bindable public solutionStatus: SolutionStatus;
   public createNewDiagramInput: HTMLInputElement;
   public diagramContextMenu: HTMLElement;
   public showContextMenu: boolean = false;
   public deleteDiagramModal: DeleteDiagramModal;
 
   private _renameDiagramInput: HTMLInputElement;
-  private _originalIconClass: string;
+  private _originalSolutionStatus: SolutionStatus;
   private _globalSolutionService: ISolutionService;
   private _diagramInContextMenu: IDiagram;
 
@@ -113,7 +114,7 @@ export class SolutionExplorerSolution {
   }
 
   public attached(): void {
-    this._originalIconClass = this.fontAwesomeIconClass;
+    this._originalSolutionStatus = this.solutionStatus;
     this._updateSolutionExplorer();
     this._setValidationRules();
 
@@ -180,7 +181,7 @@ export class SolutionExplorerSolution {
   public async updateSolution(): Promise<void> {
     try {
       this._openedSolution = await this.solutionService.loadSolution();
-      this.fontAwesomeIconClass = this._originalIconClass;
+      this.solutionStatus = this._originalSolutionStatus;
     } catch (error) {
       // In the future we can maybe display a small icon indicating the error.
       if (isError(error, UnauthorizedError)) {
@@ -189,7 +190,7 @@ export class SolutionExplorerSolution {
         this._notificationService.showNotification(NotificationType.ERROR, 'You don\'t have the required permissions to list process models.');
       } else {
         this._openedSolution.diagrams = undefined;
-        this.fontAwesomeIconClass = 'fa-bolt';
+        this.solutionStatus = 'disconnected';
       }
     }
   }
