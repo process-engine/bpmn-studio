@@ -37,6 +37,8 @@
         <template if.bind="currentlyRenamingDiagramUri !== diagram.uri">
 
           <i if.bind="shouldFileIconBeShown()" class="diagram-entry__icon fa fa-cogs"></i>
+          <i if.bind="diagram.uri.includes('temp-diagrams')" class="diagram-entry__unsaved fas fa-circle"></i>
+          
           <div class="diagram-entry__name-container">
             <span class="diagram-entry__name" title="${diagram.name}" title.bind="solutionIsSingleDiagrams ? diagram.uri : ''">${diagram.name}</span>
             <span class="diagram-entry__location" if.bind="solutionIsSingleDiagrams" title="${getDiagramLocation(diagram.uri)}">${getDiagramFolder(diagram.uri)}</span>

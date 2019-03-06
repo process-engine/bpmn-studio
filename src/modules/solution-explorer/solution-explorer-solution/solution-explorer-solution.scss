@@ -121,3 +121,12 @@
   width: calc(100% + 30px);
   margin-left: -30px;
 }
+
+.diagram-entry__unsaved {
+  flex: 0;
+  position: relative;
+  left: -14px;
+  margin-top: 6px;
+  margin-right: -9px;
+  font-size: 9px;
+}
