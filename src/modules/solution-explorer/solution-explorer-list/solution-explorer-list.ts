@@ -325,6 +325,17 @@ export class SolutionExplorerList {
     return sortedEntries;
   }
 
+  @computedFrom('_singleDiagramService._openedDiagrams.length')
+  public get unsavedDiagramsCount(): number {
+
+    const unsavedDiagramsCount: number = this._singleDiagramService
+      .getOpenedDiagrams()
+      .filter((diagram: IDiagram) => diagram.uri.includes('temp-diagrams'))
+      .length;
+
+    return unsavedDiagramsCount;
+  }
+
   private _cleanupSolution(uri: string): void {
    const indexOfSolutionToBeRemoved: number = this._getIndexOfSolution(uri);
 

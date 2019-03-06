@@ -20,6 +20,10 @@
             </span>
           </div>
 
+          <div class="solution-entry__unsaved-diagrams" if.bind="solutionEntry.uri === 'Single Diagrams' && unsavedDiagramsCount > 0">
+            ${unsavedDiagramsCount} UNSAVED
+          </div>
+
           <div class="solution-entry__actions ">
             <button class="button"
               if.bind="solutionEntry.uri.startsWith('http') && !solutionEntry.isLoggedIn"
