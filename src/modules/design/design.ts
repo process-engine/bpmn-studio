@@ -13,6 +13,7 @@ import {IDiagram, ISolution} from '@process-engine/solutionexplorer.contracts';
 import {ISolutionEntry, ISolutionService, NotificationType} from '../../contracts/index';
 import environment from '../../environment';
 import {NotificationService} from '../../services/notification-service/notification.service';
+import {SingleDiagramsSolutionExplorerService} from '../../services/solution-explorer-services/SingleDiagramsSolutionExplorerService';
 import {DiagramDetail} from './diagram-detail/diagram-detail';
 
 export interface IDesignRouteParameters {
@@ -113,14 +114,28 @@ export class Design {
         this._eventAggregator.publish(environment.events.configPanel.processEngineRouteChanged, this.activeSolutionEntry.uri);
       }
 
-      const isSingleDiagram: boolean = this.activeSolutionEntry.uri === 'Single Diagrams';
-
-      if (isSingleDiagram) {
+      if (this.activeSolutionEntry.isSingleDiagramService) {
         const persistedDiagrams: Array<IDiagram> = this._solutionService.getSingleDiagrams();
 
         this.activeDiagram = persistedDiagrams.find((diagram: IDiagram) => {
           return diagram.name === routeParameters.diagramName;
         });
+
+        /**
+         * This If gets called when the activeDiagram is not found within the localStorage.
+         * This can happen if the diagram to open is a temporarily diagram.
+         *
+         * Temporarily diagrams are not persisted in localStorage.
+         */
+        if (!this.activeDiagram) {
+          const service: SingleDiagramsSolutionExplorerService = this.activeSolutionEntry.service as SingleDiagramsSolutionExplorerService;
+          const allOpenedSingleDiagrams: Array<IDiagram> = service.getOpenedDiagrams();
+
+          this.activeDiagram = allOpenedSingleDiagrams.find((diagram: IDiagram) => {
+            return diagram.name === routeParameters.diagramName
+                && diagram.uri.includes('temp-diagrams');
+          });
+        }
 
       } else {
 
@@ -363,6 +378,14 @@ export class Design {
   }
 
   public activeDiagramChanged(newValue: IDiagram, oldValue: IDiagram): void {
+    /**
+     * The oldValue is sometimes undefined because after the first assignment of the activeDiagram,
+     * if it is a SingleDiagramSolution, the diagram may be undefined because it does not persisted
+     * if it is a temporary diagram.
+     */
+    if (!oldValue) {
+      return;
+    }
     const activeDiagramDidNotChange: boolean = newValue.id === oldValue.id
                                             && newValue.uri === oldValue.uri;
     if (activeDiagramDidNotChange) {
