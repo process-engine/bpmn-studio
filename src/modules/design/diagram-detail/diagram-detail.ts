@@ -24,6 +24,7 @@ import {
 
 import environment from '../../../environment';
 import {NotificationService} from '../../../services/notification-service/notification.service';
+import {SingleDiagramsSolutionExplorerService} from '../../../services/solution-explorer-services/SingleDiagramsSolutionExplorerService';
 import {BpmnIo} from '../bpmn-io/bpmn-io';
 
 @inject('ManagementApiClientService',
@@ -337,13 +338,13 @@ export class DiagramDetail {
       this.activeDiagram.xml = xml;
 
       const activeDiagramIsUnsavedDiagram: boolean = this.activeDiagram.uri.includes('temp-diagrams');
+
       if (activeDiagramIsUnsavedDiagram && diagramPath) {
         const path: any = (window as any).nodeRequire('path');
         const fullPath: string = path.join(diagramPath, `${this.activeDiagram.name}.bpmn`);
 
-        console.log(fullPath);
-        try {
-          await this.activeSolutionEntry.service.saveDiagram(this.activeDiagram, fullPath);
+        const service: SingleDiagramsSolutionExplorerService = this.activeSolutionEntry.service as SingleDiagramsSolutionExplorerService;
+        await service.saveDiagram(this.activeDiagram, fullPath);
 
         } catch (error) {
           console.log(error);
