@@ -345,6 +345,7 @@ export class DiagramDetail {
 
         const service: SingleDiagramsSolutionExplorerService = this.activeSolutionEntry.service as SingleDiagramsSolutionExplorerService;
         await service.saveDiagram(this.activeDiagram, fullPath);
+        await service.closeSingleDiagram(this.activeDiagram);
 
         } catch (error) {
           console.log(error);
