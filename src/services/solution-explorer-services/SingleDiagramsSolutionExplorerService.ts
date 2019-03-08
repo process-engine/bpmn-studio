@@ -140,10 +140,10 @@ export class SingleDiagramsSolutionExplorerService implements ISolutionExplorerS
     throw new Error('Method not supported.');
   }
 
-  public saveDiagram(diagram: IDiagram): Promise<void> {
+  public saveDiagram(diagram: IDiagram, pathspec?: string): Promise<void> {
     this._solutionService.addSingleDiagram(diagram);
 
-    return this._solutionExplorerToOpenDiagrams.saveDiagram(diagram);
+    return this._solutionExplorerToOpenDiagrams.saveDiagram(diagram, pathspec);
   }
 
   private _findOfDiagramWithURI(uri: string): number {
