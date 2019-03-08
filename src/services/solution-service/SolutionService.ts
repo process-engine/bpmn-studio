@@ -100,6 +100,10 @@ export class SolutionService implements ISolutionService {
    */
 
   public addSingleDiagram(diagramToAdd: IDiagram): void {
+    if (diagramToAdd.uri.includes('temp-diagrams')) {
+      return;
+    }
+
     const indexOfDiagram: number = this._persistedSingleDiagrams.indexOf(diagramToAdd);
     const diagramIsPersisted: boolean = indexOfDiagram >= 0;
 
