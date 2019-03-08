@@ -6,6 +6,7 @@ import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 import {ISolutionEntry, ISolutionService, NotificationType} from '../../contracts/index';
 import environment from '../../environment';
 import {NotificationService} from '../../services/notification-service/notification.service';
+import {SingleDiagramsSolutionExplorerService} from '../../services/solution-explorer-services/SingleDiagramsSolutionExplorerService';
 
 @inject(Router, EventAggregator, 'NotificationService', 'SolutionService')
 export class NavBar {
@@ -348,13 +349,28 @@ export class NavBar {
 
     if (solutionIsSet && diagramIsSet) {
 
-      const activeSolutionIsSingleDiagramSolution: boolean = solutionUri === 'Single Diagrams';
-      if (activeSolutionIsSingleDiagramSolution) {
+      if (this.activeSolutionEntry.isSingleDiagramService) {
         const persistedDiagrams: Array<IDiagram> = this._solutionService.getSingleDiagrams();
 
         this.activeDiagram = persistedDiagrams.find((diagram: IDiagram) => {
           return diagram.name === diagramName;
         });
+
+        /**
+         * This If gets called when the activeDiagram is not found within the localStorage.
+         * This can happen if the diagram to open is a temporarily diagram.
+         *
+         * Temporarily diagrams are not persisted in localStorage.
+         */
+        if (!this.activeDiagram) {
+          const service: SingleDiagramsSolutionExplorerService = this.activeSolutionEntry.service as SingleDiagramsSolutionExplorerService;
+          const allOpenedSingleDiagrams: Array<IDiagram> = service.getOpenedDiagrams();
+
+          this.activeDiagram = allOpenedSingleDiagrams.find((diagram: IDiagram) => {
+            return diagram.name === diagramName
+                && diagram.uri.includes('temp-diagrams');
+          });
+        }
       } else {
 
         this.activeDiagram = await this.activeSolutionEntry
