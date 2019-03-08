@@ -347,9 +347,8 @@ export class DiagramDetail {
         await service.saveDiagram(this.activeDiagram, fullPath);
         await service.closeSingleDiagram(this.activeDiagram);
 
-        } catch (error) {
-          console.log(error);
-        }
+        this.activeDiagram = await service.openSingleDiagram(fullPath, this.activeSolutionEntry.identity);
+        this._solutionService.addSingleDiagram(this.activeDiagram);
       } else if (activeDiagramIsUnsavedDiagram) {
         await this._openDirectory();
 
