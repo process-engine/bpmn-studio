@@ -356,6 +356,10 @@ export class SolutionExplorerList {
     this._ipcRenderer.send('close-bpmn-studio');
   }
 
+  private _canReadFromFileSystem(): boolean {
+    return (window as any).nodeRequire;
+  }
+
   private _prepareSaveModalForClosing(): void {
     const showCloseModalEventName: string = 'unsaved-diagrams-modal';
 
