@@ -80,5 +80,27 @@
       </div>
     </div>
 
+    <modal show.bind="showQuitModal"
+           header-text="Unsaved Diagrams">
+      <template replace-part="modal-body">
+        <span if.bind="unsavedDiagramsCount > 1">
+          Do you want to save the changes to the following ${unsavedDiagramsCount} files?
+        </span>
+        <span else>
+          Do you want to save the changes to the following file?
+        </span>
+        <ul>
+          <li repeat.for="diagram of unsavedDiagrams">
+            ${diagram.name}
+          </i>
+        </ul>
+      </template>
+      <template replace-part="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" click.delegate="cancelQuitting()">Cancel</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal" click.delegate="quitWithoutSaving()">Quit and don't save</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal" click.delegate="quitWithSaving()">Save and quit</button>
+      </template>
+    </modal>
+
   </div>
 </template>
