@@ -472,9 +472,8 @@ export class SolutionExplorerList {
 
   private _canCreateNewDiagramsInSolution(service: ISolutionExplorerService, uri: string): boolean {
     const solutionIsNotOpenedFromRemote: boolean = !uri.startsWith('http');
-    const solutionIsNotSingleDiagrams: boolean = service !== this._singleDiagramService;
 
-    return solutionIsNotOpenedFromRemote && solutionIsNotSingleDiagrams;
+    return solutionIsNotOpenedFromRemote;
   }
 
   private _canCloseSolution(service: ISolutionExplorerService, uri: string): boolean {
