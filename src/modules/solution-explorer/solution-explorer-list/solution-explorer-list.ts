@@ -356,6 +356,33 @@ export class SolutionExplorerList {
     this._ipcRenderer.send('close-bpmn-studio');
   }
 
+  private async _openDirectory(diagramName: string): Promise<string> {
+    const canNotReadFromFileSystem: boolean = !this._canReadFromFileSystem();
+    if (canNotReadFromFileSystem) {
+      return;
+    }
+
+    this._ipcRenderer.send('save_single_diagram');
+
+    this._ipcRenderer.once('send_diagram_to_path', async(event: Event, openedFolder: File) => {
+      const noFolderSelected: boolean = openedFolder === null;
+      if (noFolderSelected) {
+        return;
+      }
+
+      const singleDiagramSolution: ISolutionEntry = this.getSingleDiagramSolutionEntry();
+      const diagram: IDiagram = await singleDiagramSolution.service.loadDiagram(diagramName);
+      const path: any = (window as any).nodeRequire('path');
+      const fullPath: string = path.join(openedFolder[0], `${diagram.name}.bpmn`);
+      const service: SingleDiagramsSolutionExplorerService = singleDiagramSolution.service as SingleDiagramsSolutionExplorerService;
+
+      await service.saveDiagram(diagram, fullPath);
+
+      const newDiagram: IDiagram = await service.openSingleDiagram(fullPath, singleDiagramSolution.identity);
+      this._solutionService.addSingleDiagram(newDiagram);
+    });
+  }
+
   private _canReadFromFileSystem(): boolean {
     return (window as any).nodeRequire;
   }
