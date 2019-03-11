@@ -117,6 +117,9 @@ export class SolutionExplorerSolution {
       this._eventAggregator.subscribe('router:navigation:success', () => {
         this._updateSolutionExplorer();
       }),
+      this._eventAggregator.subscribe('temp:diagram:saved', () => {
+        this._updateSolutionExplorer();
+      }),
     ];
 
     this._refreshIntervalTask = setInterval(async() =>  {

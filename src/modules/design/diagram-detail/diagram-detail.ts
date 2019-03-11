@@ -349,6 +349,8 @@ export class DiagramDetail {
 
         this.activeDiagram = await service.openSingleDiagram(fullPath, this.activeSolutionEntry.identity);
         this._solutionService.addSingleDiagram(this.activeDiagram);
+        this._eventAggregator.publish('temp:diagram:saved');
+
       } else if (activeDiagramIsUnsavedDiagram) {
         await this._openDirectory();
 
