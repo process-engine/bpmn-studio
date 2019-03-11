@@ -337,7 +337,8 @@ export class SolutionExplorerList {
       .filter((diagram: IDiagram) => diagram.uri.includes('temp-diagrams'))
       .length;
 
-    if (unsavedDiagramsCount >= 1) {
+    const oneOrMoreUnsavedDiagrams: boolean = unsavedDiagramsCount >= 1;
+    if (oneOrMoreUnsavedDiagrams) {
       this._ipcRenderer.send('unsaved-diagrams', true);
     } else {
       this._ipcRenderer.send('unsaved-diagrams', false);
@@ -364,6 +365,7 @@ export class SolutionExplorerList {
 
   public async quitWithSaving(): Promise<void> {
     this.unsavedDiagrams.forEach(async(diagram: IDiagram) => await this._openDirectory(diagram.name));
+
     this._ipcRenderer.send('unsaved-diagrams', false);
     this._ipcRenderer.send('close-bpmn-studio');
   }
