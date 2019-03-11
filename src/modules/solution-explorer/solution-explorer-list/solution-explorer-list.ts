@@ -340,6 +340,9 @@ export class SolutionExplorerList {
     return unsavedDiagramsCount;
   }
 
+  public cancelQuitting(): void {
+    this.showQuitModal = false;
+  }
   private _prepareSaveModalForClosing(): void {
     const showCloseModalEventName: string = 'unsaved-diagrams-modal';
 
