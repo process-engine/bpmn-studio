@@ -337,6 +337,12 @@ export class SolutionExplorerList {
       .filter((diagram: IDiagram) => diagram.uri.includes('temp-diagrams'))
       .length;
 
+    if (unsavedDiagramsCount >= 1) {
+      this._ipcRenderer.send('unsaved-diagrams', true);
+    } else {
+      this._ipcRenderer.send('unsaved-diagrams', false);
+    }
+
     return unsavedDiagramsCount;
   }
 
