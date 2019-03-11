@@ -170,7 +170,8 @@ export class StatusBar {
          *
          * Temporarily diagrams are not persisted in localStorage.
          */
-        if (!this.activeDiagram) {
+        const noActiveDiagram: boolean = this.activeDiagram === undefined;
+        if (noActiveDiagram) {
           const service: SingleDiagramsSolutionExplorerService = this.activeSolutionEntry.service as SingleDiagramsSolutionExplorerService;
           const allOpenedSingleDiagrams: Array<IDiagram> = service.getOpenedDiagrams();
 
