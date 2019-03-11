@@ -127,7 +127,8 @@ export class Design {
          *
          * Temporarily diagrams are not persisted in localStorage.
          */
-        if (!this.activeDiagram) {
+        const noActiveDiagram: boolean = this.activeDiagram === undefined;
+        if (noActiveDiagram) {
           const service: SingleDiagramsSolutionExplorerService = this.activeSolutionEntry.service as SingleDiagramsSolutionExplorerService;
           const allOpenedSingleDiagrams: Array<IDiagram> = service.getOpenedDiagrams();
 
@@ -383,7 +384,8 @@ export class Design {
      * if it is a SingleDiagramSolution, the diagram may be undefined because it does not persisted
      * if it is a temporary diagram.
      */
-    if (!oldValue) {
+    const noOldValue: boolean = oldValue === undefined;
+    if (noOldValue) {
       return;
     }
     const activeDiagramDidNotChange: boolean = newValue.id === oldValue.id
