@@ -25,6 +25,7 @@ interface IUriToViewModelMap {
 @inject(Router, EventAggregator, 'SolutionExplorerServiceFactory', 'AuthenticationService', 'DiagramValidationService', 'SolutionService')
 export class SolutionExplorerList {
   public internalSolutionUri: string;
+  public showQuitModal: boolean = false;
 
   private _router: Router;
   private _eventAggregator: EventAggregator;
@@ -32,6 +33,7 @@ export class SolutionExplorerList {
   private _authenticationService: IAuthenticationService;
   private _diagramValidationService: IDiagramValidationService;
   private _solutionService: ISolutionService;
+  private _ipcRenderer: any;
   /*
    * Contains all opened solutions.
    */
@@ -65,7 +67,9 @@ export class SolutionExplorerList {
 
     const canReadFromFileSystem: boolean = (window as any).nodeRequire;
     if (canReadFromFileSystem) {
+      this._ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
       this._createSingleDiagramServiceEntry();
+      this._prepareSaveModalForClosing();
     }
 
     // Allows us to debug the solution explorer list.
@@ -334,6 +338,16 @@ export class SolutionExplorerList {
       .length;
 
     return unsavedDiagramsCount;
+  }
+
+  private _prepareSaveModalForClosing(): void {
+    const showCloseModalEventName: string = 'unsaved-diagrams-modal';
+
+    const showCloseModalFunction: Function = (): void => {
+      this.showQuitModal = true;
+    };
+
+    this._ipcRenderer.on(showCloseModalEventName, showCloseModalFunction);
   }
 
   private _cleanupSolution(uri: string): void {
