@@ -339,7 +339,8 @@ export class DiagramDetail {
 
       const activeDiagramIsUnsavedDiagram: boolean = this.activeDiagram.uri.includes('temp-diagrams');
 
-      if (activeDiagramIsUnsavedDiagram && diagramPath) {
+      const diagramPathSet: boolean = diagramPath !== undefined;
+      if (activeDiagramIsUnsavedDiagram && diagramPathSet) {
         const path: any = (window as any).nodeRequire('path');
         const fullPath: string = path.join(diagramPath, `${this.activeDiagram.name}.bpmn`);
 
