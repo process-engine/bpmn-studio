@@ -340,6 +340,13 @@ export class SolutionExplorerList {
     return unsavedDiagramsCount;
   }
 
+  @computedFrom('_singleDiagramService._openedDiagrams.length')
+  public get unsavedDiagrams(): Array<IDiagram> {
+    return this._singleDiagramService
+               .getOpenedDiagrams()
+               .filter((diagram: IDiagram) => diagram.uri.includes('temp-diagrams'));
+  }
+
   public cancelQuitting(): void {
     this.showQuitModal = false;
   }
