@@ -356,6 +356,12 @@ export class SolutionExplorerList {
     this._ipcRenderer.send('close-bpmn-studio');
   }
 
+  public async quitWithSaving(): Promise<void> {
+    this.unsavedDiagrams.forEach(async(diagram: IDiagram) => await this._openDirectory(diagram.name));
+    this._ipcRenderer.send('unsaved-diagrams', false);
+    this._ipcRenderer.send('close-bpmn-studio');
+  }
+
   private async _openDirectory(diagramName: string): Promise<string> {
     const canNotReadFromFileSystem: boolean = !this._canReadFromFileSystem();
     if (canNotReadFromFileSystem) {
