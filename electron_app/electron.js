@@ -20,6 +20,7 @@ let filePath;
 let isInitialized = false;
 
 let canNotCloseApplication = false;
+let unsavedDiagrams = false;
 
 const Main = {};
 
@@ -274,6 +275,14 @@ Main._createMainWindow = function () {
 
       return false;
     }
+
+    if (this.unsavedDiagrams) {
+      event.preventDefault();
+
+      Main._window.webContents.send('unsaved-diagrams-modal');
+      
+      return false;
+    }
   });
 
   electron.ipcMain.on('close-bpmn-studio', (event) => {
@@ -282,6 +291,10 @@ Main._createMainWindow = function () {
 
   electron.ipcMain.on('can-not-close', (event, canCloseResult) => {
     canNotCloseApplication = canCloseResult;
+  });
+
+  electron.ipcMain.on('unsaved-diagrams', (event, unsavedDiagrams) => {
+    this.unsavedDiagrams = unsavedDiagrams;
   });
 
   Main._window.on('closed', (event) => {
