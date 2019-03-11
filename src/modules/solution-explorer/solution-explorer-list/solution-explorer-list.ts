@@ -343,6 +343,12 @@ export class SolutionExplorerList {
   public cancelQuitting(): void {
     this.showQuitModal = false;
   }
+
+  public quitWithoutSaving(): void {
+    this._ipcRenderer.send('unsaved-diagrams', false);
+    this._ipcRenderer.send('close-bpmn-studio');
+  }
+
   private _prepareSaveModalForClosing(): void {
     const showCloseModalEventName: string = 'unsaved-diagrams-modal';
 
