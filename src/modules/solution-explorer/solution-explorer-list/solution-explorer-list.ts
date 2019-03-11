@@ -331,6 +331,10 @@ export class SolutionExplorerList {
 
   @computedFrom('_singleDiagramService._openedDiagrams.length')
   public get unsavedDiagramsCount(): number {
+    const canNotReadFromFileSystem: boolean = !this._canReadFromFileSystem();
+    if (canNotReadFromFileSystem) {
+      return;
+    }
 
     const unsavedDiagramsCount: number = this._singleDiagramService
       .getOpenedDiagrams()
@@ -349,6 +353,11 @@ export class SolutionExplorerList {
 
   @computedFrom('_singleDiagramService._openedDiagrams.length')
   public get unsavedDiagrams(): Array<IDiagram> {
+    const canNotReadFromFileSystem: boolean = !this._canReadFromFileSystem();
+    if (canNotReadFromFileSystem) {
+      return;
+    }
+
     return this._singleDiagramService
                .getOpenedDiagrams()
                .filter((diagram: IDiagram) => diagram.uri.includes('temp-diagrams'));
