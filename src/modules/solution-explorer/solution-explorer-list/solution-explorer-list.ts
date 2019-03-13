@@ -142,6 +142,8 @@ export class SolutionExplorerList {
     }
 
     let processEngineVersion: string;
+    let isConnected: boolean = false;
+
     try {
       await solutionExplorer.openSolution(uri, identity);
 
@@ -151,25 +153,21 @@ export class SolutionExplorerList {
 
         processEngineVersion = responseJSON.version;
       }
-    } catch (error) {
-
+      isConnected = true;
+    } catch {
+      isConnected = false;
       this._solutionService.removeSolutionEntryByUri(uri);
-
-      /**
-       * TODO: The error message only contains 'Failed to fetch' if the connection
-       * failed. A more detailed cause (such as Connection Refused) would
-       * be better. This needs to be implemented in the service or repository.
-       */
-      throw new Error('Failed to receive the list of ProcessModels from the endpoint');
     }
 
-    const newOpenedSolution: ISolution = await solutionExplorer.loadSolution();
-    const solutionURI: string = newOpenedSolution.uri;
+    if (isConnected) {
+      const newOpenedSolution: ISolution = await solutionExplorer.loadSolution();
+      const solutionURI: string = newOpenedSolution.uri;
 
-    const arrayAlreadyContainedURI: boolean = this._getIndexOfSolution(solutionURI) >= 0;
+      const arrayAlreadyContainedURI: boolean = this._getIndexOfSolution(solutionURI) >= 0;
 
-    if (arrayAlreadyContainedURI) {
-      throw new Error('Solution is already opened.');
+      if (arrayAlreadyContainedURI) {
+        throw new Error('Solution is already opened.');
+      }
     }
 
     this._addSolutionEntry(uri, solutionExplorer, identity, insertAtBeginning, processEngineVersion);
@@ -442,8 +440,9 @@ export class SolutionExplorerList {
     const status: SolutionStatus = await this._getSolutionStatus(service, uri);
     const canCloseSolution: boolean = this._canCloseSolution(service, uri);
     const canCreateNewDiagramsInSolution: boolean = this._canCreateNewDiagramsInSolution(service, uri);
-    const authority: string = await this._getAuthorityForSolution(uri);
-
+    const authority: string | undefined = status !== 'disconnected'
+      ? await this._getAuthorityForSolution(uri)
+      : undefined;
     const authorityIsUndefined: boolean = authority === undefined;
 
     const isLoggedIn: boolean = authorityIsUndefined
