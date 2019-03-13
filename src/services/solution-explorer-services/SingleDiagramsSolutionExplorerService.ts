@@ -18,6 +18,8 @@ import {IDiagramValidationService, ISolutionService} from '../../contracts';
 
 export class SingleDiagramsSolutionExplorerService implements ISolutionExplorerService {
 
+  public isCreatingDiagram: boolean = false;
+
   private _validationService: IDiagramValidationService;
   private _solutionExplorerToOpenDiagrams: ISolutionExplorerService;
   private _uriOfSingleDiagramService: string;

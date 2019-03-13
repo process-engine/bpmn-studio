@@ -34,6 +34,8 @@ export class SolutionExplorerList {
   private _diagramValidationService: IDiagramValidationService;
   private _solutionService: ISolutionService;
   private _ipcRenderer: any;
+  private _creationStarted: boolean = false;
+
   /*
    * Contains all opened solutions.
    */
@@ -260,7 +262,12 @@ export class SolutionExplorerList {
 
     const solutionIsNotOpened: boolean = viewModelOfEntry === undefined || viewModelOfEntry === null;
     if (solutionIsNotOpened) {
-      await this.openSolution(uri);
+      if (uri === 'Single Diagrams') {
+        this._creationStarted = true;
+        this._singleDiagramService.isCreatingDiagram = true;
+      } else {
+        await this.openSolution(uri);
+      }
     }
 
     /**
@@ -273,6 +280,7 @@ export class SolutionExplorerList {
       }
 
       viewModelOfEntry.startCreationOfNewDiagram();
+      this._creationStarted = false;
     }, 0);
   }
 
@@ -306,10 +314,26 @@ export class SolutionExplorerList {
    * `_singleDiagramService._openedDiagrams.length` observed because
    * aurelia cannot see the business rules happening in this._shouldDisplaySolution().
    */
-  @computedFrom('_openedSolutions.length', '_singleDiagramService._openedDiagrams.length')
+  @computedFrom('_openedSolutions.length', '_singleDiagramService._openedDiagrams.length', '_singleDiagramService.isCreatingDiagram')
   public get openedSolutions(): Array<ISolutionEntry> {
     const filteredEntries: Array<ISolutionEntry> = this._openedSolutions
-      .filter(this._shouldDisplaySolution);
+      .filter((entry: ISolutionEntry) => {
+        const isSingleDiagramService: boolean = entry.isSingleDiagramService === true;
+        if (isSingleDiagramService) {
+
+          const creationStarted: boolean = this._creationStarted === true;
+          if (creationStarted) {
+            return true;
+          }
+
+          const singleDiagramService: SingleDiagramsSolutionExplorerService = entry.service as SingleDiagramsSolutionExplorerService;
+          const someDiagramsAreOpened: boolean = singleDiagramService.getOpenedDiagrams().length > 0;
+
+          return someDiagramsAreOpened;
+        }
+
+        return true;
+      });
 
     const sortedEntries: Array<ISolutionEntry> = filteredEntries.sort((solutionA: ISolutionEntry, solutionB: ISolutionEntry) => {
       if (solutionA.isSingleDiagramService) {
@@ -487,25 +511,6 @@ export class SolutionExplorerList {
 
   private _isSingleDiagramService(service: ISolutionExplorerService): boolean {
     return service === this._singleDiagramService;
-  }
-
-  /**
-   * Wherever to display that solution entry. Some entries are not display if
-   * empty. This method capsules this logic.
-   */
-  private _shouldDisplaySolution(entry: ISolutionEntry): boolean {
-    const service: ISolutionExplorerService = entry.service;
-
-    const isSingleDiagramService: boolean = (service as any).getOpenedDiagrams !== undefined;
-    if (isSingleDiagramService) {
-      const singleDiagramService: SingleDiagramsSolutionExplorerService = service as SingleDiagramsSolutionExplorerService;
-
-      const someDiagramsAreOpened: boolean = singleDiagramService.getOpenedDiagrams().length > 0;
-
-      return someDiagramsAreOpened;
-    }
-
-    return true;
   }
 
   private _getIndexOfSolution(uri: string): number {
