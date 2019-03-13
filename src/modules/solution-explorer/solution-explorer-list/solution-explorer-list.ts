@@ -362,10 +362,15 @@ export class SolutionExplorerList {
     this._addSolutionEntry(uriOfSingleDiagramService, this._singleDiagramService, identity, true);
   }
 
-  private _getSolutionStatus(service: ISolutionExplorerService, uri: string): SolutionStatus {
+  private async _getSolutionStatus(service: ISolutionExplorerService, uri: string): Promise<SolutionStatus> {
     const solutionIsOpenedFromRemote: boolean = uri.startsWith('http');
     if (solutionIsOpenedFromRemote) {
-      return 'remote';
+      try {
+        await fetch(uri);
+        return 'remote';
+      } catch {
+        return 'disconnected';
+      }
     }
 
     const solutionIsSingleDiagrams: boolean = service === this._singleDiagramService;
@@ -424,13 +429,15 @@ export class SolutionExplorerList {
   }
 
   private async _addSolutionEntry(
-    uri: string, service: ISolutionExplorerService,
+    uri: string,
+    service: ISolutionExplorerService,
     identity: IIdentity,
     insertAtBeginning: boolean,
     processEngineVersion?: string,
-    ): Promise<void> {
+  ): Promise<void> {
+
     const isSingleDiagramService: boolean = this._isSingleDiagramService(service);
-    const status: SolutionStatus = this._getSolutionStatus(service, uri);
+    const status: SolutionStatus = await this._getSolutionStatus(service, uri);
     const canCloseSolution: boolean = this._canCloseSolution(service, uri);
     const canCreateNewDiagramsInSolution: boolean = this._canCreateNewDiagramsInSolution(service, uri);
     const authority: string = await this._getAuthorityForSolution(uri);
