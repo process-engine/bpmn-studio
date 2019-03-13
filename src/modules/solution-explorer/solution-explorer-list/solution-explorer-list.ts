@@ -25,7 +25,9 @@ interface IUriToViewModelMap {
 
 @inject(Router, EventAggregator, 'SolutionExplorerServiceFactory', 'AuthenticationService', 'DiagramValidationService', 'SolutionService')
 export class SolutionExplorerList {
+
   public internalSolutionUri: string;
+  public solutionEntryViewModels: IUriToViewModelMap = {};
 
   private _router: Router;
   private _eventAggregator: EventAggregator;
@@ -47,7 +49,7 @@ export class SolutionExplorerList {
    * The uri maps to the viewmodel. The contents of this map get set by aurelia
    * in the html view.
    */
-  public solutionEntryViewModels: IUriToViewModelMap = {};
+
 
   constructor(
     router: Router,

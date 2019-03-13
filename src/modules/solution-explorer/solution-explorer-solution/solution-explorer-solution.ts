@@ -54,6 +54,14 @@ export class SolutionExplorerSolution {
 
   public activeDiagram: IDiagram;
 
+  // Fields below are bound from the html view.
+  @bindable public solutionService: ISolutionExplorerService;
+  @bindable public solutionIsSingleDiagrams: boolean;
+  @bindable public displayedSolutionEntry: ISolutionEntry;
+  @bindable public solutionStatus: SolutionStatus;
+  public createNewDiagramInput: HTMLInputElement;
+  public deleteDiagramModal: DeleteDiagramModal;
+
   private _router: Router;
   private _eventAggregator: EventAggregator;
   private _validationController: ValidationController;
@@ -81,16 +89,6 @@ export class SolutionExplorerSolution {
   ];
 
   private _currentlyRenamingDiagram: IDiagram | null = null;
-
-  // Fields below are bound from the html view.
-  @bindable public solutionService: ISolutionExplorerService;
-  @bindable public solutionIsSingleDiagrams: boolean;
-  @bindable public displayedSolutionEntry: ISolutionEntry;
-  @bindable public solutionStatus: SolutionStatus;
-  public createNewDiagramInput: HTMLInputElement;
-  public diagramContextMenu: HTMLElement;
-  public showContextMenu: boolean = false;
-  public deleteDiagramModal: DeleteDiagramModal;
 
   private _renameDiagramInput: HTMLInputElement;
   private _originalSolutionStatus: SolutionStatus;
