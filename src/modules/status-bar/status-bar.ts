@@ -166,9 +166,9 @@ export class StatusBar {
 
         /**
          * This If gets called when the activeDiagram is not found within the localStorage.
-         * This can happen if the diagram to open is a temporarily diagram.
+         * This can happen if the diagram to open is a temporary diagram.
          *
-         * Temporarily diagrams are not persisted in localStorage.
+         * Temporary diagrams are not persisted in localStorage.
          */
         const noActiveDiagram: boolean = this.activeDiagram === undefined;
         if (noActiveDiagram) {
