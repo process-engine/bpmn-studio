@@ -554,118 +554,124 @@ Main._startInternalProcessEngine = async function () {
     process.env.CONFIG_PATH = path.join(__dirname, '..', '..', '..', 'config');
   }
 
-  const desiredPort = 8000;
   const getPortConfig = {
-    port: desiredPort,
-    host: '0.0.0.0',
+    port: 8000,
+    host: '0.0.0.0'
   };
 
-  const port = await getPort(getPortConfig);
+  return getPort(getPortConfig)
+    .then(async (port) => {
 
-  console.log(`Internal ProcessEngine starting on port ${port}.`);
+      console.log(`Internal ProcessEngine starting on port ${port}.`);
 
-  process.env.http__http_extension__server__port = port;
+      process.env.http__http_extension__server__port = port;
 
-  const processEngineDatabaseFolderName = 'process_engine_databases';
+      const processEngineDatabaseFolderName = 'process_engine_databases';
 
-  process.env.process_engine__process_model_repository__storage = path.join(userDataFolderPath, processEngineDatabaseFolderName, 'process_model.sqlite');
-  process.env.process_engine__flow_node_instance_repository__storage = path.join(userDataFolderPath, processEngineDatabaseFolderName, 'flow_node_instance.sqlite');
-  process.env.process_engine__timer_repository__storage = path.join(userDataFolderPath, processEngineDatabaseFolderName, 'timer.sqlite');
+      process.env.process_engine__process_model_repository__storage = path.join(userDataFolderPath, processEngineDatabaseFolderName, 'process_model.sqlite');
+      process.env.process_engine__flow_node_instance_repository__storage = path.join(userDataFolderPath, processEngineDatabaseFolderName, 'flow_node_instance.sqlite');
+      process.env.process_engine__timer_repository__storage = path.join(userDataFolderPath, processEngineDatabaseFolderName, 'timer.sqlite');
 
-  let internalProcessEngineStatus = undefined;
-  let internalProcessEngineStartupError = undefined;
-  const processEngineStatusListeners = [];
+      let internalProcessEngineStatus = undefined;
+      let internalProcessEngineStartupError = undefined;
+      const processEngineStatusListeners = [];
 
-  function _sendInternalProcessEngineStatus(sender) {
-    let serializedStartupError;
-    const processEngineStartFailed = internalProcessEngineStartupError !== undefined;
+      function _sendInternalProcessEngineStatus(sender) {
+        let serializedStartupError;
+        const processEngineStartSuccessful = (internalProcessEngineStartupError !== undefined &&
+          internalProcessEngineStartupError !== null);
 
-    if (processEngineStartFailed) {
-      serializedStartupError = JSON.stringify(
-        internalProcessEngineStartupError,
-        Object.getOwnPropertyNames(internalProcessEngineStartupError));
-    }
+        if (processEngineStartSuccessful) {
+          serializedStartupError = JSON.stringify(
+            internalProcessEngineStartupError,
+            Object.getOwnPropertyNames(internalProcessEngineStartupError));
 
-    sender.send(
-      'internal_processengine_status',
-      internalProcessEngineStatus,
-      serializedStartupError);
-  }
+        } else {
+          serializedStartupError = undefined;
+        }
 
-  function _publishProcessEngineStatus(status) {
-    processEngineStatusListeners.forEach(_sendInternalProcessEngineStatus);
-  }
+        sender.send(
+          'internal_processengine_status',
+          internalProcessEngineStatus,
+          serializedStartupError);
+      }
 
-  /* When someone wants to know to the internal processengine status, he
-   * must first send a `add_internal_processengine_status_listener` message
-   * to the event mechanism. We recieve this message here and add the sender
-   * to our listeners array.
-   *
-   * As soon, as the processengine status is updated, we send the listeners a
-   * notification about this change; this message contains the state and the
-   * error text (if there was an error).
-   *
-   * If the processengine status is known by the time the listener registers,
-   * we instantly respond to the listener with a notification message.
-   *
-   * This is quite a unusual pattern, the problem this approves solves is the
-   * following: It's impossible to do interactions between threads in
-   * electron like this:
-   *
-   *  'renderer process'              'main process'
-   *          |                             |
-   *          o   <<<- Send Message  -<<<   x
-   *
-   * -------------------------------------------------
-   *
-   * Instead our interaction now locks like this:
-   *
-   *  'renderer process'              'main process'
-   *          |                             |
-   *          x   >>>--  Subscribe  -->>>   o
-   *          o   <<<- Send Message  -<<<   x
-   *          |       (event occurs)        |
-   *          o   <<<- Send Message  -<<<   x
-   */
-  electron.ipcMain.on('add_internal_processengine_status_listener', (event) => {
-    if (!processEngineStatusListeners.includes(event.sender)) {
-      processEngineStatusListeners.push(event.sender);
-    }
+      function _publishProcessEngineStatus() {
+        processEngineStatusListeners.forEach(_sendInternalProcessEngineStatus);
+      }
 
-    if (internalProcessEngineStatus !== undefined) {
-      _sendInternalProcessEngineStatus(event.sender);
-    }
-  });
+      /* When someone wants to know to the internal processengine status, he
+       * must first send a `add_internal_processengine_status_listener` message
+       * to the event mechanism. We recieve this message here and add the sender
+       * to our listeners array.
+       *
+       * As soon, as the processengine status is updated, we send the listeners a
+       * notification about this change; this message contains the state and the
+       * error text (if there was an error).
+       *
+       * If the processengine status is known by the time the listener registers,
+       * we instantly respond to the listener with a notification message.
+       *
+       * This is quite a unusual pattern, the problem this approves solves is the
+       * following: It's impossible to do interactions between threads in
+       * electron like this:
+       *
+       *  'renderer process'              'main process'
+       *          |                             |
+       *          o   <<<- Send Message  -<<<   x
+       *
+       * -------------------------------------------------
+       *
+       * Instead our interaction now locks like this:
+       *
+       *  'renderer process'              'main process'
+       *          |                             |
+       *          x   >>>--  Subscribe  -->>>   o
+       *          o   <<<- Send Message  -<<<   x
+       *          |       (event occurs)        |
+       *          o   <<<- Send Message  -<<<   x
+       */
+      electron.ipcMain.on('add_internal_processengine_status_listener', (event) => {
+        if (!processEngineStatusListeners.includes(event.sender)) {
+          processEngineStatusListeners.push(event.sender);
+        }
 
-  // This tells the frontend the location at which the electron-skeleton
-  // will be running; this 'get_host' request ist emitted in src/main.ts.
-  electron.ipcMain.on('get_host', (event) => {
-    event.returnValue = `localhost:${port}`;
-  });
+        if (internalProcessEngineStatus !== undefined) {
+          _sendInternalProcessEngineStatus(event.sender);
+        }
+      });
+
+      // This tells the frontend the location at which the electron-skeleton
+      // will be running; this 'get_host' request ist emitted in src/main.ts.
+      electron.ipcMain.on('get_host', (event) => {
+        event.returnValue = `localhost:${port}`;
+      });
 
 
-  // TODO: Check if the ProcessEngine instance is now run on the UI thread.
-  // See issue https://github.com/process-engine/bpmn-studio/issues/312
-  try {
+      // TODO: Check if the ProcessEngine instance is now run on the UI thread.
+      // See issue https://github.com/process-engine/bpmn-studio/issues/312
+      try {
 
-    // Create path for sqlite database in BPMN-Studio context.
-    const userDataFolderPath = getUserConfigFolder();
-    const sqlitePath = `${userDataFolderPath}/bpmn-studio/process_engine_databases`;
+        // Create path for sqlite database in BPMN-Studio context.
+        const userDataFolderPath = getUserConfigFolder();
+        const sqlitePath = `${userDataFolderPath}/bpmn-studio/process_engine_databases`;
 
-    const pe = require('@process-engine/process_engine_runtime');
-    pe.startRuntime(sqlitePath);
+        const pe = require('@process-engine/process_engine_runtime');
+        pe.startRuntime(sqlitePath);
 
-    console.log('Internal ProcessEngine started successfully.');
-    internalProcessEngineStatus = 'success';
+        console.log('Internal ProcessEngine started successfully.');
+        internalProcessEngineStatus = 'success';
 
-    _publishProcessEngineStatus();
-  } catch (error) {
-    console.error('Failed to start internal ProcessEngine: ', error);
-    internalProcessEngineStatus = 'error';
-    internalProcessEngineStartupError = error;
+        _publishProcessEngineStatus();
+      } catch (error) {
+        console.error('Failed to start internal ProcessEngine: ', error);
+        internalProcessEngineStatus = 'error';
+        internalProcessEngineStartupError = error;
 
-    _publishProcessEngineStatus();
-  }
+        _publishProcessEngineStatus();
+      }
+
+    });
 
 }
 
