@@ -380,9 +380,9 @@ export class Design {
 
   public activeDiagramChanged(newValue: IDiagram, oldValue: IDiagram): void {
     /**
-     * The oldValue is sometimes undefined because after the first assignment of the activeDiagram,
-     * if it is a SingleDiagramSolution, the diagram may be undefined because it does not persisted
-     * if it is a temporary diagram.
+     * The oldValue can be undefined when it is the first assignment of the activeDiagram.
+     * If the user changes the diagram and the last opened diagram was a temporary diagram,
+     * the olfValue will be undefined as well since temporary diagrams are not persisted.
      */
     const noOldValue: boolean = oldValue === undefined;
     if (noOldValue) {
