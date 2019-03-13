@@ -23,7 +23,7 @@
 
           <div class="solution-entry__actions ">
             <button class="button"
-              if.bind="solutionEntry.uri.startsWith('http') && !solutionEntry.isLoggedIn"
+              if.bind="solutionEntry.status === 'remote' && !solutionEntry.isLoggedIn"
               click.delegate="login(solutionEntry)"
               title="Login">
 
@@ -39,7 +39,7 @@
             </button>
 
             <button class="button"
-              if.bind="solutionIsInternalSolution(solutionEntry)"
+              if.bind="solutionEntry.status !== 'disconnected' && solutionIsInternalSolution(solutionEntry)"
               click.delegate="openSettings()"
               title="Open settings of the internal ProcessEngine">
 
@@ -67,12 +67,12 @@
 
         </div>
 
-        <solution-explorer-solution
+        <solution-explorer-solution if.bind="solutionEntry.status !== 'disconnected'"
           displayed-solution-entry.bind="solutionEntry"
           solution-service.bind="solutionEntry.service"
           solution-is-single-diagrams.bind="solutionEntry.isSingleDiagramService"
           view-model.ref="solutionEntryViewModels[solutionEntry.uri]"
-          font-awesome-icon-class.two-way="solutionEntry.fontAwesomeIconClass">
+          solution-status.two-way="solutionEntry.status">
         </solution-explorer-solution>
       </div>
     </div>
