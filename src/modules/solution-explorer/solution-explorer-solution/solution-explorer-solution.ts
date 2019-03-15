@@ -61,6 +61,8 @@ export class SolutionExplorerSolution {
   @bindable public solutionStatus: SolutionStatus;
   public createNewDiagramInput: HTMLInputElement;
   public deleteDiagramModal: DeleteDiagramModal;
+  public diagramContextMenu: HTMLElement;
+  public showContextMenu: boolean = false;
 
   private _router: Router;
   private _eventAggregator: EventAggregator;
