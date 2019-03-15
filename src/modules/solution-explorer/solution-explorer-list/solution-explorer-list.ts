@@ -50,7 +50,6 @@ export class SolutionExplorerList {
    * in the html view.
    */
 
-
   constructor(
     router: Router,
     eventAggregator: EventAggregator,
