@@ -20,7 +20,7 @@ let filePath;
 let isInitialized = false;
 
 let canNotCloseApplication = false;
-let unsavedDiagrams = false;
+let unsavedDiagramsExist = false;
 
 const Main = {};
 
@@ -276,10 +276,10 @@ Main._createMainWindow = function () {
       return false;
     }
 
-    if (this.unsavedDiagrams) {
+    if (this.unsavedDiagramsExist) {
       event.preventDefault();
 
-      Main._window.webContents.send('unsaved-diagrams-modal');
+      Main._window.webContents.send('show-unsaved-diagrams-modal');
       
       return false;
     }
@@ -293,8 +293,8 @@ Main._createMainWindow = function () {
     canNotCloseApplication = canCloseResult;
   });
 
-  electron.ipcMain.on('unsaved-diagrams', (event, unsavedDiagrams) => {
-    this.unsavedDiagrams = unsavedDiagrams;
+  electron.ipcMain.on('unsaved-diagrams-exist', (event, unsavedDiagramsExist) => {
+    this.unsavedDiagramsExist = unsavedDiagramsExist;
   });
 
   Main._window.on('closed', (event) => {
