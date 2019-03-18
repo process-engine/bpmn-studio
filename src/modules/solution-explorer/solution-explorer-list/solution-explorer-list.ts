@@ -367,9 +367,9 @@ export class SolutionExplorerList {
 
     const oneOrMoreUnsavedDiagrams: boolean = unsavedDiagramsCount >= 1;
     if (oneOrMoreUnsavedDiagrams) {
-      this._ipcRenderer.send('unsaved-diagrams', true);
+      this._ipcRenderer.send('unsaved-diagrams-exist', true);
     } else {
-      this._ipcRenderer.send('unsaved-diagrams', false);
+      this._ipcRenderer.send('unsaved-diagrams-exist', false);
     }
 
     return unsavedDiagramsCount;
@@ -392,14 +392,14 @@ export class SolutionExplorerList {
   }
 
   public quitWithoutSaving(): void {
-    this._ipcRenderer.send('unsaved-diagrams', false);
+    this._ipcRenderer.send('unsaved-diagrams-exist', false);
     this._ipcRenderer.send('close-bpmn-studio');
   }
 
   public async quitWithSaving(): Promise<void> {
     this.unsavedDiagrams.forEach(async(diagram: IDiagram) => await this._openDirectory(diagram.name));
 
-    this._ipcRenderer.send('unsaved-diagrams', false);
+    this._ipcRenderer.send('unsaved-diagrams-exist', false);
     this._ipcRenderer.send('close-bpmn-studio');
   }
 
@@ -435,7 +435,7 @@ export class SolutionExplorerList {
   }
 
   private _prepareSaveModalForClosing(): void {
-    const showCloseModalEventName: string = 'unsaved-diagrams-modal';
+    const showCloseModalEventName: string = 'show-unsaved-diagrams-modal';
 
     const showCloseModalFunction: Function = (): void => {
       this.showQuitModal = true;
