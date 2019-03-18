@@ -45,6 +45,16 @@ export class SingleDiagramsSolutionExplorerService implements ISolutionExplorerS
     return this._openedDiagrams;
   }
 
+  public getOpenedTemporarySingleDiagramByName(diagramName: string): IDiagram {
+    const allOpenedSingleDiagrams: Array<IDiagram> = this.getOpenedDiagrams();
+
+    const matchingDiagram: IDiagram = allOpenedSingleDiagrams.find((diagram: IDiagram) => {
+      return diagram.name === diagramName
+          && diagram.uri.includes('temp-diagrams');
+    });
+
+    return matchingDiagram;
+  }
   /**
    * Gets the single diagram with the given uri, if the diagram was opened
    * before.
