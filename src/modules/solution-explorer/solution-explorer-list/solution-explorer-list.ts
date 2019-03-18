@@ -70,6 +70,7 @@ export class SolutionExplorerList {
     const canReadFromFileSystem: boolean = (window as any).nodeRequire;
     if (canReadFromFileSystem) {
       this._ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
+
       this._createSingleDiagramServiceEntry();
       this._prepareSaveModalForClosing();
     }
