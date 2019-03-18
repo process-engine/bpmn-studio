@@ -384,8 +384,8 @@ export class Design {
      * If the user changes the diagram and the last opened diagram was a temporary diagram,
      * the olfValue will be undefined as well since temporary diagrams are not persisted.
      */
-    const noOldValue: boolean = oldValue === undefined;
-    if (noOldValue) {
+    const noOldValueExist: boolean = oldValue === undefined;
+    if (noOldValueExist) {
       return;
     }
     const activeDiagramDidNotChange: boolean = newValue.id === oldValue.id
