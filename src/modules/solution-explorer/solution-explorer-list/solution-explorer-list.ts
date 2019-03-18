@@ -263,7 +263,8 @@ export class SolutionExplorerList {
 
     const solutionIsNotOpened: boolean = viewModelOfEntry === undefined || viewModelOfEntry === null;
     if (solutionIsNotOpened) {
-      if (uri === 'Single Diagrams') {
+      const uriIsSingleDiagrams: boolean = uri === 'Single Diagrams';
+      if (uriIsSingleDiagrams) {
         this._creationStarted = true;
         this._singleDiagramService.isCreatingDiagram = true;
       } else {
