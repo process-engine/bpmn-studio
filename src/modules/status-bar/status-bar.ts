@@ -173,12 +173,8 @@ export class StatusBar {
         const noActiveDiagram: boolean = this.activeDiagram === undefined;
         if (noActiveDiagram) {
           const service: SingleDiagramsSolutionExplorerService = this.activeSolutionEntry.service as SingleDiagramsSolutionExplorerService;
-          const allOpenedSingleDiagrams: Array<IDiagram> = service.getOpenedDiagrams();
 
-          this.activeDiagram = allOpenedSingleDiagrams.find((diagram: IDiagram) => {
-            return diagram.name === diagramName
-                && diagram.uri.includes('temp-diagrams');
-          });
+          this.activeDiagram = service.getOpenedTemporarySingleDiagramByName(diagramName);
         }
       } else {
         this.activeDiagram = await this.activeSolutionEntry
