@@ -352,13 +352,14 @@ export class DiagramDetail {
         this._solutionService.addSingleDiagram(this.activeDiagram);
         this._eventAggregator.publish('temp:diagram:saved');
 
-      } else if (activeDiagramIsUnsavedDiagram) {
+      } else if (!activeDiagramIsUnsavedDiagram) {
+
+        await this.activeSolutionEntry.service.saveDiagram(this.activeDiagram);
+      } else {
+
         await this._openDirectory();
 
         return;
-      } else {
-
-        await this.activeSolutionEntry.service.saveDiagram(this.activeDiagram);
       }
 
       this.bpmnio.saveCurrentXML();
