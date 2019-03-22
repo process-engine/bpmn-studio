@@ -297,7 +297,7 @@ export class NavBar {
    * or a remote ProcessEngine
    */
   private _updateNavbarTitle(): void {
-    const noActiveDiagram: boolean = this.router.currentInstruction.params.diagramName === undefined;
+    const noActiveDiagram: boolean = this.router.currentInstruction.queryParams.diagramName === undefined;
 
     if (noActiveDiagram) {
       this.showProcessName = false;
@@ -378,7 +378,7 @@ export class NavBar {
     this.savingTargetIsRemoteSolution = this.activeSolutionEntry.uri.startsWith('http');
 
     const solutionIsSet: boolean = this.activeSolutionEntry !== undefined;
-    const diagramName: string = this.router.currentInstruction.params.diagramName;
+    const diagramName: string = this.router.currentInstruction.queryParams.diagramName;
     const diagramIsSet: boolean = diagramName !== undefined;
 
     if (solutionIsSet && diagramIsSet) {
@@ -394,7 +394,7 @@ export class NavBar {
 
         this.activeDiagram = await this.activeSolutionEntry
           .service
-          .loadDiagram(this.router.currentInstruction.params.diagramName);
+          .loadDiagram(diagramName);
       }
 
       const diagramNotFound: boolean = this.activeDiagram === undefined;
