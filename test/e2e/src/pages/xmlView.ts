@@ -10,6 +10,7 @@ export class XmlView {
 
   constructor(applicationUrl: string, diagramName: string) {
     this.url = `${applicationUrl}/design/xml/diagram/${diagramName}?solutionUri=http%3A%2F%2Flocalhost%3A8000`;
+    this.url = `${applicationUrl}/design?diagramName=${diagramName}&solutionUri=http%3A%2F%2Flocalhost%3A8000&view=xml`;
   }
 
   public async show(): Promise<void> {

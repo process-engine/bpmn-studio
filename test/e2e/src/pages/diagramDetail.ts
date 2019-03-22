@@ -11,6 +11,7 @@ export class DiagramDetail {
 
   constructor(applicationUrl: string, diagramName: string) {
     this.url = `${applicationUrl}/design/detail/diagram/${diagramName}?solutionUri=http%3A%2F%2Flocalhost%3A8000`;
+    this.url = `${applicationUrl}/design?diagramName=${diagramName}&solutionUri=http%3A%2F%2Flocalhost%3A8000&view=detail`;
   }
 
   public async show(): Promise<void> {
