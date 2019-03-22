@@ -331,7 +331,7 @@ export class NavBar {
       this.showExportOnInspectCorrelation = false;
 
     } else if (activeRouteIsInspect) {
-      const inspectView: string = this.router.currentInstruction.params.view;
+      const inspectView: string = this.router.currentInstruction.queryParams.view;
       const inspectViewIsDashboard: boolean = inspectView === 'dashboard';
       const inspectViewIsHeatmap: boolean = inspectView === 'heatmap';
       const inspectViewIsInspectCorrelation: boolean = inspectView === 'inspect-correlation';
