@@ -151,7 +151,7 @@ export class StatusBar {
     this.activeSolutionEntry = this._solutionService.getSolutionEntryForUri(solutionUriFromNavigation);
 
     const solutionIsSet: boolean = this.activeSolutionEntry !== undefined;
-    const diagramName: string = this._router.currentInstruction.params.diagramName;
+    const diagramName: string = this._router.currentInstruction.queryParams.diagramName;
     const diagramIsSet: boolean = diagramName !== undefined;
 
     if (solutionIsSet && diagramIsSet) {
