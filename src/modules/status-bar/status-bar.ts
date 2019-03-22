@@ -124,7 +124,7 @@ export class StatusBar {
   }
 
   private _refreshRightButtons(): void {
-    const currentView: string = this._router.currentInstruction.params.view;
+    const currentView: string = this._router.currentInstruction.queryParams.view;
     switch (currentView) {
       case 'xml':
         this.xmlIsShown = true;

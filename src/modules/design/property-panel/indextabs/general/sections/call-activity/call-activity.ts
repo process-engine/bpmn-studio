@@ -63,7 +63,7 @@ export class CallActivitySection implements ISection {
   private async _getAllDiagrams(): Promise<void> {
     const allDiagramsInSolution: Array<IDiagram> = await this._generalService.getAllDiagrams();
 
-    const currentDiagramName: string = this._router.currentInstruction.params.diagramName;
+    const currentDiagramName: string = this._router.currentInstruction.queryParams.diagramName;
     const allDiagramWithoutCurrentOne: Array<IDiagram> = allDiagramsInSolution.filter((diagram: IDiagram) => {
       return diagram.name !== currentDiagramName;
     });

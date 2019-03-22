@@ -86,7 +86,7 @@ export class Design {
                                                 && this._router.currentInstruction !== null;
 
     const diagramNamesAreDifferent: boolean = routerAndInstructionIsNotNull
-                                              ? routeParameters.diagramName !== this._router.currentInstruction.params.diagramName
+                                              ? routeParameters.diagramName !== this._router.currentInstruction.queryParams.diagramName
                                               : true;
 
     const solutionIsDifferent: boolean = routerAndInstructionIsNotNull
@@ -478,8 +478,8 @@ export class Design {
    * the destination router parameters.
    */
   private _modalCanBeSuppressed(destinationInstruction: NavigationInstruction): boolean {
-    const oldView: string = this._router.currentInstruction.params.view;
-    const destinationView: string = destinationInstruction.params.view;
+    const oldView: string = this._router.currentInstruction.queryParams.view;
+    const destinationView: string = destinationInstruction.queryParams.view;
 
     const navigatingBetween: Function = (routeA: string, routeB: string): boolean =>
       (routeA === oldView || routeA === destinationView) && (routeB === oldView || routeB === destinationView);

@@ -843,7 +843,7 @@ export class SolutionExplorerSolution {
     const solutionUri: string = this._router.currentInstruction.queryParams.solutionUri;
     const solutionUriSpecified: boolean = solutionUri !== undefined;
 
-    const diagramName: string = this._router.currentInstruction.params.diagramName;
+    const diagramName: string = this._router.currentInstruction.queryParams.diagramName;
     const diagramNameIsSpecified: boolean = diagramName !== undefined;
 
     const routeName: string = this._router.currentInstruction.config.name;
@@ -852,7 +852,7 @@ export class SolutionExplorerSolution {
                                         || routeName === 'think';
     if (routeNameNeedsUpdate) {
       this._diagramRoute = routeName;
-      this._inspectView = this._router.currentInstruction.params.view;
+      this._inspectView = this._router.currentInstruction.queryParams.view;
     }
 
     this.activeDiagram = undefined;
