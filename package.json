@@ -110,7 +110,7 @@
     "@process-engine/bpmn-lint_rules": "1.6.2",
     "@process-engine/management_api_client": "4.2.0",
     "@process-engine/process_engine_runtime": "7.4.0-c6f6ddfc-b297",
-    "@process-engine/dynamic_ui_core": "1.4.0",
+    "@process-engine/dynamic_ui_core": "1.4.0-53e3f10c-b29",
     "@process-engine/solutionexplorer.repository.filesystem": "4.0.1",
     "@process-engine/solutionexplorer.repository.management_api": "3.0.0",
     "@process-engine/solutionexplorer.service": "4.0.0",
