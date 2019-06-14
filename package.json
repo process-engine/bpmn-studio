@@ -94,10 +94,10 @@
     "@fortawesome/fontawesome-free": "^5.1.0",
     "@process-engine/bpmn-js-custom-bundle": "2.6.3",
     "@process-engine/bpmn-lint_rules": "1.6.2",
+    "@process-engine/dynamic_ui_core": "1.5.0",
     "@process-engine/management_api_client": "5.2.0",
     "@process-engine/process_engine_runtime": "8.2.0",
-    "@process-engine/dynamic_ui_core": "1.5.0",
-    "@process-engine/solutionexplorer.repository.filesystem": "4.1.0",
+    "@process-engine/solutionexplorer.repository.filesystem": "4.1.0-44c4c2ba-b2",
     "@process-engine/solutionexplorer.repository.management_api": "3.0.0",
     "@process-engine/solutionexplorer.service": "4.1.0",
     "about-window": "1.12.1",
@@ -122,7 +122,8 @@
     "pushserve": "^1.0.2",
     "socket.io-client": "2.1.1",
     "spectrum-colorpicker": "1.8.0",
-    "sqlite3": "4.0.6"
+    "sqlite3": "4.0.6",
+    "trash": "^6.0.0"
   },
   "peerDependencies": {},
   "devDependencies": {
