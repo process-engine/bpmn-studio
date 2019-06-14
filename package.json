@@ -97,7 +97,7 @@
     "@process-engine/dynamic_ui_core": "1.5.0",
     "@process-engine/management_api_client": "5.2.0",
     "@process-engine/process_engine_runtime": "8.2.0",
-    "@process-engine/solutionexplorer.repository.filesystem": "4.1.0-44c4c2ba-b2",
+    "@process-engine/solutionexplorer.repository.filesystem": "4.1.0-24fba70d-b3",
     "@process-engine/solutionexplorer.repository.management_api": "3.0.0",
     "@process-engine/solutionexplorer.service": "4.1.0",
     "about-window": "1.12.1",

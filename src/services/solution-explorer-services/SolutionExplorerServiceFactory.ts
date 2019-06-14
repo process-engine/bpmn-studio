@@ -5,26 +5,21 @@ import {SolutionExplorerFileSystemRepository} from '@process-engine/solutionexpl
 import {SolutionExplorerManagementApiRepository} from '@process-engine/solutionexplorer.repository.management_api';
 import {SolutionExplorerService} from '@process-engine/solutionexplorer.service';
 import {ISolutionExplorerService} from '@process-engine/solutionexplorer.service.contracts';
-import {DiagramTrashFolderService} from './DiagramTrashFolderService';
 
 /**
  * This factory provides new instances of different solution explorer services.
  */
-@inject('HttpFetchClient', 'DiagramTrashFolderService')
+@inject('HttpFetchClient')
 export class SolutionExplorerServiceFactory {
 
   private _httpClient: IHttpClient;
-  private _diagramTrashFolderService: DiagramTrashFolderService;
 
-  constructor(httpClient: IHttpClient, diagramTrashFolderService: DiagramTrashFolderService) {
+  constructor(httpClient: IHttpClient) {
     this._httpClient = httpClient;
-    this._diagramTrashFolderService = diagramTrashFolderService;
   }
 
   public async newFileSystemSolutionExplorer(): Promise<ISolutionExplorerService> {
-    const diagramTrashFolder: string = this._diagramTrashFolderService.getDiagramTrashFolder();
-
-    const fileSystemRepository: SolutionExplorerFileSystemRepository = new SolutionExplorerFileSystemRepository(diagramTrashFolder);
+    const fileSystemRepository: SolutionExplorerFileSystemRepository = new SolutionExplorerFileSystemRepository();
     const createdService: SolutionExplorerService = new SolutionExplorerService(fileSystemRepository);
 
     return createdService;
