@@ -122,8 +122,7 @@
     "pushserve": "^1.0.2",
     "socket.io-client": "2.1.1",
     "spectrum-colorpicker": "1.8.0",
-    "sqlite3": "4.0.6",
-    "trash": "^6.0.0"
+    "sqlite3": "4.0.6"
   },
   "peerDependencies": {},
   "devDependencies": {
