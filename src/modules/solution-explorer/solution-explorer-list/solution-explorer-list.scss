@@ -29,6 +29,15 @@
   background-color: rgba(230, 230, 230, 0.6);
 }
 
+.solution-entry__open-diagrams-header {
+  display: flex;
+  max-height: 26px;
+  padding: 2.5px 5px;
+  padding-bottom: 2px;
+  color: darkgray;
+  cursor: default;
+}
+
 .solution-entry__header button {
   padding: 0 2px;
   background: transparent;
@@ -59,6 +68,7 @@
   font-size: 12px;
   color: #ccc;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .solution-entry__actions {

@@ -101,16 +101,16 @@ export class DeleteDiagramModal {
       .getOpenedDiagrams()
       .find((diagram: IDiagram, index: number) => index === previousOrNextDiagramIndex);
 
-    const lastIndexOfSlash: number = diagramToNavigateTo.uri.lastIndexOf('/');
-    const lastIndexOfBackSlash: number = diagramToNavigateTo.uri.lastIndexOf('\\');
-    const indexBeforeFilename: number = Math.max(lastIndexOfSlash, lastIndexOfBackSlash);
-    const activeSolutionUri: string = diagramToNavigateTo.uri.substring(0, indexBeforeFilename);
-
     const diagramIsDeployed: boolean = this.diagram.uri.startsWith('http');
 
     if (diagramIsDeployed || !diagramToNavigateTo) {
       this._router.navigateToRoute('start-page');
     } else {
+      const lastIndexOfSlash: number = diagramToNavigateTo.uri.lastIndexOf('/');
+      const lastIndexOfBackSlash: number = diagramToNavigateTo.uri.lastIndexOf('\\');
+      const indexBeforeFilename: number = Math.max(lastIndexOfSlash, lastIndexOfBackSlash);
+      const activeSolutionUri: string = diagramToNavigateTo.uri.substring(0, indexBeforeFilename);
+
       this._router.navigateToRoute('design', {
         diagramName: diagramToNavigateTo.name,
         diagramUri: diagramToNavigateTo.uri,

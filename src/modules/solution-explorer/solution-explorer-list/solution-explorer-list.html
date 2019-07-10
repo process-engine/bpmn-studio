@@ -7,7 +7,7 @@
     <div class="solution-list">
       <div repeat.for="solutionEntry of openedSolutions" class="solution-entry">
 
-        <div class="solution-entry__header" title.bind="solutionEntry.processEngineVersion ? `${solutionEntry.uri} | Version: ${solutionEntry.processEngineVersion}` : solutionEntry.uri">
+        <div class.bind="solutionEntry.uri === 'about:open-diagrams' ? 'solution-entry__open-diagrams-header' : 'solution-entry__header'" title.bind="solutionEntry.processEngineVersion ? `${solutionEntry.uri} | Version: ${solutionEntry.processEngineVersion}` : solutionEntry.uri">
              
         <div class="solution-entry__collapse-header" click.delegate="toggleSolution(solutionEntry)">
 
