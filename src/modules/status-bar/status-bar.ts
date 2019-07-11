@@ -208,6 +208,7 @@ export class StatusBar {
     this._ipcRenderer.send('cancel_update');
 
     this.updateProgressData = undefined;
+    this.updateStarted = false;
   }
 
   private _refreshRightButtons(): void {
