@@ -10,16 +10,16 @@
           <th>Task ID</th>
           <th></th>
         </tr>
-        <tr repeat.for="entry of shownTasks" class="task-list-item" id="taskList-${entry.userTask ? entry.userTask.processModelId : entry.manualTask.processModelId}">
+        <tr repeat.for="entry of shownTasks" class="task-list-item" id="taskList-${entry.processModelId}">
           <td>
-            <a>${entry.userTask ? entry.userTask.correlationId : entry.manualTask.correlationId}</a>
+            <a>${entry.correlationId}</a>
           </td>
           <td>
-            <a route-href="route: design; params.bind: { diagramName: entry.userTask ? entry.userTask.processModelId : entry.manualTask.processModelId,
+            <a route-href="route: design; params.bind: { diagramName: entry.processModelId,
                                           solutionUri: activeSolutionEntry.uri, view: 'detail' }"
-               class="task-list-item-modelname">${entry.userTask ? entry.userTask.processModelId : entry.manualTask.processModelId}</a>
+               class="task-list-item-modelname">${entry.processModelId}</a>
           </td>
-          <td>${entry.userTask.id ? entry.userTask.id : entry.manualTask.id}</td>
+          <td>${entry.id}</td>
           <td class="task-list__last-table-cell">
             <button class="btn btn-default task-list-continue-button" click.delegate="continueTask(entry)">Continue</button>
           </td>
