@@ -36,6 +36,7 @@ export class StatusBar {
   public updateAvailable: boolean = false;
   public updateDropdown: HTMLElement;
   public updateDownloadFinished: boolean = false;
+  public updateStarted: boolean = false;
 
   public DiffMode: typeof DiffMode = DiffMode;
 
@@ -183,11 +184,20 @@ export class StatusBar {
   }
 
   public hideDropdown(): void {
+    if (this.updateStarted) {
+      return;
+    }
+
     this.updateDropdown.classList.remove('show');
   }
 
   public startUpdate(): void {
+    if (this.updateStarted) {
+      return;
+    }
+
     this._ipcRenderer.send('download_update');
+    this.updateStarted = true;
   }
 
   public installUpdate(): void {
