@@ -91,15 +91,19 @@ export class DeleteDiagramModal {
       this._notificationService.showNotification(NotificationType.ERROR, message);
     }
 
-    const diagramIndex: number = this._openDiagramService
-      .getOpenedDiagrams()
-      .findIndex((diagram: IDiagram) => diagram.uri === this.diagram.uri);
+    const diagramIndex: number = this._isRunningInElectron
+                               ? this._openDiagramService
+                                  .getOpenedDiagrams()
+                                  .findIndex((diagram: IDiagram) => diagram.uri === this.diagram.uri)
+                               : undefined;
 
     const previousOrNextDiagramIndex: number = diagramIndex === 0 ? diagramIndex + 1 : diagramIndex - 1;
 
-    const diagramToNavigateTo: IDiagram = this._openDiagramService
-      .getOpenedDiagrams()
-      .find((diagram: IDiagram, index: number) => index === previousOrNextDiagramIndex);
+    const diagramToNavigateTo: IDiagram = this._isRunningInElectron
+                                        ? this._openDiagramService
+                                            .getOpenedDiagrams()
+                                            .find((diagram: IDiagram, index: number) => index === previousOrNextDiagramIndex)
+                                        : undefined;
 
     const diagramIsDeployed: boolean = this.diagram.uri.startsWith('http');
 
@@ -119,13 +123,19 @@ export class DeleteDiagramModal {
       });
     }
 
-    this._openDiagramService.closeDiagram(this.diagram);
-    this._solutionService.removeOpenDiagramByUri(this.diagram.uri);
-    this._openDiagramStateService.deleteDiagramState(this.diagram.uri);
+    if (this._isRunningInElectron) {
+      this._openDiagramService.closeDiagram(this.diagram);
+      this._solutionService.removeOpenDiagramByUri(this.diagram.uri);
+      this._openDiagramStateService.deleteDiagramState(this.diagram.uri);
+    }
 
     this.diagram = undefined;
     this._solutionExplorerService = undefined;
 
     this.showModal = false;
+  }
+
+  private get _isRunningInElectron(): boolean {
+    return (window as any).nodeRequire;
   }
 }
