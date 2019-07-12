@@ -120,7 +120,20 @@ export class LiveExecutionTracker {
       const routeParameterContainsTaskId: boolean = routeParameters.taskId !== undefined;
       if (routeParameterContainsTaskId) {
         this.taskId = routeParameters.taskId;
-        this.showDynamicUiModal = true;
+
+        const emptyActivitiesInProcessInstance: DataModels.EmptyActivities.EmptyActivityList =
+          await this._liveExecutionTrackerService.getEmptyActivitiesForProcessInstance(this.processInstanceId);
+
+        const emptyActivity: DataModels.EmptyActivities.EmptyActivity =
+          emptyActivitiesInProcessInstance.emptyActivities.find((activity: DataModels.EmptyActivities.EmptyActivity) => {
+            return activity.id === this.taskId;
+        });
+
+        if (emptyActivity) {
+          this._liveExecutionTrackerService.finishEmptyActivity(this.processInstanceId, this.correlationId, emptyActivity);
+        } else {
+          this.showDynamicUiModal = true;
+        }
       }
     }, 0);
   }
