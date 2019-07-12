@@ -20,10 +20,14 @@ interface ITaskListRouteParameters {
   correlationId?: string;
 }
 
-type Task = DataModels.ManualTasks.ManualTask
-          & DataModels.UserTasks.UserTask
-          & DataModels.EmptyActivities.EmptyActivity
-          & {processModel: DataModels.ProcessModels.ProcessModel};
+type ProcessModelAnnotation = {processModel: DataModels.ProcessModels.ProcessModel};
+type ManualTaskWithProcessModel = DataModels.ManualTasks.ManualTask & ProcessModelAnnotation;
+type UserTaskWithProcessModel = DataModels.UserTasks.UserTask & ProcessModelAnnotation;
+type EmptyActivityWithProcessModel = DataModels.EmptyActivities.EmptyActivity & ProcessModelAnnotation;
+
+type Task = ManualTaskWithProcessModel
+          | UserTaskWithProcessModel
+          | EmptyActivityWithProcessModel;
 
 @inject(EventAggregator, 'ManagementApiClientService', Router, 'NotificationService', 'SolutionService')
 export class TaskList {
@@ -349,7 +353,6 @@ export class TaskList {
         processModelId: manualTask.processModelId,
         name: manualTask.name,
         tokenPayload: manualTask.tokenPayload,
-        data: undefined,
       }));
 
     return manualTasksAndProcessModels;
@@ -370,7 +373,6 @@ export class TaskList {
         processModelId: emptyActivity.processModelId,
         name: emptyActivity.name,
         tokenPayload: emptyActivity.tokenPayload,
-        data: undefined,
       }));
 
     return emptyActivitiesAndProcessModels;
