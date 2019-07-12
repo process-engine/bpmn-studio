@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" id="Definitions_10odzbr" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.15.1">
+  <bpmn:collaboration id="Collaboration_0k2ro9a">
+    <bpmn:participant id="Participant_0s15ih3" name="error_end_event_call_activity_called_process" processRef="error_end_event_call_activity_called_process" />
+  </bpmn:collaboration>
+  <bpmn:process id="error_end_event_call_activity_called_process" name="error_end_event_call_activity_called_process" isExecutable="true">
+    <bpmn:laneSet>
+      <bpmn:lane id="Lane_0b3sdnj" name="Default_Test_Lane">
+        <bpmn:flowNodeRef>StartEvent_0cim91c</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_1uo0box</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_15zzma3</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="StartEvent_0cim91c" name="">
+      <bpmn:outgoing>SequenceFlow_0nvdaeo</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0nvdaeo" sourceRef="StartEvent_0cim91c" targetRef="Task_1uo0box" />
+    <bpmn:scriptTask id="Task_1uo0box" name="Write &#39;Hello from call activity&#39; to console">
+      <bpmn:incoming>SequenceFlow_0nvdaeo</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0o7ixxd</bpmn:outgoing>
+      <bpmn:script>console.log('Hello from call activity');</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0o7ixxd" sourceRef="Task_1uo0box" targetRef="EndEvent_15zzma3" />
+    <bpmn:endEvent id="EndEvent_15zzma3">
+      <bpmn:incoming>SequenceFlow_0o7ixxd</bpmn:incoming>
+      <bpmn:errorEventDefinition errorRef="Error_0dynwia" />
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmn:error id="Error_0dynwia" name="ExpectedError" errorCode="ErrorCode" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0k2ro9a">
+      <bpmndi:BPMNShape id="Participant_0s15ih3_di" bpmnElement="Participant_0s15ih3">
+        <dc:Bounds x="117" y="229" width="504" height="272" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_0b3sdnj_di" bpmnElement="Lane_0b3sdnj">
+        <dc:Bounds x="147" y="229" width="474" height="272" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_0cim91c_di" bpmnElement="StartEvent_0cim91c">
+        <dc:Bounds x="243" y="359" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="261" y="398" width="0" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0nvdaeo_di" bpmnElement="SequenceFlow_0nvdaeo">
+        <di:waypoint x="279" y="377" />
+        <di:waypoint x="329" y="377" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="304" y="355.5" width="0" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ScriptTask_0soyjp8_di" bpmnElement="Task_1uo0box">
+        <dc:Bounds x="329" y="337" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0o7ixxd_di" bpmnElement="SequenceFlow_0o7ixxd">
+        <di:waypoint x="429" y="377" />
+        <di:waypoint x="479" y="377" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="454" y="355.5" width="0" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_1pk88mc_di" bpmnElement="EndEvent_15zzma3">
+        <dc:Bounds x="479" y="359" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="497" y="398" width="0" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
