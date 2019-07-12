@@ -2,7 +2,7 @@
   <require from="./heatmap.css"></require>
   <div class="heatmap">
     <div ref="viewerContainer" class="heatmap__viewer-container">
-      <span if.bind="!activeDiagram" class="heatmap__empty-message">No diagram selected.</span>
+      <h3 if.bind="!activeDiagram" class="heatmap__empty-message">No diagram selected.</h3>
     </div>
     <div class="heatmap__legend">
       <span class="heatmap__legend-entry heatmap__legend-entry-first">Median runtime:</span>
