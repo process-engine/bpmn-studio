@@ -20,13 +20,13 @@
 .heatmap__legend-entry {
   display: block;
   margin: 0 10px;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .heatmap__legend-entry-first {
   margin-top: 10px;
   margin-bottom: 2px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: bold;
 }
 
@@ -38,11 +38,11 @@
   width: 35px;
   height: 35px;
   min-height: 16px;
-  padding: 9px;
+  padding: 7px;
   background-color: black;
   border-radius: 50%;
   font-family: Arial;
-  font-size: 12px;
+  font-size: 14px;
   color: white;
   text-align: center;
 }
@@ -60,7 +60,6 @@
 }
 
 .heatmap__empty-message {
+  margin: 20px;
   user-select: none;
-  font-size: 24px;
-  font-weight: 900;
 }
