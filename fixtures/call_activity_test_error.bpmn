@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1s6bugg" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.15.1">
+  <bpmn:collaboration id="Collaboration_1drzw9l">
+    <bpmn:participant id="Participant_1xno9tc" name="call_activity_test_error" processRef="call_activity_test_error" />
+  </bpmn:collaboration>
+  <bpmn:process id="call_activity_test_error" isExecutable="true">
+    <bpmn:laneSet>
+      <bpmn:lane id="Lane_1mpflpe" name="Default_Test_Lane">
+        <bpmn:flowNodeRef>StartEvent_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>XORSplit1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CallActivity2</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>XORJoin1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>XORJoin2</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CallActivity1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task2</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>BoundaryEvent_0d9zz19</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_1sjde2f</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="StartEvent_1" name="Start">
+      <bpmn:outgoing>SequenceFlow_0kktwad</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:exclusiveGateway id="XORSplit1" name="">
+      <bpmn:incoming>SequenceFlow_0kktwad</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1iz5126</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_0tbe8pb</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_0kktwad" sourceRef="StartEvent_1" targetRef="XORSplit1" />
+    <bpmn:sequenceFlow id="SequenceFlow_1iz5126" name="The Called Process should handle the exception" sourceRef="XORSplit1" targetRef="CallActivity1">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">token.current.handle_exception == true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0tbe8pb" name="The called process should not handle the exception" sourceRef="XORSplit1" targetRef="CallActivity2">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">token.current.handle_exception == false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_16ll04t" sourceRef="BoundaryEvent_0d9zz19" targetRef="Task2" />
+    <bpmn:callActivity id="CallActivity2" name="Call process that unexpectedly throw an exception" calledElement="call_activity_subprocess_error">
+      <bpmn:incoming>SequenceFlow_0tbe8pb</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0v8ngwn</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:boundaryEvent id="BoundaryEvent_0d9zz19" attachedToRef="CallActivity2">
+      <bpmn:outgoing>SequenceFlow_16ll04t</bpmn:outgoing>
+      <bpmn:errorEventDefinition />
+    </bpmn:boundaryEvent>
+    <bpmn:exclusiveGateway id="XORJoin1">
+      <bpmn:incoming>SequenceFlow_14b8cad</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_0hxbqpl</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0d6snbn</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_0v8ngwn" sourceRef="CallActivity2" targetRef="XORJoin2" />
+    <bpmn:sequenceFlow id="SequenceFlow_00x0han" sourceRef="Task2" targetRef="XORJoin2" />
+    <bpmn:sequenceFlow id="SequenceFlow_14b8cad" sourceRef="XORJoin2" targetRef="XORJoin1" />
+    <bpmn:exclusiveGateway id="XORJoin2">
+      <bpmn:incoming>SequenceFlow_0v8ngwn</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_00x0han</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_14b8cad</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_0d6snbn" sourceRef="XORJoin1" targetRef="EndEvent_1sjde2f" />
+    <bpmn:callActivity id="CallActivity1" name="Call process that throws an exception" calledElement="call_activity_subprocess_error">
+      <bpmn:incoming>SequenceFlow_1iz5126</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0hxbqpl</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:scriptTask id="Task2" name="Set boundary error message">
+      <bpmn:incoming>SequenceFlow_16ll04t</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_00x0han</bpmn:outgoing>
+      <bpmn:script>return "Error caught by main process boundary event";</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0hxbqpl" sourceRef="CallActivity1" targetRef="XORJoin1" />
+    <bpmn:endEvent id="EndEvent_1sjde2f" name="End">
+      <bpmn:incoming>SequenceFlow_0d6snbn</bpmn:incoming>
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1drzw9l">
+      <bpmndi:BPMNShape id="Participant_1xno9tc_di" bpmnElement="Participant_1xno9tc">
+        <dc:Bounds x="209" y="247" width="884" height="399" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_1mpflpe_di" bpmnElement="Lane_1mpflpe">
+        <dc:Bounds x="239" y="247" width="854" height="399" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_15iy39b_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="263" y="394" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="269" y="433" width="24" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_1djymer_di" bpmnElement="XORSplit1" isMarkerVisible="true">
+        <dc:Bounds x="349" y="387" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="409" y="405" width="0" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0kktwad_di" bpmnElement="SequenceFlow_0kktwad">
+        <di:waypoint x="299" y="412" />
+        <di:waypoint x="349" y="412" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="324" y="390" width="0" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1iz5126_di" bpmnElement="SequenceFlow_1iz5126">
+        <di:waypoint x="374" y="387" />
+        <di:waypoint x="374" y="324" />
+        <di:waypoint x="534" y="324" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="399" y="332" width="76" height="50" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="CallActivity_1vstiz8_di" bpmnElement="CallActivity1">
+        <dc:Bounds x="534" y="284" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_1uepxu0_di" bpmnElement="XORJoin1" isMarkerVisible="true">
+        <dc:Bounds x="914" y="387" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="814" y="405.5" width="90" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0tbe8pb_di" bpmnElement="SequenceFlow_0tbe8pb">
+        <di:waypoint x="374" y="437" />
+        <di:waypoint x="374" y="499" />
+        <di:waypoint x="534" y="499" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="402" y="441" width="74" height="50" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="CallActivity_10n8k62_di" bpmnElement="CallActivity2">
+        <dc:Bounds x="534" y="459" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BoundaryEvent_0rrys2a_di" bpmnElement="BoundaryEvent_0d9zz19">
+        <dc:Bounds x="616" y="521" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="589" y="497.5" width="90" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_16ll04t_di" bpmnElement="SequenceFlow_16ll04t">
+        <di:waypoint x="634" y="557" />
+        <di:waypoint x="634" y="566" />
+        <di:waypoint x="701" y="566" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="649" y="555" width="0" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_04m24sd_di" bpmnElement="XORJoin2" isMarkerVisible="true">
+        <dc:Bounds x="824" y="474" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="849" y="451" width="0" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0v8ngwn_di" bpmnElement="SequenceFlow_0v8ngwn">
+        <di:waypoint x="634" y="499" />
+        <di:waypoint x="824" y="499" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="729" y="477.5" width="0" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_00x0han_di" bpmnElement="SequenceFlow_00x0han">
+        <di:waypoint x="801" y="566" />
+        <di:waypoint x="849" y="566" />
+        <di:waypoint x="849" y="524" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="825" y="544.5" width="0" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_14b8cad_di" bpmnElement="SequenceFlow_14b8cad">
+        <di:waypoint x="874" y="499" />
+        <di:waypoint x="939" y="499" />
+        <di:waypoint x="939" y="437" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="906.5" y="477.5" width="0" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0d6snbn_di" bpmnElement="SequenceFlow_0d6snbn">
+        <di:waypoint x="964" y="412" />
+        <di:waypoint x="1024" y="412" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="984" y="390.5" width="0" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_1sjde2f_di" bpmnElement="EndEvent_1sjde2f">
+        <dc:Bounds x="1024" y="394" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1032" y="433" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ScriptTask_0mkrgu3_di" bpmnElement="Task2">
+        <dc:Bounds x="701" y="526" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0hxbqpl_di" bpmnElement="SequenceFlow_0hxbqpl">
+        <di:waypoint x="634" y="324" />
+        <di:waypoint x="939" y="324" />
+        <di:waypoint x="939" y="387" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="786.5" y="302" width="0" height="13" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

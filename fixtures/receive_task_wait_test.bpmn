@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definition_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="BPMN Studio" exporterVersion="1">
+  <bpmn:collaboration id="Collaboration_1cidyxu" name="">
+    <bpmn:participant id="Participant_0px403d" name="receive_task_wait_test" processRef="receive_task_wait_test" />
+  </bpmn:collaboration>
+  <bpmn:process id="receive_task_wait_test" name="receive_task_wait_test" isExecutable="true">
+    <bpmn:laneSet>
+      <bpmn:lane id="Lane_1xzf0d3" name="Default_Test_Lane">
+        <bpmn:flowNodeRef>StartEvent_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_14r6hzl</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_1n36z1f</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="StartEvent_1" name="Start Event">
+      <bpmn:outgoing>SequenceFlow_0i7mbw5</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0i7mbw5" sourceRef="StartEvent_1" targetRef="Task_14r6hzl" />
+    <bpmn:receiveTask id="Task_14r6hzl" name="Wait for Message &#39;MyMessage&#39;" messageRef="Message_hPN1FiPI">
+      <bpmn:incoming>SequenceFlow_0i7mbw5</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0ei4omf</bpmn:outgoing>
+    </bpmn:receiveTask>
+    <bpmn:endEvent id="EndEvent_1" name="End Event">
+      <bpmn:incoming>SequenceFlow_0f3d5g1</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0ei4omf" sourceRef="Task_14r6hzl" targetRef="Task_1n36z1f" />
+    <bpmn:sequenceFlow id="SequenceFlow_0f3d5g1" sourceRef="Task_1n36z1f" targetRef="EndEvent_1" />
+    <bpmn:scriptTask id="Task_1n36z1f" name="Return &#39;Message Received&#39; String">
+      <bpmn:incoming>SequenceFlow_0ei4omf</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0f3d5g1</bpmn:outgoing>
+      <bpmn:script>return 'Message Received';</bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmn:message id="Message_hPN1FiPI" name="My Message" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1cidyxu">
+      <bpmndi:BPMNShape id="Participant_0px403d_di" bpmnElement="Participant_0px403d">
+        <dc:Bounds x="5" y="4" width="675" height="170" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_1xzf0d3_di" bpmnElement="Lane_1xzf0d3">
+        <dc:Bounds x="35" y="4" width="645" height="170" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_1mox3jl_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="83" y="69" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0eie6q6_di" bpmnElement="EndEvent_1">
+        <dc:Bounds x="544" y="69" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="537" y="105" width="51" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0i7mbw5_di" bpmnElement="SequenceFlow_0i7mbw5">
+        <di:waypoint x="119" y="87" />
+        <di:waypoint x="202" y="87" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ReceiveTask_0yk3izi_di" bpmnElement="Task_14r6hzl">
+        <dc:Bounds x="202" y="47" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0ei4omf_di" bpmnElement="SequenceFlow_0ei4omf">
+        <di:waypoint x="302" y="87" />
+        <di:waypoint x="360" y="87" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0f3d5g1_di" bpmnElement="SequenceFlow_0f3d5g1">
+        <di:waypoint x="460" y="87" />
+        <di:waypoint x="544" y="87" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ScriptTask_0ypir0f_di" bpmnElement="Task_1n36z1f">
+        <dc:Bounds x="360" y="47" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
