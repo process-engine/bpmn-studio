@@ -664,16 +664,16 @@ function getPortList(defaultPort) {
 
 function getDefaultPorts() {
   if (isDev) {
-    return getPortList(56000);
+    return getPortList(56300);
   }
   if (isAlpha) {
-    return getPortList(56100);
-  }
-  if (isBeta) {
     return getPortList(56200);
   }
+  if (isBeta) {
+    return getPortList(56100);
+  }
   if (isStable) {
-    return getPortList(56300);
+    return getPortList(56000);
   }
   throw new Error('Could not get default port for internal process engine');
 }
