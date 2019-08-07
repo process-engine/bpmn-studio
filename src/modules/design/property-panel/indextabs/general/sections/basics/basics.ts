@@ -124,6 +124,12 @@ export class BasicsSection implements ISection {
     this.publishDiagramChange();
   }
 
+  public updateValue(): void {
+    this.modeling.updateLabel(this.elementInPanel, this.businessObjInPanel.categoryValueRef.value);
+
+    this.publishDiagramChange();
+  }
+
   public updateId(): void {
     this.validationController.validate();
 
