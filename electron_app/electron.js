@@ -182,6 +182,9 @@ Main._initializeApplication = () => {
             title: `Release Notes ${updateInfo.version}`,
             minWidth: 600,
             minHeight: 600,
+            webPreferences: {
+              nodeIntegration: true,
+            },
           });
 
           releaseNotesWindow.loadURL(
@@ -314,6 +317,9 @@ Main._createMainWindow = () => {
     minHeight: 800,
     icon: path.join(__dirname, '../build/icon.png'), // only for windows
     titleBarStyle: 'hiddenInset',
+    webPreferences: {
+      nodeIntegration: true,
+    },
   });
 
   Main._window.loadURL(`file://${__dirname}/../index.html`);
