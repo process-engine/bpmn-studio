@@ -18,8 +18,11 @@
           </td>
         </tr>
         <tr>
-          <th>Name</th>
-          <td>
+          <th>${businessObjInPanel.$type === 'bpmn:Group' ? 'Category Value' : 'Name'}</th>
+          <td if.bind="businessObjInPanel.$type === 'bpmn:Group'">
+            <input type="text" class="props-input" value.bind="businessObjInPanel.categoryValueRef.value" change.delegate="updateValue()" disabled.bind="!isEditable" data-test-property-panel-element-name>
+          </td>
+          <td else>
             <input type="text" class="props-input" value.bind="businessObjInPanel.name" change.delegate="updateName()" disabled.bind="!isEditable" data-test-property-panel-element-name>
           </td>
         </tr>
