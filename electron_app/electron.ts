@@ -6,7 +6,7 @@ import {
   App,
   BrowserWindow,
   Dialog,
-  Event as ElectronEvent,
+  IpcMainEvent,
   IpcMain,
   Menu,
   MenuItem,
@@ -45,7 +45,7 @@ let isInitialized: boolean = false;
  * This variable gets set when BPMN Studio is ready to work with Files that are
  * openend via double click.
  */
-let fileOpenMainEvent: ElectronEvent;
+let fileOpenMainEvent: IpcMainEvent;
 
 function execute(): void {
   /**
@@ -276,7 +276,7 @@ function initializeFileOpenFeature(): void {
    *
    * "open-file" gets fired when someone double clicks a .bpmn file.
    */
-  ipcMain.on('waiting-for-double-file-click', (mainEvent: ElectronEvent) => {
+  ipcMain.on('waiting-for-double-file-click', (mainEvent: IpcMainEvent) => {
     fileOpenMainEvent = mainEvent;
     isInitialized = true;
   });
@@ -371,7 +371,7 @@ function createMainWindow(): void {
       const fileExtensionIsBPMN = fileExtension === 'bpmn';
       const fileType = fileExtensionIsBPMN ? 'BPMN (.bpmn)' : `Image (.${fileExtension})`;
 
-      const filename = dialog.showSaveDialog({
+      const filename = dialog.showSaveDialogSync({
         defaultPath: defaultFilename,
         filters: [
           {
@@ -399,7 +399,7 @@ function createMainWindow(): void {
 
 function setSaveDiagramAsListener(): void {
   ipcMain.on('open_save-diagram-as_dialog', (event) => {
-    const filePath = dialog.showSaveDialog({
+    const filePath = dialog.showSaveDialogSync({
       filters: [
         {
           name: 'BPMN',
@@ -418,7 +418,7 @@ function setSaveDiagramAsListener(): void {
 
 function setOpenDiagramListener(): void {
   ipcMain.on('open_diagram', (event) => {
-    const openedFile = dialog.showOpenDialog({
+    const openedFile = dialog.showOpenDialogSync({
       filters: [
         {
           name: 'BPMN',
@@ -441,7 +441,7 @@ function setOpenDiagramListener(): void {
 
 function setOpenSolutionsListener(): void {
   ipcMain.on('open_solution', (event) => {
-    const openedFile = dialog.showOpenDialog({
+    const openedFile = dialog.showOpenDialogSync({
       properties: ['openDirectory', 'createDirectory'],
     });
 
@@ -655,7 +655,7 @@ function getEditMenu(): MenuItem {
     {
       label: 'Select All',
       accelerator: 'CmdOrCtrl+A',
-      role: 'selectall',
+      role: 'selectAll',
     },
   ];
 
@@ -684,7 +684,7 @@ function getWindowMenu(): MenuItem {
       role: 'reload',
     },
     {
-      role: 'toggledevtools',
+      role: 'toggleDevTools',
     },
   ];
 
@@ -822,7 +822,7 @@ async function startInternalProcessEngine(): Promise<any> {
    *          |       (event occurs)        |
    *          o   <<<- Send Message  -<<<   x
    */
-  ipcMain.on('add_internal_processengine_status_listener', (event: ElectronEvent) => {
+  ipcMain.on('add_internal_processengine_status_listener', (event: IpcMainEvent) => {
     if (!processEngineStatusListeners.includes(event.sender)) {
       processEngineStatusListeners.push(event.sender);
     }
@@ -834,7 +834,7 @@ async function startInternalProcessEngine(): Promise<any> {
 
   // This tells the frontend the location at which the electron-skeleton
   // will be running; this 'get_host' request ist emitted in src/main.ts.
-  ipcMain.on('get_host', (event: ElectronEvent) => {
+  ipcMain.on('get_host', (event: IpcMainEvent) => {
     event.returnValue = `localhost:${port}`;
   });
 
