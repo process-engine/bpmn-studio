@@ -31,6 +31,8 @@ interface IUriToViewModelMap {
 )
 export class SolutionExplorerList {
   public internalSolutionUri: string;
+  public processEngineIsNewerModal: boolean = false;
+  public processEngineIsOlderModal: boolean = false;
   /**
    * Reference on the service used to open open diagrams.
    * This service is also put inside the map.
