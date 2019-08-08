@@ -103,7 +103,12 @@ export class SolutionExplorerList {
     await Promise.all(refreshPromises);
   }
 
-  public toggleSolution(solutionEntry: ISolutionEntry): void {
+  public toggleSolution(solutionEntry: ISolutionEntry, event?: MouseEvent): void {
+    const target = event.target as EventTarget & {id: string};
+    if (target.id === 'versionInfoTargetOld' || target.id === 'versionInfoTargetNew') {
+      return;
+    }
+
     solutionEntry.hidden = !solutionEntry.hidden;
     this.solutionService.persistSolutionsInLocalStorage();
   }
