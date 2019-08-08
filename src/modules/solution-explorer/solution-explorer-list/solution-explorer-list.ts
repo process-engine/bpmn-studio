@@ -151,8 +151,7 @@ export class SolutionExplorerList {
     const identityToUse: IIdentity = identityIsSet ? identity : this.createIdentityForSolutionExplorer();
 
     let processEngineVersion: string;
-    const internalProcessEngineRoute: string = window.localStorage.getItem('InternalProcessEngineRoute');
-    const uriIsNotInternalProcessEngine: boolean = internalProcessEngineRoute !== uri;
+    const uriIsNotInternalProcessEngine: boolean = this.internalSolutionUri !== uri;
 
     try {
       if (uriIsRemote && uriIsNotInternalProcessEngine) {
