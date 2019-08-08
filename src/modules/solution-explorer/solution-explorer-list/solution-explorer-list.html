@@ -93,4 +93,20 @@
     </div>
 
   </div>
+
+  <modal if.bind="processEngineIsOlderModal"
+         header-text="Older ProcessEngine Version"
+         body-text="The ProcessEngine version is older than the integrated one. Maybe it's time for an update.">
+    <template replace-part="modal-footer">
+      <button type="button" class="btn btn-primary" data-dismiss="modal" click.delegate="processEngineIsOlderModal = false">Okay</button>
+    </template>
+  </modal>
+
+  <modal if.bind="processEngineIsNewerModal"
+         header-text="Newer ProcessEngine Version"
+         body-text="The ProcessEngine version is newer than the built-in, so it may be that the BPMN Studio does not yet support some functionality.">
+    <template replace-part="modal-footer">
+      <button type="button" class="btn btn-primary" data-dismiss="modal" click.delegate="processEngineIsNewerModal = false">Okay</button>
+    </template>
+  </modal>
 </template>
