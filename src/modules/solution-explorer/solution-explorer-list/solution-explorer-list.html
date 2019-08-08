@@ -13,8 +13,8 @@
 
           <div class="solution-entry__left-icon_and_name">
 
-            <i if.bind="solutionEntry.hidden" class="fas fa-angle-right collapse__icon"></i>
-            <i if.bind="!solutionEntry.hidden" class="fas fa-angle-down collapse__icon"></i>
+            <i if.bind="solutionEntry.hidden" class="fas fa-angle-right collapse__icon" title="Expand Solution"></i>
+            <i if.bind="!solutionEntry.hidden" class="fas fa-angle-down collapse__icon" title="Collapse Solution"></i>
   
             <i class="fa ${solutionEntry.fontAwesomeIconClass} solution-entry__solution-icon" title.bind="solutionEntry.fontAwesomeIconClass === 'fa-bolt' ? 'ProcessEngine Disconnected!' : ''"></i>
     
