@@ -2,6 +2,8 @@ import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {computedFrom, inject} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 
+import {SemVer} from 'semver';
+
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {IDiagram, ISolution} from '@process-engine/solutionexplorer.contracts';
 import {ISolutionExplorerService} from '@process-engine/solutionexplorer.service.contracts';
@@ -30,6 +32,7 @@ interface IUriToViewModelMap {
   'OpenDiagramService',
 )
 export class SolutionExplorerList {
+  public internalProcessEngineVersion: string;
   public internalSolutionUri: string;
   public processEngineIsNewerModal: boolean = false;
   public processEngineIsOlderModal: boolean = false;
@@ -137,7 +140,22 @@ export class SolutionExplorerList {
     });
   }
 
+  public showPEisNewerInfo(solutionEntry: object & {solutionEntry: ISolutionEntry}): boolean {
+    const internalPEVersion = new SemVer(this.internalProcessEngineVersion);
+    const solutionEntryPEVersion = new SemVer(solutionEntry.solutionEntry.processEngineVersion);
+
+    return internalPEVersion.major < solutionEntryPEVersion.major;
+  }
+
+  public showPEisOlderInfo(solutionEntry: object & {solutionEntry: ISolutionEntry}): boolean {
+    const internalPEVersion = new SemVer(this.internalProcessEngineVersion);
+    const solutionEntryPEVersion = new SemVer(solutionEntry.solutionEntry.processEngineVersion);
+
+    return internalPEVersion.major > solutionEntryPEVersion.major;
+  }
+
   public async openSolution(uri: string, insertAtBeginning: boolean = false, identity?: IIdentity): Promise<void> {
+    this.internalProcessEngineVersion = await this.getProcessEngineVersionFromInternalPE(this.internalSolutionUri);
     const uriIsRemote: boolean = uri.startsWith('http');
 
     let solutionExplorer: ISolutionExplorerService;
