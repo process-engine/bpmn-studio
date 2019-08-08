@@ -18,6 +18,9 @@
   
             <i class="fa ${solutionEntry.fontAwesomeIconClass} solution-entry__solution-icon" title.bind="solutionEntry.fontAwesomeIconClass === 'fa-bolt' ? 'ProcessEngine Disconnected!' : ''"></i>
     
+            <i if.bind="solutionEntry.uri.startsWith('http') && showPEisNewerInfo($this)" class="fas fa-info-circle version-info__new" click.delegate="processEngineIsNewerModal = true" id="versionInfoTargetNew" title="Click to show information"></i>
+            <i if.bind="solutionEntry.uri.startsWith('http') && showPEisOlderInfo($this)" class="fas fa-info-circle version-info__old" click.delegate="processEngineIsOlderModal = true" id="versionInfoTargetOld" title="Click to show information"></i>
+
             <span class="solution-entry__solution-name">${getSolutionName(solutionEntry.uri)}</span>
           </div>
           <div class="solution-entry__solution-path">
