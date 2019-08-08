@@ -362,6 +362,9 @@ export class LiveExecutionTracker {
   }
 
   private async addOverlays(): Promise<void> {
+    const elementsWithError: Array<IShape> = await this.liveExecutionTrackerService.getElementsWithError(
+      this.processInstanceId,
+    );
     const elementsWithActiveToken: Array<IShape> = await this.liveExecutionTrackerService.getElementsWithActiveToken(
       this.processInstanceId,
     );
@@ -376,6 +379,7 @@ export class LiveExecutionTracker {
     this.addOverlaysToEmptyActivities(elementsWithActiveToken);
     this.addOverlaysToActiveCallActivities(elementsWithActiveToken);
     this.addOverlaysToInactiveCallActivities(inactiveCallActivities);
+    this.addOverlaysToElementsWithError(elementsWithError);
   }
 
   private removeEventListenerFromOverlays(): void {
@@ -383,11 +387,49 @@ export class LiveExecutionTracker {
       document.getElementById(elementId).removeEventListener('click', this.handleTaskClick);
       document.getElementById(elementId).removeEventListener('click', this.handleEmptyActivityClick);
       document.getElementById(elementId).removeEventListener('click', this.handleActiveCallActivityClick);
+      document.getElementById(elementId).removeEventListener('click', this.handleErrorElementClick);
       document.getElementById(elementId).removeEventListener('click', this.handleInactiveCallActivityClick);
     }
 
     this.elementsWithEventListeners = [];
   }
+
+  private addOverlaysToElementsWithError(elementsWithError: Array<IShape>): Array<string> {
+    const liveExecutionTrackerIsNotAttached: boolean = !this.isAttached;
+    if (liveExecutionTrackerIsNotAttached) {
+      return [];
+    }
+
+    const errorElementIds: Array<string> = elementsWithError.map((element: IShape) => element.id).sort();
+
+    for (const element of elementsWithError) {
+      this.overlays.add(element, {
+        position: {
+          left: 30,
+          top: 25,
+        },
+        html: `<div class="let__overlay-button" id="${element.id}"><i class="fas fa-bug let__overlay-button-icon overlay__error-element"></i></div>`,
+      });
+
+      document.getElementById(element.id).addEventListener('click', this.handleErrorElementClick);
+
+      this.elementsWithEventListeners.push(element.id);
+    }
+
+    return errorElementIds;
+  }
+
+  private handleErrorElementClick: (event: MouseEvent) => void = (event: MouseEvent): void => {
+    const elementId: string = (event.target as HTMLDivElement).id;
+
+    this.router.navigateToRoute('inspect', {
+      view: 'inspect-correlation',
+      diagramName: this.activeDiagram.name,
+      solutionUri: this.activeSolutionEntry.uri,
+      processInstanceToSelect: this.processInstanceId,
+      flowNodeToSelect: elementId,
+    });
+  };
 
   private addOverlaysToEmptyActivities(elements: Array<IShape>): Array<string> {
     const liveExecutionTrackerIsNotAttached: boolean = !this.isAttached;

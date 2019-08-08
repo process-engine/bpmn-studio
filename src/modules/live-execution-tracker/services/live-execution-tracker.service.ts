@@ -484,7 +484,7 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
     return this.liveExecutionTrackerRepository.terminateProcess(processInstanceId);
   }
 
-  private async getElementsWithError(processInstanceId: string): Promise<Array<IShape>> {
+  public async getElementsWithError(processInstanceId: string): Promise<Array<IShape>> {
     const flowNodeInstances: Array<
       DataModels.FlowNodeInstances.FlowNodeInstance
     > = await this.liveExecutionTrackerRepository.getFlowNodeInstancesForProcessInstance(processInstanceId);

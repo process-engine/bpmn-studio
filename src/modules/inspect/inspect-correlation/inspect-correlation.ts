@@ -8,9 +8,13 @@ import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 import {IEventFunction, ISolutionEntry} from '../../../contracts/index';
 import environment from '../../../environment';
 import {IInspectCorrelationService} from './contracts';
+import {DiagramViewer} from './components/diagram-viewer/diagram-viewer';
+import {InspectPanel} from './components/inspect-panel/inspect-panel';
 
 @inject('InspectCorrelationService', EventAggregator)
 export class InspectCorrelation {
+  @bindable public processInstanceToSelect: string;
+  @bindable public flowNodeToSelect: string;
   @bindable public activeDiagram: IDiagram;
   @bindable public activeSolutionEntry: ISolutionEntry;
   @bindable public selectedProcessInstance: DataModels.Correlations.CorrelationProcessInstance;
@@ -19,6 +23,8 @@ export class InspectCorrelation {
   @bindable public noCorrelationsFound: boolean = false;
   @observable public bottomPanelHeight: number = 250;
   @observable public tokenViewerWidth: number = 250;
+  @bindable public diagramViewer: DiagramViewer;
+  @bindable public inspectPanel: InspectPanel;
 
   public correlations: Array<DataModels.Correlations.Correlation>;
   public token: string;
@@ -107,6 +113,8 @@ export class InspectCorrelation {
       window.localStorage.getItem('tokenViewerInspectCollapseState'),
     );
     this.showTokenViewer = previousTokenViewerState || false;
+
+    this.diagramViewer.selectFlowNode(this.flowNodeToSelect);
   }
 
   public detached(): void {

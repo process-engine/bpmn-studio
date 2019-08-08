@@ -12,7 +12,7 @@
       <heatmap active-diagram.bind="activeDiagram" active-solution-entry.bind="activeSolutionEntry"></heatmap>
     </div>
     <div if.bind="showInspectCorrelation" class="inspect__inspect-correlation-container">
-      <inspect-correlation active-diagram.bind="activeDiagram" active-solution-entry.bind="activeSolutionEntry"></inspect-correlation>
+      <inspect-correlation active-diagram.bind="activeDiagram" active-solution-entry.bind="activeSolutionEntry" process-instance-to-select.to-view="processInstanceToSelect" flow-node-to-select.to-view="flowNodeToSelect"></inspect-correlation>
     </div>
 
     <div class="inspect-layout__tools-right">

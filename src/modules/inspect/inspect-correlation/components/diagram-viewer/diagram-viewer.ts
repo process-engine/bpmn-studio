@@ -42,6 +42,7 @@ export class DiagramViewer {
   private subscriptions: Array<Subscription>;
   private diagramExportService: IDiagramExportService;
   private eventAggregator: EventAggregator;
+  private flowNodeToSetAfterProcessInstanceIsSet: string;
 
   constructor(notificationService: NotificationService, eventAggregator: EventAggregator) {
     this.notificationService = notificationService;
@@ -138,6 +139,22 @@ export class DiagramViewer {
     ];
   }
 
+  public selectFlowNode(flowNodeId: string): void {
+    if (this.processInstance === undefined) {
+      this.flowNodeToSetAfterProcessInstanceIsSet = flowNodeId;
+
+      return;
+    }
+
+    const elementRegistry: IElementRegistry = this.diagramViewer.get('elementRegistry');
+    const element: IShape = elementRegistry.get(flowNodeId);
+
+    this.diagramViewer.get('selection').select(element);
+
+    this.selectedFlowNode = element;
+    this.colorizeSelection(element);
+  }
+
   public detached(): void {
     const bjsContainer: Element = this.canvasModel.getElementsByClassName('bjs-container')[0];
 
@@ -201,6 +218,13 @@ export class DiagramViewer {
     }
 
     this.fitDiagramToViewport();
+
+    const flowNodeNeedsToBeSelected: boolean = this.flowNodeToSetAfterProcessInstanceIsSet !== undefined;
+    if (flowNodeNeedsToBeSelected) {
+      this.selectFlowNode(this.flowNodeToSetAfterProcessInstanceIsSet);
+
+      this.flowNodeToSetAfterProcessInstanceIsSet = undefined;
+    }
   }
 
   public activeDiagramChanged(): void {

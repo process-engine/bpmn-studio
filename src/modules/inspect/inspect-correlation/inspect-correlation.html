@@ -7,7 +7,7 @@
     <div class="inspect-correlation__left-toolbar"></div>
     <div class="inspect-correlation__panels">
       <div class="inspect-correlation__upper-panel" show.bind="!inspectPanelFullscreen" >
-        <diagram-viewer class="inspect-correlation__diagram-viewer" selected-flow-node.two-way="selectedFlowNode" active-diagram.bind="activeDiagram" process-instance.to-view="selectedProcessInstance"></diagram-viewer>
+        <diagram-viewer class="inspect-correlation__diagram-viewer" view-model.ref="diagramViewer" selected-flow-node.two-way="selectedFlowNode" active-diagram.bind="activeDiagram" process-instance.to-view="selectedProcessInstance"></diagram-viewer>
         <div class="inspect-correlation__right-resize-div" ref="rightPanelResizeDiv" show.bind="showTokenViewer"></div>
         <token-viewer class="inspect-correlation__token-viewer" css="width: ${tokenViewerWidth}px;"
           correlation.bind="selectedCorrelation"
@@ -21,7 +21,7 @@
       <div class="inspect-correlation__bottom-panel" css="height: ${bottomPanelHeight}px;"
             class.bind="inspectPanelFullscreen ? 'inspect-correlation__bottom-panel--fullscreen' : ''"
             show.bind="showInspectPanel">
-        <inspect-panel active-solution-entry.bind="activeSolutionEntry" active-diagram.bind="activeDiagram" correlations.bind="correlations" selected-correlation.from-view="selectedCorrelation" selected-process-instance.from-view="selectedProcessInstance" fullscreen.two-way="inspectPanelFullscreen" log.bind="log"></inspect-panel>
+        <inspect-panel view-model.ref="inspectPanel" active-solution-entry.bind="activeSolutionEntry" active-diagram.bind="activeDiagram" correlations.bind="correlations" selected-correlation.from-view="selectedCorrelation" selected-process-instance.from-view="selectedProcessInstance" fullscreen.two-way="inspectPanelFullscreen" log.bind="log" process-instance-to-select.to-view="processInstanceToSelect"></inspect-panel>
       </div>
     </div>
 </template>

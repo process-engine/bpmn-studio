@@ -34,6 +34,7 @@ export interface ILiveExecutionTrackerService {
   getAllElementsThatCanHaveAToken(): Array<IShape>;
   getElementsWithActiveToken(processInstanceId: string): Promise<Array<IShape> | null>;
   getElementsWithTokenHistory(processInstanceId: string): Promise<Array<IShape> | null>;
+  getElementsWithError(processInstanceId: string): Promise<Array<IShape>>;
   getCallActivities(): Array<IShape>;
   getActiveCallActivities(processInstanceId: string): Promise<Array<IShape>>;
   getInactiveCallActivities(processInstanceId: string): Promise<Array<IShape>>;
