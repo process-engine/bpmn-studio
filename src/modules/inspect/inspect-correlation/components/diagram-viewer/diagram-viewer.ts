@@ -15,19 +15,22 @@ import {
   IElementRegistry,
   IEvent,
   IModeling,
+  ISolutionEntry,
   NotificationType,
   defaultBpmnColors,
 } from '../../../../../contracts/index';
 import environment from '../../../../../environment';
 import {NotificationService} from '../../../../../services/notification-service/notification.service';
 import {DiagramExportService} from '../../../../design/bpmn-io/services/index';
+import {ILiveExecutionTrackerService} from '../../../../live-execution-tracker/contracts';
 
-@inject('NotificationService', EventAggregator)
+@inject('NotificationService', EventAggregator, 'LiveExecutionTrackerService')
 export class DiagramViewer {
   @bindable public processInstance: DataModels.Correlations.CorrelationProcessInstance;
   @bindable public xml: string;
   @bindable public activeDiagram: IDiagram;
   @bindable public selectedFlowNode: IShape;
+  @bindable public activeSolutionEntry: ISolutionEntry;
   public noCorrelationsFound: boolean;
   public xmlIsNotSelected: boolean = true;
   public canvasModel: HTMLElement;
@@ -43,11 +46,17 @@ export class DiagramViewer {
   private diagramExportService: IDiagramExportService;
   private eventAggregator: EventAggregator;
   private flowNodeToSetAfterProcessInstanceIsSet: string;
+  private liveExecutionTrackerService: ILiveExecutionTrackerService;
 
-  constructor(notificationService: NotificationService, eventAggregator: EventAggregator) {
+  constructor(
+    notificationService: NotificationService,
+    eventAggregator: EventAggregator,
+    liveExecutionTrackerService: ILiveExecutionTrackerService,
+  ) {
     this.notificationService = notificationService;
     this.diagramExportService = new DiagramExportService();
     this.eventAggregator = eventAggregator;
+    this.liveExecutionTrackerService = liveExecutionTrackerService;
   }
 
   public attached(): void {
@@ -191,10 +200,14 @@ export class DiagramViewer {
 
     this.xml = this.processInstance.xml;
 
-    await this.importXml(this.diagramModeler, this.xml);
-    this.clearColors();
-    this.uncoloredXml = await this.getXmlFromModeler();
+    this.uncoloredXml = await this.liveExecutionTrackerService.getColorizedDiagram(
+      this.activeSolutionEntry.identity,
+      this.xml,
+      this.processInstance.processInstanceId,
+      true,
+    );
 
+    await this.importXml(this.diagramModeler, this.uncoloredXml);
     await this.importXml(this.diagramViewer, this.uncoloredXml);
     this.uncoloredSVG = await this.getSVG();
 

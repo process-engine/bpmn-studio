@@ -7,7 +7,7 @@
     <div class="inspect-correlation__left-toolbar"></div>
     <div class="inspect-correlation__panels">
       <div class="inspect-correlation__upper-panel" show.bind="!inspectPanelFullscreen" >
-        <diagram-viewer class="inspect-correlation__diagram-viewer" view-model.ref="diagramViewer" selected-flow-node.two-way="selectedFlowNode" active-diagram.bind="activeDiagram" process-instance.to-view="selectedProcessInstance"></diagram-viewer>
+        <diagram-viewer class="inspect-correlation__diagram-viewer" view-model.ref="diagramViewer" active-solution-entry.bind="activeSolutionEntry" selected-flow-node.two-way="selectedFlowNode" active-diagram.bind="activeDiagram" process-instance.to-view="selectedProcessInstance"></diagram-viewer>
         <div class="inspect-correlation__right-resize-div" ref="rightPanelResizeDiv" show.bind="showTokenViewer"></div>
         <token-viewer class="inspect-correlation__token-viewer" css="width: ${tokenViewerWidth}px;"
           correlation.bind="selectedCorrelation"
