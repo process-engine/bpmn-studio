@@ -33,134 +33,232 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
     this.elementRegistry = this.diagramModeler.get('elementRegistry');
   }
 
-  public setIdentity(identity: IIdentity): void {
-    this.liveExecutionTrackerRepository.setIdentity(identity);
+  public isProcessInstanceActive(identity: IIdentity, processInstanceId: string): Promise<boolean> {
+    return this.liveExecutionTrackerRepository.isProcessInstanceActive(identity, processInstanceId);
   }
 
-  public isProcessInstanceActive(processInstanceId: string): Promise<boolean> {
-    return this.liveExecutionTrackerRepository.isProcessInstanceActive(processInstanceId);
-  }
-
-  public getCorrelationById(correlationId: string): Promise<DataModels.Correlations.Correlation> {
-    return this.liveExecutionTrackerRepository.getCorrelationById(correlationId);
+  public getCorrelationById(identity: IIdentity, correlationId: string): Promise<DataModels.Correlations.Correlation> {
+    return this.liveExecutionTrackerRepository.getCorrelationById(identity, correlationId);
   }
 
   public getTokenHistoryGroupForProcessInstance(
+    identity: IIdentity,
     processInstanceId: string,
   ): Promise<DataModels.TokenHistory.TokenHistoryGroup | null> {
-    return this.liveExecutionTrackerRepository.getTokenHistoryGroupForProcessInstance(processInstanceId);
+    return this.liveExecutionTrackerRepository.getTokenHistoryGroupForProcessInstance(identity, processInstanceId);
   }
 
-  public getActiveTokensForProcessInstance(processInstanceId: string): Promise<Array<DataModels.Kpi.ActiveToken>> {
-    return this.liveExecutionTrackerRepository.getActiveTokensForProcessInstance(processInstanceId);
+  public getActiveTokensForProcessInstance(
+    identity: IIdentity,
+    processInstanceId: string,
+  ): Promise<Array<DataModels.Kpi.ActiveToken>> {
+    return this.liveExecutionTrackerRepository.getActiveTokensForProcessInstance(identity, processInstanceId);
   }
 
   public getEmptyActivitiesForProcessInstance(
+    identity: IIdentity,
     processInstanceId: string,
   ): Promise<DataModels.EmptyActivities.EmptyActivityList | null> {
-    return this.liveExecutionTrackerRepository.getEmptyActivitiesForProcessInstance(processInstanceId);
+    return this.liveExecutionTrackerRepository.getEmptyActivitiesForProcessInstance(identity, processInstanceId);
   }
 
-  public getProcessModelById(processModelId: string): Promise<DataModels.ProcessModels.ProcessModel> {
-    return this.liveExecutionTrackerRepository.getProcessModelById(processModelId);
+  public getProcessModelById(
+    identity: IIdentity,
+    processModelId: string,
+  ): Promise<DataModels.ProcessModels.ProcessModel> {
+    return this.liveExecutionTrackerRepository.getProcessModelById(identity, processModelId);
   }
 
   public finishEmptyActivity(
+    identity: IIdentity,
     processInstanceId: string,
     correlationId: string,
     emptyActivity: DataModels.EmptyActivities.EmptyActivity,
   ): Promise<void> {
-    return this.liveExecutionTrackerRepository.finishEmptyActivity(processInstanceId, correlationId, emptyActivity);
+    return this.liveExecutionTrackerRepository.finishEmptyActivity(
+      identity,
+      processInstanceId,
+      correlationId,
+      emptyActivity,
+    );
   }
 
-  public createProcessEndedEventListener(processInstanceId: string, callback: Function): Promise<Subscription> {
-    return this.liveExecutionTrackerRepository.createProcessEndedEventListener(processInstanceId, callback);
+  public createProcessEndedEventListener(
+    identity: IIdentity,
+    processInstanceId: string,
+    callback: Function,
+  ): Promise<Subscription> {
+    return this.liveExecutionTrackerRepository.createProcessEndedEventListener(identity, processInstanceId, callback);
   }
 
-  public createProcessTerminatedEventListener(processInstanceId: string, callback: Function): Promise<Subscription> {
-    return this.liveExecutionTrackerRepository.createProcessTerminatedEventListener(processInstanceId, callback);
+  public createProcessTerminatedEventListener(
+    identity: IIdentity,
+    processInstanceId: string,
+    callback: Function,
+  ): Promise<Subscription> {
+    return this.liveExecutionTrackerRepository.createProcessTerminatedEventListener(
+      identity,
+      processInstanceId,
+      callback,
+    );
   }
 
-  public createUserTaskWaitingEventListener(processInstanceId: string, callback: Function): Promise<Subscription> {
-    return this.liveExecutionTrackerRepository.createUserTaskWaitingEventListener(processInstanceId, callback);
+  public createUserTaskWaitingEventListener(
+    identity: IIdentity,
+    processInstanceId: string,
+    callback: Function,
+  ): Promise<Subscription> {
+    return this.liveExecutionTrackerRepository.createUserTaskWaitingEventListener(
+      identity,
+      processInstanceId,
+      callback,
+    );
   }
 
-  public createUserTaskFinishedEventListener(processInstanceId: string, callback: Function): Promise<Subscription> {
-    return this.liveExecutionTrackerRepository.createUserTaskFinishedEventListener(processInstanceId, callback);
+  public createUserTaskFinishedEventListener(
+    identity: IIdentity,
+    processInstanceId: string,
+    callback: Function,
+  ): Promise<Subscription> {
+    return this.liveExecutionTrackerRepository.createUserTaskFinishedEventListener(
+      identity,
+      processInstanceId,
+      callback,
+    );
   }
 
-  public createManualTaskWaitingEventListener(processInstanceId: string, callback: Function): Promise<Subscription> {
-    return this.liveExecutionTrackerRepository.createManualTaskWaitingEventListener(processInstanceId, callback);
+  public createManualTaskWaitingEventListener(
+    identity: IIdentity,
+    processInstanceId: string,
+    callback: Function,
+  ): Promise<Subscription> {
+    return this.liveExecutionTrackerRepository.createManualTaskWaitingEventListener(
+      identity,
+      processInstanceId,
+      callback,
+    );
   }
 
-  public createManualTaskFinishedEventListener(processInstanceId: string, callback: Function): Promise<Subscription> {
-    return this.liveExecutionTrackerRepository.createManualTaskFinishedEventListener(processInstanceId, callback);
+  public createManualTaskFinishedEventListener(
+    identity: IIdentity,
+    processInstanceId: string,
+    callback: Function,
+  ): Promise<Subscription> {
+    return this.liveExecutionTrackerRepository.createManualTaskFinishedEventListener(
+      identity,
+      processInstanceId,
+      callback,
+    );
   }
 
-  public createEmptyActivityWaitingEventListener(processInstanceId: string, callback: Function): Promise<Subscription> {
-    return this.liveExecutionTrackerRepository.createEmptyActivityWaitingEventListener(processInstanceId, callback);
+  public createEmptyActivityWaitingEventListener(
+    identity: IIdentity,
+    processInstanceId: string,
+    callback: Function,
+  ): Promise<Subscription> {
+    return this.liveExecutionTrackerRepository.createEmptyActivityWaitingEventListener(
+      identity,
+      processInstanceId,
+      callback,
+    );
   }
 
   public createEmptyActivityFinishedEventListener(
+    identity: IIdentity,
     processInstanceId: string,
     callback: Function,
   ): Promise<Subscription> {
-    return this.liveExecutionTrackerRepository.createEmptyActivityFinishedEventListener(processInstanceId, callback);
+    return this.liveExecutionTrackerRepository.createEmptyActivityFinishedEventListener(
+      identity,
+      processInstanceId,
+      callback,
+    );
   }
 
-  public createActivityReachedEventListener(processInstanceId: string, callback: Function): Promise<Subscription> {
-    return this.liveExecutionTrackerRepository.createActivityReachedEventListener(processInstanceId, callback);
+  public createActivityReachedEventListener(
+    identity: IIdentity,
+    processInstanceId: string,
+    callback: Function,
+  ): Promise<Subscription> {
+    return this.liveExecutionTrackerRepository.createActivityReachedEventListener(
+      identity,
+      processInstanceId,
+      callback,
+    );
   }
 
-  public createActivityFinishedEventListener(processInstanceId: string, callback: Function): Promise<Subscription> {
-    return this.liveExecutionTrackerRepository.createActivityFinishedEventListener(processInstanceId, callback);
+  public createActivityFinishedEventListener(
+    identity: IIdentity,
+    processInstanceId: string,
+    callback: Function,
+  ): Promise<Subscription> {
+    return this.liveExecutionTrackerRepository.createActivityFinishedEventListener(
+      identity,
+      processInstanceId,
+      callback,
+    );
   }
 
   public createBoundaryEventTriggeredEventListener(
+    identity: IIdentity,
     processInstanceId: string,
     callback: Function,
   ): Promise<Subscription> {
-    return this.liveExecutionTrackerRepository.createBoundaryEventTriggeredEventListener(processInstanceId, callback);
+    return this.liveExecutionTrackerRepository.createBoundaryEventTriggeredEventListener(
+      identity,
+      processInstanceId,
+      callback,
+    );
   }
 
   public createIntermediateThrowEventTriggeredEventListener(
+    identity: IIdentity,
     processInstanceId: string,
     callback: Function,
   ): Promise<Subscription> {
     return this.liveExecutionTrackerRepository.createIntermediateThrowEventTriggeredEventListener(
+      identity,
       processInstanceId,
       callback,
     );
   }
 
   public createIntermediateCatchEventReachedEventListener(
+    identity: IIdentity,
     processInstanceId: string,
     callback: Function,
   ): Promise<Subscription> {
     return this.liveExecutionTrackerRepository.createIntermediateCatchEventReachedEventListener(
+      identity,
       processInstanceId,
       callback,
     );
   }
 
   public createIntermediateCatchEventFinishedEventListener(
+    identity: IIdentity,
     processInstanceId: string,
     callback: Function,
   ): Promise<Subscription> {
     return this.liveExecutionTrackerRepository.createIntermediateCatchEventFinishedEventListener(
+      identity,
       processInstanceId,
       callback,
     );
   }
 
-  public removeSubscription(subscription: Subscription): Promise<void> {
-    return this.liveExecutionTrackerRepository.removeSubscription(subscription);
+  public removeSubscription(identity: IIdentity, subscription: Subscription): Promise<void> {
+    return this.liveExecutionTrackerRepository.removeSubscription(identity, subscription);
   }
 
-  public async getElementsWithActiveToken(processInstanceId: string): Promise<Array<IShape> | null> {
+  public async getElementsWithActiveToken(
+    identity: IIdentity,
+    processInstanceId: string,
+  ): Promise<Array<IShape> | null> {
     const elements: Array<IShape> = this.getAllElementsThatCanHaveAToken();
 
     const activeTokens: Array<DataModels.Kpi.ActiveToken> | null = await this.getActiveTokensForProcessInstance(
+      identity,
       processInstanceId,
     );
     const couldNotGetActiveTokens: boolean = activeTokens === null;
@@ -181,10 +279,11 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
     return elementsWithActiveToken;
   }
 
-  public async getElementsWithTokenHistory(processInstanceId: string): Promise<Array<IShape>> {
+  public async getElementsWithTokenHistory(identity: IIdentity, processInstanceId: string): Promise<Array<IShape>> {
     const elements: Array<IShape> = this.getAllElementsThatCanHaveAToken();
 
     const tokenHistoryGroups: DataModels.TokenHistory.TokenHistoryGroup = await this.getTokenHistoryGroupForProcessInstance(
+      identity,
       processInstanceId,
     );
 
@@ -325,10 +424,10 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
     return callActivities;
   }
 
-  public async getActiveCallActivities(processInstanceId: string): Promise<Array<IShape>> {
+  public async getActiveCallActivities(identity: IIdentity, processInstanceId: string): Promise<Array<IShape>> {
     const activeTokens: Array<
       DataModels.Kpi.ActiveToken
-    > = await this.liveExecutionTrackerRepository.getActiveTokensForProcessInstance(processInstanceId);
+    > = await this.liveExecutionTrackerRepository.getActiveTokensForProcessInstance(identity, processInstanceId);
 
     const callActivities: Array<IShape> = this.getCallActivities();
 
@@ -339,10 +438,10 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
     return inactiveCallActivities;
   }
 
-  public async getInactiveCallActivities(processInstanceId: string): Promise<Array<IShape>> {
+  public async getInactiveCallActivities(identity: IIdentity, processInstanceId: string): Promise<Array<IShape>> {
     const activeTokens: Array<
       DataModels.Kpi.ActiveToken
-    > = await this.liveExecutionTrackerRepository.getActiveTokensForProcessInstance(processInstanceId);
+    > = await this.liveExecutionTrackerRepository.getActiveTokensForProcessInstance(identity, processInstanceId);
 
     const callActivities: Array<IShape> = this.getCallActivities();
 
@@ -354,10 +453,11 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
   }
 
   public async getProcessModelByProcessInstanceId(
+    identity: IIdentity,
     correlationId: string,
     processInstanceId: string,
   ): Promise<DataModels.Correlations.CorrelationProcessInstance> {
-    const correlation: DataModels.Correlations.Correlation = await this.getCorrelationById(correlationId);
+    const correlation: DataModels.Correlations.Correlation = await this.getCorrelationById(identity, correlationId);
 
     const errorGettingCorrelation: boolean = correlation === undefined;
     if (errorGettingCorrelation) {
@@ -380,11 +480,12 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
   }
 
   public async getProcessInstanceIdOfCallActivityTarget(
+    identity: IIdentity,
     correlationId: string,
     processInstanceIdOfOrigin: string,
     callActivityTargetId: string,
   ): Promise<string> {
-    const correlation: DataModels.Correlations.Correlation = await this.getCorrelationById(correlationId);
+    const correlation: DataModels.Correlations.Correlation = await this.getCorrelationById(identity, correlationId);
 
     const errorGettingCorrelation: boolean = correlation === undefined;
     if (errorGettingCorrelation) {
@@ -461,17 +562,18 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
   }
 
   public async getColorizedDiagram(
+    identity: IIdentity,
     processInstanceId: string,
     processEngineSupportsGettingFlowNodeInstances?: boolean,
   ): Promise<string> {
-    const elementsWithActiveToken: Array<IShape> = await this.getElementsWithActiveToken(processInstanceId);
-    const elementsWithTokenHistory: Array<IShape> = await this.getElementsWithTokenHistory(processInstanceId);
+    const elementsWithActiveToken: Array<IShape> = await this.getElementsWithActiveToken(identity, processInstanceId);
+    const elementsWithTokenHistory: Array<IShape> = await this.getElementsWithTokenHistory(identity, processInstanceId);
 
     this.colorizeElements(elementsWithTokenHistory, defaultBpmnColors.green);
     this.colorizeElements(elementsWithActiveToken, defaultBpmnColors.orange);
 
     if (processEngineSupportsGettingFlowNodeInstances) {
-      const elementsWithError: Array<IShape> = await this.getElementsWithError(processInstanceId);
+      const elementsWithError: Array<IShape> = await this.getElementsWithError(identity, processInstanceId);
       this.colorizeElements(elementsWithError, defaultBpmnColors.red);
     }
 
@@ -480,14 +582,14 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
     return colorizedXml;
   }
 
-  public terminateProcess(processInstanceId: string): Promise<void> {
-    return this.liveExecutionTrackerRepository.terminateProcess(processInstanceId);
+  public terminateProcess(identity: IIdentity, processInstanceId: string): Promise<void> {
+    return this.liveExecutionTrackerRepository.terminateProcess(identity, processInstanceId);
   }
 
-  public async getElementsWithError(processInstanceId: string): Promise<Array<IShape>> {
+  public async getElementsWithError(identity: IIdentity, processInstanceId: string): Promise<Array<IShape>> {
     const flowNodeInstances: Array<
       DataModels.FlowNodeInstances.FlowNodeInstance
-    > = await this.liveExecutionTrackerRepository.getFlowNodeInstancesForProcessInstance(processInstanceId);
+    > = await this.liveExecutionTrackerRepository.getFlowNodeInstancesForProcessInstance(identity, processInstanceId);
 
     return flowNodeInstances
       .filter((flowNodeInstance: DataModels.FlowNodeInstances.FlowNodeInstance) => {
