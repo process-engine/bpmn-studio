@@ -5,7 +5,7 @@ import {IShape} from '@process-engine/bpmn-elements_contracts';
 import {DataModels} from '@process-engine/management_api_contracts';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 
-import {IEventFunction, ISolutionEntry} from '../../../contracts/index';
+import {IEventFunction, ISolutionEntry, InspectPanelTab} from '../../../contracts/index';
 import environment from '../../../environment';
 import {IInspectCorrelationService} from './contracts';
 import {DiagramViewer} from './components/diagram-viewer/diagram-viewer';
@@ -25,6 +25,7 @@ export class InspectCorrelation {
   @observable public tokenViewerWidth: number = 250;
   @bindable public diagramViewer: DiagramViewer;
   @bindable public inspectPanel: InspectPanel;
+  @bindable public inspectPanelTabToShow: InspectPanelTab;
 
   public correlations: Array<DataModels.Correlations.Correlation>;
   public token: string;
@@ -115,6 +116,11 @@ export class InspectCorrelation {
     this.showTokenViewer = previousTokenViewerState || false;
 
     this.diagramViewer.selectFlowNode(this.flowNodeToSelect);
+
+    const shouldDisplaySpecificInspectPanelTab: boolean = this.inspectPanelTabToShow !== undefined;
+    if (shouldDisplaySpecificInspectPanelTab) {
+      this.inspectPanel.changeTab(this.inspectPanelTabToShow);
+    }
   }
 
   public detached(): void {

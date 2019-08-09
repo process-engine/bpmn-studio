@@ -19,7 +19,7 @@ export class InspectPanel {
   @bindable public activeSolutionEntry: ISolutionEntry;
   public inspectPanelTab: typeof InspectPanelTab = InspectPanelTab;
   public showCorrelationList: boolean = true;
-  public showLogViewer: boolean;
+  public showLogViewer: boolean = false;
 
   private eventAggregator: EventAggregator;
   private subscriptions: Array<Subscription>;

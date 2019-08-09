@@ -21,6 +21,7 @@ import {
   IOverlays,
   ISolutionEntry,
   ISolutionService,
+  InspectPanelTab,
   NotificationType,
 } from '../../contracts/index';
 
@@ -524,6 +525,7 @@ export class LiveExecutionTracker {
       solutionUri: this.activeSolutionEntry.uri,
       processInstanceToSelect: this.processInstanceId,
       flowNodeToSelect: elementId,
+      inspectPanelTabToShow: InspectPanelTab.LogViewer,
     });
   };
 
