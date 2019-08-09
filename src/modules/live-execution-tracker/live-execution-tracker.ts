@@ -74,6 +74,8 @@ export class LiveExecutionTracker {
   private notificationService: NotificationService;
   private solutionService: ISolutionService;
 
+  private xml: string;
+
   private processStopped: boolean = false;
   private isAttached: boolean = false;
   private parentProcessInstanceId: string;
@@ -184,9 +186,6 @@ export class LiveExecutionTracker {
       return;
     }
 
-    // Import the xml to the modeler to add colors to it
-    await this.liveExecutionTrackerService.importXmlIntoDiagramModeler(xml);
-
     // Colorize xml & Add overlays
     /*
      * Remove all colors if the diagram has already colored elements.
@@ -194,11 +193,10 @@ export class LiveExecutionTracker {
      * the diagram, one would think in LiveExecutionTracker that the element is
      * active although it is not active.
      */
-    this.liveExecutionTrackerService.clearDiagramColors();
+    const uncoloredXml: string = await this.liveExecutionTrackerService.clearDiagramColors(xml);
+    this.xml = uncoloredXml;
 
-    // Import the xml without colors to DiagramViewer
-    const xmlFromModeler: string = await this.liveExecutionTrackerService.exportXmlFromDiagramModeler();
-    await this.importXmlIntoDiagramViewer(xmlFromModeler);
+    await this.importXmlIntoDiagramViewer(uncoloredXml);
 
     // The version must be later than 8.1.0
     const processEngineSupportsEvents: boolean = this.checkIfProcessEngineSupportsEvents();
@@ -810,6 +808,7 @@ export class LiveExecutionTracker {
       try {
         return await this.liveExecutionTrackerService.getColorizedDiagram(
           this.activeSolutionEntry.identity,
+          this.xml,
           this.processInstanceId,
           this.checkIfProcessEngineSupportsGettingFlowNodeInstances(),
         );

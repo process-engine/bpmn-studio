@@ -505,42 +505,9 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
     return processInstanceId;
   }
 
-  public async importXmlIntoDiagramModeler(xml: string): Promise<void> {
-    const xmlImportPromise: Promise<void> = new Promise((resolve: Function, reject: Function): void => {
-      this.diagramModeler.importXML(xml, (importXmlError: Error) => {
-        if (importXmlError) {
-          reject(importXmlError);
+  public async clearDiagramColors(xml: string): Promise<string> {
+    await this.importXmlIntoDiagramModeler(xml);
 
-          return;
-        }
-        resolve();
-      });
-    });
-
-    return xmlImportPromise;
-  }
-
-  public async exportXmlFromDiagramModeler(): Promise<string> {
-    const saveXmlPromise: Promise<string> = new Promise((resolve: Function, reject: Function): void => {
-      const xmlSaveOptions: IBpmnXmlSaveOptions = {
-        format: true,
-      };
-
-      this.diagramModeler.saveXML(xmlSaveOptions, async (saveXmlError: Error, xml: string) => {
-        if (saveXmlError) {
-          reject(saveXmlError);
-
-          return;
-        }
-
-        resolve(xml);
-      });
-    });
-
-    return saveXmlPromise;
-  }
-
-  public clearDiagramColors(): void {
     const elementsWithColor: Array<IShape> = this.elementRegistry.filter((element: IShape): boolean => {
       const elementHasFillColor: boolean = element.businessObject.di.fill !== undefined;
       const elementHasBorderColor: boolean = element.businessObject.di.stroke !== undefined;
@@ -552,20 +519,25 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
 
     const noElementsWithColor: boolean = elementsWithColor.length === 0;
     if (noElementsWithColor) {
-      return;
+      return xml;
     }
 
     this.modeling.setColor(elementsWithColor, {
       stroke: defaultBpmnColors.none.border,
       fill: defaultBpmnColors.none.fill,
     });
+
+    return this.exportXmlFromDiagramModeler();
   }
 
   public async getColorizedDiagram(
     identity: IIdentity,
+    xml: string,
     processInstanceId: string,
     processEngineSupportsGettingFlowNodeInstances?: boolean,
   ): Promise<string> {
+    await this.importXmlIntoDiagramModeler(xml);
+
     const elementsWithActiveToken: Array<IShape> = await this.getElementsWithActiveToken(identity, processInstanceId);
     const elementsWithTokenHistory: Array<IShape> = await this.getElementsWithTokenHistory(identity, processInstanceId);
 
@@ -598,6 +570,41 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
       .map((flowNodeInstance: DataModels.FlowNodeInstances.FlowNodeInstance) => {
         return this.elementRegistry.get(flowNodeInstance.flowNodeId);
       });
+  }
+
+  private async importXmlIntoDiagramModeler(xml: string): Promise<void> {
+    const xmlImportPromise: Promise<void> = new Promise((resolve: Function, reject: Function): void => {
+      this.diagramModeler.importXML(xml, (importXmlError: Error) => {
+        if (importXmlError) {
+          reject(importXmlError);
+
+          return;
+        }
+        resolve();
+      });
+    });
+
+    return xmlImportPromise;
+  }
+
+  private async exportXmlFromDiagramModeler(): Promise<string> {
+    const saveXmlPromise: Promise<string> = new Promise((resolve: Function, reject: Function): void => {
+      const xmlSaveOptions: IBpmnXmlSaveOptions = {
+        format: true,
+      };
+
+      this.diagramModeler.saveXML(xmlSaveOptions, async (saveXmlError: Error, xml: string) => {
+        if (saveXmlError) {
+          reject(saveXmlError);
+
+          return;
+        }
+
+        resolve(xml);
+      });
+    });
+
+    return saveXmlPromise;
   }
 
   private colorizeElements(elements: Array<IShape>, color: IColorPickerColor): void {

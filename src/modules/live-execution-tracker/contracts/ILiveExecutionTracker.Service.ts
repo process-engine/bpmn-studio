@@ -54,11 +54,10 @@ export interface ILiveExecutionTrackerService {
   elementHasActiveToken(elementId: string, activeTokens: Array<DataModels.Kpi.ActiveToken>): boolean;
   elementHasTokenHistory(elementId: string, tokenHistoryGroups: DataModels.TokenHistory.TokenHistoryGroup): boolean;
 
-  importXmlIntoDiagramModeler(xml: string): Promise<void>;
-  exportXmlFromDiagramModeler(): Promise<string>;
-  clearDiagramColors(): void;
+  clearDiagramColors(xml: string): Promise<string>;
   getColorizedDiagram(
     identity: IIdentity,
+    xml: string,
     processInstanceId: string,
     processEngineSupportsGettingFlowNodeInstances?: boolean,
   ): Promise<string>;
