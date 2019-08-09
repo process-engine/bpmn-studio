@@ -16,7 +16,9 @@ import {
   ICanvas,
   IEvent,
   IEventFunction,
+  IOverlay,
   IOverlayManager,
+  IOverlays,
   ISolutionEntry,
   ISolutionService,
   NotificationType,
@@ -86,7 +88,7 @@ export class LiveExecutionTracker {
   private colorizeAgain: boolean = false;
 
   private eventListenerSubscriptions: Array<Subscription> = [];
-  private elementsWithEventListeners: Array<string> = [];
+  private overlaysWithEventListeners: Array<string> = [];
 
   private liveExecutionTrackerService: ILiveExecutionTrackerService;
 
@@ -381,23 +383,67 @@ export class LiveExecutionTracker {
     this.overlays.clear();
     this.removeEventListenerFromOverlays();
 
-    this.addOverlaysToUserAndManualTasks(elementsWithActiveToken);
-    this.addOverlaysToEmptyActivities(elementsWithActiveToken);
-    this.addOverlaysToActiveCallActivities(elementsWithActiveToken);
-    this.addOverlaysToInactiveCallActivities(inactiveCallActivities);
-    this.addOverlaysToElementsWithError(elementsWithError);
+    const userAndManualTaskOverlays: Array<string> = this.addOverlaysToUserAndManualTasks(elementsWithActiveToken);
+    const emptyActivityOverlays: Array<string> = this.addOverlaysToEmptyActivities(elementsWithActiveToken);
+    const activeCallActivityOverlays: Array<string> = this.addOverlaysToActiveCallActivities(elementsWithActiveToken);
+    const inactiveCallActivityOverlays: Array<string> = this.addOverlaysToInactiveCallActivities(
+      inactiveCallActivities,
+    );
+    const errorElementOverlays: Array<string> = this.addOverlaysToElementsWithError(elementsWithError);
+
+    const elementsWithOverlays: Array<string> = [
+      ...userAndManualTaskOverlays,
+      ...emptyActivityOverlays,
+      ...activeCallActivityOverlays,
+      ...inactiveCallActivityOverlays,
+      ...errorElementOverlays,
+    ];
+
+    this.rearrangeOverlaysForElementWithMultipleOverlays(elementsWithOverlays);
   }
 
   private removeEventListenerFromOverlays(): void {
-    for (const elementId of this.elementsWithEventListeners) {
-      document.getElementById(elementId).removeEventListener('click', this.handleTaskClick);
-      document.getElementById(elementId).removeEventListener('click', this.handleEmptyActivityClick);
-      document.getElementById(elementId).removeEventListener('click', this.handleActiveCallActivityClick);
-      document.getElementById(elementId).removeEventListener('click', this.handleErrorElementClick);
-      document.getElementById(elementId).removeEventListener('click', this.handleInactiveCallActivityClick);
+    for (const overlayId of this.overlaysWithEventListeners) {
+      this.removeEventListenerFromOverlay(overlayId);
     }
 
-    this.elementsWithEventListeners = [];
+    this.overlaysWithEventListeners = [];
+  }
+
+  private addEventListenerToOverlay(overlayHtmlId: string): void {
+    const functionToAdd: EventListenerOrEventListenerObject = this.getEventListenerForOverlayId(overlayHtmlId);
+
+    document.getElementById(overlayHtmlId).addEventListener('click', functionToAdd);
+
+    this.overlaysWithEventListeners.push(overlayHtmlId);
+  }
+
+  private removeEventListenerFromOverlay(overlayHtmlId: string): void {
+    const functionToRemove: EventListenerOrEventListenerObject = this.getEventListenerForOverlayId(overlayHtmlId);
+
+    document.getElementById(overlayHtmlId).removeEventListener('click', functionToRemove);
+
+    this.overlaysWithEventListeners.splice(this.overlaysWithEventListeners.indexOf(overlayHtmlId), 1);
+  }
+
+  private getEventListenerForOverlayId(overlayHtmlId: string): EventListenerOrEventListenerObject {
+    if (overlayHtmlId.endsWith('manual-user-task')) {
+      return this.handleTaskClick;
+    }
+    if (overlayHtmlId.endsWith('empty-activity')) {
+      return this.handleEmptyActivityClick;
+    }
+    if (overlayHtmlId.endsWith('active-call-activity')) {
+      return this.handleActiveCallActivityClick;
+    }
+    if (overlayHtmlId.endsWith('error-element')) {
+      return this.handleErrorElementClick;
+    }
+    if (overlayHtmlId.endsWith('inactive-call-activity')) {
+      return this.handleInactiveCallActivityClick;
+    }
+
+    return undefined;
   }
 
   private addOverlaysToElementsWithError(elementsWithError: Array<IShape>): Array<string> {
@@ -409,24 +455,68 @@ export class LiveExecutionTracker {
     const errorElementIds: Array<string> = elementsWithError.map((element: IShape) => element.id).sort();
 
     for (const element of elementsWithError) {
+      const overlayHtmlId: string = `${element.id}#error-element`;
+
       this.overlays.add(element, {
         position: {
           left: 30,
           top: 25,
         },
-        html: `<div class="let__overlay-button" id="${element.id}"><i class="fas fa-bug let__overlay-button-icon overlay__error-element"></i></div>`,
+        html: `<div class="let__overlay-button" id="${overlayHtmlId}"><i class="fas fa-bug let__overlay-button-icon overlay__error-element"></i></div>`,
       });
 
-      document.getElementById(element.id).addEventListener('click', this.handleErrorElementClick);
-
-      this.elementsWithEventListeners.push(element.id);
+      this.addEventListenerToOverlay(overlayHtmlId);
     }
 
     return errorElementIds;
   }
 
+  private rearrangeOverlaysForElementWithMultipleOverlays(elementsWithOverlays: Array<string>): void {
+    const elementsWithMultipleOverlays: Array<string> = elementsWithOverlays.filter(
+      (element, index, elementArray: Array<string>) => {
+        return elementArray.indexOf(element) === index && elementArray.lastIndexOf(element) !== index;
+      },
+    );
+
+    for (const element of elementsWithMultipleOverlays) {
+      const elementOverlays: Array<IOverlay> = this.elementOverlays(element);
+
+      elementOverlays.forEach((overlay: IOverlay, index: number) => {
+        const overlayHtmlId: string = /id="(.*?)"/g.exec(overlay.html)[1];
+
+        this.removeEventListenerFromOverlay(overlayHtmlId);
+        this.overlays.remove(overlay.id);
+
+        overlay.position.left = 10 + 40 * index;
+
+        this.overlays.add(element, overlay);
+        this.addEventListenerToOverlay(overlayHtmlId);
+      });
+    }
+  }
+
+  private elementOverlays(elementId: string): Array<IOverlay> {
+    const overlaysForElement: Array<IOverlay> = [];
+
+    // eslint-disable-next-line no-underscore-dangle
+    const overlays: IOverlays = this.overlays._overlays;
+    const overlayIds: Array<string> = Object.keys(overlays);
+    for (const overlayId of overlayIds) {
+      const currentOverlay: IOverlay = overlays[overlayId];
+
+      const isOverlayOfElement: boolean = currentOverlay.element.id === elementId;
+
+      if (isOverlayOfElement) {
+        overlaysForElement.push(currentOverlay);
+      }
+    }
+
+    return overlaysForElement;
+  }
+
   private handleErrorElementClick: (event: MouseEvent) => void = (event: MouseEvent): void => {
-    const elementId: string = (event.target as HTMLDivElement).id;
+    const overlayHtmlId: string = (event.target as HTMLDivElement).id;
+    const elementId: string = this.getElementIdByOverlayHtmlId(overlayHtmlId);
 
     this.router.navigateToRoute('inspect', {
       view: 'inspect-correlation',
@@ -452,17 +542,17 @@ export class LiveExecutionTracker {
     const activeEmptyActivitiesIds: Array<string> = activeEmptyActivities.map((element: IShape) => element.id).sort();
 
     for (const element of activeEmptyActivities) {
+      const overlayHtmlId: string = `${element.id}#empty-activity`;
+
       this.overlays.add(element, {
         position: {
           left: 30,
           top: 25,
         },
-        html: `<div class="let__overlay-button" id="${element.id}"><i class="fas fa-play let__overlay-button-icon overlay__empty-task"></i></div>`,
+        html: `<div class="let__overlay-button" id="${overlayHtmlId}"><i class="fas fa-play let__overlay-button-icon overlay__empty-task"></i></div>`,
       });
 
-      document.getElementById(element.id).addEventListener('click', this.handleEmptyActivityClick);
-
-      this.elementsWithEventListeners.push(element.id);
+      this.addEventListenerToOverlay(overlayHtmlId);
     }
 
     return activeEmptyActivitiesIds;
@@ -486,59 +576,45 @@ export class LiveExecutionTracker {
       .sort();
 
     for (const element of activeManualAndUserTasks) {
+      const overlayHtmlId: string = `${element.id}#manual-user-task`;
+
       this.overlays.add(element, {
         position: {
           left: 30,
           top: 25,
         },
-        html: `<div class="let__overlay-button" id="${element.id}"><i class="fas fa-play let__overlay-button-icon"></i></div>`,
+        html: `<div class="let__overlay-button" id="${overlayHtmlId}"><i class="fas fa-play let__overlay-button-icon"></i></div>`,
       });
 
-      document.getElementById(element.id).addEventListener('click', this.handleTaskClick);
-
-      this.elementsWithEventListeners.push(element.id);
+      this.addEventListenerToOverlay(overlayHtmlId);
     }
 
     return activeManualAndUserTaskIds;
   }
 
-  private addOverlaysToInactiveCallActivities(callActivities: Array<IShape>): void {
+  private addOverlaysToInactiveCallActivities(inactiveCallActivities: Array<IShape>): Array<string> {
     const liveExecutionTrackerIsNotAttached: boolean = !this.isAttached;
     if (liveExecutionTrackerIsNotAttached) {
-      return;
+      return [];
     }
 
-    const callActivityIds: Array<string> = callActivities.map((element: IShape) => element.id).sort();
+    const callActivityIds: Array<string> = inactiveCallActivities.map((element: IShape) => element.id).sort();
 
-    // eslint-disable-next-line no-underscore-dangle
-    const overlayIds: Array<string> = Object.keys(this.overlays._overlays);
-    const allCallActivitiesHaveAnOverlay: boolean = callActivityIds.every((callActivityId: string): boolean => {
-      const overlayFound: boolean =
-        overlayIds.find((overlayId: string): boolean => {
-          // eslint-disable-next-line no-underscore-dangle
-          return this.overlays._overlays[overlayId].element.id === callActivityId;
-        }) !== undefined;
+    for (const element of inactiveCallActivities) {
+      const overlayHtmlId: string = `${element.id}#inactive-call-activity`;
 
-      return overlayFound;
-    });
-
-    if (allCallActivitiesHaveAnOverlay) {
-      return;
-    }
-
-    for (const element of callActivities) {
       this.overlays.add(element, {
         position: {
           left: 30,
           top: 25,
         },
-        html: `<div class="let__overlay-button" id="${element.id}"><i class="fas fa-search let__overlay-button-icon"></i></div>`,
+        html: `<div class="let__overlay-button" id="${overlayHtmlId}"><i class="fas fa-search let__overlay-button-icon"></i></div>`,
       });
 
-      document.getElementById(element.id).addEventListener('click', this.handleInactiveCallActivityClick);
-
-      this.elementsWithEventListeners.push(element.id);
+      this.addEventListenerToOverlay(overlayHtmlId);
     }
+
+    return callActivityIds;
   }
 
   private addOverlaysToActiveCallActivities(activeElements: Array<IShape>): Array<string> {
@@ -558,30 +634,34 @@ export class LiveExecutionTracker {
     this.activeCallActivities = activeCallActivities;
 
     for (const element of activeCallActivities) {
+      const overlayHtmlId: string = `${element.id}#active-call-activity`;
+
       this.overlays.add(element, {
         position: {
           left: 30,
           top: 25,
         },
-        html: `<div class="let__overlay-button" id="${element.id}"><i class="fas fa-external-link-square-alt let__overlay-button-icon"></i></div>`,
+        html: `<div class="let__overlay-button" id="${overlayHtmlId}"><i class="fas fa-external-link-square-alt let__overlay-button-icon"></i></div>`,
       });
 
-      document.getElementById(element.id).addEventListener('click', this.handleActiveCallActivityClick);
-
-      this.elementsWithEventListeners.push(element.id);
+      this.addEventListenerToOverlay(overlayHtmlId);
     }
 
     return activeCallActivityIds;
   }
 
   private handleTaskClick: (event: MouseEvent) => void = (event: MouseEvent): void => {
-    const elementId: string = (event.target as HTMLDivElement).id;
+    const overlayHtmlId: string = (event.target as HTMLDivElement).id;
+    const elementId: string = this.getElementIdByOverlayHtmlId(overlayHtmlId);
+
     this.taskId = elementId;
     this.showDynamicUiModal = true;
   };
 
   private handleEmptyActivityClick: (event: MouseEvent) => void = async (event: MouseEvent): Promise<void> => {
-    const elementId: string = (event.target as HTMLDivElement).id;
+    const overlayHtmlId: string = (event.target as HTMLDivElement).id;
+    const elementId: string = this.getElementIdByOverlayHtmlId(overlayHtmlId);
+
     this.taskId = elementId;
 
     const emptyActivitiesInProcessInstance: DataModels.EmptyActivities.EmptyActivityList = await this.liveExecutionTrackerService.getEmptyActivitiesForProcessInstance(
@@ -606,8 +686,10 @@ export class LiveExecutionTracker {
   private handleActiveCallActivityClick: (event: MouseEvent) => Promise<void> = async (
     event: MouseEvent,
   ): Promise<void> => {
-    const elementId: string = (event.target as HTMLDivElement).id;
+    const overlayHtmlId: string = (event.target as HTMLDivElement).id;
+    const elementId: string = this.getElementIdByOverlayHtmlId(overlayHtmlId);
     const element: IShape = this.liveExecutionTrackerService.getElementById(elementId);
+
     const callActivityTargetProcess: string = element.businessObject.calledElement;
 
     const callAcitivityHasNoTargetProcess: boolean = callActivityTargetProcess === undefined;
@@ -627,8 +709,7 @@ export class LiveExecutionTracker {
 
     const errorGettingTargetProcessInstanceId: boolean = targetProcessInstanceId === undefined;
     if (errorGettingTargetProcessInstanceId) {
-      const errorMessage: string =
-        'Could not get processInstanceId of the target process. Please try to click on the call activity again.';
+      const errorMessage: string = 'Target process of call activity not found.';
 
       this.notificationService.showNotification(NotificationType.ERROR, errorMessage);
       return;
@@ -645,7 +726,8 @@ export class LiveExecutionTracker {
   private handleInactiveCallActivityClick: (event: MouseEvent) => Promise<void> = async (
     event: MouseEvent,
   ): Promise<void> => {
-    const elementId: string = (event.target as HTMLDivElement).id;
+    const overlayHtmlId: string = (event.target as HTMLDivElement).id;
+    const elementId: string = this.getElementIdByOverlayHtmlId(overlayHtmlId);
     const element: IShape = this.liveExecutionTrackerService.getElementById(elementId);
     const callActivityTargetProcess: string = element.businessObject.calledElement;
 
@@ -745,6 +827,10 @@ export class LiveExecutionTracker {
     });
 
     return xmlImportPromise;
+  }
+
+  private getElementIdByOverlayHtmlId(overlayHtmlId: string): string {
+    return overlayHtmlId.substring(0, overlayHtmlId.lastIndexOf('#'));
   }
 
   private async importXmlIntoDiagramPreviewViewer(xml: string): Promise<void> {

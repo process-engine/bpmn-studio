@@ -492,7 +492,7 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
       return undefined;
     }
 
-    const {processInstanceId} = correlation.processInstances.find(
+    const processInstance: DataModels.Correlations.CorrelationProcessInstance = correlation.processInstances.find(
       (correlationProcessInstance: DataModels.Correlations.CorrelationProcessInstance): boolean => {
         const targetProcessModelFound: boolean =
           correlationProcessInstance.parentProcessInstanceId === processInstanceIdOfOrigin &&
@@ -502,7 +502,9 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
       },
     );
 
-    return processInstanceId;
+    const processInstanceFound: boolean = processInstance !== undefined;
+
+    return processInstanceFound ? processInstance.processInstanceId : undefined;
   }
 
   public async clearDiagramColors(xml: string): Promise<string> {
