@@ -40,7 +40,7 @@ export class DiagramViewer {
   private diagramModeler: IBpmnModeler;
   private diagramViewer: IBpmnModeler;
   private modeling: IModeling;
-  private uncoloredXml: string;
+  private xmlWithColorizedProgress: string;
   private uncoloredSVG: string;
   private subscriptions: Array<Subscription>;
   private diagramExportService: IDiagramExportService;
@@ -83,7 +83,7 @@ export class DiagramViewer {
         try {
           const exportName: string = `${this.activeDiagram.name}.bpmn`;
           await this.diagramExportService
-            .loadXML(this.uncoloredXml)
+            .loadXML(this.xmlWithColorizedProgress)
             .asBpmn()
             .export(exportName);
         } catch (error) {
@@ -200,15 +200,15 @@ export class DiagramViewer {
 
     this.xml = this.processInstance.xml;
 
-    this.uncoloredXml = await this.liveExecutionTrackerService.getColorizedDiagram(
+    this.xmlWithColorizedProgress = await this.liveExecutionTrackerService.getColorizedDiagram(
       this.activeSolutionEntry.identity,
       this.xml,
       this.processInstance.processInstanceId,
       true,
     );
 
-    await this.importXml(this.diagramModeler, this.uncoloredXml);
-    await this.importXml(this.diagramViewer, this.uncoloredXml);
+    await this.importXml(this.diagramModeler, this.xmlWithColorizedProgress);
+    await this.importXml(this.diagramViewer, this.xmlWithColorizedProgress);
     this.uncoloredSVG = await this.getSVG();
 
     const elementSelected: boolean = this.selectedFlowNode !== undefined;
@@ -265,7 +265,7 @@ export class DiagramViewer {
   }
 
   private async colorizeSelection(selectedElement: IShape): Promise<void> {
-    await this.importXml(this.diagramModeler, this.uncoloredXml);
+    await this.importXml(this.diagramModeler, this.xmlWithColorizedProgress);
 
     const elementToColorize: IShape = this.elementRegistry.filter((element: IShape): boolean => {
       const isSelectedElement: boolean = element.id === selectedElement.id;
