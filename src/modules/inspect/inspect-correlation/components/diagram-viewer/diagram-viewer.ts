@@ -275,7 +275,12 @@ export class DiagramViewer {
       return isSelectedElement;
     })[0];
 
-    this.colorElement(elementToColorize, defaultBpmnColors.grey);
+    const previousColorWithGreyFill: IColorPickerColor = {
+      fill: defaultBpmnColors.grey.fill,
+      border: elementToColorize.businessObject.di.stroke,
+    };
+
+    this.colorElement(elementToColorize, previousColorWithGreyFill);
 
     const colorizedXml: string = await this.getXmlFromModeler();
     this.importXml(this.diagramViewer, colorizedXml);
