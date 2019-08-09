@@ -219,8 +219,8 @@ export class DiagramViewer {
         return isSelectedElement;
       });
 
-      const correlationHasSameElementASelected: boolean = elementsToColorize.length > 0;
-      if (correlationHasSameElementASelected) {
+      const correlationHasSameElementAsPreviouslySelected: boolean = elementsToColorize.length > 0;
+      if (correlationHasSameElementAsPreviouslySelected) {
         this.colorizeSelection(this.selectedFlowNode);
 
         const colorizedXml: string = await this.getXmlFromModeler();
