@@ -206,17 +206,17 @@ Der Prozess wird bei erreichen des Events beendet.
 
 #### SignalEndEvent
 
-<img src="./bpmn-elements-svg/Signalendevent.svg">
+<img src="./bpmn-elements-svg/signalendevent.svg">
 
 #### MessageEndEvent
 
-<img src="./bpmn-elements-svg/Messageendevent.svg">
+<img src="./bpmn-elements-svg/messageendevent.svg">
 
 #### TerminateEndEvent
 
-<img src="./bpmn-elements-svg/errorendevent.svg">
+<img src="./bpmn-elements-svg/terminateendevent.svg">
 
 #### EscalationEndEvent
 
-<img src="./bpmn-elements-svg/Escalationendevent.svg">
+<img src="./bpmn-elements-svg/escalationendevent.svg">
 
