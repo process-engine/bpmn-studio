@@ -200,9 +200,11 @@ export class DiagramViewer {
 
     this.xml = this.processInstance.xml;
 
+    const uncoloredXml: string = await this.liveExecutionTrackerService.clearDiagramColors(this.xml);
+
     this.xmlWithColorizedProgress = await this.liveExecutionTrackerService.getColorizedDiagram(
       this.activeSolutionEntry.identity,
-      this.xml,
+      uncoloredXml,
       this.processInstance.processInstanceId,
       true,
     );
