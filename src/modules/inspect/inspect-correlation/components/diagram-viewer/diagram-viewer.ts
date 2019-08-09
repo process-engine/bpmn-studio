@@ -281,27 +281,6 @@ export class DiagramViewer {
     this.importXml(this.diagramViewer, colorizedXml);
   }
 
-  private clearColors(): void {
-    const elementsWithColor: Array<IShape> = this.elementRegistry.filter((element: IShape): boolean => {
-      const elementHasFillColor: boolean = element.businessObject.di.fill !== undefined;
-      const elementHasBorderColor: boolean = element.businessObject.di.stroke !== undefined;
-
-      const elementHasColor: boolean = elementHasFillColor || elementHasBorderColor;
-
-      return elementHasColor;
-    });
-
-    const noElementsWithColor: boolean = elementsWithColor.length === 0;
-    if (noElementsWithColor) {
-      return;
-    }
-
-    this.modeling.setColor(elementsWithColor, {
-      stroke: defaultBpmnColors.none.border,
-      fill: defaultBpmnColors.none.fill,
-    });
-  }
-
   private colorElement(element: IShape, color: IColorPickerColor): void {
     this.modeling.setColor(element, {
       stroke: color.border,
