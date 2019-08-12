@@ -16,6 +16,7 @@ export {IEditorActions} from './IEditorActions';
 export {IEventFunction} from './IEventFunction';
 export {IBpmnXmlSaveOptions} from './IBpmnXmlSaveOptions';
 export {IOverlay} from './IOverlay';
+export {IOverlays} from './IOverlays';
 export {IOverlayManager} from './IOverlayManager';
 export {IOverlayDescriptor} from './IOverlayDescriptor';
 export {IOverlayPosition} from './IOverlayPosition';

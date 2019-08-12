@@ -15,19 +15,22 @@ import {
   IElementRegistry,
   IEvent,
   IModeling,
+  ISolutionEntry,
   NotificationType,
   defaultBpmnColors,
 } from '../../../../../contracts/index';
 import environment from '../../../../../environment';
 import {NotificationService} from '../../../../../services/notification-service/notification.service';
 import {DiagramExportService} from '../../../../design/bpmn-io/services/index';
+import {ILiveExecutionTrackerService} from '../../../../live-execution-tracker/contracts';
 
-@inject('NotificationService', EventAggregator)
+@inject('NotificationService', EventAggregator, 'LiveExecutionTrackerService')
 export class DiagramViewer {
   @bindable public processInstance: DataModels.Correlations.CorrelationProcessInstance;
   @bindable public xml: string;
   @bindable public activeDiagram: IDiagram;
   @bindable public selectedFlowNode: IShape;
+  @bindable public activeSolutionEntry: ISolutionEntry;
   public noCorrelationsFound: boolean;
   public xmlIsNotSelected: boolean = true;
   public canvasModel: HTMLElement;
@@ -37,16 +40,23 @@ export class DiagramViewer {
   private diagramModeler: IBpmnModeler;
   private diagramViewer: IBpmnModeler;
   private modeling: IModeling;
-  private uncoloredXml: string;
+  private xmlWithColorizedProgress: string;
   private uncoloredSVG: string;
   private subscriptions: Array<Subscription>;
   private diagramExportService: IDiagramExportService;
   private eventAggregator: EventAggregator;
+  private flowNodeToSetAfterProcessInstanceIsSet: string;
+  private liveExecutionTrackerService: ILiveExecutionTrackerService;
 
-  constructor(notificationService: NotificationService, eventAggregator: EventAggregator) {
+  constructor(
+    notificationService: NotificationService,
+    eventAggregator: EventAggregator,
+    liveExecutionTrackerService: ILiveExecutionTrackerService,
+  ) {
     this.notificationService = notificationService;
     this.diagramExportService = new DiagramExportService();
     this.eventAggregator = eventAggregator;
+    this.liveExecutionTrackerService = liveExecutionTrackerService;
   }
 
   public attached(): void {
@@ -73,7 +83,7 @@ export class DiagramViewer {
         try {
           const exportName: string = `${this.activeDiagram.name}.bpmn`;
           await this.diagramExportService
-            .loadXML(this.uncoloredXml)
+            .loadXML(this.xmlWithColorizedProgress)
             .asBpmn()
             .export(exportName);
         } catch (error) {
@@ -138,6 +148,22 @@ export class DiagramViewer {
     ];
   }
 
+  public selectFlowNode(flowNodeId: string): void {
+    if (this.processInstance === undefined) {
+      this.flowNodeToSetAfterProcessInstanceIsSet = flowNodeId;
+
+      return;
+    }
+
+    const elementRegistry: IElementRegistry = this.diagramViewer.get('elementRegistry');
+    const element: IShape = elementRegistry.get(flowNodeId);
+
+    this.diagramViewer.get('selection').select(element);
+
+    this.selectedFlowNode = element;
+    this.colorizeSelection(element);
+  }
+
   public detached(): void {
     const bjsContainer: Element = this.canvasModel.getElementsByClassName('bjs-container')[0];
 
@@ -174,11 +200,17 @@ export class DiagramViewer {
 
     this.xml = this.processInstance.xml;
 
-    await this.importXml(this.diagramModeler, this.xml);
-    this.clearColors();
-    this.uncoloredXml = await this.getXmlFromModeler();
+    const uncoloredXml: string = await this.liveExecutionTrackerService.clearDiagramColors(this.xml);
 
-    await this.importXml(this.diagramViewer, this.uncoloredXml);
+    this.xmlWithColorizedProgress = await this.liveExecutionTrackerService.getColorizedDiagram(
+      this.activeSolutionEntry.identity,
+      uncoloredXml,
+      this.processInstance.processInstanceId,
+      true,
+    );
+
+    await this.importXml(this.diagramModeler, this.xmlWithColorizedProgress);
+    await this.importXml(this.diagramViewer, this.xmlWithColorizedProgress);
     this.uncoloredSVG = await this.getSVG();
 
     const elementSelected: boolean = this.selectedFlowNode !== undefined;
@@ -189,8 +221,8 @@ export class DiagramViewer {
         return isSelectedElement;
       });
 
-      const correlationHasSameElementASelected: boolean = elementsToColorize.length > 0;
-      if (correlationHasSameElementASelected) {
+      const correlationHasSameElementAsPreviouslySelected: boolean = elementsToColorize.length > 0;
+      if (correlationHasSameElementAsPreviouslySelected) {
         this.colorizeSelection(this.selectedFlowNode);
 
         const colorizedXml: string = await this.getXmlFromModeler();
@@ -201,6 +233,13 @@ export class DiagramViewer {
     }
 
     this.fitDiagramToViewport();
+
+    const flowNodeNeedsToBeSelected: boolean = this.flowNodeToSetAfterProcessInstanceIsSet !== undefined;
+    if (flowNodeNeedsToBeSelected) {
+      this.selectFlowNode(this.flowNodeToSetAfterProcessInstanceIsSet);
+
+      this.flowNodeToSetAfterProcessInstanceIsSet = undefined;
+    }
   }
 
   public activeDiagramChanged(): void {
@@ -228,7 +267,7 @@ export class DiagramViewer {
   }
 
   private async colorizeSelection(selectedElement: IShape): Promise<void> {
-    await this.importXml(this.diagramModeler, this.uncoloredXml);
+    await this.importXml(this.diagramModeler, this.xmlWithColorizedProgress);
 
     const elementToColorize: IShape = this.elementRegistry.filter((element: IShape): boolean => {
       const isSelectedElement: boolean = element.id === selectedElement.id;
@@ -236,31 +275,15 @@ export class DiagramViewer {
       return isSelectedElement;
     })[0];
 
-    this.colorElement(elementToColorize, defaultBpmnColors.grey);
+    const previousColorWithGreyFill: IColorPickerColor = {
+      fill: defaultBpmnColors.grey.fill,
+      border: elementToColorize.businessObject.di.stroke,
+    };
+
+    this.colorElement(elementToColorize, previousColorWithGreyFill);
 
     const colorizedXml: string = await this.getXmlFromModeler();
     this.importXml(this.diagramViewer, colorizedXml);
-  }
-
-  private clearColors(): void {
-    const elementsWithColor: Array<IShape> = this.elementRegistry.filter((element: IShape): boolean => {
-      const elementHasFillColor: boolean = element.businessObject.di.fill !== undefined;
-      const elementHasBorderColor: boolean = element.businessObject.di.stroke !== undefined;
-
-      const elementHasColor: boolean = elementHasFillColor || elementHasBorderColor;
-
-      return elementHasColor;
-    });
-
-    const noElementsWithColor: boolean = elementsWithColor.length === 0;
-    if (noElementsWithColor) {
-      return;
-    }
-
-    this.modeling.setColor(elementsWithColor, {
-      stroke: defaultBpmnColors.none.border,
-      fill: defaultBpmnColors.none.fill,
-    });
   }
 
   private colorElement(element: IShape, color: IColorPickerColor): void {

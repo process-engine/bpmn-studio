@@ -15,6 +15,7 @@ import {IProcessInstanceWithCorrelation} from '../../../../contracts/index';
 
 @inject(EventAggregator)
 export class CorrelationList {
+  @bindable public processInstanceToSelect: string;
   @bindable public selectedProcessInstance: DataModels.Correlations.CorrelationProcessInstance;
   @bindable public selectedCorrelation: DataModels.Correlations.Correlation;
   @bindable public correlations: Array<DataModels.Correlations.Correlation>;
@@ -91,6 +92,17 @@ export class CorrelationList {
       this.sortSettings.ascending = true;
 
       this.sortList(CorrelationListSortProperty.Number);
+    }
+
+    const processInstanceToSelectExists: boolean = this.processInstanceToSelect !== undefined;
+    if (processInstanceToSelectExists) {
+      const entryToSelect: ICorrelationTableEntry = this.sortedTableData.find((entry: ICorrelationTableEntry) => {
+        return entry.processInstanceId === this.processInstanceToSelect;
+      });
+
+      this.selectCorrelation(entryToSelect);
+
+      this.processInstanceToSelect = undefined;
     }
   }
 

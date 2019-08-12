@@ -4,7 +4,7 @@ import {activationStrategy} from 'aurelia-router';
 
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 
-import {ISolutionEntry, ISolutionService, NotificationType} from '../../contracts/index';
+import {ISolutionEntry, ISolutionService, InspectPanelTab, NotificationType} from '../../contracts/index';
 import environment from '../../environment';
 import {NotificationService} from '../../services/notification-service/notification.service';
 import {Dashboard} from './dashboard/dashboard';
@@ -13,6 +13,9 @@ interface IInspectRouteParameters {
   view?: string;
   diagramName?: string;
   solutionUri?: string;
+  processInstanceToSelect?: string;
+  flowNodeToSelect?: string;
+  inspectPanelTabToShow?: InspectPanelTab;
 }
 
 @inject(EventAggregator, 'SolutionService', 'NotificationService')
@@ -26,6 +29,9 @@ export class Inspect {
   public dashboard: Dashboard;
   public showTokenViewer: boolean = false;
   public tokenViewerButtonDisabled: boolean = false;
+  public processInstanceToSelect: string;
+  public flowNodeToSelect: string;
+  public inspectPanelTabToShow: InspectPanelTab;
 
   private eventAggregator: EventAggregator;
   private subscriptions: Array<Subscription>;
@@ -73,6 +79,10 @@ export class Inspect {
     const routeViewIsDashboard: boolean = routeParameters.view === 'dashboard';
     const routeViewIsHeatmap: boolean = routeParameters.view === 'heatmap';
     const routeViewIsInspectCorrelation: boolean = routeParameters.view === 'inspect-correlation';
+
+    this.processInstanceToSelect = routeParameters.processInstanceToSelect;
+    this.flowNodeToSelect = routeParameters.flowNodeToSelect;
+    this.inspectPanelTabToShow = routeParameters.inspectPanelTabToShow;
 
     if (routeViewIsDashboard) {
       this.showHeatmap = false;
