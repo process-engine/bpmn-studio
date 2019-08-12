@@ -968,6 +968,7 @@ export class SolutionExplorerSolution {
 
       const diagramIndex: number = parseInt(diagram.name.replace('Untitled-', ''));
 
+      // eslint-disable-next-line no-restricted-globals
       return !isNaN(diagramIndex);
     });
 
