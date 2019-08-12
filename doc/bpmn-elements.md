@@ -139,6 +139,8 @@ Der Prozess wird anhand eines Timers im Cronjob format gestartet.
 
 <img src="./bpmn-elements-svg/intermediatethrowevent.svg">
 
+Wird ausgeführt.
+
 #### IntermediateLinkCatchEvent
 
 <img src="./bpmn-elements-svg/intermediatelinkcatchevent.svg">
@@ -161,19 +163,25 @@ Es kann ein Datum oder eine Dauer/Duration gesetzt werden, an dem die Ausführun
 
 <img src="./bpmn-elements-svg/signalintermediatecatchevent.svg">
 
+Fängt ein Signal und führt den Prozess am ausgehenden Pfad weiter.
+
 #### SignalIntermediateThrowEvent
 
 <img src="./bpmn-elements-svg/signalintermediatethrowevent.svg">
 
+Wirft ein Signal und führt den Prozess am ausgehenden Pfad weiter.
 
 #### MessageIntermediateCatchEvent
 
 <img src="./bpmn-elements-svg/messagecatchevent.svg">
 
+Fängt eine Message und führt den Prozess am ausgehenden Pfad weiter.
 
 #### MessageIntermediateThrowEvent
 
 <img src="./bpmn-elements-svg/messagethrowevent.svg">
+
+Wirft eine Message und führt den Prozess am ausgehenden Pfad weiter.
 
 ### BoundaryEvents
 
@@ -181,18 +189,51 @@ Es kann ein Datum oder eine Dauer/Duration gesetzt werden, an dem die Ausführun
 
 <img src="./bpmn-elements-svg/errorboundaryevent.svg">
 
+Im Fall eines Errors am zugehörigen Task wird der Prozess am ausgehenden
+Pfad des BoundaryEvents weitergeführt.
+
+#### SignalBoundaryEvent
+
+<img src="./bpmn-elements-svg/signalboundaryevent.svg">
+
+Wenn ein Signal empfangen wird läuft der Prozess am ausgehenden
+Pfad des BoundaryEvents weiter. 
+
+#### MessageBoundaryEvent
+
+<img src="./bpmn-elements-svg/messageboundaryevent.svg">
+
+Wenn eine Message empfangen wird läuft der Prozess am ausgehenden
+Pfad des BoundaryEvents weiter. 
+
+#### TimerBoundaryEvent
+
+<img src="./bpmn-elements-svg/timerboundaryevent.svg">
+
+Wenn das konfigurierte Datum oder die zu wartende Dauer erreicht wurde, 
+wird läuft der Prozess am ausgehenden
+Pfad des BoundaryEvents weiter. 
+
 #### NonInterruptingMessageBoundaryEvent
 
 <img src="./bpmn-elements-svg/noninterruptingmessageboundaryevent.svg">
 
+Bricht den Task beim Empfangen einer Message nicht ab und führt den Prozess
+zusätzlich am ausgehenden Pfad weiter.
 
 #### NonInterruptingSignalBoundaryEvent
 
 <img src="./bpmn-elements-svg/noninterruptingsignalboundaryevent.svg">
 
+Bricht den Task beim Empfangen eines Signals nicht ab und führt den Prozess
+zusätzlich am ausgehenden Pfad weiter.
+
 #### NonInterruptingTimerBoundaryEvent
 
 <img src="./bpmn-elements-svg/noninterruptingtimerboundaryevent.svg">
+
+Bricht den Task nach Ablauf des Datums/der Dauer nicht ab und führt den Prozess
+zusätzlich am ausgehenden Pfad weiter.
 
 ### EndEvents
 
@@ -204,19 +245,22 @@ Der Prozess wird bei erreichen des Events beendet.
 
 <img src="./bpmn-elements-svg/errorendevent.svg">
 
+???
+
 #### SignalEndEvent
 
 <img src="./bpmn-elements-svg/signalendevent.svg">
+
+Sendet beim beenden des Prozesses ein Signal.
 
 #### MessageEndEvent
 
 <img src="./bpmn-elements-svg/messageendevent.svg">
 
+Sendet beim beenden des Prozesses eine Message.
+
 #### TerminateEndEvent
 
 <img src="./bpmn-elements-svg/terminateendevent.svg">
 
-#### EscalationEndEvent
-
-<img src="./bpmn-elements-svg/escalationendevent.svg">
-
+???
