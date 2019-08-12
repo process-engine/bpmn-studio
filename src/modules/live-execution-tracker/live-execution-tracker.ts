@@ -381,8 +381,8 @@ export class LiveExecutionTracker {
       this.processInstanceId,
     );
 
-    this.overlays.clear();
     this.removeEventListenerFromOverlays();
+    this.overlays.clear();
 
     const userAndManualTaskOverlays: Array<string> = this.addOverlaysToUserAndManualTasks(elementsWithActiveToken);
     const emptyActivityOverlays: Array<string> = this.addOverlaysToEmptyActivities(elementsWithActiveToken);
@@ -422,7 +422,16 @@ export class LiveExecutionTracker {
   private removeEventListenerFromOverlay(overlayHtmlId: string): void {
     const functionToRemove: EventListenerOrEventListenerObject = this.getEventListenerForOverlayId(overlayHtmlId);
 
-    document.getElementById(overlayHtmlId).removeEventListener('click', functionToRemove);
+    const elementWithEventListener: HTMLElement = document.getElementById(overlayHtmlId);
+
+    const elementIsAlreadyRemoved: boolean = elementWithEventListener === null;
+    if (elementIsAlreadyRemoved) {
+      this.overlaysWithEventListeners.splice(this.overlaysWithEventListeners.indexOf(overlayHtmlId), 1);
+
+      return;
+    }
+
+    elementWithEventListener.removeEventListener('click', functionToRemove);
 
     this.overlaysWithEventListeners.splice(this.overlaysWithEventListeners.indexOf(overlayHtmlId), 1);
   }
