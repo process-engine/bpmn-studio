@@ -463,7 +463,7 @@ export class LiveExecutionTracker {
           left: 30,
           top: 25,
         },
-        html: `<div class="let__overlay-button" id="${overlayHtmlId}"><i class="fas fa-bug let__overlay-button-icon overlay__error-element"></i></div>`,
+        html: `<div class="let__overlay-button" id="${overlayHtmlId}" title="Open process instance in Inspect Correlation."><i class="fas fa-bug let__overlay-button-icon overlay__error-element"></i></div>`,
       });
 
       this.addEventListenerToOverlay(overlayHtmlId);
@@ -551,7 +551,7 @@ export class LiveExecutionTracker {
           left: 30,
           top: 25,
         },
-        html: `<div class="let__overlay-button" id="${overlayHtmlId}"><i class="fas fa-play let__overlay-button-icon overlay__empty-task"></i></div>`,
+        html: `<div class="let__overlay-button" id="${overlayHtmlId}" title="Continue empty activity."><i class="fas fa-play let__overlay-button-icon overlay__empty-task"></i></div>`,
       });
 
       this.addEventListenerToOverlay(overlayHtmlId);
@@ -585,7 +585,7 @@ export class LiveExecutionTracker {
           left: 30,
           top: 25,
         },
-        html: `<div class="let__overlay-button" id="${overlayHtmlId}"><i class="fas fa-play let__overlay-button-icon"></i></div>`,
+        html: `<div class="let__overlay-button" id="${overlayHtmlId}" title="Continue task."><i class="fas fa-play let__overlay-button-icon"></i></div>`,
       });
 
       this.addEventListenerToOverlay(overlayHtmlId);
@@ -610,7 +610,7 @@ export class LiveExecutionTracker {
           left: 30,
           top: 25,
         },
-        html: `<div class="let__overlay-button" id="${overlayHtmlId}"><i class="fas fa-search let__overlay-button-icon"></i></div>`,
+        html: `<div class="let__overlay-button" id="${overlayHtmlId}" title="Show target process."><i class="fas fa-search let__overlay-button-icon"></i></div>`,
       });
 
       this.addEventListenerToOverlay(overlayHtmlId);
@@ -643,7 +643,7 @@ export class LiveExecutionTracker {
           left: 30,
           top: 25,
         },
-        html: `<div class="let__overlay-button" id="${overlayHtmlId}"><i class="fas fa-external-link-square-alt let__overlay-button-icon"></i></div>`,
+        html: `<div class="let__overlay-button" id="${overlayHtmlId}" title="Show target process."><i class="fas fa-external-link-square-alt let__overlay-button-icon"></i></div>`,
       });
 
       this.addEventListenerToOverlay(overlayHtmlId);
