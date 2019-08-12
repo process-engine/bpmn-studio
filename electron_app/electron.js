@@ -4,11 +4,7 @@
 /* eslint-disable no-underscore-dangle */
 const electron = require('electron');
 
-const {
-  ipcMain,
-  dialog,
-  app,
-} = electron;
+const {ipcMain, dialog, app} = electron;
 
 const autoUpdater = require('electron-updater').autoUpdater;
 const CancellationToken = require('electron-updater').CancellationToken;
@@ -22,12 +18,8 @@ const studioVersion = require('../package.json').version;
 const electronOidc = require('./electron-oidc');
 const oidcConfig = require('./oidc-config');
 
-const {
-  ReleaseChannel,
-} = require('../src/services/release-channel-service/release-channel-service');
-const {
-  getDefaultPorts,
-} = require('../src/services/default-ports-module/default-ports-module');
+const {ReleaseChannel} = require('../src/services/release-channel-service/release-channel-service');
+const {getDefaultPorts} = require('../src/services/default-ports-module/default-ports-module');
 
 const releaseChannel = new ReleaseChannel(studioVersion);
 
@@ -353,7 +345,8 @@ Main._createMainWindow = () => {
 
       const filename = dialog.showSaveDialog({
         defaultPath: defaultFilename,
-        filters: [{
+        filters: [
+          {
             name: fileType,
             extensions: [fileExtension],
           },
@@ -378,7 +371,8 @@ Main._createMainWindow = () => {
   function setSaveDiagramAs() {
     electron.ipcMain.on('open_save-diagram-as_dialog', (event) => {
       const filePath = dialog.showSaveDialog({
-        filters: [{
+        filters: [
+          {
             name: 'BPMN',
             extensions: ['bpmn', 'xml'],
           },
@@ -396,7 +390,8 @@ Main._createMainWindow = () => {
   function setOpenDiagram() {
     electron.ipcMain.on('open_diagram', (event) => {
       const openedFile = dialog.showOpenDialog({
-        filters: [{
+        filters: [
+          {
             name: 'BPMN',
             extensions: ['bpmn', 'xml'],
           },
@@ -431,12 +426,14 @@ Main._createMainWindow = () => {
     const getApplicationMenu = () => {
       return {
         label: 'BPMN-Studio',
-        submenu: [{
+        submenu: [
+          {
             label: 'About BPMN-Studio',
             click: () =>
               openAboutWindow({
-                icon_path: releaseChannel.isDev() ?
-                  path.join(__dirname, '..', 'build/icon.png') : path.join(__dirname, '../../../build/icon.png'),
+                icon_path: releaseChannel.isDev()
+                  ? path.join(__dirname, '..', 'build/icon.png')
+                  : path.join(__dirname, '../../../build/icon.png'),
                 product_name: 'BPMN-Studio',
                 bug_report_url: 'https://github.com/process-engine/bpmn-studio/issues/new',
                 homepage: 'www.process-engine.io',
@@ -463,7 +460,8 @@ Main._createMainWindow = () => {
     const getFileMenu = () => {
       return {
         label: 'File',
-        submenu: [{
+        submenu: [
+          {
             label: 'New Diagram',
             accelerator: 'CmdOrCtrl+N',
             click: () => {
@@ -535,7 +533,8 @@ Main._createMainWindow = () => {
     const getEditMenu = () => {
       return {
         label: 'Edit',
-        submenu: [{
+        submenu: [
+          {
             label: 'Undo',
             accelerator: 'CmdOrCtrl+Z',
             selector: 'undo:',
@@ -602,7 +601,8 @@ Main._createMainWindow = () => {
     const getHelpMenu = () => {
       return {
         label: 'Help',
-        submenu: [{
+        submenu: [
+          {
             label: 'Documentation',
             click: () => {
               const documentationUrl = 'https://www.process-engine.io/documentation/';
