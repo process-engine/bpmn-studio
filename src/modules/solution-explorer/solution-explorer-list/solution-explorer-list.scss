@@ -133,14 +133,15 @@
   margin-left: 2px;
 }
 
-.version-info__old {
+.version-info {
   padding-top: 3px;
   padding-right: 5px;
+}
+
+.version-info--old {
   color: #ffc107;
 }
 
-.version-info__new {
-  padding-top: 3px;
-  padding-right: 5px;
+.version-info--new {
   color: #007bffd4;
 }
