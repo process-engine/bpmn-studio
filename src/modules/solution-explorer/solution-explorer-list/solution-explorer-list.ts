@@ -140,16 +140,16 @@ export class SolutionExplorerList {
     });
   }
 
-  public showPEisNewerInfo(solutionEntry: object & {solutionEntry: ISolutionEntry}): boolean {
+  public isProcessEngineNewerThanInternal(solutionEntry: ISolutionEntry): boolean {
     const internalPEVersion = new SemVer(this.internalProcessEngineVersion);
-    const solutionEntryPEVersion = new SemVer(solutionEntry.solutionEntry.processEngineVersion);
+    const solutionEntryPEVersion = new SemVer(solutionEntry.processEngineVersion);
 
     return internalPEVersion.major < solutionEntryPEVersion.major;
   }
 
-  public showPEisOlderInfo(solutionEntry: object & {solutionEntry: ISolutionEntry}): boolean {
+  public isProcessEngineOlderThanInternal(solutionEntry: ISolutionEntry): boolean {
     const internalPEVersion = new SemVer(this.internalProcessEngineVersion);
-    const solutionEntryPEVersion = new SemVer(solutionEntry.solutionEntry.processEngineVersion);
+    const solutionEntryPEVersion = new SemVer(solutionEntry.processEngineVersion);
 
     return internalPEVersion.major > solutionEntryPEVersion.major;
   }
