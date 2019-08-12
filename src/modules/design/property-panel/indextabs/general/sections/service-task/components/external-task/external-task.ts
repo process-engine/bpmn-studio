@@ -49,8 +49,7 @@ export class ExternalTask {
     if (payloadPropertyExists) {
       return payloadProperty.value;
     }
-      return undefined;
-
+    return undefined;
   }
 
   private setPayloadToModel(value: string): void {
