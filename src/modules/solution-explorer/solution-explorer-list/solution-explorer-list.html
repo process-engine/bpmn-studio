@@ -13,11 +13,14 @@
 
           <div class="solution-entry__left-icon_and_name">
 
-            <i if.bind="solutionEntry.hidden" class="fas fa-angle-right collapse__icon"></i>
-            <i if.bind="!solutionEntry.hidden" class="fas fa-angle-down collapse__icon"></i>
+            <i if.bind="solutionEntry.hidden" class="fas fa-angle-right collapse__icon" title="Expand Solution"></i>
+            <i if.bind="!solutionEntry.hidden" class="fas fa-angle-down collapse__icon" title="Collapse Solution"></i>
   
             <i class="fa ${solutionEntry.fontAwesomeIconClass} solution-entry__solution-icon" title.bind="solutionEntry.fontAwesomeIconClass === 'fa-bolt' ? 'ProcessEngine Disconnected!' : ''"></i>
     
+            <i if.bind="solutionEntry.uri.startsWith('http') && isProcessEngineNewerThanInternal(solutionEntry)" class="fas fa-info-circle version-info version-info--new" click.capture="showNewerModal($event)" title="ProcessEngine is newer. Click to show more information."></i>
+            <i if.bind="solutionEntry.uri.startsWith('http') && isProcessEngineOlderThanInternal(solutionEntry)" class="fas fa-info-circle version-info version-info--old" click.capture="showOlderModal($event)" title="ProcessEngine is outdated. Click to show more information."></i>
+
             <span class="solution-entry__solution-name">${getSolutionName(solutionEntry.uri)}</span>
           </div>
           <div class="solution-entry__solution-path">
@@ -90,4 +93,20 @@
     </div>
 
   </div>
+
+  <modal if.bind="processEngineIsOlderModal"
+         header-text="Older ProcessEngine Version"
+         body-text="The ProcessEngine version is older than the integrated one. Maybe it's time for an update.">
+    <template replace-part="modal-footer">
+      <button type="button" class="btn btn-primary" data-dismiss="modal" click.delegate="processEngineIsOlderModal = false">Okay</button>
+    </template>
+  </modal>
+
+  <modal if.bind="processEngineIsNewerModal"
+         header-text="Newer ProcessEngine Version"
+         body-text="The ProcessEngine version is newer than the built-in, so it may be that the BPMN Studio does not yet support some functionality.">
+    <template replace-part="modal-footer">
+      <button type="button" class="btn btn-primary" data-dismiss="modal" click.delegate="processEngineIsNewerModal = false">Okay</button>
+    </template>
+  </modal>
 </template>

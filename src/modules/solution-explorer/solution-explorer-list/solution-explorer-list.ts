@@ -2,6 +2,8 @@ import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {computedFrom, inject} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 
+import {SemVer} from 'semver';
+
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {IDiagram, ISolution} from '@process-engine/solutionexplorer.contracts';
 import {ISolutionExplorerService} from '@process-engine/solutionexplorer.service.contracts';
@@ -30,7 +32,10 @@ interface IUriToViewModelMap {
   'OpenDiagramService',
 )
 export class SolutionExplorerList {
+  public internalProcessEngineVersion: string;
   public internalSolutionUri: string;
+  public processEngineIsNewerModal: boolean = false;
+  public processEngineIsOlderModal: boolean = false;
   /**
    * Reference on the service used to open open diagrams.
    * This service is also put inside the map.
@@ -135,7 +140,36 @@ export class SolutionExplorerList {
     });
   }
 
+  public isProcessEngineNewerThanInternal(solutionEntry: ISolutionEntry): boolean {
+    const internalPEVersion = new SemVer(this.internalProcessEngineVersion);
+    const solutionEntryPEVersion = new SemVer(solutionEntry.processEngineVersion);
+
+    return internalPEVersion.major < solutionEntryPEVersion.major;
+  }
+
+  public isProcessEngineOlderThanInternal(solutionEntry: ISolutionEntry): boolean {
+    const internalPEVersion = new SemVer(this.internalProcessEngineVersion);
+    const solutionEntryPEVersion = new SemVer(solutionEntry.processEngineVersion);
+
+    return internalPEVersion.major > solutionEntryPEVersion.major;
+  }
+
+  public showNewerModal(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.processEngineIsNewerModal = true;
+  }
+
+  public showOlderModal(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.processEngineIsOlderModal = true;
+  }
+
   public async openSolution(uri: string, insertAtBeginning: boolean = false, identity?: IIdentity): Promise<void> {
+    this.internalProcessEngineVersion = await this.getProcessEngineVersionFromInternalPE(this.internalSolutionUri);
     const uriIsRemote: boolean = uri.startsWith('http');
 
     let solutionExplorer: ISolutionExplorerService;
@@ -151,8 +185,7 @@ export class SolutionExplorerList {
     const identityToUse: IIdentity = identityIsSet ? identity : this.createIdentityForSolutionExplorer();
 
     let processEngineVersion: string;
-    const internalProcessEngineRoute: string = window.localStorage.getItem('InternalProcessEngineRoute');
-    const uriIsNotInternalProcessEngine: boolean = internalProcessEngineRoute !== uri;
+    const uriIsNotInternalProcessEngine: boolean = this.internalSolutionUri !== uri;
 
     try {
       if (uriIsRemote && uriIsNotInternalProcessEngine) {

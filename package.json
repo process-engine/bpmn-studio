@@ -83,6 +83,7 @@
     "print-js": "1.0.47",
     "proxy-polyfill": "0.3.0",
     "pushserve": "^1.0.2",
+    "semver": "^6.3.0",
     "socket.io-client": "2.2.0",
     "spectrum-colorpicker": "1.8.0",
     "sqlite3": "4.0.9"
@@ -99,6 +100,7 @@
     "@process-engine/solutionexplorer.service.contracts": "4.2.0",
     "@types/jasmine": "^3.3.13",
     "@types/node": "^10.0.0",
+    "@types/semver": "^6.0.1",
     "@types/spectrum": "^1.5.31",
     "@types/toastr": "^2.1.37",
     "aurelia-animator-css": "1.0.4",
