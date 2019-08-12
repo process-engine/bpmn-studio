@@ -103,12 +103,7 @@ export class SolutionExplorerList {
     await Promise.all(refreshPromises);
   }
 
-  public toggleSolution(solutionEntry: ISolutionEntry, event?: MouseEvent): void {
-    const target = event.target as EventTarget & {id: string};
-    if (target.id === 'versionInfoTargetOld' || target.id === 'versionInfoTargetNew') {
-      return;
-    }
-
+  public toggleSolution(solutionEntry: ISolutionEntry): void {
     solutionEntry.hidden = !solutionEntry.hidden;
     this.solutionService.persistSolutionsInLocalStorage();
   }
@@ -157,6 +152,20 @@ export class SolutionExplorerList {
     const solutionEntryPEVersion = new SemVer(solutionEntry.solutionEntry.processEngineVersion);
 
     return internalPEVersion.major > solutionEntryPEVersion.major;
+  }
+
+  public showNewerModal(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.processEngineIsNewerModal = true;
+  }
+
+  public showOlderModal(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.processEngineIsOlderModal = true;
   }
 
   public async openSolution(uri: string, insertAtBeginning: boolean = false, identity?: IIdentity): Promise<void> {
