@@ -373,7 +373,7 @@ export class SolutionExplorerList {
 
         const solutionAIsInternalProcessEngine: boolean =
           solutionA.uri === window.localStorage.getItem('InternalProcessEngineRoute');
-        if (solutionAIsInternalProcessEngine) {
+        if (solutionAIsInternalProcessEngine || solutionB.isOpenDiagramService) {
           return 1;
         }
 
