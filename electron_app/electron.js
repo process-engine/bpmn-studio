@@ -174,9 +174,6 @@ Main._initializeApplication = () => {
             title: `Release Notes ${updateInfo.version}`,
             minWidth: 600,
             minHeight: 600,
-            webPreferences: {
-              nodeIntegration: true,
-            },
           });
 
           releaseNotesWindow.loadURL(
