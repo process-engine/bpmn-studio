@@ -135,6 +135,95 @@ export class DiagramViewer {
         },
       ),
     ];
+
+    document.addEventListener('keydown', (event: KeyboardEvent): void => {
+      const noElementSelected: boolean = this.selectFlowNode === undefined;
+      if (noElementSelected) {
+        return;
+      }
+
+      const leftKeyPressed: boolean = event.code === 'ArrowLeft';
+      if (leftKeyPressed) {
+        const elementsThatCanHaveAToken: Array<IShape> = this.getElementsThatCanHaveAToken();
+        const elementsOnTheLeft: Array<IShape> = this.filterElementsOnTheLeftOfTheSelected(elementsThatCanHaveAToken);
+
+        const noElementsAreOnTheLeftOfTheSelected: boolean = elementsOnTheLeft.length === 0;
+        if (noElementsAreOnTheLeftOfTheSelected) {
+          return;
+        }
+
+        const elementsOnTheLeftFilteredByYAxis: Array<IShape> = this.filterElementsByYAxis(elementsOnTheLeft);
+
+        const elementsOnTheLeftFilteredByYAxisIsNotEmpty: boolean = elementsOnTheLeftFilteredByYAxis.length > 0;
+        const elementsToWorkWith: Array<IShape> = elementsOnTheLeftFilteredByYAxisIsNotEmpty
+          ? elementsOnTheLeftFilteredByYAxis
+          : elementsOnTheLeft;
+
+        const closestElementOnTheLeft: IShape = this.getClosestElementByX(elementsToWorkWith);
+
+        this.selectFlowNode(closestElementOnTheLeft.id);
+      }
+    });
+  }
+
+  private getClosestElementByX(elements: Array<IShape>): IShape {
+    return elements.reduce(
+      (previousElement: IShape, currentElement: IShape): IShape => {
+        const noPreviousElementExists: boolean = previousElement === undefined;
+        if (noPreviousElementExists) {
+          return currentElement;
+        }
+
+        const distancePreviousElement: number = Math.abs(this.selectedFlowNode.x - previousElement.x);
+        const distanceCurrentElement: number = Math.abs(this.selectedFlowNode.x - currentElement.x);
+
+        const currentElementIsCloser: boolean = distanceCurrentElement < distancePreviousElement;
+        return currentElementIsCloser ? currentElement : previousElement;
+      },
+    );
+  }
+
+  private getElementsThatCanHaveAToken(): Array<IShape> {
+    return this.elementRegistry.filter((element: IShape) => {
+      const elementCanHaveAToken: boolean =
+        element.type !== 'bpmn:Participant' &&
+        element.type !== 'bpmn:Collaboration' &&
+        element.type !== 'bpmn:Lane' &&
+        element.type !== 'bpmn:LaneSet' &&
+        element.type !== 'label' &&
+        element.type !== 'bpmn:SequenceFlow';
+
+      return elementCanHaveAToken;
+    });
+  }
+
+  private filterElementsOnTheLeftOfTheSelected(elementsToFilter: Array<IShape>): Array<IShape> {
+    return elementsToFilter.filter((element: IShape): boolean => {
+      const elementIsOnTheLeftOfTheSelectedFlowNode: boolean = this.selectedFlowNode.x > element.x;
+
+      return elementIsOnTheLeftOfTheSelectedFlowNode;
+    });
+  }
+
+  private filterElementsByYAxis(elementsToFilter: Array<IShape>): Array<IShape> {
+    return elementsToFilter.filter((element: IShape): boolean => {
+      const elementStartsBetweenSelectedElement: boolean =
+        element.y >= this.selectedFlowNode.y && element.y <= this.selectedFlowNode.y + this.selectedFlowNode.height;
+
+      const elementEndsBetweenSelectedElement: boolean =
+        element.y + element.height >= this.selectedFlowNode.y &&
+        element.y + element.height <= this.selectedFlowNode.y + this.selectedFlowNode.height;
+
+      const elementStartsBeforeSelectedAndEndsAfterSelected: boolean =
+        this.selectedFlowNode.y > element.y &&
+        this.selectedFlowNode.y + this.selectedFlowNode.height < element.y + element.height;
+
+      return (
+        elementStartsBetweenSelectedElement ||
+        elementEndsBetweenSelectedElement ||
+        elementStartsBeforeSelectedAndEndsAfterSelected
+      );
+    });
   }
 
   public selectFlowNode(flowNodeId: string): void {
