@@ -144,6 +144,7 @@ export class DiagramViewer {
 
       const topKeyPressed: boolean = event.code === 'ArrowUp';
       const rightKeyPressed: boolean = event.code === 'ArrowRight';
+      const bottomKeyPressed: boolean = event.code === 'ArrowDown';
       const leftKeyPressed: boolean = event.code === 'ArrowLeft';
 
       if (leftKeyPressed) {
@@ -208,6 +209,27 @@ export class DiagramViewer {
 
         this.selectFlowNode(closestElementAboveSelected.id);
       }
+
+      if (bottomKeyPressed) {
+        const elementsThatCanHaveAToken: Array<IShape> = this.getElementsThatCanHaveAToken();
+        const elementsUnderSelected: Array<IShape> = this.filterElementsUnderTheSelected(elementsThatCanHaveAToken);
+
+        const noElementsAreUnderTheSelected: boolean = elementsUnderSelected.length === 0;
+        if (noElementsAreUnderTheSelected) {
+          return;
+        }
+
+        const elementsUnderSelectedFilteredByXAxis: Array<IShape> = this.filterElementsByXAxis(elementsUnderSelected);
+
+        const elementsUnderSelectedFilteredByYAxisIsNotEmpty: boolean = elementsUnderSelectedFilteredByXAxis.length > 0;
+        const elementsToWorkWith: Array<IShape> = elementsUnderSelectedFilteredByYAxisIsNotEmpty
+          ? elementsUnderSelectedFilteredByXAxis
+          : elementsUnderSelected;
+
+        const closestElementUnderSelected: IShape = this.getClosestElementByY(elementsToWorkWith);
+
+        this.selectFlowNode(closestElementUnderSelected.id);
+      }
     });
   }
 
@@ -262,6 +284,14 @@ export class DiagramViewer {
   private filterElementsAboveTheSelected(elementsToFilter: Array<IShape>): Array<IShape> {
     return elementsToFilter.filter((element: IShape): boolean => {
       const elementIsAboveTheSelectedFlowNode: boolean = this.selectedFlowNode.y > element.y;
+
+      return elementIsAboveTheSelectedFlowNode;
+    });
+  }
+
+  private filterElementsUnderTheSelected(elementsToFilter: Array<IShape>): Array<IShape> {
+    return elementsToFilter.filter((element: IShape): boolean => {
+      const elementIsAboveTheSelectedFlowNode: boolean = this.selectedFlowNode.y < element.y;
 
       return elementIsAboveTheSelectedFlowNode;
     });
