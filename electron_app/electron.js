@@ -600,9 +600,9 @@ Main._createMainWindow = () => {
         label: 'Help',
         submenu: [
           {
-            label: 'Documentation',
+            label: 'Getting Started',
             click: () => {
-              const documentationUrl = 'https://www.process-engine.io/documentation/';
+              const documentationUrl = 'https://www.process-engine.io/docs/getting-started/';
               electron.shell.openExternal(documentationUrl);
             },
           },
