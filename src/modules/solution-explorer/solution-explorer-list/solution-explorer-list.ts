@@ -189,7 +189,18 @@ export class SolutionExplorerList {
 
     try {
       if (uriIsRemote && uriIsNotInternalProcessEngine) {
-        const response: Response = await fetch(uri);
+        const response: Response = await new Promise(
+          async (resolve, reject): Promise<void> => {
+            const timeout: NodeJS.Timeout = setTimeout(() => {
+              reject(new Error('Server did not respond.'));
+            }, 3000);
+
+            const fetchResponse: Response = await fetch(uri);
+            clearTimeout(timeout);
+
+            resolve(fetchResponse);
+          },
+        );
 
         const responseJSON: object & {version: string} = await response.json();
 
@@ -207,7 +218,8 @@ export class SolutionExplorerList {
 
       const errorIsNoProcessEngine: boolean =
         error.message === 'The response was not send by a ProcessEngine.' ||
-        error.message === 'Unexpected token < in JSON at position 0';
+        error.message === 'Unexpected token < in JSON at position 0' ||
+        error.message === 'Server did not respond.';
       if (errorIsNoProcessEngine) {
         throw new Error('There is no processengine running on this uri.');
       }
