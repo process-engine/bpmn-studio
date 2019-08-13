@@ -200,18 +200,19 @@ export class DiagramViewer {
 
     const elementSelected: boolean = this.selectedFlowNode !== undefined;
     if (elementSelected) {
-      const elementsToColorize: Array<IShape> = this.elementRegistry.filter((element: IShape) => {
+      const previouslySelectedElementFound: boolean = this.elementRegistry.getAll().some((element: IShape) => {
         const isSelectedElement: boolean = element.id === this.selectedFlowNode.id;
 
         return isSelectedElement;
       });
 
-      const correlationHasSameElementAsPreviouslySelected: boolean = elementsToColorize.length > 0;
-      if (correlationHasSameElementAsPreviouslySelected) {
+      if (previouslySelectedElementFound) {
         this.selectFlowNode(this.selectedFlowNode.id);
-
-        return;
+      } else {
+        this.selectStartEvent();
       }
+    } else {
+      this.selectStartEvent();
     }
 
     this.fitDiagramToViewport();
@@ -241,6 +242,14 @@ export class DiagramViewer {
 
   public xmlChanged(): void {
     this.xmlIsNotSelected = this.xml === undefined;
+  }
+
+  private selectStartEvent(): void {
+    const startEvent: IShape = this.elementRegistry.filter((element: IShape): boolean => {
+      return element.type === 'bpmn:StartEvent';
+    })[0];
+
+    this.selectFlowNode(startEvent.id);
   }
 
   private fitDiagramToViewport(): void {
