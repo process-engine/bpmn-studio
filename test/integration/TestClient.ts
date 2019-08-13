@@ -1,3 +1,4 @@
+/* eslint-disable no-empty-function */
 import {Application, SpectronWebContents} from 'spectron';
 
 export class TestClient {
@@ -26,11 +27,11 @@ export class TestClient {
     await this.sendKeyboardInput(['enter']);
   }
 
-  public async focusElement(windowId, selector) {}
+  public async focusElement(windowId, selector): Promise<void> {}
 
-  public async getElements(windowId, selector) {}
+  public async getElements(windowId, selector): Promise<void> {}
 
-  public async getWindowIds() {}
+  public async getWindowIds(): Promise<void> {}
 
   public async ensureVisible(selector: string): Promise<boolean> {
     return this.client.waitForVisible(selector);
