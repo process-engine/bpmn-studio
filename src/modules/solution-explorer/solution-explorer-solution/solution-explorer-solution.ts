@@ -960,9 +960,16 @@ export class SolutionExplorerSolution {
 
   private async openNewDiagram(): Promise<void> {
     const unsavedDiagrams: Array<IDiagram> = this.openedDiagrams.filter((diagram: IDiagram): boolean => {
-      const diagramIsUnsavedDiagram: boolean = diagram.name.startsWith('Untitled');
+      const diagramIsUnsavedDiagram: boolean = diagram.name.startsWith('Untitled-');
 
-      return diagramIsUnsavedDiagram;
+      if (!diagramIsUnsavedDiagram) {
+        return false;
+      }
+
+      const diagramIndex: number = parseInt(diagram.name.replace('Untitled-', ''));
+
+      // eslint-disable-next-line no-restricted-globals
+      return !isNaN(diagramIndex);
     });
 
     const unsavedDiagramIndexes: Array<number> = unsavedDiagrams.map((diagram: IDiagram) => {
