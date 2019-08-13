@@ -58,6 +58,10 @@ export class Inspect {
       ? routeParameters.solutionUri
       : window.localStorage.getItem('InternalProcessEngineRoute');
 
+    if (solutionUri === 'about:open-diagrams') {
+      return false;
+    }
+
     this.activeSolutionEntry = this.solutionService.getSolutionEntryForUri(solutionUri);
 
     const noSolutionEntry: boolean = this.activeSolutionEntry === undefined;
