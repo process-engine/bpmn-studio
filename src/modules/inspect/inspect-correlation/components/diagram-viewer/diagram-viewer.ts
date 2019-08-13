@@ -142,6 +142,7 @@ export class DiagramViewer {
         return;
       }
 
+      const topKeyPressed: boolean = event.code === 'ArrowUp';
       const rightKeyPressed: boolean = event.code === 'ArrowRight';
       const leftKeyPressed: boolean = event.code === 'ArrowLeft';
 
@@ -186,7 +187,45 @@ export class DiagramViewer {
 
         this.selectFlowNode(closestElementOnTheRight.id);
       }
+
+      if (topKeyPressed) {
+        const elementsThatCanHaveAToken: Array<IShape> = this.getElementsThatCanHaveAToken();
+        const elementsAboveSelected: Array<IShape> = this.filterElementsAboveTheSelected(elementsThatCanHaveAToken);
+
+        const noElementsAreAboveTheSelected: boolean = elementsAboveSelected.length === 0;
+        if (noElementsAreAboveTheSelected) {
+          return;
+        }
+
+        const elementsAboveSelectedFilteredByXAxis: Array<IShape> = this.filterElementsByXAxis(elementsAboveSelected);
+
+        const elementsAboveSelectedFilteredByYAxisIsNotEmpty: boolean = elementsAboveSelectedFilteredByXAxis.length > 0;
+        const elementsToWorkWith: Array<IShape> = elementsAboveSelectedFilteredByYAxisIsNotEmpty
+          ? elementsAboveSelectedFilteredByXAxis
+          : elementsAboveSelected;
+
+        const closestElementAboveSelected: IShape = this.getClosestElementByY(elementsToWorkWith);
+
+        this.selectFlowNode(closestElementAboveSelected.id);
+      }
     });
+  }
+
+  private getClosestElementByY(elements: Array<IShape>): IShape {
+    return elements.reduce(
+      (previousElement: IShape, currentElement: IShape): IShape => {
+        const noPreviousElementExists: boolean = previousElement === undefined;
+        if (noPreviousElementExists) {
+          return currentElement;
+        }
+
+        const distancePreviousElement: number = Math.abs(this.selectedFlowNode.y - previousElement.y);
+        const distanceCurrentElement: number = Math.abs(this.selectedFlowNode.y - currentElement.y);
+
+        const currentElementIsCloser: boolean = distanceCurrentElement < distancePreviousElement;
+        return currentElementIsCloser ? currentElement : previousElement;
+      },
+    );
   }
 
   private getClosestElementByX(elements: Array<IShape>): IShape {
@@ -220,6 +259,14 @@ export class DiagramViewer {
     });
   }
 
+  private filterElementsAboveTheSelected(elementsToFilter: Array<IShape>): Array<IShape> {
+    return elementsToFilter.filter((element: IShape): boolean => {
+      const elementIsAboveTheSelectedFlowNode: boolean = this.selectedFlowNode.y > element.y;
+
+      return elementIsAboveTheSelectedFlowNode;
+    });
+  }
+
   private filterElementsOnTheRightOfTheSelected(elementsToFilter: Array<IShape>): Array<IShape> {
     return elementsToFilter.filter((element: IShape): boolean => {
       const elementIsOnTheRightOfTheSelectedFlowNode: boolean = this.selectedFlowNode.x < element.x;
@@ -233,6 +280,27 @@ export class DiagramViewer {
       const elementIsOnTheLeftOfTheSelectedFlowNode: boolean = this.selectedFlowNode.x > element.x;
 
       return elementIsOnTheLeftOfTheSelectedFlowNode;
+    });
+  }
+
+  private filterElementsByXAxis(elementsToFilter: Array<IShape>): Array<IShape> {
+    return elementsToFilter.filter((element: IShape): boolean => {
+      const elementStartsBetweenSelectedElement: boolean =
+        element.x >= this.selectedFlowNode.x && element.x <= this.selectedFlowNode.x + this.selectedFlowNode.width;
+
+      const elementEndsBetweenSelectedElement: boolean =
+        element.x + element.width >= this.selectedFlowNode.x &&
+        element.x + element.width <= this.selectedFlowNode.x + this.selectedFlowNode.width;
+
+      const elementStartsBeforeSelectedAndEndsAfterSelected: boolean =
+        this.selectedFlowNode.x > element.x &&
+        this.selectedFlowNode.x + this.selectedFlowNode.width < element.x + element.width;
+
+      return (
+        elementStartsBetweenSelectedElement ||
+        elementEndsBetweenSelectedElement ||
+        elementStartsBeforeSelectedAndEndsAfterSelected
+      );
     });
   }
 
