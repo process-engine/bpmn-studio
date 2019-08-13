@@ -142,7 +142,9 @@ export class DiagramViewer {
         return;
       }
 
+      const rightKeyPressed: boolean = event.code === 'ArrowRight';
       const leftKeyPressed: boolean = event.code === 'ArrowLeft';
+
       if (leftKeyPressed) {
         const elementsThatCanHaveAToken: Array<IShape> = this.getElementsThatCanHaveAToken();
         const elementsOnTheLeft: Array<IShape> = this.filterElementsOnTheLeftOfTheSelected(elementsThatCanHaveAToken);
@@ -162,6 +164,27 @@ export class DiagramViewer {
         const closestElementOnTheLeft: IShape = this.getClosestElementByX(elementsToWorkWith);
 
         this.selectFlowNode(closestElementOnTheLeft.id);
+      }
+
+      if (rightKeyPressed) {
+        const elementsThatCanHaveAToken: Array<IShape> = this.getElementsThatCanHaveAToken();
+        const elementsOnTheRight: Array<IShape> = this.filterElementsOnTheRightOfTheSelected(elementsThatCanHaveAToken);
+
+        const noElementsAreOnTheRightOfTheSelected: boolean = elementsOnTheRight.length === 0;
+        if (noElementsAreOnTheRightOfTheSelected) {
+          return;
+        }
+
+        const elementsOnTheRightFilteredByYAxis: Array<IShape> = this.filterElementsByYAxis(elementsOnTheRight);
+
+        const elementsOnTheSameHeightOnTheRightIsNotEmpty: boolean = elementsOnTheRightFilteredByYAxis.length > 0;
+        const elementsToWorkWith: Array<IShape> = elementsOnTheSameHeightOnTheRightIsNotEmpty
+          ? elementsOnTheRightFilteredByYAxis
+          : elementsOnTheRight;
+
+        const closestElementOnTheRight: IShape = this.getClosestElementByX(elementsToWorkWith);
+
+        this.selectFlowNode(closestElementOnTheRight.id);
       }
     });
   }
@@ -194,6 +217,14 @@ export class DiagramViewer {
         element.type !== 'bpmn:SequenceFlow';
 
       return elementCanHaveAToken;
+    });
+  }
+
+  private filterElementsOnTheRightOfTheSelected(elementsToFilter: Array<IShape>): Array<IShape> {
+    return elementsToFilter.filter((element: IShape): boolean => {
+      const elementIsOnTheRightOfTheSelectedFlowNode: boolean = this.selectedFlowNode.x < element.x;
+
+      return elementIsOnTheRightOfTheSelectedFlowNode;
     });
   }
 
