@@ -211,8 +211,7 @@ Pfad des BoundaryEvents weiter.
 <img src="./bpmn-elements-svg/timerboundaryevent.svg">
 
 Wenn das konfigurierte Datum oder die zu wartende Dauer erreicht wurde, 
-wird läuft der Prozess am ausgehenden
-Pfad des BoundaryEvents weiter. 
+läuft der Prozess am ausgehenden Pfad des BoundaryEvents weiter. 
 
 #### NonInterruptingMessageBoundaryEvent
 
