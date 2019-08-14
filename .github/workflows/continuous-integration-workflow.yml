@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   prepare:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     steps:
     - uses: actions/checkout@master
@@ -21,6 +21,7 @@ jobs:
         node ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir
 
   build_and_test:
+    runs-on: ubuntu-18.04
     strategy:
       matrix:
         node: [10]
