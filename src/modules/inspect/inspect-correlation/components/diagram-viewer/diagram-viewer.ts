@@ -59,11 +59,12 @@ export class DiagramViewer {
       additionalModules: [bundle.ZoomScrollModule, bundle.MoveCanvasModule],
     });
 
+    this.elementRegistry = this.diagramViewer.get('elementRegistry');
 
     this.diagramViewer.attachTo(this.canvasModel);
 
     this.diagramViewer.on('element.click', async (event: IEvent) => {
-      this.selectedFlowNode = event.element;
+      this.selectFlowNode(event.element.id);
     });
 
     this.subscriptions = [
@@ -143,10 +144,10 @@ export class DiagramViewer {
       return;
     }
 
-    const elementRegistry: IElementRegistry = this.diagramViewer.get('elementRegistry');
-    const element: IShape = elementRegistry.get(flowNodeId);
+    const element: IShape = this.elementRegistry.get(flowNodeId);
 
     this.selectedFlowNode = element;
+    this.diagramViewer.get('selection').select(element);
   }
 
   public detached(): void {
@@ -207,6 +208,7 @@ export class DiagramViewer {
 
       const correlationHasSameElementAsPreviouslySelected: boolean = elementsToColorize.length > 0;
       if (correlationHasSameElementAsPreviouslySelected) {
+        this.selectFlowNode(this.selectedFlowNode.id);
 
         return;
       }
