@@ -536,6 +536,7 @@ export class DiagramViewer {
         element.type !== 'bpmn:Lane' &&
         element.type !== 'bpmn:LaneSet' &&
         element.type !== 'label' &&
+        element.type !== 'bpmn:TextAnnotation' &&
         element.type !== 'bpmn:SequenceFlow';
 
       return elementCanHaveAToken;
