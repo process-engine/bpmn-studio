@@ -502,7 +502,8 @@ export class DiagramViewer {
     const elementsThatCanHaveAToken: Array<IShape> = this.getElementsThatCanHaveAToken();
 
     return elementsThatCanHaveAToken.filter((element: IShape): boolean => {
-      const elementIsAboveTheSelectedFlowNode: boolean = this.selectedFlowNode.y < element.y;
+      const elementIsAboveTheSelectedFlowNode: boolean =
+        this.selectedFlowNode.y + this.selectedFlowNode.height < element.y;
 
       return elementIsAboveTheSelectedFlowNode;
     });
