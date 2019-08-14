@@ -155,11 +155,13 @@ export class DiagramViewer {
           return;
         }
 
-        const elementsOnTheLeftFilteredByYAxis: Array<IShape> = this.filterElementsByYAxis(elementsOnTheLeft);
+        const elementsOnTheLeftOverlappingOnYAxis: Array<IShape> = this.elementsThatOverlapWithSelectedOnYAxis(
+          elementsOnTheLeft,
+        );
 
-        const elementsOnTheLeftFilteredByYAxisIsNotEmpty: boolean = elementsOnTheLeftFilteredByYAxis.length > 0;
-        const elementsToWorkWith: Array<IShape> = elementsOnTheLeftFilteredByYAxisIsNotEmpty
-          ? elementsOnTheLeftFilteredByYAxis
+        const elementsOnTheLeftOverlappingOnYAxisIsNotEmpty: boolean = elementsOnTheLeftOverlappingOnYAxis.length > 0;
+        const elementsToWorkWith: Array<IShape> = elementsOnTheLeftOverlappingOnYAxisIsNotEmpty
+          ? elementsOnTheLeftOverlappingOnYAxis
           : elementsOnTheLeft;
 
         const closestElementOnTheLeft: IShape = this.getClosestElementByX(elementsToWorkWith);
@@ -175,11 +177,13 @@ export class DiagramViewer {
           return;
         }
 
-        const elementsOnTheRightFilteredByYAxis: Array<IShape> = this.filterElementsByYAxis(elementsOnTheRight);
+        const elementsOnTheRightOverlappingOnYAxis: Array<IShape> = this.elementsThatOverlapWithSelectedOnYAxis(
+          elementsOnTheRight,
+        );
 
-        const elementsOnTheSameHeightOnTheRightIsNotEmpty: boolean = elementsOnTheRightFilteredByYAxis.length > 0;
-        const elementsToWorkWith: Array<IShape> = elementsOnTheSameHeightOnTheRightIsNotEmpty
-          ? elementsOnTheRightFilteredByYAxis
+        const elementsOnTheRightOverlappingOnYAxisIsNotEmpty: boolean = elementsOnTheRightOverlappingOnYAxis.length > 0;
+        const elementsToWorkWith: Array<IShape> = elementsOnTheRightOverlappingOnYAxisIsNotEmpty
+          ? elementsOnTheRightOverlappingOnYAxis
           : elementsOnTheRight;
 
         const closestElementOnTheRight: IShape = this.getClosestElementByX(elementsToWorkWith);
@@ -195,11 +199,14 @@ export class DiagramViewer {
           return;
         }
 
-        const elementsAboveSelectedFilteredByXAxis: Array<IShape> = this.filterElementsByXAxis(elementsAboveSelected);
+        const elementsAboveSelectedOverlappingOnXAxis: Array<IShape> = this.elementsThatOverlapWithSelectedOnXAxis(
+          elementsAboveSelected,
+        );
 
-        const elementsAboveSelectedFilteredByYAxisIsNotEmpty: boolean = elementsAboveSelectedFilteredByXAxis.length > 0;
-        const elementsToWorkWith: Array<IShape> = elementsAboveSelectedFilteredByYAxisIsNotEmpty
-          ? elementsAboveSelectedFilteredByXAxis
+        const elementsAboveSelectedOverlappingOnXAxisIsNotEmpty: boolean =
+          elementsAboveSelectedOverlappingOnXAxis.length > 0;
+        const elementsToWorkWith: Array<IShape> = elementsAboveSelectedOverlappingOnXAxisIsNotEmpty
+          ? elementsAboveSelectedOverlappingOnXAxis
           : elementsAboveSelected;
 
         const closestElementAboveSelected: IShape = this.getClosestElementByY(elementsToWorkWith);
@@ -215,11 +222,14 @@ export class DiagramViewer {
           return;
         }
 
-        const elementsUnderSelectedFilteredByXAxis: Array<IShape> = this.filterElementsByXAxis(elementsUnderSelected);
+        const elementsUnderSelectedOverlappingOnXAxis: Array<IShape> = this.elementsThatOverlapWithSelectedOnXAxis(
+          elementsUnderSelected,
+        );
 
-        const elementsUnderSelectedFilteredByYAxisIsNotEmpty: boolean = elementsUnderSelectedFilteredByXAxis.length > 0;
-        const elementsToWorkWith: Array<IShape> = elementsUnderSelectedFilteredByYAxisIsNotEmpty
-          ? elementsUnderSelectedFilteredByXAxis
+        const elementsUnderSelectedOverlappingOnXAxisIsNotEmpty: boolean =
+          elementsUnderSelectedOverlappingOnXAxis.length > 0;
+        const elementsToWorkWith: Array<IShape> = elementsUnderSelectedOverlappingOnXAxisIsNotEmpty
+          ? elementsUnderSelectedOverlappingOnXAxis
           : elementsUnderSelected;
 
         const closestElementUnderSelected: IShape = this.getClosestElementByY(elementsToWorkWith);
@@ -317,7 +327,7 @@ export class DiagramViewer {
     });
   }
 
-  private filterElementsByXAxis(elementsToFilter: Array<IShape>): Array<IShape> {
+  private elementsThatOverlapWithSelectedOnXAxis(elementsToFilter: Array<IShape>): Array<IShape> {
     return elementsToFilter.filter((element: IShape): boolean => {
       const elementStartsBetweenSelectedElement: boolean =
         element.x >= this.selectedFlowNode.x && element.x <= this.selectedFlowNode.x + this.selectedFlowNode.width;
@@ -338,7 +348,7 @@ export class DiagramViewer {
     });
   }
 
-  private filterElementsByYAxis(elementsToFilter: Array<IShape>): Array<IShape> {
+  private elementsThatOverlapWithSelectedOnYAxis(elementsToFilter: Array<IShape>): Array<IShape> {
     return elementsToFilter.filter((element: IShape): boolean => {
       const elementStartsBetweenSelectedElement: boolean =
         element.y >= this.selectedFlowNode.y && element.y <= this.selectedFlowNode.y + this.selectedFlowNode.height;
