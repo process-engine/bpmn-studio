@@ -15,25 +15,22 @@ jobs:
     - name: Install NPM dependencies
       run: |
         npm ci
-        node ./node_modules/.bin/ci_tools npm-install-only @process-engine/ @essential-projects/
+        node ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
     - name: Prepare version
       run: |
         # does prepare the version, but not commit it
         node ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir
 
-  build_and_test:
+  build_and_test_linux:
+    name: "Build & Test (Linux)"
     needs: prepare_version
     runs-on: ubuntu-18.04
-    # strategy:
-    #   matrix:
-    #     node: [10]
-    #     os: [macOS-10.14, windows-2016, ubuntu-18.04]
     steps:
     - uses: actions/checkout@master
-    - name: Install NPM dependencies
-      run: |
-        npm ci
-        node ./node_modules/.bin/ci_tools npm-install-only @process-engine/ @essential-projects/
+    # - name: Install NPM dependencies
+    #   run: |
+    #     npm ci
+    #     node ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
     - name: npm build and test
       run: |
         npm run build
