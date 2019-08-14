@@ -167,218 +167,6 @@ export class DiagramViewer {
     });
   }
 
-  private getClosestElementAboveSelected(): IShape {
-    const elementsAboveSelected: Array<IShape> = this.getElementsAboveTheSelected();
-
-    const noElementsAreAboveTheSelected: boolean = elementsAboveSelected.length === 0;
-    if (noElementsAreAboveTheSelected) {
-      return undefined;
-    }
-
-    const elementsAboveSelectedOverlappingOnXAxis: Array<IShape> = this.filterElementsThatOverlapWithSelectedOnXAxis(
-      elementsAboveSelected,
-    );
-
-    const elementsAboveSelectedOverlappingOnXAxisIsNotEmpty: boolean =
-      elementsAboveSelectedOverlappingOnXAxis.length > 0;
-    const elementsToWorkWith: Array<IShape> = elementsAboveSelectedOverlappingOnXAxisIsNotEmpty
-      ? elementsAboveSelectedOverlappingOnXAxis
-      : elementsAboveSelected;
-
-    return this.getClosestElementByY(elementsToWorkWith);
-  }
-
-  private getClosestElementOnTheRightOfSelected(): IShape {
-    const elementsOnTheRight: Array<IShape> = this.getElementsOnTheRightOfTheSelected();
-
-    const noElementsAreOnTheRightOfTheSelected: boolean = elementsOnTheRight.length === 0;
-    if (noElementsAreOnTheRightOfTheSelected) {
-      return undefined;
-    }
-
-    const elementsOnTheRightOverlappingOnYAxis: Array<IShape> = this.filterElementsThatOverlapWithSelectedOnYAxis(
-      elementsOnTheRight,
-    );
-
-    const elementsOnTheRightOverlappingOnYAxisIsNotEmpty: boolean = elementsOnTheRightOverlappingOnYAxis.length > 0;
-    const elementsToWorkWith: Array<IShape> = elementsOnTheRightOverlappingOnYAxisIsNotEmpty
-      ? elementsOnTheRightOverlappingOnYAxis
-      : elementsOnTheRight;
-
-    return this.getClosestElementByX(elementsToWorkWith);
-  }
-
-  private getClosestElementUnderSelected(): IShape {
-    const elementsUnderSelected: Array<IShape> = this.getElementsUnderTheSelected();
-
-    const noElementsAreUnderTheSelected: boolean = elementsUnderSelected.length === 0;
-    if (noElementsAreUnderTheSelected) {
-      return undefined;
-    }
-
-    const elementsUnderSelectedOverlappingOnXAxis: Array<IShape> = this.filterElementsThatOverlapWithSelectedOnXAxis(
-      elementsUnderSelected,
-    );
-
-    const elementsUnderSelectedOverlappingOnXAxisIsNotEmpty: boolean =
-      elementsUnderSelectedOverlappingOnXAxis.length > 0;
-    const elementsToWorkWith: Array<IShape> = elementsUnderSelectedOverlappingOnXAxisIsNotEmpty
-      ? elementsUnderSelectedOverlappingOnXAxis
-      : elementsUnderSelected;
-
-    return this.getClosestElementByY(elementsToWorkWith);
-  }
-
-  private getClosestElementOnTheLeftOfSelected(): IShape {
-    const elementsOnTheLeft: Array<IShape> = this.getElementsOnTheLeftOfTheSelected();
-
-    const noElementsAreOnTheLeftOfTheSelected: boolean = elementsOnTheLeft.length === 0;
-    if (noElementsAreOnTheLeftOfTheSelected) {
-      return undefined;
-    }
-
-    const elementsOnTheLeftOverlappingOnYAxis: Array<IShape> = this.filterElementsThatOverlapWithSelectedOnYAxis(
-      elementsOnTheLeft,
-    );
-
-    const elementsOnTheLeftOverlappingOnYAxisIsNotEmpty: boolean = elementsOnTheLeftOverlappingOnYAxis.length > 0;
-    const elementsToWorkWith: Array<IShape> = elementsOnTheLeftOverlappingOnYAxisIsNotEmpty
-      ? elementsOnTheLeftOverlappingOnYAxis
-      : elementsOnTheLeft;
-
-    return this.getClosestElementByX(elementsToWorkWith);
-  }
-
-  private getClosestElementByY(elements: Array<IShape>): IShape {
-    return elements.reduce(
-      (previousElement: IShape, currentElement: IShape): IShape => {
-        const noPreviousElementExists: boolean = previousElement === undefined;
-        if (noPreviousElementExists) {
-          return currentElement;
-        }
-
-        const distancePreviousElement: number = Math.abs(this.selectedFlowNode.y - previousElement.y);
-        const distanceCurrentElement: number = Math.abs(this.selectedFlowNode.y - currentElement.y);
-
-        const currentElementIsCloser: boolean = distanceCurrentElement < distancePreviousElement;
-        return currentElementIsCloser ? currentElement : previousElement;
-      },
-    );
-  }
-
-  private getClosestElementByX(elements: Array<IShape>): IShape {
-    return elements.reduce(
-      (previousElement: IShape, currentElement: IShape): IShape => {
-        const noPreviousElementExists: boolean = previousElement === undefined;
-        if (noPreviousElementExists) {
-          return currentElement;
-        }
-
-        const distancePreviousElement: number = Math.abs(this.selectedFlowNode.x - previousElement.x);
-        const distanceCurrentElement: number = Math.abs(this.selectedFlowNode.x - currentElement.x);
-
-        const currentElementIsCloser: boolean = distanceCurrentElement < distancePreviousElement;
-        return currentElementIsCloser ? currentElement : previousElement;
-      },
-    );
-  }
-
-  private getElementsThatCanHaveAToken(): Array<IShape> {
-    return this.elementRegistry.filter((element: IShape) => {
-      const elementCanHaveAToken: boolean =
-        element.type !== 'bpmn:Participant' &&
-        element.type !== 'bpmn:Collaboration' &&
-        element.type !== 'bpmn:Lane' &&
-        element.type !== 'bpmn:LaneSet' &&
-        element.type !== 'label' &&
-        element.type !== 'bpmn:SequenceFlow';
-
-      return elementCanHaveAToken;
-    });
-  }
-
-  private getElementsAboveTheSelected(): Array<IShape> {
-    const elementsThatCanHaveAToken: Array<IShape> = this.getElementsThatCanHaveAToken();
-
-    return elementsThatCanHaveAToken.filter((element: IShape): boolean => {
-      const elementIsAboveTheSelectedFlowNode: boolean = this.selectedFlowNode.y > element.y;
-
-      return elementIsAboveTheSelectedFlowNode;
-    });
-  }
-
-  private getElementsUnderTheSelected(): Array<IShape> {
-    const elementsThatCanHaveAToken: Array<IShape> = this.getElementsThatCanHaveAToken();
-
-    return elementsThatCanHaveAToken.filter((element: IShape): boolean => {
-      const elementIsAboveTheSelectedFlowNode: boolean = this.selectedFlowNode.y < element.y;
-
-      return elementIsAboveTheSelectedFlowNode;
-    });
-  }
-
-  private getElementsOnTheRightOfTheSelected(): Array<IShape> {
-    const elementsThatCanHaveAToken: Array<IShape> = this.getElementsThatCanHaveAToken();
-
-    return elementsThatCanHaveAToken.filter((element: IShape): boolean => {
-      const elementIsOnTheRightOfTheSelectedFlowNode: boolean = this.selectedFlowNode.x < element.x;
-
-      return elementIsOnTheRightOfTheSelectedFlowNode;
-    });
-  }
-
-  private getElementsOnTheLeftOfTheSelected(): Array<IShape> {
-    const elementsThatCanHaveAToken: Array<IShape> = this.getElementsThatCanHaveAToken();
-
-    return elementsThatCanHaveAToken.filter((element: IShape): boolean => {
-      const elementIsOnTheLeftOfTheSelectedFlowNode: boolean = this.selectedFlowNode.x > element.x;
-
-      return elementIsOnTheLeftOfTheSelectedFlowNode;
-    });
-  }
-
-  private filterElementsThatOverlapWithSelectedOnXAxis(elementsToFilter: Array<IShape>): Array<IShape> {
-    return elementsToFilter.filter((element: IShape): boolean => {
-      const elementStartsBetweenSelectedElement: boolean =
-        element.x >= this.selectedFlowNode.x && element.x <= this.selectedFlowNode.x + this.selectedFlowNode.width;
-
-      const elementEndsBetweenSelectedElement: boolean =
-        element.x + element.width >= this.selectedFlowNode.x &&
-        element.x + element.width <= this.selectedFlowNode.x + this.selectedFlowNode.width;
-
-      const elementStartsBeforeSelectedAndEndsAfterSelected: boolean =
-        this.selectedFlowNode.x > element.x &&
-        this.selectedFlowNode.x + this.selectedFlowNode.width < element.x + element.width;
-
-      return (
-        elementStartsBetweenSelectedElement ||
-        elementEndsBetweenSelectedElement ||
-        elementStartsBeforeSelectedAndEndsAfterSelected
-      );
-    });
-  }
-
-  private filterElementsThatOverlapWithSelectedOnYAxis(elementsToFilter: Array<IShape>): Array<IShape> {
-    return elementsToFilter.filter((element: IShape): boolean => {
-      const elementStartsBetweenSelectedElement: boolean =
-        element.y >= this.selectedFlowNode.y && element.y <= this.selectedFlowNode.y + this.selectedFlowNode.height;
-
-      const elementEndsBetweenSelectedElement: boolean =
-        element.y + element.height >= this.selectedFlowNode.y &&
-        element.y + element.height <= this.selectedFlowNode.y + this.selectedFlowNode.height;
-
-      const elementStartsBeforeSelectedAndEndsAfterSelected: boolean =
-        this.selectedFlowNode.y > element.y &&
-        this.selectedFlowNode.y + this.selectedFlowNode.height < element.y + element.height;
-
-      return (
-        elementStartsBetweenSelectedElement ||
-        elementEndsBetweenSelectedElement ||
-        elementStartsBeforeSelectedAndEndsAfterSelected
-      );
-    });
-  }
-
   public selectFlowNode(flowNodeId: string): void {
     if (this.processInstance === undefined) {
       this.flowNodeToSetAfterProcessInstanceIsSet = flowNodeId;
@@ -537,5 +325,217 @@ export class DiagramViewer {
     });
 
     return returnPromise;
+  }
+
+  private getClosestElementOnTheLeftOfSelected(): IShape {
+    const elementsOnTheLeft: Array<IShape> = this.getElementsOnTheLeftOfTheSelected();
+
+    const noElementsAreOnTheLeftOfTheSelected: boolean = elementsOnTheLeft.length === 0;
+    if (noElementsAreOnTheLeftOfTheSelected) {
+      return undefined;
+    }
+
+    const elementsOnTheLeftOverlappingOnYAxis: Array<IShape> = this.filterElementsThatOverlapWithSelectedOnYAxis(
+      elementsOnTheLeft,
+    );
+
+    const elementsOnTheLeftOverlappingOnYAxisIsNotEmpty: boolean = elementsOnTheLeftOverlappingOnYAxis.length > 0;
+    const elementsToWorkWith: Array<IShape> = elementsOnTheLeftOverlappingOnYAxisIsNotEmpty
+      ? elementsOnTheLeftOverlappingOnYAxis
+      : elementsOnTheLeft;
+
+    return this.getClosestElementByX(elementsToWorkWith);
+  }
+
+  private getClosestElementOnTheRightOfSelected(): IShape {
+    const elementsOnTheRight: Array<IShape> = this.getElementsOnTheRightOfTheSelected();
+
+    const noElementsAreOnTheRightOfTheSelected: boolean = elementsOnTheRight.length === 0;
+    if (noElementsAreOnTheRightOfTheSelected) {
+      return undefined;
+    }
+
+    const elementsOnTheRightOverlappingOnYAxis: Array<IShape> = this.filterElementsThatOverlapWithSelectedOnYAxis(
+      elementsOnTheRight,
+    );
+
+    const elementsOnTheRightOverlappingOnYAxisIsNotEmpty: boolean = elementsOnTheRightOverlappingOnYAxis.length > 0;
+    const elementsToWorkWith: Array<IShape> = elementsOnTheRightOverlappingOnYAxisIsNotEmpty
+      ? elementsOnTheRightOverlappingOnYAxis
+      : elementsOnTheRight;
+
+    return this.getClosestElementByX(elementsToWorkWith);
+  }
+
+  private getClosestElementAboveSelected(): IShape {
+    const elementsAboveSelected: Array<IShape> = this.getElementsAboveTheSelected();
+
+    const noElementsAreAboveTheSelected: boolean = elementsAboveSelected.length === 0;
+    if (noElementsAreAboveTheSelected) {
+      return undefined;
+    }
+
+    const elementsAboveSelectedOverlappingOnXAxis: Array<IShape> = this.filterElementsThatOverlapWithSelectedOnXAxis(
+      elementsAboveSelected,
+    );
+
+    const elementsAboveSelectedOverlappingOnXAxisIsNotEmpty: boolean =
+      elementsAboveSelectedOverlappingOnXAxis.length > 0;
+    const elementsToWorkWith: Array<IShape> = elementsAboveSelectedOverlappingOnXAxisIsNotEmpty
+      ? elementsAboveSelectedOverlappingOnXAxis
+      : elementsAboveSelected;
+
+    return this.getClosestElementByY(elementsToWorkWith);
+  }
+
+  private getClosestElementUnderSelected(): IShape {
+    const elementsUnderSelected: Array<IShape> = this.getElementsUnderTheSelected();
+
+    const noElementsAreUnderTheSelected: boolean = elementsUnderSelected.length === 0;
+    if (noElementsAreUnderTheSelected) {
+      return undefined;
+    }
+
+    const elementsUnderSelectedOverlappingOnXAxis: Array<IShape> = this.filterElementsThatOverlapWithSelectedOnXAxis(
+      elementsUnderSelected,
+    );
+
+    const elementsUnderSelectedOverlappingOnXAxisIsNotEmpty: boolean =
+      elementsUnderSelectedOverlappingOnXAxis.length > 0;
+    const elementsToWorkWith: Array<IShape> = elementsUnderSelectedOverlappingOnXAxisIsNotEmpty
+      ? elementsUnderSelectedOverlappingOnXAxis
+      : elementsUnderSelected;
+
+    return this.getClosestElementByY(elementsToWorkWith);
+  }
+
+  private getClosestElementByX(elements: Array<IShape>): IShape {
+    return elements.reduce(
+      (previousElement: IShape, currentElement: IShape): IShape => {
+        const noPreviousElementExists: boolean = previousElement === undefined;
+        if (noPreviousElementExists) {
+          return currentElement;
+        }
+
+        const distancePreviousElement: number = Math.abs(this.selectedFlowNode.x - previousElement.x);
+        const distanceCurrentElement: number = Math.abs(this.selectedFlowNode.x - currentElement.x);
+
+        const currentElementIsCloser: boolean = distanceCurrentElement < distancePreviousElement;
+        return currentElementIsCloser ? currentElement : previousElement;
+      },
+    );
+  }
+
+  private getClosestElementByY(elements: Array<IShape>): IShape {
+    return elements.reduce(
+      (previousElement: IShape, currentElement: IShape): IShape => {
+        const noPreviousElementExists: boolean = previousElement === undefined;
+        if (noPreviousElementExists) {
+          return currentElement;
+        }
+
+        const distancePreviousElement: number = Math.abs(this.selectedFlowNode.y - previousElement.y);
+        const distanceCurrentElement: number = Math.abs(this.selectedFlowNode.y - currentElement.y);
+
+        const currentElementIsCloser: boolean = distanceCurrentElement < distancePreviousElement;
+        return currentElementIsCloser ? currentElement : previousElement;
+      },
+    );
+  }
+
+  private filterElementsThatOverlapWithSelectedOnYAxis(elementsToFilter: Array<IShape>): Array<IShape> {
+    return elementsToFilter.filter((element: IShape): boolean => {
+      const elementStartsBetweenSelectedElement: boolean =
+        element.y >= this.selectedFlowNode.y && element.y <= this.selectedFlowNode.y + this.selectedFlowNode.height;
+
+      const elementEndsBetweenSelectedElement: boolean =
+        element.y + element.height >= this.selectedFlowNode.y &&
+        element.y + element.height <= this.selectedFlowNode.y + this.selectedFlowNode.height;
+
+      const elementStartsBeforeSelectedAndEndsAfterSelected: boolean =
+        this.selectedFlowNode.y > element.y &&
+        this.selectedFlowNode.y + this.selectedFlowNode.height < element.y + element.height;
+
+      return (
+        elementStartsBetweenSelectedElement ||
+        elementEndsBetweenSelectedElement ||
+        elementStartsBeforeSelectedAndEndsAfterSelected
+      );
+    });
+  }
+
+  private filterElementsThatOverlapWithSelectedOnXAxis(elementsToFilter: Array<IShape>): Array<IShape> {
+    return elementsToFilter.filter((element: IShape): boolean => {
+      const elementStartsBetweenSelectedElement: boolean =
+        element.x >= this.selectedFlowNode.x && element.x <= this.selectedFlowNode.x + this.selectedFlowNode.width;
+
+      const elementEndsBetweenSelectedElement: boolean =
+        element.x + element.width >= this.selectedFlowNode.x &&
+        element.x + element.width <= this.selectedFlowNode.x + this.selectedFlowNode.width;
+
+      const elementStartsBeforeSelectedAndEndsAfterSelected: boolean =
+        this.selectedFlowNode.x > element.x &&
+        this.selectedFlowNode.x + this.selectedFlowNode.width < element.x + element.width;
+
+      return (
+        elementStartsBetweenSelectedElement ||
+        elementEndsBetweenSelectedElement ||
+        elementStartsBeforeSelectedAndEndsAfterSelected
+      );
+    });
+  }
+
+  private getElementsAboveTheSelected(): Array<IShape> {
+    const elementsThatCanHaveAToken: Array<IShape> = this.getElementsThatCanHaveAToken();
+
+    return elementsThatCanHaveAToken.filter((element: IShape): boolean => {
+      const elementIsAboveTheSelectedFlowNode: boolean = this.selectedFlowNode.y > element.y;
+
+      return elementIsAboveTheSelectedFlowNode;
+    });
+  }
+
+  private getElementsUnderTheSelected(): Array<IShape> {
+    const elementsThatCanHaveAToken: Array<IShape> = this.getElementsThatCanHaveAToken();
+
+    return elementsThatCanHaveAToken.filter((element: IShape): boolean => {
+      const elementIsAboveTheSelectedFlowNode: boolean = this.selectedFlowNode.y < element.y;
+
+      return elementIsAboveTheSelectedFlowNode;
+    });
+  }
+
+  private getElementsOnTheRightOfTheSelected(): Array<IShape> {
+    const elementsThatCanHaveAToken: Array<IShape> = this.getElementsThatCanHaveAToken();
+
+    return elementsThatCanHaveAToken.filter((element: IShape): boolean => {
+      const elementIsOnTheRightOfTheSelectedFlowNode: boolean = this.selectedFlowNode.x < element.x;
+
+      return elementIsOnTheRightOfTheSelectedFlowNode;
+    });
+  }
+
+  private getElementsOnTheLeftOfTheSelected(): Array<IShape> {
+    const elementsThatCanHaveAToken: Array<IShape> = this.getElementsThatCanHaveAToken();
+
+    return elementsThatCanHaveAToken.filter((element: IShape): boolean => {
+      const elementIsOnTheLeftOfTheSelectedFlowNode: boolean = this.selectedFlowNode.x > element.x;
+
+      return elementIsOnTheLeftOfTheSelectedFlowNode;
+    });
+  }
+
+  private getElementsThatCanHaveAToken(): Array<IShape> {
+    return this.elementRegistry.filter((element: IShape) => {
+      const elementCanHaveAToken: boolean =
+        element.type !== 'bpmn:Participant' &&
+        element.type !== 'bpmn:Collaboration' &&
+        element.type !== 'bpmn:Lane' &&
+        element.type !== 'bpmn:LaneSet' &&
+        element.type !== 'label' &&
+        element.type !== 'bpmn:SequenceFlow';
+
+      return elementCanHaveAToken;
+    });
   }
 }
