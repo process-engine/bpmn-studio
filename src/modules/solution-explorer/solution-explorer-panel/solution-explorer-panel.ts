@@ -640,11 +640,11 @@ export class SolutionExplorerPanel {
     // Send event to signal the component is ready to handle the event.
     this.ipcRenderer.send('waiting-for-double-file-click');
 
-    // Check if there was a double click before BPMN-Studio was loaded.
+    // Check if there was a double click before BPMN Studio was loaded.
     const fileInfo: IFile = this.ipcRenderer.sendSync('get_opened_file');
 
     if (fileInfo.path) {
-      // There was a file opened before BPMN-Studio was loaded, open it.
+      // There was a file opened before BPMN Studio was loaded, open it.
       const uri: string = fileInfo.path;
       this.openDiagramOrDisplayError(uri);
     }

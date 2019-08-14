@@ -73,8 +73,8 @@ export class App {
     ];
 
     /*
-     * These EventListeners are used to prevent the BPMN-Studio from redirecting after
-     * trying to drop a file to the BPMN-Studio.
+     * These EventListeners are used to prevent the BPMN Studio from redirecting after
+     * trying to drop a file to the BPMN Studio.
      */
     document.addEventListener('dragover', this.preventDefaultBehaviour);
     document.addEventListener('drop', this.preventDefaultBehaviour);
@@ -120,7 +120,7 @@ export class App {
       config.options.baseRoute = '/';
     }
 
-    config.title = 'BPMN-Studio';
+    config.title = 'BPMN Studio';
 
     config.map([
       {
