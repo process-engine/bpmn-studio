@@ -1,10 +1,9 @@
 name: Node CI
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
-  build:
-
+  prepare:
     runs-on: ubuntu-latest
 
     steps:
@@ -13,11 +12,22 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 10.x
-    - name: echo test
+    - name: Prepare version
       run: |
-        echo "This is a test"
+        npm ci
+        node ./node_modules/.bin/ci_tools npm-install-only @process-engine/ @essential-projects/
+
+        # does prepare the version, but not commit it
+        node ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir
+
+  build_and_test:
+    strategy:
+      matrix:
+        node: [10]
+        os: [macOS-10.14, windows-2016, ubuntu-18.04]
+    steps:
     - name: npm install, build, and test
       run: |
         npm ci
-        npm run build --if-present
+        npm run build
         npm test
