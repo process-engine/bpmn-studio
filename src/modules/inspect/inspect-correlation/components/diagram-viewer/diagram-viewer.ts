@@ -136,35 +136,7 @@ export class DiagramViewer {
       ),
     ];
 
-    document.addEventListener('keydown', (event: KeyboardEvent): void => {
-      const noElementSelected: boolean = this.selectFlowNode === undefined;
-      if (noElementSelected) {
-        return;
-      }
-
-      const leftKeyPressed: boolean = event.code === 'ArrowLeft';
-      const rightKeyPressed: boolean = event.code === 'ArrowRight';
-      const topKeyPressed: boolean = event.code === 'ArrowUp';
-      const bottomKeyPressed: boolean = event.code === 'ArrowDown';
-
-      let elementToSelect: IShape;
-      if (leftKeyPressed) {
-        elementToSelect = this.getClosestElementOnTheLeftOfSelected();
-      } else if (rightKeyPressed) {
-        elementToSelect = this.getClosestElementOnTheRightOfSelected();
-      } else if (topKeyPressed) {
-        elementToSelect = this.getClosestElementAboveSelected();
-      } else if (bottomKeyPressed) {
-        elementToSelect = this.getClosestElementUnderSelected();
-      }
-
-      const elementToSelectNotFound: boolean = elementToSelect === undefined;
-      if (elementToSelectNotFound) {
-        return;
-      }
-
-      this.selectFlowNode(elementToSelect.id);
-    });
+    document.addEventListener('keydown', this.handleArrowKeyInput);
   }
 
   public selectFlowNode(flowNodeId: string): void {
@@ -326,6 +298,36 @@ export class DiagramViewer {
 
     return returnPromise;
   }
+
+  private handleArrowKeyInput: EventListenerOrEventListenerObject = (event: KeyboardEvent): void => {
+    const noElementSelected: boolean = this.selectFlowNode === undefined;
+    if (noElementSelected) {
+      return;
+    }
+
+    const leftKeyPressed: boolean = event.code === 'ArrowLeft';
+    const rightKeyPressed: boolean = event.code === 'ArrowRight';
+    const topKeyPressed: boolean = event.code === 'ArrowUp';
+    const bottomKeyPressed: boolean = event.code === 'ArrowDown';
+
+    let elementToSelect: IShape;
+    if (leftKeyPressed) {
+      elementToSelect = this.getClosestElementOnTheLeftOfSelected();
+    } else if (rightKeyPressed) {
+      elementToSelect = this.getClosestElementOnTheRightOfSelected();
+    } else if (topKeyPressed) {
+      elementToSelect = this.getClosestElementAboveSelected();
+    } else if (bottomKeyPressed) {
+      elementToSelect = this.getClosestElementUnderSelected();
+    }
+
+    const elementToSelectNotFound: boolean = elementToSelect === undefined;
+    if (elementToSelectNotFound) {
+      return;
+    }
+
+    this.selectFlowNode(elementToSelect.id);
+  };
 
   private getClosestElementOnTheLeftOfSelected(): IShape {
     const elementsOnTheLeft: Array<IShape> = this.getElementsOnTheLeftOfTheSelected();
