@@ -147,96 +147,106 @@ export class DiagramViewer {
       const bottomKeyPressed: boolean = event.code === 'ArrowDown';
       const leftKeyPressed: boolean = event.code === 'ArrowLeft';
 
+      let elementToSelect: IShape;
       if (leftKeyPressed) {
-        const elementsOnTheLeft: Array<IShape> = this.getElementsOnTheLeftOfTheSelected();
-
-        const noElementsAreOnTheLeftOfTheSelected: boolean = elementsOnTheLeft.length === 0;
-        if (noElementsAreOnTheLeftOfTheSelected) {
-          return;
-        }
-
-        const elementsOnTheLeftOverlappingOnYAxis: Array<IShape> = this.elementsThatOverlapWithSelectedOnYAxis(
-          elementsOnTheLeft,
-        );
-
-        const elementsOnTheLeftOverlappingOnYAxisIsNotEmpty: boolean = elementsOnTheLeftOverlappingOnYAxis.length > 0;
-        const elementsToWorkWith: Array<IShape> = elementsOnTheLeftOverlappingOnYAxisIsNotEmpty
-          ? elementsOnTheLeftOverlappingOnYAxis
-          : elementsOnTheLeft;
-
-        const closestElementOnTheLeft: IShape = this.getClosestElementByX(elementsToWorkWith);
-
-        this.selectFlowNode(closestElementOnTheLeft.id);
+        elementToSelect = this.getClosestElementOnTheLeftOfSelected();
+      } else if (rightKeyPressed) {
+        elementToSelect = this.getClosestElementOnTheRightOfSelected();
+      } else if (topKeyPressed) {
+        elementToSelect = this.getClosestElementAboveSelected();
+      } else if (bottomKeyPressed) {
+        elementToSelect = this.getClosestElementUnderSelected();
       }
 
-      if (rightKeyPressed) {
-        const elementsOnTheRight: Array<IShape> = this.getElementsOnTheRightOfTheSelected();
-
-        const noElementsAreOnTheRightOfTheSelected: boolean = elementsOnTheRight.length === 0;
-        if (noElementsAreOnTheRightOfTheSelected) {
-          return;
-        }
-
-        const elementsOnTheRightOverlappingOnYAxis: Array<IShape> = this.elementsThatOverlapWithSelectedOnYAxis(
-          elementsOnTheRight,
-        );
-
-        const elementsOnTheRightOverlappingOnYAxisIsNotEmpty: boolean = elementsOnTheRightOverlappingOnYAxis.length > 0;
-        const elementsToWorkWith: Array<IShape> = elementsOnTheRightOverlappingOnYAxisIsNotEmpty
-          ? elementsOnTheRightOverlappingOnYAxis
-          : elementsOnTheRight;
-
-        const closestElementOnTheRight: IShape = this.getClosestElementByX(elementsToWorkWith);
-
-        this.selectFlowNode(closestElementOnTheRight.id);
+      const elementToSelectNotFound: boolean = elementToSelect === undefined;
+      if (elementToSelectNotFound) {
+        return;
       }
 
-      if (topKeyPressed) {
-        const elementsAboveSelected: Array<IShape> = this.getElementsAboveTheSelected();
-
-        const noElementsAreAboveTheSelected: boolean = elementsAboveSelected.length === 0;
-        if (noElementsAreAboveTheSelected) {
-          return;
-        }
-
-        const elementsAboveSelectedOverlappingOnXAxis: Array<IShape> = this.elementsThatOverlapWithSelectedOnXAxis(
-          elementsAboveSelected,
-        );
-
-        const elementsAboveSelectedOverlappingOnXAxisIsNotEmpty: boolean =
-          elementsAboveSelectedOverlappingOnXAxis.length > 0;
-        const elementsToWorkWith: Array<IShape> = elementsAboveSelectedOverlappingOnXAxisIsNotEmpty
-          ? elementsAboveSelectedOverlappingOnXAxis
-          : elementsAboveSelected;
-
-        const closestElementAboveSelected: IShape = this.getClosestElementByY(elementsToWorkWith);
-
-        this.selectFlowNode(closestElementAboveSelected.id);
-      }
-
-      if (bottomKeyPressed) {
-        const elementsUnderSelected: Array<IShape> = this.getElementsUnderTheSelected();
-
-        const noElementsAreUnderTheSelected: boolean = elementsUnderSelected.length === 0;
-        if (noElementsAreUnderTheSelected) {
-          return;
-        }
-
-        const elementsUnderSelectedOverlappingOnXAxis: Array<IShape> = this.elementsThatOverlapWithSelectedOnXAxis(
-          elementsUnderSelected,
-        );
-
-        const elementsUnderSelectedOverlappingOnXAxisIsNotEmpty: boolean =
-          elementsUnderSelectedOverlappingOnXAxis.length > 0;
-        const elementsToWorkWith: Array<IShape> = elementsUnderSelectedOverlappingOnXAxisIsNotEmpty
-          ? elementsUnderSelectedOverlappingOnXAxis
-          : elementsUnderSelected;
-
-        const closestElementUnderSelected: IShape = this.getClosestElementByY(elementsToWorkWith);
-
-        this.selectFlowNode(closestElementUnderSelected.id);
-      }
+      this.selectFlowNode(elementToSelect.id);
     });
+  }
+
+  private getClosestElementAboveSelected(): IShape {
+    const elementsAboveSelected: Array<IShape> = this.getElementsAboveTheSelected();
+
+    const noElementsAreAboveTheSelected: boolean = elementsAboveSelected.length === 0;
+    if (noElementsAreAboveTheSelected) {
+      return undefined;
+    }
+
+    const elementsAboveSelectedOverlappingOnXAxis: Array<IShape> = this.elementsThatOverlapWithSelectedOnXAxis(
+      elementsAboveSelected,
+    );
+
+    const elementsAboveSelectedOverlappingOnXAxisIsNotEmpty: boolean =
+      elementsAboveSelectedOverlappingOnXAxis.length > 0;
+    const elementsToWorkWith: Array<IShape> = elementsAboveSelectedOverlappingOnXAxisIsNotEmpty
+      ? elementsAboveSelectedOverlappingOnXAxis
+      : elementsAboveSelected;
+
+    return this.getClosestElementByY(elementsToWorkWith);
+  }
+
+  private getClosestElementOnTheRightOfSelected(): IShape {
+    const elementsOnTheRight: Array<IShape> = this.getElementsOnTheRightOfTheSelected();
+
+    const noElementsAreOnTheRightOfTheSelected: boolean = elementsOnTheRight.length === 0;
+    if (noElementsAreOnTheRightOfTheSelected) {
+      return undefined;
+    }
+
+    const elementsOnTheRightOverlappingOnYAxis: Array<IShape> = this.elementsThatOverlapWithSelectedOnYAxis(
+      elementsOnTheRight,
+    );
+
+    const elementsOnTheRightOverlappingOnYAxisIsNotEmpty: boolean = elementsOnTheRightOverlappingOnYAxis.length > 0;
+    const elementsToWorkWith: Array<IShape> = elementsOnTheRightOverlappingOnYAxisIsNotEmpty
+      ? elementsOnTheRightOverlappingOnYAxis
+      : elementsOnTheRight;
+
+    return this.getClosestElementByX(elementsToWorkWith);
+  }
+
+  private getClosestElementUnderSelected(): IShape {
+    const elementsUnderSelected: Array<IShape> = this.getElementsUnderTheSelected();
+
+    const noElementsAreUnderTheSelected: boolean = elementsUnderSelected.length === 0;
+    if (noElementsAreUnderTheSelected) {
+      return undefined;
+    }
+
+    const elementsUnderSelectedOverlappingOnXAxis: Array<IShape> = this.elementsThatOverlapWithSelectedOnXAxis(
+      elementsUnderSelected,
+    );
+
+    const elementsUnderSelectedOverlappingOnXAxisIsNotEmpty: boolean =
+      elementsUnderSelectedOverlappingOnXAxis.length > 0;
+    const elementsToWorkWith: Array<IShape> = elementsUnderSelectedOverlappingOnXAxisIsNotEmpty
+      ? elementsUnderSelectedOverlappingOnXAxis
+      : elementsUnderSelected;
+
+    return this.getClosestElementByY(elementsToWorkWith);
+  }
+
+  private getClosestElementOnTheLeftOfSelected(): IShape {
+    const elementsOnTheLeft: Array<IShape> = this.getElementsOnTheLeftOfTheSelected();
+
+    const noElementsAreOnTheLeftOfTheSelected: boolean = elementsOnTheLeft.length === 0;
+    if (noElementsAreOnTheLeftOfTheSelected) {
+      return undefined;
+    }
+
+    const elementsOnTheLeftOverlappingOnYAxis: Array<IShape> = this.elementsThatOverlapWithSelectedOnYAxis(
+      elementsOnTheLeft,
+    );
+
+    const elementsOnTheLeftOverlappingOnYAxisIsNotEmpty: boolean = elementsOnTheLeftOverlappingOnYAxis.length > 0;
+    const elementsToWorkWith: Array<IShape> = elementsOnTheLeftOverlappingOnYAxisIsNotEmpty
+      ? elementsOnTheLeftOverlappingOnYAxis
+      : elementsOnTheLeft;
+
+    return this.getClosestElementByX(elementsToWorkWith);
   }
 
   private getClosestElementByY(elements: Array<IShape>): IShape {
