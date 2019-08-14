@@ -175,7 +175,7 @@ export class DiagramViewer {
       return undefined;
     }
 
-    const elementsAboveSelectedOverlappingOnXAxis: Array<IShape> = this.elementsThatOverlapWithSelectedOnXAxis(
+    const elementsAboveSelectedOverlappingOnXAxis: Array<IShape> = this.filterElementsThatOverlapWithSelectedOnXAxis(
       elementsAboveSelected,
     );
 
@@ -196,7 +196,7 @@ export class DiagramViewer {
       return undefined;
     }
 
-    const elementsOnTheRightOverlappingOnYAxis: Array<IShape> = this.elementsThatOverlapWithSelectedOnYAxis(
+    const elementsOnTheRightOverlappingOnYAxis: Array<IShape> = this.filterElementsThatOverlapWithSelectedOnYAxis(
       elementsOnTheRight,
     );
 
@@ -216,7 +216,7 @@ export class DiagramViewer {
       return undefined;
     }
 
-    const elementsUnderSelectedOverlappingOnXAxis: Array<IShape> = this.elementsThatOverlapWithSelectedOnXAxis(
+    const elementsUnderSelectedOverlappingOnXAxis: Array<IShape> = this.filterElementsThatOverlapWithSelectedOnXAxis(
       elementsUnderSelected,
     );
 
@@ -237,7 +237,7 @@ export class DiagramViewer {
       return undefined;
     }
 
-    const elementsOnTheLeftOverlappingOnYAxis: Array<IShape> = this.elementsThatOverlapWithSelectedOnYAxis(
+    const elementsOnTheLeftOverlappingOnYAxis: Array<IShape> = this.filterElementsThatOverlapWithSelectedOnYAxis(
       elementsOnTheLeft,
     );
 
@@ -337,7 +337,7 @@ export class DiagramViewer {
     });
   }
 
-  private elementsThatOverlapWithSelectedOnXAxis(elementsToFilter: Array<IShape>): Array<IShape> {
+  private filterElementsThatOverlapWithSelectedOnXAxis(elementsToFilter: Array<IShape>): Array<IShape> {
     return elementsToFilter.filter((element: IShape): boolean => {
       const elementStartsBetweenSelectedElement: boolean =
         element.x >= this.selectedFlowNode.x && element.x <= this.selectedFlowNode.x + this.selectedFlowNode.width;
@@ -358,7 +358,7 @@ export class DiagramViewer {
     });
   }
 
-  private elementsThatOverlapWithSelectedOnYAxis(elementsToFilter: Array<IShape>): Array<IShape> {
+  private filterElementsThatOverlapWithSelectedOnYAxis(elementsToFilter: Array<IShape>): Array<IShape> {
     return elementsToFilter.filter((element: IShape): boolean => {
       const elementStartsBetweenSelectedElement: boolean =
         element.y >= this.selectedFlowNode.y && element.y <= this.selectedFlowNode.y + this.selectedFlowNode.height;
