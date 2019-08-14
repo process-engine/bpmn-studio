@@ -20,6 +20,8 @@ jobs:
       run: |
         # does prepare the version, but not commit it
         node ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir
+        ls -al
+        head package.json
 
   build_and_test_linux:
     name: "Build & Test (Linux)"
@@ -33,5 +35,6 @@ jobs:
     #     node ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
     - name: npm build and test
       run: |
+        ls -al
         npm run build
         npm test
