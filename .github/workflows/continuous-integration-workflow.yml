@@ -3,7 +3,7 @@ name: Node CI
 on: [push, pull_request]
 
 jobs:
-  prepare:
+  prepare_version:
     runs-on: ubuntu-18.04
 
     steps:
@@ -21,6 +21,7 @@ jobs:
         node ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir
 
   build_and_test:
+    needs: prepare_version
     runs-on: ubuntu-18.04
     strategy:
       matrix:
