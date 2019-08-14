@@ -153,6 +153,7 @@ export class DiagramViewer {
   }
 
   public detached(): void {
+    document.removeEventListener('keydown', this.handleArrowKeyInput);
     const bjsContainer: Element = this.canvasModel.getElementsByClassName('bjs-container')[0];
 
     const bjsContainerIsExisting: boolean =
