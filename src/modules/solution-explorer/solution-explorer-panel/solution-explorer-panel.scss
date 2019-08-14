@@ -140,3 +140,21 @@
 .remote-solution-badge__stable {
   background: rgb(90, 170, 220)
 }
+
+.remote-solution-list__loading-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: inline-block;
+  transform: translate(-50%, -50%);
+  user-select: none;
+  white-space: nowrap;
+}
+
+.remote-solution-list__loading-spinner-icon {
+  height: 150px;
+}
+
+.remote-solution-list__loading-spinner-text {
+  margin-top: 5px;
+}

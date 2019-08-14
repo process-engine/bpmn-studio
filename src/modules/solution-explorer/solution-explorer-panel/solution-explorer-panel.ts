@@ -52,6 +52,7 @@ export class SolutionExplorerPanel {
   public solutionExplorerPanel: SolutionExplorerPanel = this;
   public remoteSolutionHistoryStatus: Map<string, boolean> = new Map<string, boolean>();
   public availableDefaultRemoteSolutions: Array<RemoteSolutionListEntry> = [];
+  public isConnecting: boolean = false;
 
   private eventAggregator: EventAggregator;
   private notificationService: NotificationService;
@@ -188,8 +189,6 @@ export class SolutionExplorerPanel {
       return;
     }
 
-    this.showOpenRemoteSolutionModal = false;
-
     try {
       const lastCharacterIsASlash: boolean = this.uriOfRemoteSolutionWithoutProtocol.endsWith('/');
       if (lastCharacterIsASlash) {
@@ -198,11 +197,18 @@ export class SolutionExplorerPanel {
 
       await this.addSolutionToRemoteSolutionHistory(this.uriOfRemoteSolution);
 
+      this.isConnecting = true;
       await this.solutionExplorerList.openSolution(this.uriOfRemoteSolution);
+      this.isConnecting = false;
     } catch (error) {
+      this.isConnecting = false;
+
       const genericMessage: string = `Unable to connect to ProcessEngine on: ${this.uriOfRemoteSolution}`;
       const cause: string = error.message ? error.message : '';
+
       this.notificationService.showNotification(NotificationType.ERROR, `${genericMessage}<br />${cause}`);
+
+      return;
     }
 
     this.closeRemoteSolutionModal();
