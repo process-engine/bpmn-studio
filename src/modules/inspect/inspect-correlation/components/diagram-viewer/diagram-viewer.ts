@@ -301,7 +301,7 @@ export class DiagramViewer {
   }
 
   private handleArrowKeyInput: EventListenerOrEventListenerObject = (event: KeyboardEvent): void => {
-    const noElementSelected: boolean = this.selectFlowNode === undefined;
+    const noElementSelected: boolean = this.selectedFlowNode === undefined;
     if (noElementSelected) {
       return;
     }
