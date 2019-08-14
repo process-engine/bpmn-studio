@@ -23,7 +23,7 @@ const {getDefaultPorts} = require('../src/services/default-ports-module/default-
 
 const releaseChannel = new ReleaseChannel(studioVersion);
 
-// If BPMN-Studio was opened by double-clicking a .bpmn file, then the
+// If BPMN Studio was opened by double-clicking a .bpmn file, then the
 // following code tells the frontend the name and content of that file;
 // this 'get_opened_file' request is emmitted in src/main.ts.
 let filePath;
@@ -32,7 +32,7 @@ let isInitialized = false;
 const Main = {};
 
 /**
- * This variable gets set when BPMN-Studio is ready to work with Files that are
+ * This variable gets set when BPMN Studio is ready to work with Files that are
  * openend via double click.
  */
 let fileOpenMainEvent;
@@ -293,6 +293,21 @@ function answerOpenFileEvent(filePath) {
   this.fileOpenMainEvent.sender.send('double-click-on-file', filePath);
 }
 
+function getProductName() {
+  switch (releaseChannel.getName()) {
+    case 'stable':
+      return 'BPMN Studio';
+    case 'beta':
+      return 'BPMN Studio (Beta)';
+    case 'alpha':
+      return 'BPMN Studio (Alpha)';
+    case 'dev':
+      return 'BPMN Studio (Dev)';
+    default:
+      return 'BPMN Studio (pre)';
+  }
+}
+
 Main._createMainWindow = () => {
   console.log('create window called');
 
@@ -301,7 +316,7 @@ Main._createMainWindow = () => {
   Main._window = new electron.BrowserWindow({
     width: 1300,
     height: 800,
-    title: 'BPMN-Studio',
+    title: getProductName(),
     minWidth: 1300,
     minHeight: 800,
     icon: path.join(__dirname, '../build/icon.png'), // only for windows
@@ -419,19 +434,20 @@ Main._createMainWindow = () => {
 
   function setElectronMenubar() {
     const copyrightYear = new Date().getFullYear();
+    const productName = getProductName();
 
     const getApplicationMenu = () => {
       return {
-        label: 'BPMN-Studio',
+        label: productName,
         submenu: [
           {
-            label: 'About BPMN-Studio',
+            label: `About ${productName}`,
             click: () =>
               openAboutWindow({
                 icon_path: releaseChannel.isDev()
                   ? path.join(__dirname, '..', 'build/icon.png')
                   : path.join(__dirname, '../../../build/icon.png'),
-                product_name: 'BPMN-Studio',
+                product_name: productName,
                 bug_report_url: 'https://github.com/process-engine/bpmn-studio/issues/new',
                 homepage: 'www.process-engine.io',
                 copyright: `Copyright © ${copyrightYear} process-engine`,
