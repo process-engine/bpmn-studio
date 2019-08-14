@@ -148,8 +148,7 @@ export class DiagramViewer {
       const leftKeyPressed: boolean = event.code === 'ArrowLeft';
 
       if (leftKeyPressed) {
-        const elementsThatCanHaveAToken: Array<IShape> = this.getElementsThatCanHaveAToken();
-        const elementsOnTheLeft: Array<IShape> = this.filterElementsOnTheLeftOfTheSelected(elementsThatCanHaveAToken);
+        const elementsOnTheLeft: Array<IShape> = this.getElementsOnTheLeftOfTheSelected();
 
         const noElementsAreOnTheLeftOfTheSelected: boolean = elementsOnTheLeft.length === 0;
         if (noElementsAreOnTheLeftOfTheSelected) {
@@ -169,8 +168,7 @@ export class DiagramViewer {
       }
 
       if (rightKeyPressed) {
-        const elementsThatCanHaveAToken: Array<IShape> = this.getElementsThatCanHaveAToken();
-        const elementsOnTheRight: Array<IShape> = this.filterElementsOnTheRightOfTheSelected(elementsThatCanHaveAToken);
+        const elementsOnTheRight: Array<IShape> = this.getElementsOnTheRightOfTheSelected();
 
         const noElementsAreOnTheRightOfTheSelected: boolean = elementsOnTheRight.length === 0;
         if (noElementsAreOnTheRightOfTheSelected) {
@@ -190,8 +188,7 @@ export class DiagramViewer {
       }
 
       if (topKeyPressed) {
-        const elementsThatCanHaveAToken: Array<IShape> = this.getElementsThatCanHaveAToken();
-        const elementsAboveSelected: Array<IShape> = this.filterElementsAboveTheSelected(elementsThatCanHaveAToken);
+        const elementsAboveSelected: Array<IShape> = this.getElementsAboveTheSelected();
 
         const noElementsAreAboveTheSelected: boolean = elementsAboveSelected.length === 0;
         if (noElementsAreAboveTheSelected) {
@@ -211,8 +208,7 @@ export class DiagramViewer {
       }
 
       if (bottomKeyPressed) {
-        const elementsThatCanHaveAToken: Array<IShape> = this.getElementsThatCanHaveAToken();
-        const elementsUnderSelected: Array<IShape> = this.filterElementsUnderTheSelected(elementsThatCanHaveAToken);
+        const elementsUnderSelected: Array<IShape> = this.getElementsUnderTheSelected();
 
         const noElementsAreUnderTheSelected: boolean = elementsUnderSelected.length === 0;
         if (noElementsAreUnderTheSelected) {
@@ -281,32 +277,40 @@ export class DiagramViewer {
     });
   }
 
-  private filterElementsAboveTheSelected(elementsToFilter: Array<IShape>): Array<IShape> {
-    return elementsToFilter.filter((element: IShape): boolean => {
+  private getElementsAboveTheSelected(): Array<IShape> {
+    const elementsThatCanHaveAToken: Array<IShape> = this.getElementsThatCanHaveAToken();
+
+    return elementsThatCanHaveAToken.filter((element: IShape): boolean => {
       const elementIsAboveTheSelectedFlowNode: boolean = this.selectedFlowNode.y > element.y;
 
       return elementIsAboveTheSelectedFlowNode;
     });
   }
 
-  private filterElementsUnderTheSelected(elementsToFilter: Array<IShape>): Array<IShape> {
-    return elementsToFilter.filter((element: IShape): boolean => {
+  private getElementsUnderTheSelected(): Array<IShape> {
+    const elementsThatCanHaveAToken: Array<IShape> = this.getElementsThatCanHaveAToken();
+
+    return elementsThatCanHaveAToken.filter((element: IShape): boolean => {
       const elementIsAboveTheSelectedFlowNode: boolean = this.selectedFlowNode.y < element.y;
 
       return elementIsAboveTheSelectedFlowNode;
     });
   }
 
-  private filterElementsOnTheRightOfTheSelected(elementsToFilter: Array<IShape>): Array<IShape> {
-    return elementsToFilter.filter((element: IShape): boolean => {
+  private getElementsOnTheRightOfTheSelected(): Array<IShape> {
+    const elementsThatCanHaveAToken: Array<IShape> = this.getElementsThatCanHaveAToken();
+
+    return elementsThatCanHaveAToken.filter((element: IShape): boolean => {
       const elementIsOnTheRightOfTheSelectedFlowNode: boolean = this.selectedFlowNode.x < element.x;
 
       return elementIsOnTheRightOfTheSelectedFlowNode;
     });
   }
 
-  private filterElementsOnTheLeftOfTheSelected(elementsToFilter: Array<IShape>): Array<IShape> {
-    return elementsToFilter.filter((element: IShape): boolean => {
+  private getElementsOnTheLeftOfTheSelected(): Array<IShape> {
+    const elementsThatCanHaveAToken: Array<IShape> = this.getElementsThatCanHaveAToken();
+
+    return elementsThatCanHaveAToken.filter((element: IShape): boolean => {
       const elementIsOnTheLeftOfTheSelectedFlowNode: boolean = this.selectedFlowNode.x > element.x;
 
       return elementIsOnTheLeftOfTheSelectedFlowNode;
