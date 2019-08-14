@@ -142,10 +142,10 @@ export class DiagramViewer {
         return;
       }
 
-      const topKeyPressed: boolean = event.code === 'ArrowUp';
-      const rightKeyPressed: boolean = event.code === 'ArrowRight';
-      const bottomKeyPressed: boolean = event.code === 'ArrowDown';
       const leftKeyPressed: boolean = event.code === 'ArrowLeft';
+      const rightKeyPressed: boolean = event.code === 'ArrowRight';
+      const topKeyPressed: boolean = event.code === 'ArrowUp';
+      const bottomKeyPressed: boolean = event.code === 'ArrowDown';
 
       let elementToSelect: IShape;
       if (leftKeyPressed) {
