@@ -13,6 +13,9 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 10.x
+    - name: echo test
+      run: |
+        echo "This is a test"
     - name: npm install, build, and test
       run: |
         npm ci
