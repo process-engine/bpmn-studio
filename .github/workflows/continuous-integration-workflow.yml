@@ -27,6 +27,7 @@ jobs:
         node: [10]
         os: [macOS-10.14, windows-2016, ubuntu-18.04]
     steps:
+    - uses: actions/checkout@master
     - name: npm install, build, and test
       run: |
         npm ci
