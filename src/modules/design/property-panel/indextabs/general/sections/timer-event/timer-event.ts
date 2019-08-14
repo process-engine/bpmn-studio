@@ -162,7 +162,6 @@ export class TimerEventSection implements ISection {
 
     if (timeDate !== undefined) {
       this.timerType = TimerType.Date;
-
     }
   }
 

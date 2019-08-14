@@ -6,9 +6,9 @@ import {NavigationInstruction} from 'aurelia-router';
 export type AureliaNavigationObject = {
   result: NavigationResult;
   instruction: NavigationInstruction;
-}
+};
 
 type NavigationResult = {
   completed: boolean;
   status: string;
-}
+};

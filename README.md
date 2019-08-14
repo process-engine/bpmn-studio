@@ -1,13 +1,13 @@
-# BPMN-Studio
+# BPMN Studio
 
-BPMN-Studio ist eine Web- und Desktop-Applikation zur Erstellung, Verwaltung,
+BPMN Studio ist eine Web- und Desktop-Applikation zur Erstellung, Verwaltung,
 Ausführung und Auswertung von BPMN-Prozessen.  Es setzt auf dem BPMN.io auf und
 den BPMN-Standard 2.x um.
 
 ## Was sind die Ziele dieses Projekts?
 
-BPMN-Studio soll es dem Anwender so leicht wie möglich machen BPMN-Diagramme zu
-erstellen und zu pflegen.  Des Weiteren kann BPMN-Studio mit einer Workflow
+BPMN Studio soll es dem Anwender so leicht wie möglich machen BPMN-Diagramme zu
+erstellen und zu pflegen.  Des Weiteren kann BPMN Studio mit einer Workflow
 Engine verbunden werden, um diese Diagramme auszuführen.
 
 ## Relevante URLs
@@ -86,7 +86,7 @@ Es ist möglich einen anderen Port zu spezifizieren:
 npm start -- --port 9000
 ```
 
-Das startet das BPMN-Studio auf Port 9000.
+Das startet das BPMN Studio auf Port 9000.
 
 **Anmerkung**
 
@@ -149,7 +149,7 @@ Beispiel:
 
 **Alternative:**
 
-Die Releases des BPMN-Studios lassen sich alternativ auch
+Die Releases des BPMN Studios lassen sich alternativ auch
 [hier](https://github.com/process-engine/bpmn-studio/releases)
 herunterladen.
 
@@ -182,7 +182,7 @@ Der Container lässt sich mit folgendem Befehl starten:
 docker run -p 9000:9000 bpmn-studio:latest
 ```
 
-Anschließend lässt sich das BPMN-Studio unter URL `http://localhost:17290`
+Anschließend lässt sich das BPMN Studio unter URL `http://localhost:17290`
 aufrufen.
 
 ## End-to-End-Tests
@@ -271,11 +271,11 @@ Es werden folgende Pakete benötigt:
    ```shell
    export CB_USER=""           # CrossBrowserTesting E-Mail Adresse
    export CB_KEY=""            # CrossBrowserTesting API Key
-   export aureliaUrl=""        # URL oder IP der VM + Port des BPMN-Studio; z.B.: http://1.1.1.1:9000
-   export processEngineUrl=""  # URL oder IP der VM + Port der ProcessEngine; z.B.: http://1.1.1.1:8000
+   export aureliaUrl=""        # URL oder IP der VM + Port des BPMN Studios, z.B. http://1.1.1.1:9000
+   export processEngineUrl=""  # URL oder IP der VM + Port der ProcessEngine, z.B. http://1.1.1.1:8000
    ```
 
-1. Ein Terminal öffnen und das BPMN-Studio auf der VM mit folgendem Befehl
+1. Ein Terminal öffnen und das BPMN Studio auf der VM mit folgendem Befehl
    starten:
 
    ```shell
@@ -310,11 +310,11 @@ Die folgenden Skripte, werden in unserem Tooling verwendet:
 
 * `start`
 
-  Startet die BPMN-Studio Webanwendung.
+  Startet die BPMN Studio Webanwendung.
 
 * `start_dev`
 
-  Startet die BPMN-Studio Webanwendung und trackt die Quelldatein
+  Startet die BPMN Studio Webanwendung und trackt die Quelldatein
   (geänderte Quelltextdatein werden neu transpiliert und die
   Webanwendung wird neu geladen).
 
@@ -349,13 +349,13 @@ Die folgenden Skripte, werden in unserem Tooling verwendet:
 
 * `test`
 
-  Führt die End-to-End Tests für das BPMN-Studio Frontend aus.
+  Führt die End-to-End Tests für das BPMN Studio Frontend aus.
 
 * `test-docker`
 
-  Startet die BPMN-Studio Webanwendung als Docker Container und führt
+  Startet die BPMN Studio Webanwendung als Docker Container und führt
   die End-to-End Tests gegen der im Container laufenden Instanz der
-  BPMN-Studio Webanwendung aus.
+  BPMN Studio Webanwendung aus.
 
 ## Was muss ich sonst noch wissen?
 

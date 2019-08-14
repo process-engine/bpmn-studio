@@ -118,7 +118,6 @@ export class ServiceTaskSection implements ISection {
     const modulePropertyExists: boolean = this.serviceTaskService.getProperty('module') !== undefined;
     if (modulePropertyExists) {
       this.selectedKind = ServiceKind[this.serviceTaskService.getProperty('module').value];
-
     } else {
       this.selectedKind = ServiceKind.None;
     }

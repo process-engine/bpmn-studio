@@ -9,6 +9,7 @@ import environment from '../../../../../environment';
 
 @inject(EventAggregator)
 export class InspectPanel {
+  @bindable public processInstanceToSelect: string;
   @bindable public correlations: Array<DataModels.Correlations.Correlation>;
   @bindable public processInstances: Array<DataModels.Correlations.CorrelationProcessInstance>;
   @bindable public selectedProcessInstance: DataModels.Correlations.CorrelationProcessInstance;
@@ -18,7 +19,7 @@ export class InspectPanel {
   @bindable public activeSolutionEntry: ISolutionEntry;
   public inspectPanelTab: typeof InspectPanelTab = InspectPanelTab;
   public showCorrelationList: boolean = true;
-  public showLogViewer: boolean;
+  public showLogViewer: boolean = false;
 
   private eventAggregator: EventAggregator;
   private subscriptions: Array<Subscription>;

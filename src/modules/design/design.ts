@@ -121,8 +121,8 @@ export class Design {
 
         this.eventAggregator.publish(environment.events.configPanel.solutionEntryChanged, this.activeSolutionEntry);
       } else if (isRunningInElectron) {
-          this.ipcRenderer.send('menu_show-all-menu-entries');
-        }
+        this.ipcRenderer.send('menu_show-all-menu-entries');
+      }
 
       const isOpenDiagram: boolean = this.activeSolutionEntry.uri === 'about:open-diagrams';
 

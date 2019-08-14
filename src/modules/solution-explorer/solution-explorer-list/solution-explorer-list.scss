@@ -132,3 +132,16 @@
   padding-right: 14px;
   margin-left: 2px;
 }
+
+.version-info {
+  padding-top: 3px;
+  padding-right: 5px;
+}
+
+.version-info--old {
+  color: #ffc107;
+}
+
+.version-info--new {
+  color: #007bffd4;
+}

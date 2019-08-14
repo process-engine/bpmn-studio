@@ -39,6 +39,11 @@ export class LogViewer {
   }
 
   public async processInstanceChanged(): Promise<void> {
+    const noProcessInstanceSet: boolean = this.processInstance === undefined;
+    if (noProcessInstanceSet) {
+      return;
+    }
+
     setTimeout(async () => {
       this.log = await this.inspectCorrelationService.getLogsForProcessInstance(
         this.processInstance.processModelId,

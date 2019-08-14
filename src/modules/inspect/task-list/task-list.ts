@@ -160,6 +160,10 @@ export class TaskList {
       await this.updateTasks();
     });
 
+    this.managementApiService.onProcessError(this.activeSolutionEntry.identity, async () => {
+      await this.updateTasks();
+    });
+
     this.isAttached = true;
   }
 

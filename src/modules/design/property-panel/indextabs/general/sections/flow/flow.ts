@@ -54,8 +54,7 @@ export class FlowSection implements ISection {
 
   public updateCondition(): void {
     const objectHasNoConditionExpression: boolean =
-      this.businessObjInPanel.conditionExpression === undefined ||
-      this.businessObjInPanel.conditionExpression === null;
+      this.businessObjInPanel.conditionExpression === undefined || this.businessObjInPanel.conditionExpression === null;
 
     if (objectHasNoConditionExpression) {
       this.createConditionExpression();
@@ -75,10 +74,7 @@ export class FlowSection implements ISection {
   }
 
   private init(): void {
-    if (
-      this.businessObjInPanel.conditionExpression &&
-      this.businessObjInPanel.conditionExpression.body !== undefined
-    ) {
+    if (this.businessObjInPanel.conditionExpression && this.businessObjInPanel.conditionExpression.body !== undefined) {
       this.condition = this.businessObjInPanel.conditionExpression.body;
     } else {
       this.condition = '';
