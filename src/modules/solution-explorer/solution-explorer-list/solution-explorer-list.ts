@@ -58,6 +58,8 @@ export class SolutionExplorerList {
    * Contains all opened solutions.
    */
   private openedSolutions: Array<ISolutionEntry> = [];
+  private solutionsToOpen: Array<string> = [];
+  private solutionsWhoseOpeningShouldGetAborted: Array<string> = [];
 
   constructor(
     router: Router,
@@ -168,7 +170,15 @@ export class SolutionExplorerList {
     this.processEngineIsOlderModal = true;
   }
 
+  public cancelOpeningSolution(solutionUri: string): void {
+    if (this.solutionsToOpen.includes(solutionUri)) {
+      this.solutionsWhoseOpeningShouldGetAborted.push(solutionUri);
+    }
+  }
+
   public async openSolution(uri: string, insertAtBeginning: boolean = false, identity?: IIdentity): Promise<void> {
+    this.solutionsToOpen.push(uri);
+
     this.internalProcessEngineVersion = await this.getProcessEngineVersionFromInternalPE(this.internalSolutionUri);
     const uriIsRemote: boolean = uri.startsWith('http');
 
@@ -192,6 +202,12 @@ export class SolutionExplorerList {
         const response: Response = await new Promise(
           async (resolve, reject): Promise<void> => {
             const timeout: NodeJS.Timeout = setTimeout(() => {
+              if (this.solutionsWhoseOpeningShouldGetAborted.includes(uri)) {
+                this.openingSolutionWasCanceled(uri);
+
+                return;
+              }
+
               reject(new Error('Server did not respond.'));
             }, 3000);
 
@@ -204,6 +220,12 @@ export class SolutionExplorerList {
 
         const responseJSON: object & {version: string} = await response.json();
 
+        if (this.solutionsWhoseOpeningShouldGetAborted.includes(uri)) {
+          this.openingSolutionWasCanceled(uri);
+
+          return;
+        }
+
         const isResponseFromProcessEngine: boolean = responseJSON['name'] === '@process-engine/process_engine_runtime';
         if (!isResponseFromProcessEngine) {
           throw new Error('The response was not send by a ProcessEngine.');
@@ -212,8 +234,17 @@ export class SolutionExplorerList {
         processEngineVersion = responseJSON.version;
       }
 
+      if (this.solutionsWhoseOpeningShouldGetAborted.includes(uri)) {
+        this.openingSolutionWasCanceled(uri);
+
+        return;
+      }
+
       await solutionExplorer.openSolution(uri, identityToUse);
+
+      this.solutionsToOpen.splice(this.solutionsToOpen.indexOf(uri), 1);
     } catch (error) {
+      this.solutionsToOpen.splice(this.solutionsToOpen.indexOf(uri), 1);
       this.solutionService.removeSolutionEntryByUri(uri);
 
       const errorIsNoProcessEngine: boolean =
@@ -427,6 +458,14 @@ export class SolutionExplorerList {
     );
 
     return sortedEntries;
+  }
+
+  private openingSolutionWasCanceled(solutionUri: string): void {
+    this.solutionsWhoseOpeningShouldGetAborted.splice(
+      this.solutionsWhoseOpeningShouldGetAborted.indexOf(solutionUri),
+      1,
+    );
+    this.solutionsToOpen.splice(this.solutionsToOpen.indexOf(solutionUri), 1);
   }
 
   private getProcessEngineVersionFromInternalPE(uri: string): Promise<string> {

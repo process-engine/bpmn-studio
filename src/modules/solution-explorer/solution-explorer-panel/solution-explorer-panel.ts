@@ -180,10 +180,11 @@ export class SolutionExplorerPanel {
   }
 
   public closeRemoteSolutionModal(): void {
+    this.stopPollingOfRemoteSolutionHistoryStatus();
+    this.solutionExplorerList.cancelOpeningSolution(this.uriOfRemoteSolution);
     this.isConnecting = false;
     this.showOpenRemoteSolutionModal = false;
     this.uriOfRemoteSolutionWithoutProtocol = undefined;
-    this.stopPollingOfRemoteSolutionHistoryStatus();
     this.connectionError = undefined;
   }
 
