@@ -14,7 +14,7 @@ import {CancellationToken, autoUpdater} from 'electron-updater';
 import path from 'path';
 import openAboutWindow, {AboutWindowInfo} from 'about-window';
 import getPort from 'get-port';
-import pe from '@process-engine/process_engine_runtime';
+import * as pe from '@process-engine/process_engine_runtime';
 import {homedir} from 'os';
 import electronOidc from './electron-oidc';
 import oidcConfig from './oidc-config';
