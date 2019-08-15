@@ -59,7 +59,7 @@
 }
 
 .remote-solution-list {
-  margin-top: 14px;
+  margin: 14px 0;
   width: 100%;
   height: 120px;
   overflow-x: hidden;
@@ -142,19 +142,29 @@
 }
 
 .remote-solution-list__loading-spinner {
-  position: absolute;
-  top: 50%;
-  left: 50%;
   display: inline-block;
-  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
   user-select: none;
   white-space: nowrap;
 }
 
 .remote-solution-list__loading-spinner-icon {
+  position: absolute;
+  left: 50%;
+  top: calc(50% - 22px);
   height: 150px;
+  transform: translate(-50%, -50%);
 }
 
 .remote-solution-list__loading-spinner-text {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   margin-top: 5px;
+  bottom: 10px;
+}
+
+.remote-solution-list__connection-error-message {
+  white-space: pre-wrap;
 }

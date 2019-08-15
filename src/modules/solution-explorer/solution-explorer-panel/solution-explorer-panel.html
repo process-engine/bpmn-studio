@@ -48,7 +48,7 @@
   <!-- Open Remote Solution Modal -->
   <modal if.bind="showOpenRemoteSolutionModal"
          header-text="Open Remote Solution"
-         modal-style="height: 350px"
+         modal-style="height: 400px"
          origin.bind="solutionExplorerPanel">
     <template replace-part="modal-body">
       <form if.bind="!isConnecting" role="form" submit.delegate="openRemoteSolution()">
@@ -81,10 +81,10 @@
             <i class="fas fa-times"></i>
           </button>
         </div>
-      </div>
-      <div else class="remote-solution-list__loading-spinner">
+      </div><span if.bind="connectionErrorExists" class="remote-solution-list__connection-error-message">${connectionError}</span>
+      <div if.bind="isConnecting" class="remote-solution-list__loading-spinner">
         <img class="remote-solution-list__loading-spinner-icon" src="src/resources/images/gears.svg">
-        <h3 class="remote-solution-list__loading-spinner-text">Connecting...</h3>
+        <h3 class="remote-solution-list__loading-spinner-text">Connecting to ${uriOfRemoteSolution}...</h3>
       </div>
     </template>
     <template replace-part="modal-footer">
