@@ -34,6 +34,7 @@ jobs:
     - uses: actions/download-artifact@master
       with:
         name: package_json
+        path: "."
     - name: Install NPM dependencies
       run: |
         npm ci
