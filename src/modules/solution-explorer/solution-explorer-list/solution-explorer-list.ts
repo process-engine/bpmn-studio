@@ -211,10 +211,16 @@ export class SolutionExplorerList {
               reject(new Error('Server did not respond.'));
             }, 3000);
 
-            const fetchResponse: Response = await fetch(uri);
-            clearTimeout(timeout);
+            try {
+              const fetchResponse: Response = await fetch(uri);
+              clearTimeout(timeout);
 
-            resolve(fetchResponse);
+              resolve(fetchResponse);
+            } catch (error) {
+              clearTimeout(timeout);
+
+              reject(error);
+            }
           },
         );
 
