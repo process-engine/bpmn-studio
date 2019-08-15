@@ -20,8 +20,6 @@ jobs:
       run: |
         # does prepare the version, but not commit it
         node ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir
-        ls -al
-        head package.json
     - name: Save prepared package.json
       uses: actions/upload-artifact@master
       with:
