@@ -29,12 +29,13 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@master
-    # - name: Install NPM dependencies
-    #   run: |
-    #     npm ci
-    #     node ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+    - name: Install NPM dependencies
+      run: |
+        npm ci
+        node ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
     - name: npm build and test
       run: |
+        head package.json
         ls -al
         npm run build
         npm test
