@@ -22,6 +22,11 @@ jobs:
         node ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir
         ls -al
         head package.json
+    - name: Save prepared package.json
+      uses: actions/upload-artifact@master
+      with:
+        name: package_json
+        path: package.json
 
   build_and_test_linux:
     name: "Build & Test (Linux)"
@@ -29,6 +34,10 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@master
+    - name: Load prepared package.json
+      uses: actions/download-artifact@master
+      with:
+        name: package_json
     - name: Install NPM dependencies
       run: |
         npm ci
@@ -39,3 +48,5 @@ jobs:
         ls -al
         npm run build
         npm test
+
+        # TODO: save artifacts for webapp
