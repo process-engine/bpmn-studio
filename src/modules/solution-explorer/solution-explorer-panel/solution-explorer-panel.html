@@ -48,7 +48,7 @@
   <!-- Open Remote Solution Modal -->
   <modal if.bind="showOpenRemoteSolutionModal"
          header-text="Open Remote Solution"
-         modal-style="height: 400px"
+         body-style="min-height: 230px"
          origin.bind="solutionExplorerPanel">
     <template replace-part="modal-body">
       <form if.bind="!isConnecting" role="form" submit.delegate="openRemoteSolution()">
