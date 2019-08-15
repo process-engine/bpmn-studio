@@ -89,7 +89,7 @@ export default class Main {
           Main.browserWindow.loadURL(`file://${__dirname}/../index.html`);
           Main.browserWindow.loadURL('/');
 
-          electron.ipcMain.once('deep-linking-ready', (): void => {
+          Main.ipcMain.once('deep-linking-ready', (): void => {
             Main.browserWindow.webContents.send('deep-linking-request', redirectUrl);
           });
         }
@@ -119,7 +119,7 @@ export default class Main {
   }
 
   private static initializeAutoUpdater(): void {
-    electron.ipcMain.on('app_ready', async (appReadyEvent) => {
+    Main.ipcMain.on('app_ready', async (appReadyEvent) => {
       autoUpdater.autoDownload = false;
 
       const currentVersion = Main.app.getVersion();
@@ -166,17 +166,17 @@ export default class Main {
       autoUpdater.addListener('update-available', (updateInfo) => {
         appReadyEvent.sender.send('update_available', updateInfo.version);
 
-        electron.ipcMain.on('download_update', () => {
+        Main.ipcMain.on('download_update', () => {
           downloadCancellationToken = new CancellationToken();
           autoUpdater.downloadUpdate(downloadCancellationToken);
 
-          electron.ipcMain.on('cancel_update', () => {
+          Main.ipcMain.on('cancel_update', () => {
             downloadCancellationToken.cancel();
           });
         });
 
-        electron.ipcMain.on('show_release_notes', () => {
-          const releaseNotesWindow = new electron.BrowserWindow({
+        Main.ipcMain.on('show_release_notes', () => {
+          const releaseNotesWindow = new BrowserWindow({
             width: 600,
             height: 600,
             title: `Release Notes ${updateInfo.version}`,
@@ -193,7 +193,7 @@ export default class Main {
       autoUpdater.addListener('update-downloaded', () => {
         appReadyEvent.sender.send('update_downloaded');
 
-        electron.ipcMain.on('quit_and_install', () => {
+        Main.ipcMain.on('quit_and_install', () => {
           autoUpdater.quitAndInstall();
         });
       });
@@ -276,12 +276,12 @@ export default class Main {
      *
      * "open-file" gets fired when someone double clicks a .bpmn file.
      */
-    electron.ipcMain.on('waiting-for-double-file-click', (mainEvent: ElectronEvent) => {
+    Main.ipcMain.on('waiting-for-double-file-click', (mainEvent: ElectronEvent) => {
       Main.fileOpenMainEvent = mainEvent;
       Main.isInitialized = true;
     });
 
-    electron.ipcMain.on('get_opened_file', (event) => {
+    Main.ipcMain.on('get_opened_file', (event) => {
       const filePathExists: boolean = Main.filePath === undefined;
       if (filePathExists) {
         event.returnValue = {};
@@ -341,7 +341,7 @@ export default class Main {
     // history.
     Main.browserWindow.loadURL('/');
 
-    electron.ipcMain.on('close_bpmn-studio', (event) => {
+    Main.ipcMain.on('close_bpmn-studio', (event) => {
       Main.browserWindow.close();
     });
 
@@ -391,7 +391,7 @@ export default class Main {
   }
 
   private static setSaveDiagramAsListener(): void {
-    electron.ipcMain.on('open_save-diagram-as_dialog', (event) => {
+    Main.ipcMain.on('open_save-diagram-as_dialog', (event) => {
       const filePath = Main.dialog.showSaveDialog({
         filters: [
           {
@@ -410,7 +410,7 @@ export default class Main {
   }
 
   private static setOpenDiagramListener(): void {
-    electron.ipcMain.on('open_diagram', (event) => {
+    Main.ipcMain.on('open_diagram', (event) => {
       const openedFile = Main.dialog.showOpenDialog({
         filters: [
           {
@@ -433,7 +433,7 @@ export default class Main {
   }
 
   private static setOpenSolutionsListener(): void {
-    electron.ipcMain.on('open_solution', (event) => {
+    Main.ipcMain.on('open_solution', (event) => {
       const openedFile = Main.dialog.showOpenDialog({
         properties: ['openDirectory', 'createDirectory'],
       });
@@ -445,11 +445,11 @@ export default class Main {
   private static setElectronMenubar(): void {
     Main.showMenuEntriesWithoutDiagramEntries();
 
-    electron.ipcMain.on('menu_hide-diagram-entries', () => {
+    Main.ipcMain.on('menu_hide-diagram-entries', () => {
       Main.showMenuEntriesWithoutDiagramEntries();
     });
 
-    electron.ipcMain.on('menu_show-all-menu-entries', () => {
+    Main.ipcMain.on('menu_show-all-menu-entries', () => {
       Main.showAllMenuEntries();
     });
   }
@@ -695,7 +695,7 @@ export default class Main {
       {
         label: 'Release Notes for Current Version',
         click: (): void => {
-          const currentVersion = electron.app.getVersion();
+          const currentVersion = Main.app.getVersion();
           const currentReleaseNotesUrl = `https://github.com/process-engine/bpmn-studio/releases/tag/v${currentVersion}`;
           electron.shell.openExternal(currentReleaseNotesUrl);
         },
@@ -808,7 +808,7 @@ export default class Main {
      *          |       (event occurs)        |
      *          o   <<<- Send Message  -<<<   x
      */
-    electron.ipcMain.on('add_internal_processengine_status_listener', (event: ElectronEvent) => {
+    Main.ipcMain.on('add_internal_processengine_status_listener', (event: ElectronEvent) => {
       if (!processEngineStatusListeners.includes(event.sender)) {
         processEngineStatusListeners.push(event.sender);
       }
@@ -824,7 +824,7 @@ export default class Main {
 
     // This tells the frontend the location at which the electron-skeleton
     // will be running; this 'get_host' request ist emitted in src/main.ts.
-    electron.ipcMain.on('get_host', (event: ElectronEvent) => {
+    Main.ipcMain.on('get_host', (event: ElectronEvent) => {
       event.returnValue = `localhost:${port}`;
     });
 
