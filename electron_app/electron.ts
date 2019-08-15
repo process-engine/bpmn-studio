@@ -86,7 +86,7 @@ export default class Main {
         if (argumentContainsRedirect) {
           const redirectUrl = argv[1];
 
-          Main.browserWindow.loadURL(`file://${__dirname}/../index.html`);
+          Main.browserWindow.loadURL(`file://${__dirname}/../../../index.html`);
           Main.browserWindow.loadURL('/');
 
           Main.ipcMain.once('deep-linking-ready', (): void => {
@@ -335,7 +335,7 @@ export default class Main {
       },
     });
 
-    Main.browserWindow.loadURL(`file://${__dirname}/../index.html`);
+    Main.browserWindow.loadURL(`file://${__dirname}/../../../index.html`);
     // We need to navigate to "/" because something in the push state seems to be
     // broken if we carry a file system link as the last item of the browser
     // history.
