@@ -44,7 +44,7 @@ export default class Main {
    * This variable gets set when BPMN Studio is ready to work with Files that are
    * openend via double click.
    */
-  private static fileOpenMainEvent: electron.Event;
+  private static fileOpenMainEvent: ElectronEvent;
 
   public static execute(): void {
     /**
