@@ -20,8 +20,7 @@ jobs:
       run: |
         # does prepare the version, but not commit it
         node ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir
-    - name: Save prepared package.json
-      uses: actions/upload-artifact@master
+    - uses: actions/upload-artifact@master
       with:
         name: package_json
         path: package.json
@@ -32,8 +31,7 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@master
-    - name: Load prepared package.json
-      uses: actions/download-artifact@master
+    - uses: actions/download-artifact@master
       with:
         name: package_json
     - name: Install NPM dependencies
