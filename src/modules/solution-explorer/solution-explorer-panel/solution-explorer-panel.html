@@ -81,7 +81,8 @@
             <i class="fas fa-times"></i>
           </button>
         </div>
-      </div><span if.bind="connectionErrorExists" class="remote-solution-list__connection-error-message">${connectionError}</span>
+      </div>
+      <div if.bind="connectionErrorExists" class="alert alert-warning remote-solution-list__connection-error-message" role="alert">${connectionError}</div>
       <div if.bind="isConnecting" class="remote-solution-list__loading-spinner">
         <img class="remote-solution-list__loading-spinner-icon" src="src/resources/images/gears.svg">
         <h3 class="remote-solution-list__loading-spinner-text">Connecting to ${uriOfRemoteSolution}...</h3>
