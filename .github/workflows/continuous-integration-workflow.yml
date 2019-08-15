@@ -25,6 +25,22 @@ jobs:
         name: package_json
         path: package.json
 
+  lint_linux:
+    name: "Lint sources"
+    needs: prepare_version
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@master
+    - uses: actions/download-artifact@master
+      with:
+        name: package_json
+        path: "."
+    - name: Install NPM dependencies
+      run: |
+        npm ci
+        node ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+    - run: npm run lint
+
   build_and_test_linux:
     name: "Build & Test (Linux)"
     needs: prepare_version
@@ -47,3 +63,55 @@ jobs:
         npm test
 
         # TODO: save artifacts for webapp
+
+  build_and_test_macos:
+    name: "Build & Test (macOS)"
+    needs: prepare_version
+    runs-on: macOS-latest
+    steps:
+    - uses: actions/checkout@master
+    - uses: actions/download-artifact@master
+      with:
+        name: package_json
+        path: "."
+    - name: Install NPM dependencies
+      run: |
+        npm ci
+        node ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+
+    - name: npm build and test
+      run: |
+        npm run electron-build-macos
+
+        npm run test-electron-macos
+
+    - uses: actions/upload-artifact@master
+      with:
+        name: dist_electron_macos
+        path: dist/electron
+
+  build_and_test_windows:
+    name: "Build & Test (Windows)"
+    needs: prepare_version
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@master
+    - uses: actions/download-artifact@master
+      with:
+        name: package_json
+        path: "."
+    - name: Install NPM dependencies
+      run: |
+        npm ci
+        node ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+
+    - name: npm build and test
+      run: |
+        npm run electron-build-windows
+
+        npm run test-electron-windows
+
+    - uses: actions/upload-artifact@master
+      with:
+        name: dist_electron_windows
+        path: dist/electron
