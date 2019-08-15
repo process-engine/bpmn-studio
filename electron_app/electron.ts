@@ -105,7 +105,7 @@ export default class Main {
     });
 
     Main.app.on('activate', (): void => {
-      if (Main.browserWindow === null) {
+      if (Main.browserWindow === undefined) {
         Main.createMainWindow();
       }
     });
