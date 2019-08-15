@@ -1,10 +1,14 @@
 import queryString from 'querystring';
 import fetch from 'node-fetch';
 import nodeUrl from 'url';
-import electron, {BrowserWindowConstructorOptions, Event as ElectronEvent} from 'electron';
+import {BrowserWindowConstructorOptions, Event as ElectronEvent} from 'electron';
 import crypto from 'crypto';
 
 import {IOidcConfig, ITokenObject} from '../src/contracts/index';
+
+// TODO Check if this is really necessary
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+import electron = require('electron');
 
 const BrowserWindow = electron.BrowserWindow || electron.remote.BrowserWindow;
 

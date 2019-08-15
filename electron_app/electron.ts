@@ -1,4 +1,4 @@
-import electron, {
+import {
   App,
   BrowserWindow,
   Dialog,
@@ -21,6 +21,10 @@ import oidcConfig from './oidc-config';
 import ReleaseChannel from '../src/services/release-channel-service/release-channel-service';
 import {version as CurrentStudioVersion} from '../package.json';
 import {getDefaultPortList} from '../src/services/default-ports-module/default-ports-module';
+
+// TODO Check if this is really necessary
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+import electron = require('electron');
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export default class Main {
