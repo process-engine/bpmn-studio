@@ -18,9 +18,9 @@ import pe from '@process-engine/process_engine_runtime';
 import {homedir} from 'os';
 import electronOidc from './electron-oidc';
 import oidcConfig from './oidc-config';
-import ReleaseChannel from '../services/release-channel-service/release-channel-service';
-import {version as CurrentStudioVersion} from '../../package.json';
-import {getDefaultPortList} from '../services/default-ports-module/default-ports-module';
+import ReleaseChannel from '../src/services/release-channel-service/release-channel-service';
+import {version as CurrentStudioVersion} from '../package.json';
+import {getDefaultPortList} from '../src/services/default-ports-module/default-ports-module';
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export default class Main {

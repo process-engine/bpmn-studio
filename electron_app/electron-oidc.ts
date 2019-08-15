@@ -4,7 +4,7 @@ import nodeUrl from 'url';
 import electron, {BrowserWindowConstructorOptions, Event as ElectronEvent} from 'electron';
 import crypto from 'crypto';
 
-import {IOidcConfig, ITokenObject} from '../contracts/index';
+import {IOidcConfig, ITokenObject} from '../src/contracts/index';
 
 const BrowserWindow = electron.BrowserWindow || electron.remote.BrowserWindow;
 
@@ -154,7 +154,7 @@ function logout(
 
   return new Promise(
     async (resolve: Function): Promise<void> => {
-      const response: Response = await fetch(endSessionUrl);
+      const response: fetch.Response = await fetch(endSessionUrl);
 
       const logoutWindow = new BrowserWindow(windowParams || {useContentSize: true});
 
