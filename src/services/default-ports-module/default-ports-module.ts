@@ -1,12 +1,4 @@
-import {version as CurrentStudioVersion} from '../../../package.json';
-import ReleaseChannel from '../release-channel-service/release-channel-service';
 import {StudioVersion} from '../../contracts/index';
-
-const releaseChanel: ReleaseChannel = new ReleaseChannel(CurrentStudioVersion);
-
-export function getDefaultPortList(): Array<number> {
-  return this.getPortListByVersion(releaseChanel.getVersion());
-}
 
 export function getPortListByVersion(studioVersion: StudioVersion): Array<number> {
   const portList = [];

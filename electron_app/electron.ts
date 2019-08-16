@@ -20,7 +20,7 @@ import electronOidc from './electron-oidc';
 import oidcConfig from './oidc-config';
 import ReleaseChannel from '../src/services/release-channel-service/release-channel-service';
 import {version as CurrentStudioVersion} from '../package.json';
-import {getDefaultPortList} from '../src/services/default-ports-module/default-ports-module';
+import {getPortListByVersion} from '../src/services/default-ports-module/default-ports-module';
 
 // TODO Check if this is really necessary
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -744,7 +744,7 @@ export default class Main {
     }
 
     const configForGetPort = {
-      port: getDefaultPortList(),
+      port: getPortListByVersion(this.releaseChannel.getVersion()),
       host: '0.0.0.0',
     };
     console.log('Trying to start internal ProcessEngine on ports:', configForGetPort);
