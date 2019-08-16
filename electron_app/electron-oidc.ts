@@ -6,7 +6,6 @@ import crypto from 'crypto';
 
 import {IOidcConfig, ITokenObject} from '../src/contracts/index';
 
-// TODO Check if this is really necessary
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import electron = require('electron');
 

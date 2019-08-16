@@ -22,7 +22,6 @@ import ReleaseChannel from '../src/services/release-channel-service/release-chan
 import {version as CurrentStudioVersion} from '../package.json';
 import {getPortListByVersion} from '../src/services/default-ports-module/default-ports-module';
 
-// TODO Check if this is really necessary
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import electron = require('electron');
 
