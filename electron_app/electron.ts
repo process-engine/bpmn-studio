@@ -450,13 +450,7 @@ function setElectronMenubar(): void {
 }
 
 function showAllMenuEntries(): void {
-  const template = [
-    getApplicationMenu(),
-    getFileMenu(),
-    getEditMenu(),
-    getWindowMenu(),
-    getHelpMenu(),
-  ];
+  const template = [getApplicationMenu(), getFileMenu(), getEditMenu(), getWindowMenu(), getHelpMenu()];
 
   electron.Menu.setApplicationMenu(electron.Menu.buildFromTemplate(template));
 }
@@ -803,11 +797,7 @@ async function startInternalProcessEngine(): Promise<any> {
     }
 
     if (internalProcessEngineStatus !== undefined) {
-      sendInternalProcessEngineStatus(
-        event.sender,
-        internalProcessEngineStatus,
-        internalProcessEngineStartupError,
-      );
+      sendInternalProcessEngineStatus(event.sender, internalProcessEngineStatus, internalProcessEngineStartupError);
     }
   });
 
