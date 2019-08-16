@@ -4,7 +4,6 @@ directories:
   buildResources: build
 extraFiles:
   - filter:
-      - config/**/*
       - build/**
 extraResources:
   - filter:
