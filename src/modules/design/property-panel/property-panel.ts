@@ -48,36 +48,32 @@ export class PropertyPanel {
     this.indextabs = [this.generalIndextab, this.formsIndextab, this.extensionsIndextab];
 
     this.updateIndexTabsSuitability();
-    this.checkIndexTabSuitability();
 
-    this.eventBus.on(['selection.changed'], (event: IEvent) => {
-      console.log(event);
-      const elementWasClickedOn: boolean = event.type === 'element.click';
-      const elementIsValidShape: boolean = event.type === 'shape.changed' && event.element.type !== 'label';
+    this.eventBus.on(
+      ['selection.changed', 'bendpoint.move.hover', 'canvas.viewbox.changing', 'canvas.viewbox.changed'],
+      (event: IEvent) => {
+        console.log(event);
+        const elementWasClickedOn: boolean = event.type === 'element.click';
+        const elementIsValidShape: boolean = event.type === 'shape.changed' && event.element.type !== 'label';
 
-      const elementIsShapeInPanel: boolean = elementIsValidShape && event.element.id === this.elementInPanel.id;
+        const elementIsShapeInPanel: boolean = elementIsValidShape && event.element.id === this.elementInPanel.id;
 
-      if (elementWasClickedOn || elementIsShapeInPanel) {
-        this.elementInPanel = event.element;
-      }
+        if (elementWasClickedOn || elementIsShapeInPanel) {
+          this.elementInPanel = event.element;
+        }
 
-      const selectedElementChanged: boolean = event.type === 'selection.changed' && event.newSelection.length !== 0;
+        const selectedElementChanged: boolean = event.type === 'selection.changed' && event.newSelection.length !== 0;
 
-      if (selectedElementChanged) {
-        this.elementInPanel = event.newSelection[0];
-      }
-
-      this.updateIndexTabsSuitability();
-      this.checkIndexTabSuitability();
-    });
+        if (selectedElementChanged) {
+          this.elementInPanel = event.newSelection[0];
+          this.updateIndexTabsSuitability();
+        }
+      },
+    );
 
     setTimeout(() => {
       this.selectPreviouslySelectedOrFirstElement();
     }, 0);
-  }
-
-  public updateIndextab(selectedIndextab: IIndextab): void {
-    this.currentIndextabTitle = selectedIndextab.title;
   }
 
   public selectPreviouslySelectedOrFirstElement(): void {
@@ -149,16 +145,6 @@ export class PropertyPanel {
   private updateIndexTabsSuitability(): void {
     for (const indextab of this.indextabs) {
       indextab.canHandleElement = indextab.isSuitableForElement(this.elementInPanel);
-    }
-  }
-
-  private checkIndexTabSuitability(): void {
-    const currentIndexTab: IIndextab = this.indextabs.find((indextab: IIndextab) => {
-      return indextab.title === this.currentIndextabTitle;
-    });
-
-    if (!currentIndexTab.canHandleElement) {
-      this.currentIndextabTitle = this.generalIndextab.title;
     }
   }
 
