@@ -1018,6 +1018,7 @@ export class SolutionExplorerSolution {
       return;
     }
 
+    this.eventAggregator.publish(environment.events.diagramChangedByStudio);
     await this.openDiagramAndUpdateSolution(emptyDiagram);
   };
 
@@ -1045,6 +1046,7 @@ export class SolutionExplorerSolution {
         return;
       }
 
+      this.eventAggregator.publish(environment.events.diagramChangedByStudio);
       await this.openDiagramAndUpdateSolution(emptyDiagram);
     } else if (pressedKey === ESCAPE_KEY) {
       this.resetDiagramCreation();
