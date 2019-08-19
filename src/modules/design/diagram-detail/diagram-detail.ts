@@ -44,7 +44,6 @@ export class DiagramDetail {
   @bindable({defaultBindingMode: bindingMode.oneWay}) public xml: string;
   @bindable() public initialToken: string;
   public bpmnio: BpmnIo;
-  public showUnsavedChangesModal: boolean = false;
   public showSaveForStartModal: boolean = false;
   public showSaveBeforeDeployModal: boolean = false;
   public showStartEventModal: boolean = false;
