@@ -153,7 +153,6 @@ export class BpmnIo {
           this.eventAggregator.publish(environment.events.diagramChange);
         }
 
-        // console.log('commanstack.changed');
         this.xml = await this.getXML();
       },
       handlerPriority,
@@ -177,7 +176,6 @@ export class BpmnIo {
 
     this.modeler.on(['shape.added', 'shape.removed'], (event: IInternalEvent) => {
       if (!this.solutionIsRemote) {
-        // console.log('shape added/removed');
         const shapeIsParticipant: boolean = event.element.type === 'bpmn:Participant';
         if (shapeIsParticipant) {
           return this.checkForMultipleParticipants(event);
@@ -192,8 +190,6 @@ export class BpmnIo {
         this.fitDiagramToViewport();
 
         if (!this.solutionIsRemote) {
-          console.log('import done');
-
           // await this.validateDiagram();
           // this.linting.update();
         }
@@ -203,7 +199,6 @@ export class BpmnIo {
 
     this.modeler.on('shape.remove', (event: IInternalEvent) => {
       if (!this.solutionIsRemote) {
-        // console.log('shape remove');
         const shapeIsParticipant: boolean = event.element.type === 'bpmn:Participant';
         if (shapeIsParticipant) {
           const rootElements: Array<IProcessRef> = this.modeler._definitions.rootElements;
@@ -220,7 +215,6 @@ export class BpmnIo {
 
     this.modeler.on('element.paste', (event: IInternalEvent) => {
       if (!this.solutionIsRemote) {
-        console.log('element paste');
         const elementToPasteIsUserTask: boolean = event.descriptor.type === 'bpmn:UserTask';
         if (elementToPasteIsUserTask) {
           return this.renameFormFields(event);
@@ -457,8 +451,6 @@ export class BpmnIo {
   public attachPaletteContainer(): void {
     const bpmnIoPaletteContainer: Element = this.canvasModel.getElementsByClassName('djs-palette')[0];
 
-    console.log(bpmnIoPaletteContainer);
-
     bpmnIoPaletteContainer.className += ' djs-palette-override';
     // this.paletteContainer.appendChild(bpmnIoPaletteContainer);
   }
@@ -522,7 +514,6 @@ export class BpmnIo {
 
     this.solutionIsRemote = this.diagramUri.startsWith('http');
     if (this.solutionIsRemote) {
-      console.log('if');
       const viewerNotInitialized: boolean = this.viewer === undefined;
       if (viewerNotInitialized) {
         // eslint-disable-next-line 6river/new-cap
@@ -531,7 +522,6 @@ export class BpmnIo {
         });
 
         this.viewer.on('selection.changed', (event: IEvent) => {
-          console.log('selection changed');
           const nothingIsSelected: boolean = event.newSelection.length === 0;
           if (nothingIsSelected) {
             return;
@@ -566,7 +556,6 @@ export class BpmnIo {
         this.linting.deactivateLinting();
       }, 0);
     } else {
-      console.log('else');
       const xmlExists: boolean = this.xml !== undefined;
       if (xmlExists) {
         this.xmlChanged(this.xml);

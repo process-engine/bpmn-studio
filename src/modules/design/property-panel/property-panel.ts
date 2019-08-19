@@ -52,7 +52,6 @@ export class PropertyPanel {
     this.eventBus.on(
       ['selection.changed', 'bendpoint.move.hover', 'canvas.viewbox.changing', 'canvas.viewbox.changed'],
       (event: IEvent) => {
-        console.log(event);
         const elementWasClickedOn: boolean = event.type === 'element.click';
         const elementIsValidShape: boolean = event.type === 'shape.changed' && event.element.type !== 'label';
 
