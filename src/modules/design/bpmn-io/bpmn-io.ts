@@ -447,10 +447,12 @@ export class BpmnIo {
   }
 
   public attachPaletteContainer(): void {
-    const bpmnIoPaletteContainer: Element = document.getElementsByClassName('djs-palette')[0];
+    const bpmnIoPaletteContainer: Element = this.canvasModel.getElementsByClassName('djs-palette')[0];
+
+    console.log(bpmnIoPaletteContainer);
 
     bpmnIoPaletteContainer.className += ' djs-palette-override';
-    this.paletteContainer.appendChild(bpmnIoPaletteContainer);
+    // this.paletteContainer.appendChild(bpmnIoPaletteContainer);
   }
 
   public async saveCurrentXML(): Promise<void> {

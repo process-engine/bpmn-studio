@@ -121,9 +121,9 @@
 }
 
 .djs-palette-override {
-  position: relative !important;
-  left: auto !important;
-  top: 4px !important;
+  position: fixed !important;
+  left: 250px !important;
+  top: 70px !important;
   width: 36px !important;
   background: transparent !important;
   border: none !important;
