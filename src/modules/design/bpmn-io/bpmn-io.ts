@@ -427,6 +427,13 @@ export class BpmnIo {
   public detached(): void {
     this.modeler.detach();
     this.modeler.destroy();
+
+    const viewerIsInitialized: boolean = this.viewer !== undefined;
+    if (viewerIsInitialized) {
+      this.viewer.destroy();
+      this.viewer.detach();
+    }
+
     window.removeEventListener('resize', this.resizeEventHandler);
     document.removeEventListener('keydown', this.printHotkeyEventHandler);
 
