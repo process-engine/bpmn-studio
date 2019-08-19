@@ -3,13 +3,13 @@
   <require from="../../styles/registers.css"></require>
   <div class="index-tab">
     <template repeat.for="section of sections">
-      <template if.bind="section.isSuitableForElement(elementInPanel)">
-        <compose
-          view-model=".${section.path}"
-          view=".${section.path}.html"
-          model.bind="{modeler: modeler, elementInPanel: elementInPanel, isEditable: isEditable}"
-          containerless></compose>
-      </template>
+      <compose
+        view-model=".${section.path}"
+        view=".${section.path}.html"
+        model.bind="{modeler: modeler, elementInPanel: elementInPanel, isEditable: isEditable}"
+        if.bind="section.isSuitableForElement(elementInPanel)"
+        containerless>
+      </compose>
     </template>
   </div>
 </template>
