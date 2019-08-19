@@ -456,10 +456,18 @@ function showAllMenuEntries(): void {
 }
 
 function showMenuEntriesWithoutDiagramEntries(): void {
+  const filteredFileMenu: MenuItem = getFilteredFileMenu();
+
+  const template = [getApplicationMenu(), filteredFileMenu, getEditMenu(), getWindowMenu(), getHelpMenu()];
+
+  electron.Menu.setApplicationMenu(electron.Menu.buildFromTemplate(template));
+}
+
+function getFilteredFileMenu(): MenuItem {
   let previousEntryIsSeparator = false;
 
-  const fileMenu = getFileMenu();
-  const filteredFileSubmenuItems = fileMenu.submenu.items.filter((submenuEntry: MenuItem) => {
+  const unfilteredFileMenu = getFileMenu();
+  const filteredFileSubmenuItems = unfilteredFileMenu.submenu.items.filter((submenuEntry: MenuItem) => {
     const isSeparator = submenuEntry.type !== undefined && submenuEntry.type === 'separator';
     if (isSeparator) {
       // This is used to prevent double separators
@@ -479,11 +487,14 @@ function showMenuEntriesWithoutDiagramEntries(): void {
     previousEntryIsSeparator = false;
     return true;
   });
-  fileMenu.submenu.items = filteredFileSubmenuItems;
+  const newFileSubmenu: Menu = electron.Menu.buildFromTemplate(filteredFileSubmenuItems);
 
-  const template = [getApplicationMenu(), fileMenu, getEditMenu(), getWindowMenu(), getHelpMenu()];
+  const menuOptions: MenuItemConstructorOptions = {
+    label: 'File',
+    submenu: newFileSubmenu,
+  };
 
-  electron.Menu.setApplicationMenu(electron.Menu.buildFromTemplate(template));
+  return new MenuItem(menuOptions);
 }
 
 function getApplicationMenu(): MenuItem {
