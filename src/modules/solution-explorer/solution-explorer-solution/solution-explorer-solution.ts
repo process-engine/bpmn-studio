@@ -808,8 +808,6 @@ export class SolutionExplorerSolution {
     diagramToSave: IDiagram,
     shouldNavigate: boolean = true,
   ): Promise<CloseModalResult> {
-    const previousLocation: string = (this.router.history as any).previousLocation;
-
     const diagramToSaveIsNotActiveDiagram: boolean = diagramToSave.uri !== this.activeDiagramUri;
     if (diagramToSaveIsNotActiveDiagram && shouldNavigate) {
       await this.navigateToDiagram(diagramToSave);
@@ -833,9 +831,7 @@ export class SolutionExplorerSolution {
       const saveFunction: EventListenerOrEventListenerObject = async (): Promise<void> => {
         this.eventAggregator.subscribeOnce(environment.events.navBar.diagramChangesResolved, async () => {
           if (shouldNavigate) {
-            await this.waitForNavigation();
-
-            this.router.navigate(previousLocation);
+            await this.navigateBack();
           }
 
           resolve(CloseModalResult.Save);
