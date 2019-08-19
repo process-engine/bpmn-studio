@@ -19,7 +19,6 @@ import {TimerEventSection} from './sections/timer-event/timer-event';
 export class General implements IIndextab {
   public title: string = 'General';
   public path: string = '/indextabs/general/general';
-  public elementInPanel: IShape;
 
   public basicsSection: ISection = new BasicsSection();
   public poolSection: ISection = new PoolSection();
@@ -63,9 +62,5 @@ export class General implements IIndextab {
     return this.sections.some((section: ISection) => {
       return section.canHandleElement;
     });
-  }
-
-  public activate(model: IPageModel): void {
-    this.elementInPanel = model.elementInPanel;
   }
 }
