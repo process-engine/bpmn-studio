@@ -1,14 +1,12 @@
 #!/usr/bin/env node
 
-/* eslint-disable @typescript-eslint/no-require-imports */
-/* eslint-disable @typescript-eslint/no-var-requires */
-
-const open = require('open');
-const argv = require('minimist')(process.argv.slice(2));
-const pushserve = require('pushserve');
+import open from 'open';
+import minimist from 'minimist';
+import pushserve from 'pushserve';
 
 const defaultPort = 17290;
 const defaultHost = '127.0.0.1';
+const argv = minimist(process.argv.slice(2));
 const portUsed = applicationPortIsValid(argv.port) ? argv.port : defaultPort;
 const hostUsed = applicationHostIsValid(argv.host) ? argv.host : defaultHost;
 
@@ -17,7 +15,7 @@ const httpServerOptions = {
   noPushstate: false,
   hostname: hostUsed,
   port: portUsed,
-  path: `${__dirname}./..`,
+  path: `${__dirname}./../..`,
   indexPath: 'index.html',
 };
 
@@ -32,7 +30,7 @@ open(`http://${hostUsed}:${portUsed}`);
  * @param[in]: port The port, specified from argv.
  * @return true If the everything is okay; false otherwise.
  */
-function applicationPortIsValid(port) {
+function applicationPortIsValid(port): boolean {
   if (port === null || port === undefined) {
     return false;
   }
@@ -55,7 +53,7 @@ function applicationPortIsValid(port) {
   return true;
 }
 
-function applicationHostIsValid(host) {
+function applicationHostIsValid(host): boolean {
   if (host === null || host === undefined) {
     return false;
   }
