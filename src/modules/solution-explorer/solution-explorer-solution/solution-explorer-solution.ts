@@ -808,71 +808,65 @@ export class SolutionExplorerSolution {
     diagramToSave: IDiagram,
     shouldNavigate: boolean = true,
   ): Promise<CloseModalResult> {
-    const previousLocation: string = (this.router.history as any).previousLocation;
-
     const diagramToSaveIsNotActiveDiagram: boolean = diagramToSave.uri !== this.activeDiagramUri;
     if (diagramToSaveIsNotActiveDiagram && shouldNavigate) {
       await this.navigateToDiagram(diagramToSave);
     }
 
-    const modalResult: Promise<CloseModalResult> = new Promise(
-      (resolve: Function, reject: Function): CloseModalResult | void => {
-        const dontSaveFunction: EventListenerOrEventListenerObject = async (): Promise<void> => {
-          this.showCloseModal = false;
+    const modalResult: Promise<CloseModalResult> = new Promise((resolve: Function): CloseModalResult | void => {
+      const dontSaveFunction: EventListenerOrEventListenerObject = async (): Promise<void> => {
+        this.showCloseModal = false;
 
-          document.getElementById('dontSaveButtonCloseView').removeEventListener('click', dontSaveFunction);
-          document.getElementById('saveButtonCloseView').removeEventListener('click', saveFunction);
-          document.getElementById('cancelButtonCloseView').removeEventListener('click', cancelFunction);
+        document.getElementById('dontSaveButtonCloseView').removeEventListener('click', dontSaveFunction);
+        document.getElementById('saveButtonCloseView').removeEventListener('click', saveFunction);
+        document.getElementById('cancelButtonCloseView').removeEventListener('click', cancelFunction);
 
-          if (diagramToSaveIsNotActiveDiagram && shouldNavigate) {
+        if (diagramToSaveIsNotActiveDiagram && shouldNavigate) {
+          await this.navigateBack();
+        }
+
+        resolve(CloseModalResult.Delete);
+      };
+
+      const saveFunction: EventListenerOrEventListenerObject = async (): Promise<void> => {
+        this.eventAggregator.subscribeOnce(environment.events.navBar.diagramChangesResolved, async () => {
+          if (shouldNavigate) {
             await this.navigateBack();
           }
 
-          resolve(CloseModalResult.Delete);
-        };
+          resolve(CloseModalResult.Save);
+        });
 
-        const saveFunction: EventListenerOrEventListenerObject = async (): Promise<void> => {
-          this.eventAggregator.subscribeOnce(environment.events.navBar.diagramChangesResolved, async () => {
-            if (shouldNavigate) {
-              await this.waitForNavigation();
+        this.eventAggregator.publish(environment.events.diagramDetail.saveDiagram);
 
-              this.router.navigate(previousLocation);
-            }
+        this.showCloseModal = false;
 
-            resolve(CloseModalResult.Save);
-          });
+        document.getElementById('dontSaveButtonCloseView').removeEventListener('click', dontSaveFunction);
+        document.getElementById('saveButtonCloseView').removeEventListener('click', saveFunction);
+        document.getElementById('cancelButtonCloseView').removeEventListener('click', cancelFunction);
+      };
 
-          this.eventAggregator.publish(environment.events.diagramDetail.saveDiagram);
+      const cancelFunction: EventListenerOrEventListenerObject = async (): Promise<void> => {
+        this.showCloseModal = false;
 
-          this.showCloseModal = false;
+        document.getElementById('dontSaveButtonCloseView').removeEventListener('click', dontSaveFunction);
+        document.getElementById('saveButtonCloseView').removeEventListener('click', saveFunction);
+        document.getElementById('cancelButtonCloseView').removeEventListener('click', cancelFunction);
 
-          document.getElementById('dontSaveButtonCloseView').removeEventListener('click', dontSaveFunction);
-          document.getElementById('saveButtonCloseView').removeEventListener('click', saveFunction);
-          document.getElementById('cancelButtonCloseView').removeEventListener('click', cancelFunction);
-        };
+        if (diagramToSaveIsNotActiveDiagram && shouldNavigate) {
+          await this.navigateBack();
+        }
 
-        const cancelFunction: EventListenerOrEventListenerObject = async (): Promise<void> => {
-          this.showCloseModal = false;
+        resolve(CloseModalResult.Cancel);
+      };
 
-          document.getElementById('dontSaveButtonCloseView').removeEventListener('click', dontSaveFunction);
-          document.getElementById('saveButtonCloseView').removeEventListener('click', saveFunction);
-          document.getElementById('cancelButtonCloseView').removeEventListener('click', cancelFunction);
+      // register onClick handler
+      document.getElementById('dontSaveButtonCloseView').addEventListener('click', dontSaveFunction);
+      document.getElementById('saveButtonCloseView').addEventListener('click', saveFunction);
+      document.getElementById('cancelButtonCloseView').addEventListener('click', cancelFunction);
 
-          if (diagramToSaveIsNotActiveDiagram && shouldNavigate) {
-            await this.navigateBack();
-          }
-
-          resolve(CloseModalResult.Cancel);
-        };
-
-        // register onClick handler
-        document.getElementById('dontSaveButtonCloseView').addEventListener('click', dontSaveFunction);
-        document.getElementById('saveButtonCloseView').addEventListener('click', saveFunction);
-        document.getElementById('cancelButtonCloseView').addEventListener('click', cancelFunction);
-
-        this.showCloseModal = true;
-      },
-    );
+      this.showCloseModal = true;
+    });
 
     return modalResult;
   }
