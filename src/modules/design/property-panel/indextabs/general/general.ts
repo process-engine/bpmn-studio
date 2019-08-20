@@ -1,6 +1,6 @@
 import {IShape} from '@process-engine/bpmn-elements_contracts';
 
-import {IIndextab, IPageModel, ISection} from '../../../../../contracts';
+import {IIndextab, ISection} from '../../../../../contracts';
 import {BasicsSection} from './sections/basics/basics';
 import {CallActivitySection} from './sections/call-activity/call-activity';
 import {ConditionalEventSection} from './sections/conditional-event/conditional-event';
