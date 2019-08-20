@@ -37,11 +37,11 @@ bpmn-diff-view {
 }
 
 .design-layout__tools-right {
-  position: fixed;
+  position: absolute;
   width: 36px;
   top: 42px;
   right: 0px;
-  bottom: 0;
+  bottom: 20px;
   background-color: #f7f7f7;
   border-left: 2px solid #dcdbdb;
 }
