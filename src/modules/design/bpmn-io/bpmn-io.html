@@ -25,12 +25,15 @@
         </div>
         <div else class="modeler__diagram" id="bpmnIoDiagram">
           <div ref="canvasModel" class="canvasModel"></div>
-          <button class.bind="diagramIsInvalid ? 'button btn linter-toggle-button-invalid-diagram' : 'button btn btn-default linter-toggle-button'"
-                  css.bind="showLinter || diagramIsInvalid? 'opacity: 1;' : ''"
-                  title.bind="showLinter ? 'Hide Linter' : 'Show Linter'"
-                  click.delegate="toggleLinter()">
-            <i class.bind="diagramIsInvalid ? 'fas fa-times' : 'fas fa-check'"></i>
-          </button>
+
+          <div class="linter-toggle">
+            <button class.bind="diagramIsInvalid ? 'linter-toggle__button linter-toggle__button--invalid-diagram' : 'linter-toggle__button'"
+                    css.bind="showLinter || diagramIsInvalid? 'opacity: 1;' : ''"
+                    title.bind="showLinter ? 'Hide Linter' : 'Show Linter'"
+                    click.delegate="toggleLinter()">
+              <i class.bind="diagramIsInvalid ? 'fas fa-times' : 'fas fa-check'"></i>
+            </button>
+          </div>
         </div>
         <div class="modeler__properties" ref="propertyPanel" show.bind="showPropertyPanel" css="width: ${propertyPanelWidth}px; max-width: calc(100% - ${minCanvasWidth}px); min-width: ${minPropertyPanelWidth}px;">
           <div class="resize-div" ref="resizeButton"></div>

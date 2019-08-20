@@ -211,34 +211,35 @@
   pointer-events: none;
 }
 
-.linter-toggle-button {
+.linter-toggle {
   position: relative;
+  display: inline-block;
   bottom: 50px;
   left: 15px;
+}
+
+.linter-toggle__button {
   width: 31px;
   height: 31px;
   padding: 0;
+  border: solid 1px #ccc;
+  border-radius: 2px;
+
   background-color: rgba(255, 255, 255, 0.9);
-  border: solid 1px #ccc;
-  border-radius: 2px;
+
+  &:hover {
+    background-color: #f7f7f7;
+  }
 }
 
-.linter-toggle-button-invalid-diagram {
-  position: relative;
-  bottom: 50px;
-  left: 15px;
-  width: 31px;
-  height: 31px;
-  padding: 0;
+.linter-toggle__button--invalid-diagram {
   background-color: rgba(204, 51, 0, 0.95);
-  border: solid 1px #ccc;
   color: white;
-  border-radius: 2px;
-}
 
-.linter-toggle-button-invalid-diagram:hover {
-  background-color: rgb(230, 77, 26);
-  color: white;
+  &:hover {
+    background-color: rgb(230, 77, 26);
+    color: white;
+  }
 }
 
 .bpmn-js-bpmnlint-process-issues {
