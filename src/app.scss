@@ -34,6 +34,7 @@ input:focus {
   // The height of the navbar must be subtracted in order to get the total height for the content.
   max-height: calc(100% - 42px);
   flex: 1;
+  padding-bottom: 20px;
   align-items: stretch;
 }
 
