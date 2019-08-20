@@ -99,6 +99,11 @@
   border-right: 1px solid #eee;
 }
 
+.panel:last-child {
+  margin-bottom: 2px;
+  border-bottom: none;
+}
+
 .bpmn-io-layout__main {
   display: flex;
   flex: 1 100%;
