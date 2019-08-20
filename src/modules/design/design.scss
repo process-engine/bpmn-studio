@@ -1,6 +1,6 @@
 .design {
-  width: 100%;
-  height: 100%;
+  display: flex;
+  flex: 1;
   padding-bottom: 20px;
 }
 
@@ -11,6 +11,8 @@
 }
 
 .design__detail-container {
+  display: flex;
+  flex: 1;
   height: 100%;
   margin-right: 36px;
 }

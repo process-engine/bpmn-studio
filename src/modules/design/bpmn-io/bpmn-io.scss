@@ -1,30 +1,25 @@
 .modeler {
   display: flex;
+  flex: 1;
   height: 100%;
+}
+
+.modeler__diagram {
+  flex: 1;
+}
+
+.modeler__properties {
+  position: relative;
+  width: 250px;
+  background: rgb(220, 219, 219);
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .canvasModel {
   height: 100%;
-}
-
-.diagram {
-  position: relative;
-  height: 100%;
-  padding-right: 0;
-  flex: 1;
-}
-
-.properties {
-  width: 250px;
-  height: 100%;
-  background: rgb(220, 219, 219);
-  overflow-y: auto;
-  display: inline;
-  -ms-overflow-style: none;
-}
-
-.properties::-webkit-scrollbar {
-  display: none;
 }
 
 .modeler .label {
@@ -32,11 +27,11 @@
 }
 
 .resize-div {
-  position: relative;
-  float:left;
+  position: absolute;
+  top: 0;
+  bottom: 0;
   left: -3px;
   width: 6px;
-  height: 100%;
 }
 
 .resize-div:hover {
@@ -69,8 +64,7 @@
 
 .bpmn-io-layout {
   display: flex;
-  width: 100%;
-  height: 100%;
+  flex: 1;
   background: white;
   flex-direction: row;
   align-items: stretch;
@@ -106,7 +100,7 @@
 }
 
 .bpmn-io-layout__main {
-  width: 0;
+  display: flex;
   flex: 1 100%;
 }
 
@@ -169,23 +163,23 @@
 */
 
 .red {
-  color: #E53935;
+  color: #e53935;
 }
 
 .blue {
-  color: #1E88E5;
+  color: #1e88e5;
 }
 
 .orange {
-  color: #FB8C00;
+  color: #fb8c00;
 }
 
 .green {
-  color: #43A047;
+  color: #43a047;
 }
 
 .purple {
-  color: #8E24AA;
+  color: #8e24aa;
 }
 
 .none {

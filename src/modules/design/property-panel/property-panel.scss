@@ -1,8 +1,5 @@
 .property-panel {
-  float: left;
-  width: 100%;
-  margin-left: -6px;
-  overflow-y: auto;
+  overflow-y: scroll;
   border-left: 2px solid #dcdbdb;
 }
 

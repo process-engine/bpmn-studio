@@ -10,11 +10,6 @@
   border-bottom: none;
 }
 
-.panel--grow {
-  flex: 1 100%;
-  margin-top: 2px;
-}
-
 .panel__heading {
   padding: 5px 10px;
   font-weight: 400;
@@ -136,7 +131,7 @@
 }
 
 .key-value-delete-button:hover:disabled {
-  pointer-events: none;  
+  pointer-events: none;
   opacity: 0.2;
   color: darkgrey;
 }

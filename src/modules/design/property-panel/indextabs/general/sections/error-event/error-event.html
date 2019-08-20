@@ -1,7 +1,7 @@
 <template>
   <require from="./error-event.css"></require>
   <require from="../../../../styles/sections.css"></require>
-  <div class="section-panel panel--grow" id="js-general-errorEvent-section">
+  <div class="section-panel" id="js-general-errorEvent-section">
     <div class="panel__heading">
       Error Event
       <button class="button remove-context-button" class.bind="selectedId ? '' : 'button--disabled'" disabled.bind="!selectedId || !isEditable" click.delegate="removeSelectedError()">
