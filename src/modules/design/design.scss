@@ -3,13 +3,12 @@
   flex: 1;
 }
 
-.design__xml-view-container {
-  flex: 1 100%;
+bpmn-xml-view {
   height: 100%;
   margin-right: 36px;
 }
 
-.design__detail-container {
+diagram-detail {
   display: flex;
   flex: 1;
   height: 100%;
@@ -31,7 +30,8 @@
   opacity: 1;
 }
 
-.design__diff-view-container {
+bpmn-diff-view {
+  flex: 1;
   height: 100%;
   margin-right: 36px;
 }
