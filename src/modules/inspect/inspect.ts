@@ -65,7 +65,7 @@ export class Inspect {
 
       this.notificationService.showNotification(
         NotificationType.INFO,
-        'There are currently no runtime information about this process available.',
+        'There is currently no runtime information about this process available.',
       );
 
       return true;
