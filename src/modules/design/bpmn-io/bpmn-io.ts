@@ -186,12 +186,12 @@ export class BpmnIo {
 
     this.modeler.on(
       'import.done',
-      async () => {
+      () => {
         this.fitDiagramToViewport();
 
         if (!this.solutionIsRemote) {
-          // await this.validateDiagram();
-          // this.linting.update();
+          this.validateDiagram();
+          this.linting.update();
         }
       },
       1,
@@ -280,130 +280,130 @@ export class BpmnIo {
       document.addEventListener('mouseup', mouseUpFunction);
     });
 
-    // document.addEventListener('keydown', this.printHotkeyEventHandler);
+    document.addEventListener('keydown', this.printHotkeyEventHandler);
 
-    // if (!this.isRunningInElectron) {
-    //   document.addEventListener('keydown', this.saveHotkeyEventHandler);
-    // }
+    if (!this.isRunningInElectron) {
+      document.addEventListener('keydown', this.saveHotkeyEventHandler);
+    }
 
     this.hideOrShowPpForSpaceReasons();
 
     this.subscriptions = [
-      //   this.eventAggregator.subscribe(environment.events.processSolutionPanel.toggleProcessSolutionExplorer, () => {
-      //     this.hideOrShowPpForSpaceReasons();
-      //   }),
+      this.eventAggregator.subscribe(environment.events.processSolutionPanel.toggleProcessSolutionExplorer, () => {
+        this.hideOrShowPpForSpaceReasons();
+      }),
 
-      //   this.eventAggregator.subscribe(`${environment.events.diagramDetail.exportDiagramAs}:BPMN`, async () => {
-      //     try {
-      //       const exportName: string = `${this.name}.bpmn`;
-      //       const xmlToExport: string = await this.getXML();
+      this.eventAggregator.subscribe(`${environment.events.diagramDetail.exportDiagramAs}:BPMN`, async () => {
+        try {
+          const exportName: string = `${this.name}.bpmn`;
+          const xmlToExport: string = await this.getXML();
 
-      //       await this.diagramExportService
-      //         .loadXML(xmlToExport)
-      //         .asBpmn()
-      //         .export(exportName);
-      //     } catch {
-      //       this.notificationService.showNotification(
-      //         NotificationType.ERROR,
-      //         'An error occurred while preparing the diagram for exporting',
-      //       );
-      //     }
-      //   }),
+          await this.diagramExportService
+            .loadXML(xmlToExport)
+            .asBpmn()
+            .export(exportName);
+        } catch {
+          this.notificationService.showNotification(
+            NotificationType.ERROR,
+            'An error occurred while preparing the diagram for exporting',
+          );
+        }
+      }),
 
-      //   this.eventAggregator.subscribe(`${environment.events.diagramDetail.exportDiagramAs}:SVG`, async () => {
-      //     try {
-      //       const exportName: string = `${this.name}.svg`;
-      //       await this.diagramExportService
-      //         .loadSVG(await this.getSVG())
-      //         .asSVG()
-      //         .export(exportName);
-      //     } catch (error) {
-      //       this.notificationService.showNotification(
-      //         NotificationType.ERROR,
-      //         'An error occurred while preparing the diagram for exporting',
-      //       );
-      //     }
-      //   }),
+      this.eventAggregator.subscribe(`${environment.events.diagramDetail.exportDiagramAs}:SVG`, async () => {
+        try {
+          const exportName: string = `${this.name}.svg`;
+          await this.diagramExportService
+            .loadSVG(await this.getSVG())
+            .asSVG()
+            .export(exportName);
+        } catch (error) {
+          this.notificationService.showNotification(
+            NotificationType.ERROR,
+            'An error occurred while preparing the diagram for exporting',
+          );
+        }
+      }),
 
-      //   this.eventAggregator.subscribe(`${environment.events.diagramDetail.exportDiagramAs}:PNG`, async () => {
-      //     try {
-      //       const exportName: string = `${this.name}.png`;
-      //       await this.diagramExportService
-      //         .loadSVG(await this.getSVG())
-      //         .asPNG()
-      //         .export(exportName);
-      //     } catch (error) {
-      //       this.notificationService.showNotification(
-      //         NotificationType.ERROR,
-      //         'An error occurred while preparing the diagram for exporting',
-      //       );
-      //     }
-      //   }),
+      this.eventAggregator.subscribe(`${environment.events.diagramDetail.exportDiagramAs}:PNG`, async () => {
+        try {
+          const exportName: string = `${this.name}.png`;
+          await this.diagramExportService
+            .loadSVG(await this.getSVG())
+            .asPNG()
+            .export(exportName);
+        } catch (error) {
+          this.notificationService.showNotification(
+            NotificationType.ERROR,
+            'An error occurred while preparing the diagram for exporting',
+          );
+        }
+      }),
 
-      //   this.eventAggregator.subscribe(`${environment.events.diagramDetail.exportDiagramAs}:JPEG`, async () => {
-      //     try {
-      //       const exportName: string = `${this.name}.jpeg`;
-      //       await this.diagramExportService
-      //         .loadSVG(await this.getSVG())
-      //         .asJPEG()
-      //         .export(exportName);
-      //     } catch (error) {
-      //       this.notificationService.showNotification(
-      //         NotificationType.ERROR,
-      //         'An error occurred while preparing the diagram for exporting',
-      //       );
-      //     }
-      //   }),
+      this.eventAggregator.subscribe(`${environment.events.diagramDetail.exportDiagramAs}:JPEG`, async () => {
+        try {
+          const exportName: string = `${this.name}.jpeg`;
+          await this.diagramExportService
+            .loadSVG(await this.getSVG())
+            .asJPEG()
+            .export(exportName);
+        } catch (error) {
+          this.notificationService.showNotification(
+            NotificationType.ERROR,
+            'An error occurred while preparing the diagram for exporting',
+          );
+        }
+      }),
 
-      //   this.eventAggregator.subscribe(`${environment.events.diagramDetail.printDiagram}`, async () => {
-      //     await this.printHandler();
-      //   }),
+      this.eventAggregator.subscribe(`${environment.events.diagramDetail.printDiagram}`, async () => {
+        await this.printHandler();
+      }),
 
-      //   this.eventAggregator.subscribe(environment.events.diagramDetail.saveDiagram, async () => {
-      //     this.savedXml = await this.getXML();
-      //     this.diagramHasChanges = false;
+      this.eventAggregator.subscribe(environment.events.diagramDetail.saveDiagram, async () => {
+        this.savedXml = await this.getXML();
+        this.diagramHasChanges = false;
 
-      //     await this.saveDiagramState(this.diagramUri);
-      //   }),
+        await this.saveDiagramState(this.diagramUri);
+      }),
 
-      //   this.eventAggregator.subscribe(environment.events.diagramChange, async () => {
-      //     this.xml = await this.getXML();
+      this.eventAggregator.subscribe(environment.events.diagramChange, async () => {
+        this.xml = await this.getXML();
 
-      //     const diagramIsChanged: boolean = !this.areXmlsIdentical(this.xml, this.savedXml);
+        const diagramIsChanged: boolean = !this.areXmlsIdentical(this.xml, this.savedXml);
 
-      //     this.validateDiagram();
+        this.validateDiagram();
 
-      //     this.eventAggregator.publish(environment.events.differsFromOriginal, diagramIsChanged);
-      //   }),
+        this.eventAggregator.publish(environment.events.differsFromOriginal, diagramIsChanged);
+      }),
 
-      //   this.eventAggregator.subscribe(environment.events.navBar.validationError, () => {
-      //     this.diagramIsInvalid = true;
-      //   }),
+      this.eventAggregator.subscribe(environment.events.navBar.validationError, () => {
+        this.diagramIsInvalid = true;
+      }),
 
-      //   this.eventAggregator.subscribe(environment.events.navBar.noValidationError, () => {
-      //     this.diagramIsInvalid = false;
-      //   }),
+      this.eventAggregator.subscribe(environment.events.navBar.noValidationError, () => {
+        this.diagramIsInvalid = false;
+      }),
 
       this.eventAggregator.subscribe(environment.events.bpmnio.togglePropertyPanel, () => {
         this.togglePanel();
       }),
 
-      //   this.eventAggregator.subscribe(environment.events.bpmnio.bindKeyboard, () => {
-      //     const keyboard: IKeyboard = this.modeler.get('keyboard');
+      this.eventAggregator.subscribe(environment.events.bpmnio.bindKeyboard, () => {
+        const keyboard: IKeyboard = this.modeler.get('keyboard');
 
-      //     const element: Document | any = document;
-      //     keyboard.bind(element);
-      //   }),
+        const element: Document | any = document;
+        keyboard.bind(element);
+      }),
 
-      //   this.eventAggregator.subscribe(environment.events.bpmnio.unbindKeyboard, () => {
-      //     const keyboard: IKeyboard = this.modeler.get('keyboard');
+      this.eventAggregator.subscribe(environment.events.bpmnio.unbindKeyboard, () => {
+        const keyboard: IKeyboard = this.modeler.get('keyboard');
 
-      //     keyboard.unbind();
-      //   }),
+        keyboard.unbind();
+      }),
 
-      //   this.eventAggregator.subscribe(environment.events.differsFromOriginal, (changes: boolean) => {
-      //     this.diagramHasChanges = changes;
-      //   }),
+      this.eventAggregator.subscribe(environment.events.differsFromOriginal, (changes: boolean) => {
+        this.diagramHasChanges = changes;
+      }),
     ];
 
     const previousPropertyPanelWidth: string = window.localStorage.getItem('propertyPanelWidth');
@@ -427,21 +427,18 @@ export class BpmnIo {
     this.modeler.detach();
     this.modeler.destroy();
 
-    // const viewerIsInitialized: boolean = this.viewer !== undefined;
-    // if (viewerIsInitialized) {
-    //   this.viewer.destroy();
-    //   this.viewer.detach();
-    // }
+    const viewerIsInitialized: boolean = this.viewer !== undefined;
+    if (viewerIsInitialized) {
+      this.viewer.destroy();
+      this.viewer.detach();
+    }
 
-    // window.removeEventListener('resize', this.resizeEventHandler);
-    // document.removeEventListener('keydown', this.printHotkeyEventHandler);
+    window.removeEventListener('resize', this.resizeEventHandler);
+    document.removeEventListener('keydown', this.printHotkeyEventHandler);
 
-    // window.removeEventListener('resize', this.resizeEventHandler);
-    // document.removeEventListener('keydown', this.printHotkeyEventHandler);
-
-    // if (!this.isRunningInElectron) {
-    //   document.removeEventListener('keydown', this.saveHotkeyEventHandler);
-    // }
+    if (!this.isRunningInElectron) {
+      document.removeEventListener('keydown', this.saveHotkeyEventHandler);
+    }
 
     for (const subscription of this.subscriptions) {
       subscription.dispose();
@@ -570,11 +567,7 @@ export class BpmnIo {
         if (this.bpmnLintButton) {
           this.bpmnLintButton.style.display = 'none';
         }
-
-        // clearTimeout(timeout);
       }, 0);
-
-      //
     }
 
     this.diagramHasChanges = false;
@@ -620,24 +613,24 @@ export class BpmnIo {
     }, 0);
   }
 
-  // private async validateDiagram(): Promise<void> {
-  //   const validationResult: IValidateResult = await this.linting.lint();
-  //   this.linting.update();
+  private async validateDiagram(): Promise<void> {
+    const validationResult: IValidateResult = await this.linting.lint();
+    this.linting.update();
 
-  //   let validationResultContainsErrors: boolean = false;
+    let validationResultContainsErrors: boolean = false;
 
-  //   Object.entries(validationResult).forEach(([key, validationIssues]: [string, Array<IValidateIssue>]) => {
-  //     const issuesContainError: boolean = validationIssues.some((issue: IValidateIssue) => {
-  //       return issue.category === IValidateIssueCategory.error;
-  //     });
+    Object.entries(validationResult).forEach(([key, validationIssues]: [string, Array<IValidateIssue>]) => {
+      const issuesContainError: boolean = validationIssues.some((issue: IValidateIssue) => {
+        return issue.category === IValidateIssueCategory.error;
+      });
 
-  //     if (issuesContainError) {
-  //       validationResultContainsErrors = true;
-  //     }
-  //   });
+      if (issuesContainError) {
+        validationResultContainsErrors = true;
+      }
+    });
 
-  //   this.diagramIsInvalid = validationResultContainsErrors;
-  // }
+    this.diagramIsInvalid = validationResultContainsErrors;
+  }
 
   public togglePanel(): void {
     if (this.propertyPanelShouldOpen) {
@@ -689,26 +682,26 @@ export class BpmnIo {
     return returnPromise;
   }
 
-  // public toggleLinter(): void {
-  //   this.showLinter = !this.showLinter;
-  //   this.bpmnLintButton = document.querySelector('.bpmn-js-bpmnlint-button');
+  public toggleLinter(): void {
+    this.showLinter = !this.showLinter;
+    this.bpmnLintButton = document.querySelector('.bpmn-js-bpmnlint-button');
 
-  //   if (this.showLinter) {
-  //     this.bpmnLintButton.style.display = 'block';
+    if (this.showLinter) {
+      this.bpmnLintButton.style.display = 'block';
 
-  //     this.linting.activateLinting();
-  //   } else {
-  //     this.bpmnLintButton.style.display = 'none';
+      this.linting.activateLinting();
+    } else {
+      this.bpmnLintButton.style.display = 'none';
 
-  //     this.linting.deactivateLinting();
-  //   }
-  // }
+      this.linting.deactivateLinting();
+    }
+  }
 
-  // private get isRunningInElectron(): boolean {
-  //   const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
+  private get isRunningInElectron(): boolean {
+    const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
 
-  //   return isRunningInElectron;
-  // }
+    return isRunningInElectron;
+  }
 
   private async saveDiagramState(diagramUri: string): Promise<void> {
     const savedXml: string = this.savedXml;
@@ -881,17 +874,17 @@ export class BpmnIo {
   /**
    * Handles an incoming printDiagram message.
    */
-  // private async printHandler(): Promise<void> {
-  //   try {
-  //     const svgToPrint: string = await this.getSVG();
-  //     this.diagramPrintService.printDiagram(svgToPrint);
-  //   } catch (error) {
-  //     this.notificationService.showNotification(
-  //       NotificationType.ERROR,
-  //       'An error while trying to print the diagram occurred.',
-  //     );
-  //   }
-  // }
+  private async printHandler(): Promise<void> {
+    try {
+      const svgToPrint: string = await this.getSVG();
+      this.diagramPrintService.printDiagram(svgToPrint);
+    } catch (error) {
+      this.notificationService.showNotification(
+        NotificationType.ERROR,
+        'An error while trying to print the diagram occurred.',
+      );
+    }
+  }
 
   /**
    * Handles a key down event and saves the diagram, if the user presses a CRTL + s key combination.
@@ -903,35 +896,35 @@ export class BpmnIo {
    * @param event Passed key event.
    * @return void
    */
-  // private saveHotkeyEventHandler = (event: KeyboardEvent): void => {
-  //   // On macOS the 'common control key' is the meta instead of the control key. So on a mac we need to find
-  //   // out, if the meta key instead of the control key is pressed.
-  //   const currentPlatformIsMac: boolean = this.checkIfCurrentPlatformIsMac();
-  //   const metaKeyIsPressed: boolean = currentPlatformIsMac ? event.metaKey : event.ctrlKey;
-  //   const shiftKeyIsPressed: boolean = event.shiftKey;
+  private saveHotkeyEventHandler = (event: KeyboardEvent): void => {
+    // On macOS the 'common control key' is the meta instead of the control key. So on a mac we need to find
+    // out, if the meta key instead of the control key is pressed.
+    const currentPlatformIsMac: boolean = this.checkIfCurrentPlatformIsMac();
+    const metaKeyIsPressed: boolean = currentPlatformIsMac ? event.metaKey : event.ctrlKey;
+    const shiftKeyIsPressed: boolean = event.shiftKey;
 
-  //   /*
-  //    * If both keys (meta and s) are pressed, save the diagram.
-  //    * A diagram is saved, by throwing a saveDiagram event.
-  //    *
-  //    * @see environment.events.diagramDetail.saveDiagram
-  //    */
-  //   const sKeyIsPressed: boolean = event.key === 's';
-  //   const userWantsToSave: boolean = metaKeyIsPressed && sKeyIsPressed && !shiftKeyIsPressed;
-  //   const userWantsToSaveAs: boolean = metaKeyIsPressed && sKeyIsPressed && shiftKeyIsPressed;
+    /*
+     * If both keys (meta and s) are pressed, save the diagram.
+     * A diagram is saved, by throwing a saveDiagram event.
+     *
+     * @see environment.events.diagramDetail.saveDiagram
+     */
+    const sKeyIsPressed: boolean = event.key === 's';
+    const userWantsToSave: boolean = metaKeyIsPressed && sKeyIsPressed && !shiftKeyIsPressed;
+    const userWantsToSaveAs: boolean = metaKeyIsPressed && sKeyIsPressed && shiftKeyIsPressed;
 
-  //   if (userWantsToSave) {
-  //     event.preventDefault();
+    if (userWantsToSave) {
+      event.preventDefault();
 
-  //     this.eventAggregator.publish(environment.events.diagramDetail.saveDiagram);
-  //     return;
-  //   }
+      this.eventAggregator.publish(environment.events.diagramDetail.saveDiagram);
+      return;
+    }
 
-  //   if (userWantsToSaveAs) {
-  //     event.preventDefault();
-  //     this.eventAggregator.publish(environment.events.diagramDetail.saveDiagramAs);
-  //   }
-  // };
+    if (userWantsToSaveAs) {
+      event.preventDefault();
+      this.eventAggregator.publish(environment.events.diagramDetail.saveDiagramAs);
+    }
+  };
 
   /**
    * On macOS it is typically to remove elements with the backspace instead
@@ -974,31 +967,31 @@ export class BpmnIo {
    * @param event Passed key event.
    * @return void
    */
-  // private printHotkeyEventHandler = (event: KeyboardEvent): void => {
-  //   // On macOS the 'common control key' is the meta instead of the control key. So on a mac we need to find
-  //   // out, if the meta key instead of the control key is pressed.
-  //   const currentPlatformIsMac: boolean = this.checkIfCurrentPlatformIsMac();
-  //   const metaKeyIsPressed: boolean = currentPlatformIsMac ? event.metaKey : event.ctrlKey;
+  private printHotkeyEventHandler = (event: KeyboardEvent): void => {
+    // On macOS the 'common control key' is the meta instead of the control key. So on a mac we need to find
+    // out, if the meta key instead of the control key is pressed.
+    const currentPlatformIsMac: boolean = this.checkIfCurrentPlatformIsMac();
+    const metaKeyIsPressed: boolean = currentPlatformIsMac ? event.metaKey : event.ctrlKey;
 
-  //   /*
-  //    * If both keys (meta and p) are pressed, print the diagram.
-  //    * A diagram is printed, by throwing a printDiagram event.
-  //    *
-  //    * @see environment.events.diagramDetail.printDiagram
-  //    */
-  //   const pKeyIsPressed: boolean = event.key === 'p';
-  //   const userWantsToPrint: boolean = metaKeyIsPressed && pKeyIsPressed;
+    /*
+     * If both keys (meta and p) are pressed, print the diagram.
+     * A diagram is printed, by throwing a printDiagram event.
+     *
+     * @see environment.events.diagramDetail.printDiagram
+     */
+    const pKeyIsPressed: boolean = event.key === 'p';
+    const userWantsToPrint: boolean = metaKeyIsPressed && pKeyIsPressed;
 
-  //   if (userWantsToPrint) {
-  //     // Prevent the browser from handling the default action for CMD/CTRL + p.
-  //     event.preventDefault();
+    if (userWantsToPrint) {
+      // Prevent the browser from handling the default action for CMD/CTRL + p.
+      event.preventDefault();
 
-  //     // TODO: Handle the promise properly
-  //     this.getSVG().then((svg: string): void => {
-  //       this.diagramPrintService.printDiagram(svg);
-  //     });
-  //   }
-  // };
+      // TODO: Handle the promise properly
+      this.getSVG().then((svg: string): void => {
+        this.diagramPrintService.printDiagram(svg);
+      });
+    }
+  };
 
   /**
    * Checks, if the current platform is a macOS.
