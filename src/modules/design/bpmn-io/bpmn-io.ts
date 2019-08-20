@@ -62,18 +62,6 @@ export class BpmnIo {
   public diagramHasChanged: boolean = false;
   public saveStateForNewUri: boolean = false;
 
-  /**
-   * We are using the direct reference of a container element to place the tools of bpmn-js
-   * in the left sidebar (bpmn-io-layout__tools-left).
-   *
-   * This needs to be refactored.
-   * To get more control over certain elements in the palette it would be nice to have
-   * an aurelia-component for handling the logic behind it.
-   *
-   * TODO: https://github.com/process-engine/bpmn-studio/issues/455
-   */
-  public paletteContainer: HTMLDivElement;
-
   private bpmnLintButton: HTMLElement;
   private linting: ILinting;
 
@@ -232,7 +220,7 @@ export class BpmnIo {
     if (this.diagramHasState(this.diagramUri)) {
       const diagramState: IDiagramState = this.loadDiagramState(this.diagramUri);
 
-      this.importXmlIntoModeler(diagramState.data.xml);
+      await this.importXmlIntoModeler(diagramState.data.xml);
     } else {
       const xmlIsNotEmpty: boolean = this.xml !== undefined && this.xml !== null;
       if (xmlIsNotEmpty) {
@@ -257,7 +245,7 @@ export class BpmnIo {
     } else {
       this.modeler.attachTo(this.canvasModel);
 
-      this.attachPaletteContainer();
+      this.movePaletteToLeftToolbar();
     }
 
     window.addEventListener('resize', this.resizeEventHandler);
@@ -445,11 +433,10 @@ export class BpmnIo {
     }
   }
 
-  public attachPaletteContainer(): void {
+  public movePaletteToLeftToolbar(): void {
     const bpmnIoPaletteContainer: Element = this.canvasModel.getElementsByClassName('djs-palette')[0];
 
     bpmnIoPaletteContainer.className += ' djs-palette-override';
-    // this.paletteContainer.appendChild(bpmnIoPaletteContainer);
   }
 
   public async saveCurrentXML(): Promise<void> {
@@ -561,7 +548,7 @@ export class BpmnIo {
 
       setTimeout(() => {
         this.modeler.attachTo(this.canvasModel);
-        this.attachPaletteContainer();
+        this.movePaletteToLeftToolbar();
         this.bpmnLintButton = document.querySelector('.bpmn-js-bpmnlint-button');
 
         if (this.bpmnLintButton) {
@@ -606,11 +593,9 @@ export class BpmnIo {
     const xml: string = diagramState.data.xml;
     const viewbox: IViewbox = diagramState.metaData.location;
 
-    this.importXmlIntoModeler(xml);
+    await this.importXmlIntoModeler(xml);
 
-    setTimeout(() => {
-      this.modeler.get('canvas').viewbox(viewbox);
-    }, 0);
+    this.modeler.get('canvas').viewbox(viewbox);
   }
 
   private async validateDiagram(): Promise<void> {
