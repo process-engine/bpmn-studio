@@ -59,7 +59,16 @@ export class Inspect {
       : window.localStorage.getItem('InternalProcessEngineRoute');
 
     if (solutionUri === 'about:open-diagrams') {
-      return false;
+      this.activeSolutionEntry = this.solutionService.getSolutionEntryForUri(
+        window.localStorage.getItem('InternalProcessEngineRoute'),
+      );
+
+      this.notificationService.showNotification(
+        NotificationType.INFO,
+        'There are currently no runtime information about this process available.',
+      );
+
+      return true;
     }
 
     this.activeSolutionEntry = this.solutionService.getSolutionEntryForUri(solutionUri);
