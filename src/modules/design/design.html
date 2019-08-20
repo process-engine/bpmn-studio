@@ -21,7 +21,7 @@
           <i class="fas fa-database"></i>
           <i class="fas fa-angle-down start-options__icon"></i>
         </button>
-        <div class="dropdown-menu">
+        <div class="dropdown-menu design__diff-view-dropdown">
           <li class="dropdown-item" click.delegate="setDiffDestination('lastSaved')">Last saved version</li>
           <li repeat.for="solution of remoteSolutions" class="dropdown-item" click.delegate="setDiffDestination(solution.uri)">${solution.uri}</li>
         </div>

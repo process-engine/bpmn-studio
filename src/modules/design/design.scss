@@ -82,3 +82,10 @@ bpmn-diff-view {
 .diagram-list_dropdown {
   max-width: 100%;
 }
+
+.design__diff-view-dropdown {
+  position: absolute;
+  will-change: transform;
+  top: 0px;
+  transform: translate3d(-147px, 31px, 0px);
+}
