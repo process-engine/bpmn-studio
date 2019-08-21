@@ -142,7 +142,7 @@ export class SolutionExplorerSolution {
         this.updateSolutionExplorer();
       }),
 
-      this.eventAggregator.subscribe(environment.events.differsFromOriginal, async (isDiagramChanged: boolean) => {
+      this.eventAggregator.subscribe(environment.events.differsFromOriginal, (isDiagramChanged: boolean) => {
         this.isActiveDiagramChanged = isDiagramChanged;
         if (this.displayedSolutionEntry.isOpenDiagramService) {
           this.bindingSignaler.signal('diagramChanges');
