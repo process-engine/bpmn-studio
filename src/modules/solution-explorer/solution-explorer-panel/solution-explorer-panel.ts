@@ -118,9 +118,9 @@ export class SolutionExplorerPanel {
     });
 
     const persistedOpenDiagrams: Array<IDiagram> = this.solutionService.getOpenDiagrams();
-    persistedOpenDiagrams.forEach((diagram: IDiagram) => {
+    persistedOpenDiagrams.forEach(async (diagram: IDiagram) => {
       try {
-        this.solutionExplorerList.openDiagram(diagram.uri);
+        await this.solutionExplorerList.openDiagram(diagram.uri);
       } catch {
         // Do nothing
       }
