@@ -213,7 +213,11 @@ export class Inspect {
           return diagram.name === diagramName;
         });
       } else {
-        this.activeDiagram = await this.activeSolutionEntry.service.loadDiagram(diagramName);
+        try {
+          this.activeDiagram = await this.activeSolutionEntry.service.loadDiagram(diagramName);
+        } catch {
+          // If loading the diagram failed, do nothing
+        }
       }
     }
   }
