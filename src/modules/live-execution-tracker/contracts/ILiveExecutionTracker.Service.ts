@@ -2,6 +2,7 @@ import {Subscription} from '@essential-projects/event_aggregator_contracts';
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {IShape} from '@process-engine/bpmn-elements_contracts';
 import {DataModels} from '@process-engine/management_api_contracts';
+import {IElementRegistry} from '../../../contracts';
 
 export interface ILiveExecutionTrackerService {
   finishEmptyActivity(
@@ -38,18 +39,31 @@ export interface ILiveExecutionTrackerService {
     processInstanceIdOfOrigin: string,
     callActivityTargetId: string,
   ): Promise<string>;
-  getElementById(elementId: string): IShape;
-  getAllElementsThatCanHaveAToken(identity: IIdentity): Array<IShape>;
-  getElementsWithActiveToken(identity: IIdentity, processInstanceId: string): Promise<Array<IShape> | null>;
-  getElementsWithTokenHistory(identity: IIdentity, processInstanceId: string): Promise<Array<IShape> | null>;
-  getElementsWithError(identity: IIdentity, processInstanceId: string): Promise<Array<IShape>>;
-  getCallActivities(identity: IIdentity): Array<IShape>;
-  getActiveCallActivities(identity: IIdentity, processInstanceId: string): Promise<Array<IShape>>;
-  getInactiveCallActivities(identity: IIdentity, processInstanceId: string): Promise<Array<IShape>>;
-  getOutgoingElementsOfElement(
-    element: IShape,
-    tokenHistoryGroups: DataModels.TokenHistory.TokenHistoryGroup,
-  ): Array<IShape>;
+  getElementsWithActiveToken(
+    identity: IIdentity,
+    processInstanceId: string,
+    elementRegistry: IElementRegistry,
+  ): Promise<Array<IShape> | null>;
+  getElementsWithTokenHistory(
+    identity: IIdentity,
+    processInstanceId: string,
+    elementRegistry: IElementRegistry,
+  ): Promise<Array<IShape> | null>;
+  getElementsWithError(
+    identity: IIdentity,
+    processInstanceId: string,
+    elementRegistry: IElementRegistry,
+  ): Promise<Array<IShape>>;
+  getActiveCallActivities(
+    identity: IIdentity,
+    processInstanceId: string,
+    elementRegistry: IElementRegistry,
+  ): Promise<Array<IShape>>;
+  getInactiveCallActivities(
+    identity: IIdentity,
+    processInstanceId: string,
+    elementRegistry: IElementRegistry,
+  ): Promise<Array<IShape>>;
 
   elementHasActiveToken(elementId: string, activeTokens: Array<DataModels.Kpi.ActiveToken>): boolean;
   elementHasTokenHistory(elementId: string, tokenHistoryGroups: DataModels.TokenHistory.TokenHistoryGroup): boolean;
