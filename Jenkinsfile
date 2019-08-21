@@ -26,7 +26,7 @@ pipeline {
     stage('Prepare version') {
       steps {
         sh('npm ci')
-        sh('node ./node_modules/.bin/ci_tools npm-install-only @process-engine/ @essential-projects/')
+        // sh('node ./node_modules/.bin/ci_tools npm-install-only @process-engine/ @essential-projects/')
 
         // does prepare the version, but not commit it
         sh('node ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir')

@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+/* eslint-disable 6river/new-cap */
 import {computedFrom, inject, observable} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 
@@ -14,6 +15,7 @@ import {
   IBpmnModeler,
   IBpmnXmlSaveOptions,
   ICanvas,
+  IElementRegistry,
   IEvent,
   IEventFunction,
   IOverlay,
@@ -70,6 +72,7 @@ export class LiveExecutionTracker {
 
   private diagramViewer: IBpmnModeler;
   private diagramPreviewViewer: IBpmnModeler;
+  private elementRegistry: IElementRegistry;
   private viewerCanvas: ICanvas;
   private overlays: IOverlayManager;
 
@@ -159,12 +162,12 @@ export class LiveExecutionTracker {
     this.isAttached = true;
 
     // Create Viewer
-    // eslint-disable-next-line 6river/new-cap
     this.diagramViewer = new bundle.viewer({
       additionalModules: [bundle.ZoomScrollModule, bundle.MoveCanvasModule, bundle.MiniMap],
     });
 
-    // eslint-disable-next-line 6river/new-cap
+    this.elementRegistry = this.diagramViewer.get('elementRegistry');
+
     this.diagramPreviewViewer = new bundle.viewer({
       additionalModules: [bundle.ZoomScrollModule, bundle.MoveCanvasModule, bundle.MiniMap],
     });
@@ -371,14 +374,17 @@ export class LiveExecutionTracker {
     const elementsWithError: Array<IShape> = await this.liveExecutionTrackerService.getElementsWithError(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
+      this.elementRegistry,
     );
     const elementsWithActiveToken: Array<IShape> = await this.liveExecutionTrackerService.getElementsWithActiveToken(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
+      this.elementRegistry,
     );
     const inactiveCallActivities: Array<IShape> = await this.liveExecutionTrackerService.getInactiveCallActivities(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
+      this.elementRegistry,
     );
 
     this.removeEventListenerFromOverlays();
@@ -699,7 +705,7 @@ export class LiveExecutionTracker {
   ): Promise<void> => {
     const overlayHtmlId: string = (event.target as HTMLDivElement).id;
     const elementId: string = this.getElementIdByOverlayHtmlId(overlayHtmlId);
-    const element: IShape = this.liveExecutionTrackerService.getElementById(elementId);
+    const element: IShape = this.elementRegistry.get(elementId);
 
     const callActivityTargetProcess: string = element.businessObject.calledElement;
 
@@ -739,7 +745,7 @@ export class LiveExecutionTracker {
   ): Promise<void> => {
     const overlayHtmlId: string = (event.target as HTMLDivElement).id;
     const elementId: string = this.getElementIdByOverlayHtmlId(overlayHtmlId);
-    const element: IShape = this.liveExecutionTrackerService.getElementById(elementId);
+    const element: IShape = this.elementRegistry.get(elementId);
     const callActivityTargetProcess: string = element.businessObject.calledElement;
 
     const callActivityHasNoTargetProcess: boolean = callActivityTargetProcess === undefined;
@@ -919,7 +925,6 @@ export class LiveExecutionTracker {
     })();
 
     const colorizingWasSuccessfull: boolean = colorizedXml !== undefined;
-
     const xmlChanged: boolean = previousXml !== colorizedXml;
     if (xmlChanged && colorizingWasSuccessfull) {
       await this.importXmlIntoDiagramViewer(colorizedXml);
