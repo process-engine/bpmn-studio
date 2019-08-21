@@ -3,6 +3,7 @@ import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {NewInstance, bindable, computedFrom, inject} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 import {ControllerValidateResult, ValidateResult, ValidationController, ValidationRules} from 'aurelia-validation';
+import {BindingSignaler} from 'aurelia-templating-resources';
 
 import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
 import {IDiagram, ISolution} from '@process-engine/solutionexplorer.contracts';
@@ -51,6 +52,7 @@ interface IDiagramCreationState extends IDiagramNameInputState {
   'NotificationService',
   'SolutionService',
   'OpenDiagramStateService',
+  BindingSignaler,
 )
 export class SolutionExplorerSolution {
   public activeDiagram: IDiagram;
@@ -103,6 +105,9 @@ export class SolutionExplorerSolution {
 
   private sortedDiagramsOfSolutions: Array<IDiagram> = [];
 
+  private bindingSignaler: BindingSignaler;
+  private isActiveDiagramChanged: boolean = false;
+
   constructor(
     router: Router,
     eventAggregator: EventAggregator,
@@ -111,6 +116,7 @@ export class SolutionExplorerSolution {
     notificationService: NotificationService,
     solutionService: ISolutionService,
     openDiagramStateService: OpenDiagramStateService,
+    bindingSignaler: BindingSignaler,
   ) {
     this.router = router;
     this.eventAggregator = eventAggregator;
@@ -119,6 +125,7 @@ export class SolutionExplorerSolution {
     this.notificationService = notificationService;
     this.globalSolutionService = solutionService;
     this.openDiagramStateService = openDiagramStateService;
+    this.bindingSignaler = bindingSignaler;
   }
 
   public async attached(): Promise<void> {
@@ -133,6 +140,18 @@ export class SolutionExplorerSolution {
     this.subscriptions = [
       this.eventAggregator.subscribe('router:navigation:success', () => {
         this.updateSolutionExplorer();
+      }),
+
+      this.eventAggregator.subscribe(environment.events.differsFromOriginal, async (isDiagramChanged: boolean) => {
+        this.isActiveDiagramChanged = isDiagramChanged;
+        if (this.displayedSolutionEntry.isOpenDiagramService) {
+          this.bindingSignaler.signal('diagramChanges');
+        }
+      }),
+
+      this.eventAggregator.subscribe(environment.events.navBar.diagramChangesResolved, () => {
+        this.isActiveDiagramChanged = false;
+        this.bindingSignaler.signal('diagramChanges');
       }),
     ];
 
@@ -475,7 +494,20 @@ export class SolutionExplorerSolution {
   public isDiagramChanged(diagramUri: string): boolean {
     const diagramState: IDiagramState = this.openDiagramStateService.loadDiagramState(diagramUri);
 
+    const updateDiagramState: Function = () => {
+      diagramState.metaData.isChanged = this.isActiveDiagramChanged;
+      this.openDiagramStateService.updateDiagramState(diagramUri, diagramState);
+    };
 
+    const diagramIsOpenedDiagram: boolean = diagramUri === this.activeDiagramUri;
+    if (diagramIsOpenedDiagram) {
+      if (!diagramState.metaData.isChanged && this.isActiveDiagramChanged) {
+        updateDiagramState();
+        this.isActiveDiagramChanged = false;
+      } else if (diagramState.metaData.isChanged && !this.isActiveDiagramChanged) {
+        updateDiagramState();
+      }
+    }
 
     return diagramState !== null && diagramState.metaData.isChanged;
   }
