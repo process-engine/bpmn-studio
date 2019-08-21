@@ -226,6 +226,7 @@ export class BpmnIo {
       if (xmlIsNotEmpty) {
         this.modeler.importXML(this.xml, async (err: Error) => {
           this.savedXml = await this.getXML();
+          this.xml = await this.getXML();
         });
       }
     }
@@ -349,6 +350,7 @@ export class BpmnIo {
 
       this.eventAggregator.subscribe(environment.events.diagramDetail.saveDiagram, async () => {
         this.savedXml = await this.getXML();
+        this.xml = await this.getXML();
         this.diagramHasChanges = false;
 
         await this.saveDiagramState(this.diagramUri);
@@ -441,23 +443,26 @@ export class BpmnIo {
 
   public async saveCurrentXML(): Promise<void> {
     this.savedXml = await this.getXML();
+    this.xml = await this.getXML();
     this.tempProcess = undefined;
   }
 
   public async xmlChanged(newValue: string, oldValue?: string): Promise<void> {
     if (this.diagramHasChanged) {
-      this.savedXml = newValue;
-
       if (this.solutionIsRemote) {
         this.viewer.importXML(this.xml);
       }
 
       if (this.diagramHasState(this.diagramUri)) {
-        this.recoverDiagramState();
+        await this.recoverDiagramState();
       } else {
-        this.importXmlIntoModeler(this.xml);
+        await this.importXmlIntoModeler(this.xml);
       }
 
+      this.savedXml = await this.getXML();
+
+      console.log(this.savedXml);
+      console.log(this.xml);
       const diagramState: IDiagramState = this.loadDiagramState(this.diagramUri);
       const diagramContainsChanges: boolean = diagramState !== null && diagramState.metaData.isChanged;
 
@@ -479,6 +484,8 @@ export class BpmnIo {
     const previousDiagramExists: boolean = previousUri !== undefined;
     if (!this.solutionIsRemote && previousDiagramExists) {
       if (this.saveStateForNewUri) {
+        // this.savedXml = await this.getXML();
+        // this.xml = await this.getXML();
         this.saveStateForNewUri = false;
 
         const previousDiagramWasNoNewDiagram: boolean = !previousUri.startsWith('about:open-diagrams');
@@ -699,6 +706,10 @@ export class BpmnIo {
     const xml: string = await this.getXML();
     const isChanged: boolean = isUnsavedDiagram || !this.areXmlsIdentical(xml, savedXml);
 
+    if (isChanged) {
+      console.log(this.xml);
+      console.log(this.savedXml);
+    }
     this.openDiagramStateService.saveDiagramState(diagramUri, xml, viewbox, selectedElement, isChanged);
   }
 
@@ -717,13 +728,16 @@ export class BpmnIo {
 
   private importXmlIntoModeler(xml: string): Promise<void> {
     return new Promise((resolve: Function, reject: Function): void => {
-      this.modeler.importXML(xml, (error: Error) => {
+      this.modeler.importXML(xml, async (error: Error) => {
         const errorOccured: boolean = error !== undefined;
         if (errorOccured) {
           reject();
 
           return;
         }
+
+        this.xml = await this.getXML();
+        this.savedXml = await this.getXML();
 
         resolve();
       });
