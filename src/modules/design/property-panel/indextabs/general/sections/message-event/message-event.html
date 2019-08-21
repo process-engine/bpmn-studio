@@ -1,7 +1,7 @@
 <template>
   <require from="./message-event.css"></require>
   <require from="../../../../styles/sections.css"></require>
-  <div class="panel panel--grow" id="js-general-messageEvent-section">
+  <div class="panel" id="js-general-messageEvent-section">
     <div class="panel__heading">
       Message Event
       <button class="button remove-context-button" class.bind="selectedId ? '' : 'button--disabled'" disabled.bind="!selectedId || !isEditable" click.delegate="removeSelectedMessage()">

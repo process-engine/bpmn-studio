@@ -3,10 +3,6 @@
   <require from="./diagram-list/diagram-list"></require>
 
   <div class="think">
-
-    <div show.bind="showDiagramList" class="think__diagram-list-container">
-      <diagram-list active-solution-entry.bind="activeSolutionEntry"></diagram-list>
-    </div>
-
+    <diagram-list show.bind="showDiagramList" active-solution-entry.bind="activeSolutionEntry"></diagram-list>
   </div>
 </template>

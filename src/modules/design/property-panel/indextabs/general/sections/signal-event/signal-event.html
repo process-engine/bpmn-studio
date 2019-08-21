@@ -1,7 +1,7 @@
 <template>
   <require from="./signal-event.css"></require>
   <require from="../../../../styles/sections.css"></require>
-  <div class="section-panel panel--grow" id="js-general-signalEvent-section">
+  <div class="section-panel" id="js-general-signalEvent-section">
     <div class="panel__heading">
       Signal Event
       <button class="button remove-context-button" class.bind="selectedId ? '' : 'button--disabled'" disabled.bind="!selectedId || !isEditable" click.delegate="removeSelectedSignal()">

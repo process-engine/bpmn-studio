@@ -6,15 +6,9 @@
 
   <div class="design">
 
-    <div show.bind="showDetail" class="design__detail-container" id="diagramDetailContainer">
-      <diagram-detail view-model.ref="diagramDetail" active-diagram.bind="activeDiagram" xml.two-way="xml" active-solution-entry.bind="activeSolutionEntry"></diagram-detail>
-    </div>
-    <div show.bind="showXML" class="design__xml-view-container" id="diagramXmlContainer">
-      <bpmn-xml-view xml.bind="xml"></bpmn-xml-view>
-    </div>
-    <div if.bind="showDiff" class="design__diff-view-container" id="js-diagram-diffContainer">
-      <bpmn-diff-view saved-xml.bind="activeDiagram.xml" current-xml.bind="xmlForDiff" process-model-id.bind="activeDiagram.name"></bpmn-diff-view>
-    </div>
+    <diagram-detail show.bind="showDetail" view-model.ref="diagramDetail" active-diagram.bind="activeDiagram" xml.two-way="xml" active-solution-entry.bind="activeSolutionEntry"></diagram-detail>
+    <bpmn-xml-view show.bind="showXML" xml.bind="xml"></bpmn-xml-view>
+    <bpmn-diff-view if.bind="showDiff" saved-xml.bind="activeDiagram.xml" current-xml.bind="xmlForDiff" process-model-id.bind="activeDiagram.name"></bpmn-diff-view>
 
     <div class="design-layout__tools-right">
       <div class="tool-list tool-list--vertical">
@@ -27,7 +21,7 @@
           <i class="fas fa-database"></i>
           <i class="fas fa-angle-down start-options__icon"></i>
         </button>
-        <div class="dropdown-menu">
+        <div class="dropdown-menu design__diff-view-dropdown">
           <li class="dropdown-item" click.delegate="setDiffDestination('lastSaved')">Last saved version</li>
           <li repeat.for="solution of remoteSolutions" class="dropdown-item" click.delegate="setDiffDestination(solution.uri)">${solution.uri}</li>
         </div>

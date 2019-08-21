@@ -2,9 +2,6 @@
   <require from="../bpmn-io/bpmn-io"></require>
   <require from="./diagram-detail.css"></require>
   <require from="spectrum-colorpicker/spectrum.css"></require>
-  <div class="diagram-detail">
-    <div class="bpmnio-container">
-      <bpmn-io view-model.ref="bpmnio" xml.two-way="xml" diagram-uri.bind="activeDiagramUri" name.bind="activeDiagram.name"></bpmn-io>
-    </div>
-  </div>
+
+  <bpmn-io view-model.ref="bpmnio" xml.two-way="xml" diagram-uri.bind="activeDiagramUri" name.bind="activeDiagram.name"></bpmn-io>
 </template>

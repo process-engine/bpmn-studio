@@ -1,12 +1,14 @@
-.diagram-detail {
+diagram-detail {
   display: flex;
+  flex: 1;
   height: 100%;
   align-items: stretch;
 }
 
-.bpmnio-container {
-  height: 100%;
+bpmn-io {
+  display: flex;
   flex: 1;
+  height: 100%;
 }
 
 /*

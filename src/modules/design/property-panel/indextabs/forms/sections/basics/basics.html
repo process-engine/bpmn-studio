@@ -1,7 +1,7 @@
 <template>
   <require from="./basics.css"></require>
   <require from="../../../../styles/sections.css"></require>
-  <div class="section-panel panel--grow" id="js-forms-basics-section">
+  <div class="section-panel" id="js-forms-basics-section">
     <div class="panel__heading">User Task</div>
     <div class="panel__content">
       <table class="props-table">
@@ -14,7 +14,7 @@
       </table>
     </div>
   </div>
-  <div class="section-panel panel--grow">
+  <div class="section-panel">
     <div class="panel__heading">
       Form Fields
       <button class="button remove-context-button" class.bind="isFormSelected ? '' : 'button--disabled'" disabled.bind="!isFormSelected || !isEditable" click.delegate="removeSelectedForm()">
@@ -30,7 +30,7 @@
       </select>
     </div>
   </div>
-  <div class="section-panel panel--grow" show.bind="isFormSelected">
+  <div class="section-panel" show.bind="isFormSelected">
     <div class="panel__heading">Form Field</div>
     <div class="panel__content">
       <table class="props-table">
@@ -84,7 +84,7 @@
       </table>
     </div>
   </div>
-  <div class="section-panel panel--grow" if.bind="isFormSelected && selectedType === FormfieldTypes.enum">
+  <div class="section-panel" if.bind="isFormSelected && selectedType === FormfieldTypes.enum">
     <div class="panel__heading">
       <span>Values</span>
       <button class="button add-context-button" click.delegate="addEnumValue()" disabled.bind="!isEditable">
