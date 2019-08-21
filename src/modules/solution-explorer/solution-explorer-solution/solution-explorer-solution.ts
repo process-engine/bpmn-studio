@@ -472,18 +472,12 @@ export class SolutionExplorerSolution {
     );
   }
 
-  public get diagramChangedStateMap(): Map<string, boolean> {
-    const isChangedMap: Map<string, boolean> = new Map<string, boolean>();
+  public isDiagramChanged(diagramUri: string): boolean {
+    const diagramState: IDiagramState = this.openDiagramStateService.loadDiagramState(diagramUri);
 
-    this.openedDiagrams.forEach((diagram: IDiagram): void => {
-      const diagramState: IDiagramState = this.openDiagramStateService.loadDiagramState(diagram.uri);
 
-      const isChanged: boolean = diagramState !== null && diagramState.metaData.isChanged;
 
-      isChangedMap.set(diagram.uri, isChanged);
-    });
-
-    return isChangedMap;
+    return diagramState !== null && diagramState.metaData.isChanged;
   }
 
   public canDeleteDiagram(): boolean {
