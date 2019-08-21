@@ -1,4 +1,5 @@
 <template>
+  <require from="@process-engine/bpmn-js-custom-bundle/bpmn-modeler-custom.css"></require>
   <require from="./diagram-viewer.css"></require>
   <div ref="canvasModel" class="diagram-viewer__body">
     <div if.bind="xmlIsNotSelected && !noCorrelationsFound">

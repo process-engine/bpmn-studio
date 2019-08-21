@@ -5,15 +5,9 @@
   <require from="./inspect-correlation/inspect-correlation"></require>
   <div class="inspect">
 
-    <div show.bind="showDashboard" class="inspect__dashboard-container">
-      <dashboard view-model.ref="dashboard" active-solution-entry.bind="activeSolutionEntry"></dashboard>
-    </div>
-    <div if.bind="showHeatmap" class="inspect__heatmap-container">
-      <heatmap active-diagram.bind="activeDiagram" active-solution-entry.bind="activeSolutionEntry"></heatmap>
-    </div>
-    <div if.bind="showInspectCorrelation" class="inspect__inspect-correlation-container">
-      <inspect-correlation active-diagram.bind="activeDiagram" active-solution-entry.bind="activeSolutionEntry" process-instance-to-select.to-view="processInstanceToSelect" flow-node-to-select.to-view="flowNodeToSelect" inspect-panel-tab-to-show.to-view="inspectPanelTabToShow"></inspect-correlation>
-    </div>
+    <dashboard show.bind="showDashboard" view-model.ref="dashboard" active-solution-entry.bind="activeSolutionEntry"></dashboard>
+    <heatmap if.bind="showHeatmap" active-diagram.bind="activeDiagram" active-solution-entry.bind="activeSolutionEntry"></heatmap>
+    <inspect-correlation if.bind="showInspectCorrelation" active-diagram.bind="activeDiagram" active-solution-entry.bind="activeSolutionEntry" process-instance-to-select.to-view="processInstanceToSelect" flow-node-to-select.to-view="flowNodeToSelect" inspect-panel-tab-to-show.to-view="inspectPanelTabToShow"></inspect-correlation>
 
     <div class="inspect-layout__tools-right">
       <div class="tool-list tool-list--vertical">

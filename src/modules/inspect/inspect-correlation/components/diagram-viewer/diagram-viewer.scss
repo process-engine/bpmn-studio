@@ -22,11 +22,11 @@
 }
 
 .diagram-viewer__loading-spinner {
-  display: inline-block;
   position: absolute;
+  top: 25%;
   left: 50%;
-  top: 15%;
-  white-space: nowrap;
+  display: inline-block;
   transform: translate(-50%, -50%);
   user-select: none;
+  white-space: nowrap;
 }

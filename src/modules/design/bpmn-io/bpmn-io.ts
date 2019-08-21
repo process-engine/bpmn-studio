@@ -62,18 +62,6 @@ export class BpmnIo {
   public diagramHasChanged: boolean = false;
   public saveStateForNewUri: boolean = false;
 
-  /**
-   * We are using the direct reference of a container element to place the tools of bpmn-js
-   * in the left sidebar (bpmn-io-layout__tools-left).
-   *
-   * This needs to be refactored.
-   * To get more control over certain elements in the palette it would be nice to have
-   * an aurelia-component for handling the logic behind it.
-   *
-   * TODO: https://github.com/process-engine/bpmn-studio/issues/455
-   */
-  public paletteContainer: HTMLDivElement;
-
   private bpmnLintButton: HTMLElement;
   private linting: ILinting;
 
@@ -177,7 +165,6 @@ export class BpmnIo {
     this.modeler.on(['shape.added', 'shape.removed'], (event: IInternalEvent) => {
       if (!this.solutionIsRemote) {
         const shapeIsParticipant: boolean = event.element.type === 'bpmn:Participant';
-
         if (shapeIsParticipant) {
           return this.checkForMultipleParticipants(event);
         }
@@ -187,11 +174,11 @@ export class BpmnIo {
 
     this.modeler.on(
       'import.done',
-      async () => {
+      () => {
         this.fitDiagramToViewport();
 
         if (!this.solutionIsRemote) {
-          await this.validateDiagram();
+          this.validateDiagram();
           this.linting.update();
         }
       },
@@ -258,7 +245,7 @@ export class BpmnIo {
     } else {
       this.modeler.attachTo(this.canvasModel);
 
-      this.attachPaletteContainer();
+      this.movePaletteToLeftToolbar();
     }
 
     window.addEventListener('resize', this.resizeEventHandler);
@@ -427,6 +414,13 @@ export class BpmnIo {
   public detached(): void {
     this.modeler.detach();
     this.modeler.destroy();
+
+    const viewerIsInitialized: boolean = this.viewer !== undefined;
+    if (viewerIsInitialized) {
+      this.viewer.destroy();
+      this.viewer.detach();
+    }
+
     window.removeEventListener('resize', this.resizeEventHandler);
     document.removeEventListener('keydown', this.printHotkeyEventHandler);
 
@@ -439,11 +433,10 @@ export class BpmnIo {
     }
   }
 
-  public attachPaletteContainer(): void {
-    const bpmnIoPaletteContainer: Element = document.getElementsByClassName('djs-palette')[0];
+  public movePaletteToLeftToolbar(): void {
+    const bpmnIoPaletteContainer: Element = this.canvasModel.getElementsByClassName('djs-palette')[0];
 
     bpmnIoPaletteContainer.className += ' djs-palette-override';
-    this.paletteContainer.appendChild(bpmnIoPaletteContainer);
   }
 
   public async saveCurrentXML(): Promise<void> {
@@ -460,9 +453,9 @@ export class BpmnIo {
       }
 
       if (this.diagramHasState(this.diagramUri)) {
-        await this.recoverDiagramState();
+        this.recoverDiagramState();
       } else {
-        await this.importXmlIntoModeler(this.xml);
+        this.importXmlIntoModeler(this.xml);
       }
 
       const diagramState: IDiagramState = this.loadDiagramState(this.diagramUri);
@@ -473,7 +466,7 @@ export class BpmnIo {
 
     const oldValueExists: boolean = oldValue !== undefined;
     if (!this.diagramHasChanged && oldValueExists && !this.solutionIsRemote) {
-      await this.saveDiagramState(this.diagramUri);
+      this.saveDiagramState(this.diagramUri);
     }
 
     this.diagramHasChanged = false;
@@ -555,7 +548,7 @@ export class BpmnIo {
 
       setTimeout(() => {
         this.modeler.attachTo(this.canvasModel);
-        this.attachPaletteContainer();
+        this.movePaletteToLeftToolbar();
         this.bpmnLintButton = document.querySelector('.bpmn-js-bpmnlint-button');
 
         if (this.bpmnLintButton) {
@@ -602,9 +595,7 @@ export class BpmnIo {
 
     await this.importXmlIntoModeler(xml);
 
-    setTimeout(() => {
-      this.modeler.get('canvas').viewbox(viewbox);
-    }, 0);
+    this.modeler.get('canvas').viewbox(viewbox);
   }
 
   private async validateDiagram(): Promise<void> {

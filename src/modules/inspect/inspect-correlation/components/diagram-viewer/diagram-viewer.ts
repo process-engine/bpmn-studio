@@ -8,16 +8,12 @@ import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {
   IBpmnModeler,
-  IBpmnXmlSaveOptions,
   ICanvas,
-  IColorPickerColor,
   IDiagramExportService,
   IElementRegistry,
   IEvent,
-  IModeling,
   ISolutionEntry,
   NotificationType,
-  defaultBpmnColors,
 } from '../../../../../contracts/index';
 import environment from '../../../../../environment';
 import {NotificationService} from '../../../../../services/notification-service/notification.service';
@@ -37,9 +33,7 @@ export class DiagramViewer {
 
   private notificationService: NotificationService;
   private elementRegistry: IElementRegistry;
-  private diagramModeler: IBpmnModeler;
   private diagramViewer: IBpmnModeler;
-  private modeling: IModeling;
   private xmlWithColorizedProgress: string;
   private uncoloredSVG: string;
   private subscriptions: Array<Subscription>;
@@ -61,21 +55,16 @@ export class DiagramViewer {
 
   public attached(): void {
     // eslint-disable-next-line 6river/new-cap
-    this.diagramModeler = new bundle.modeler();
-    // eslint-disable-next-line 6river/new-cap
     this.diagramViewer = new bundle.viewer({
       additionalModules: [bundle.ZoomScrollModule, bundle.MoveCanvasModule],
     });
 
-    this.modeling = this.diagramModeler.get('modeling');
-    this.elementRegistry = this.diagramModeler.get('elementRegistry');
+    this.elementRegistry = this.diagramViewer.get('elementRegistry');
 
     this.diagramViewer.attachTo(this.canvasModel);
 
     this.diagramViewer.on('element.click', async (event: IEvent) => {
-      await this.colorizeSelection(event.element);
-
-      this.selectedFlowNode = event.element;
+      this.selectFlowNode(event.element.id);
     });
 
     this.subscriptions = [
@@ -155,13 +144,10 @@ export class DiagramViewer {
       return;
     }
 
-    const elementRegistry: IElementRegistry = this.diagramViewer.get('elementRegistry');
-    const element: IShape = elementRegistry.get(flowNodeId);
-
-    this.diagramViewer.get('selection').select(element);
+    const element: IShape = this.elementRegistry.get(flowNodeId);
 
     this.selectedFlowNode = element;
-    this.colorizeSelection(element);
+    this.diagramViewer.get('selection').select(element);
   }
 
   public detached(): void {
@@ -209,8 +195,7 @@ export class DiagramViewer {
       true,
     );
 
-    await this.importXml(this.diagramModeler, this.xmlWithColorizedProgress);
-    await this.importXml(this.diagramViewer, this.xmlWithColorizedProgress);
+    await this.importXml(this.xmlWithColorizedProgress);
     this.uncoloredSVG = await this.getSVG();
 
     const elementSelected: boolean = this.selectedFlowNode !== undefined;
@@ -223,10 +208,7 @@ export class DiagramViewer {
 
       const correlationHasSameElementAsPreviouslySelected: boolean = elementsToColorize.length > 0;
       if (correlationHasSameElementAsPreviouslySelected) {
-        this.colorizeSelection(this.selectedFlowNode);
-
-        const colorizedXml: string = await this.getXmlFromModeler();
-        await this.importXml(this.diagramViewer, colorizedXml);
+        this.selectFlowNode(this.selectedFlowNode.id);
 
         return;
       }
@@ -266,34 +248,7 @@ export class DiagramViewer {
     canvas.zoom('fit-viewport', 'auto');
   }
 
-  private async colorizeSelection(selectedElement: IShape): Promise<void> {
-    await this.importXml(this.diagramModeler, this.xmlWithColorizedProgress);
-
-    const elementToColorize: IShape = this.elementRegistry.filter((element: IShape): boolean => {
-      const isSelectedElement: boolean = element.id === selectedElement.id;
-
-      return isSelectedElement;
-    })[0];
-
-    const previousColorWithGreyFill: IColorPickerColor = {
-      fill: defaultBpmnColors.grey.fill,
-      border: elementToColorize.businessObject.di.stroke,
-    };
-
-    this.colorElement(elementToColorize, previousColorWithGreyFill);
-
-    const colorizedXml: string = await this.getXmlFromModeler();
-    this.importXml(this.diagramViewer, colorizedXml);
-  }
-
-  private colorElement(element: IShape, color: IColorPickerColor): void {
-    this.modeling.setColor(element, {
-      stroke: color.border,
-      fill: color.fill,
-    });
-  }
-
-  private async importXml(modeler: IBpmnModeler, xml: string): Promise<void> {
+  private async importXml(xml: string): Promise<void> {
     const xmlIsNotLoaded: boolean = xml === undefined || xml === null;
 
     if (xmlIsNotLoaded) {
@@ -305,7 +260,7 @@ export class DiagramViewer {
     }
 
     const xmlImportPromise: Promise<void> = new Promise((resolve: Function, reject: Function): void => {
-      modeler.importXML(xml, (importXmlError: Error) => {
+      this.diagramViewer.importXML(xml, (importXmlError: Error) => {
         if (importXmlError) {
           reject(importXmlError);
 
@@ -317,26 +272,6 @@ export class DiagramViewer {
     });
 
     return xmlImportPromise;
-  }
-
-  private async getXmlFromModeler(): Promise<string> {
-    const saveXmlPromise: Promise<string> = new Promise((resolve: Function, reject: Function): void => {
-      const xmlSaveOptions: IBpmnXmlSaveOptions = {
-        format: true,
-      };
-
-      this.diagramModeler.saveXML(xmlSaveOptions, async (saveXmlError: Error, xml: string) => {
-        if (saveXmlError) {
-          reject(saveXmlError);
-
-          return;
-        }
-
-        resolve(xml);
-      });
-    });
-
-    return saveXmlPromise;
   }
 
   private async getSVG(): Promise<string> {

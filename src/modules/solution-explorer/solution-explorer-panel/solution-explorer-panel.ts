@@ -52,6 +52,8 @@ export class SolutionExplorerPanel {
   public solutionExplorerPanel: SolutionExplorerPanel = this;
   public remoteSolutionHistoryStatus: Map<string, boolean> = new Map<string, boolean>();
   public availableDefaultRemoteSolutions: Array<RemoteSolutionListEntry> = [];
+  public isConnecting: boolean = false;
+  public connectionError: string;
 
   private eventAggregator: EventAggregator;
   private notificationService: NotificationService;
@@ -178,9 +180,12 @@ export class SolutionExplorerPanel {
   }
 
   public closeRemoteSolutionModal(): void {
+    this.stopPollingOfRemoteSolutionHistoryStatus();
+    this.solutionExplorerList.cancelOpeningSolution(this.uriOfRemoteSolution);
+    this.isConnecting = false;
     this.showOpenRemoteSolutionModal = false;
     this.uriOfRemoteSolutionWithoutProtocol = undefined;
-    this.stopPollingOfRemoteSolutionHistoryStatus();
+    this.connectionError = undefined;
   }
 
   public async openRemoteSolution(): Promise<void> {
@@ -188,7 +193,7 @@ export class SolutionExplorerPanel {
       return;
     }
 
-    this.showOpenRemoteSolutionModal = false;
+    this.connectionError = undefined;
 
     try {
       const lastCharacterIsASlash: boolean = this.uriOfRemoteSolutionWithoutProtocol.endsWith('/');
@@ -198,14 +203,25 @@ export class SolutionExplorerPanel {
 
       await this.addSolutionToRemoteSolutionHistory(this.uriOfRemoteSolution);
 
+      this.isConnecting = true;
       await this.solutionExplorerList.openSolution(this.uriOfRemoteSolution);
+      this.isConnecting = false;
     } catch (error) {
+      this.isConnecting = false;
+
       const genericMessage: string = `Unable to connect to ProcessEngine on: ${this.uriOfRemoteSolution}`;
       const cause: string = error.message ? error.message : '';
-      this.notificationService.showNotification(NotificationType.ERROR, `${genericMessage}<br />${cause}`);
+
+      this.connectionError = `${genericMessage}\n${cause}`;
+
+      return;
     }
 
     this.closeRemoteSolutionModal();
+  }
+
+  public get connectionErrorExists(): boolean {
+    return this.connectionError !== undefined;
   }
 
   public get remoteSolutionHistoryWithStatus(): Array<RemoteSolutionListEntry> {

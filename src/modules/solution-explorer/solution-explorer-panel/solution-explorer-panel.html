@@ -48,9 +48,10 @@
   <!-- Open Remote Solution Modal -->
   <modal if.bind="showOpenRemoteSolutionModal"
          header-text="Open Remote Solution"
+         body-style="min-height: 230px"
          origin.bind="solutionExplorerPanel">
     <template replace-part="modal-body">
-      <form role="form" submit.delegate="openRemoteSolution()">
+      <form if.bind="!isConnecting" role="form" submit.delegate="openRemoteSolution()">
         Location:
         <div class="input-group mb-3">
           <div class="input-group-prepend">
@@ -63,7 +64,7 @@
           <input type="text" class="form-control" class.bind="uriIsValid || uriIsEmpty ? '' : 'uri-input--invalid'" value.bind="origin.uriOfRemoteSolutionWithoutProtocol" placeholder="Please provide a URI for the remote ProcessEngine" autofocus>
         </div>
       </form>
-      <div class="remote-solution-list" if.bind="unconnectedSuggestedRemoteSolutionsExist">
+      <div if.bind="!isConnecting" class="remote-solution-list" if.bind="unconnectedSuggestedRemoteSolutionsExist">
         <div class="remote-solution-list__remote-solution"
             repeat.for="remoteSolution of unconnectedSuggestedRemoteSolutions"
             class.bind="uriOfRemoteSolution === remoteSolution.uri ? 'remote-solution-list__remote-solution-selected' : ''"
@@ -81,10 +82,15 @@
           </button>
         </div>
       </div>
+      <div if.bind="connectionErrorExists" class="alert alert-warning remote-solution-list__connection-error-message" role="alert">${connectionError}</div>
+      <div if.bind="isConnecting" class="remote-solution-list__loading-spinner">
+        <img class="remote-solution-list__loading-spinner-icon" src="src/resources/images/gears.svg">
+        <h3 class="remote-solution-list__loading-spinner-text">Connecting to ${uriOfRemoteSolution}...</h3>
+      </div>
     </template>
     <template replace-part="modal-footer">
       <button type="button" class="btn btn-default" data-dismiss="modal" id="cancelOpenRemoteSolutionButton" click.delegate="closeRemoteSolutionModal()">Cancel</button>
-      <button type="submit" class="btn btn-primary" data-dismiss="modal" id="openRemoteSolutionButton" disabled.bind="!uriIsValid || uriIsEmpty" click.delegate="openRemoteSolution()">Open Solution</button>
+      <button type="submit" class="btn btn-primary" data-dismiss="modal" id="openRemoteSolutionButton" disabled.bind="!uriIsValid || uriIsEmpty || isConnecting" click.delegate="openRemoteSolution()">Open Solution</button>
     </template>
   </modal>
 

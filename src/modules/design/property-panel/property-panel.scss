@@ -1,20 +1,4 @@
 .property-panel {
-  float: left;
-  width: 100%;
-  margin-left: -6px;
-  overflow-y: auto;
+  overflow-y: scroll;
   border-left: 2px solid #dcdbdb;
-}
-
-.indextab-dropdown {
-  margin: 15px 0 20px 0;
-}
-
-.indextab-dropdown__button {
-  width: 100%;
-}
-
-.indextab-dropdown__glyhicon {
-  float: right;
-  top: 4px;
 }
