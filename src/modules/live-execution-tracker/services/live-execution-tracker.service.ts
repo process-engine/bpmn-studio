@@ -454,9 +454,11 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
       fill: defaultBpmnColors.none.fill,
     });
 
+    const clearedXml: string = await this.exportXmlFromDiagramModeler(diagramModeler);
+
     this.killModeler(diagramModeler);
 
-    return this.exportXmlFromDiagramModeler(diagramModeler);
+    return clearedXml;
   }
 
   public async getColorizedDiagram(
