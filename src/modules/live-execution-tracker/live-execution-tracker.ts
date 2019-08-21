@@ -1,5 +1,5 @@
-/* eslint-disable 6river/new-cap */
 /* eslint-disable max-lines */
+/* eslint-disable 6river/new-cap */
 import {computedFrom, inject, observable} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 
