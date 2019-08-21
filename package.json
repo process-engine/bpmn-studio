@@ -42,11 +42,11 @@
   "files": [
     "dist/web",
     "index.html",
-    "bin",
+    "dist/bin",
     "src/resources",
     "dist/web/@fortawesome"
   ],
-  "bin": "./bin/bpmn-studio.js",
+  "bin": "./dist/bin/bpmn-studio.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/process-engine/bpmn-studio"
