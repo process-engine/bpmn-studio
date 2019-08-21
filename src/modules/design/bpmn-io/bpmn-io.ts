@@ -414,7 +414,8 @@ export class BpmnIo {
 
   public async xmlChanged(newValue: string, oldValue?: string): Promise<void> {
     if (this.diagramHasChanged) {
-      this.savedXml = newValue;
+      await this.importXmlIntoModeler(newValue);
+      this.savedXml = await this.getXML();
 
       if (this.solutionIsRemote) {
         this.viewer.importXML(this.xml);
