@@ -165,7 +165,6 @@ export class BpmnDiffView {
 
   public async processModelIdChanged(): Promise<void> {
     const hasNoProcessModelId: boolean = this.processModelId === undefined;
-
     if (hasNoProcessModelId) {
       this.deployedXml = undefined;
 
