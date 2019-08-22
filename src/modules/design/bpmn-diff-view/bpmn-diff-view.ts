@@ -465,7 +465,7 @@ export class BpmnDiffView {
   private markChangedElements(changedElements: object): void {
     const changedElementsWithChanges: object = this.removeElementsWithoutChanges(changedElements);
 
-    const elementsToBeColored: Array<IShape> = this.getElementsToBeColored(changedElementsWithChanges);
+    const elementsToBeColored: Array<IShape> = this.getChangedElementsToBeColored(changedElementsWithChanges);
 
     this.colorizeElements(elementsToBeColored, defaultBpmnColors.orange);
   }
@@ -598,12 +598,28 @@ export class BpmnDiffView {
     });
   }
 
-  private getElementsToBeColored(elements: object): Array<IShape> {
-    return Object.values(elements).map((element: IModdleElement) => {
-      const currentElement: IShape = this.elementRegistry.get(element.id);
+  private getChangedElementsToBeColored(elements: any): Array<IShape> {
+    return Object.values(elements)
+      .filter((element: any) => {
+        return element.model.$type !== 'bpmn:Collaboration' && element.model.$type !== 'bpmn:Process';
+      })
+      .map((element: any) => {
+        const currentElement: IShape = this.elementRegistry.get(element.model.id);
 
-      return currentElement;
-    });
+        return currentElement;
+      });
+  }
+
+  private getElementsToBeColored(elements: object): Array<IShape> {
+    return Object.values(elements)
+      .filter((element: IModdleElement) => {
+        return element.$type !== 'bpmn:Collaboration' && element.$type !== 'bpmn:Process';
+      })
+      .map((element: IModdleElement) => {
+        const currentElement: IShape = this.elementRegistry.get(element.id);
+
+        return currentElement;
+      });
   }
 
   private clearColors(): void {
