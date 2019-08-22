@@ -175,7 +175,9 @@ export class BpmnIo {
     this.modeler.on(
       'import.done',
       () => {
-        this.fitDiagramToViewport();
+        if (!this.diagramHasState(this.diagramUri)) {
+          this.fitDiagramToViewport();
+        }
 
         if (!this.solutionIsRemote) {
           this.validateDiagram();
@@ -519,7 +521,9 @@ export class BpmnIo {
         });
 
         this.viewer.on('import.done', () => {
-          this.fitDiagramToViewport();
+          if (!this.diagramHasState(this.diagramUri)) {
+            this.fitDiagramToViewport();
+          }
         });
       }
 
