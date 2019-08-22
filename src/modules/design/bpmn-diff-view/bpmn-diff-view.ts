@@ -552,7 +552,6 @@ export class BpmnDiffView {
 
   private async importXml(xml: string, viewer: IBpmnModeler): Promise<void> {
     const xmlIsNotLoaded: boolean = xml === undefined || xml === null;
-
     if (xmlIsNotLoaded) {
       const notificationMessage: string =
         'The xml could not be loaded. Please try to reopen the Diff View or reload the Detail View.';
