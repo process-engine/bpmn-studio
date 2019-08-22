@@ -456,7 +456,7 @@ export class BpmnDiffView {
     this.colorElements(elementsToColor, defaultBpmnColors.red);
   }
 
-  private markLayoutChangedElements(layoutChangedElements: object): void {
+  private markElementsWithLayoutChanges(elementsWithLayoutChanges: object): void {
     const elementsToColor: Array<IShape> = this.getElementsToColor(layoutChangedElements);
 
     this.colorElements(elementsToColor, defaultBpmnColors.purple);
@@ -521,7 +521,7 @@ export class BpmnDiffView {
     await this.importXml(xml, this.diffModeler);
     this.clearColors();
 
-    this.markLayoutChangedElements(layoutChangedElements);
+    this.markElementsWithLayoutChanges(layoutChangedElements);
     this.markChangedElements(changedElements);
 
     if (diffModeIsCurrentVsPrevious) {
