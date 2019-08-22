@@ -413,18 +413,6 @@ export class BpmnDiffView {
     return changeListEntry;
   }
 
-  private markAddedElements(addedElements: object): void {
-    const elementsToColor: Array<IShape> = this.getElementsToColor(addedElements);
-
-    this.colorElements(elementsToColor, defaultBpmnColors.green);
-  }
-
-  private markRemovedElements(deletedElements: object): void {
-    const elementsToColor: Array<IShape> = this.getElementsToColor(deletedElements);
-
-    this.colorElements(elementsToColor, defaultBpmnColors.red);
-  }
-
   private startSynchronizingViewers(): void {
     const lowerCanvas: ICanvas = this.lowerViewer.get('canvas');
     const leftCanvas: ICanvas = this.leftViewer.get('canvas');
@@ -454,6 +442,18 @@ export class BpmnDiffView {
     changingCanvasContainer.onwheel = adjustViewboxes;
     changingCanvasContainer.onmousedown = startCheckingForMouseMovement;
     changingCanvasContainer.onmouseup = stopCheckingForMousemovement;
+  }
+
+  private markAddedElements(addedElements: object): void {
+    const elementsToColor: Array<IShape> = this.getElementsToColor(addedElements);
+
+    this.colorElements(elementsToColor, defaultBpmnColors.green);
+  }
+
+  private markRemovedElements(deletedElements: object): void {
+    const elementsToColor: Array<IShape> = this.getElementsToColor(deletedElements);
+
+    this.colorElements(elementsToColor, defaultBpmnColors.red);
   }
 
   private markLayoutChangedElements(layoutChangedElements: object): void {
