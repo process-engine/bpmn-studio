@@ -556,10 +556,9 @@ export class BpmnIo {
     }
 
     const xml: string = diagramState.data.xml;
-    const viewbox: IViewbox = diagramState.metaData.location;
-
     await this.importXmlIntoModeler(xml);
 
+    const viewbox: IViewbox = diagramState.metaData.location;
     const viewboxIsSet: boolean = viewbox !== undefined;
     if (viewboxIsSet) {
       this.modeler.get('canvas').viewbox(viewbox);
@@ -665,7 +664,20 @@ export class BpmnIo {
     const isUnsavedDiagram: boolean = diagramUri.startsWith('about:open-diagrams');
 
     const selectedElement: Array<IShape> = this.modeler.get('selection')._selectedElements;
-    const viewbox: IViewbox = modelerCanvas.viewbox();
+
+    const currentViewbox: IViewbox = modelerCanvas.viewbox();
+    const previousDiagramState: IDiagramState | null = this.openDiagramStateService.loadDiagramState(diagramUri);
+
+    const diagramIsVisible: boolean = currentViewbox.width > 0 && currentViewbox.height > 0;
+    const previousDiagramStateExists: boolean = previousDiagramState !== null;
+
+    let viewbox: IViewbox;
+    if (diagramIsVisible) {
+      viewbox = currentViewbox;
+    } else if (previousDiagramStateExists) {
+      viewbox = previousDiagramState.metaData.location;
+    }
+
     const xml: string = await this.getXML();
     const isChanged: boolean = isUnsavedDiagram || !this.areXmlsIdentical(xml, savedXml);
 
