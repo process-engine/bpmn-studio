@@ -35,9 +35,11 @@ import {NotificationService} from '../../../services/notification-service/notifi
 import {OpenDiagramStateService} from '../../../services/solution-explorer-services/OpenDiagramStateService';
 import {PropertyPanel} from '../property-panel/property-panel';
 import {DiagramExportService, DiagramPrintService} from './services/index';
+import {UserConfigService} from '../../../services/user-config-service/userconfig.service';
 
 const sideBarRightSize: number = 35;
-@inject('NotificationService', EventAggregator, 'OpenDiagramStateService', 'SolutionService')
+
+@inject('NotificationService', EventAggregator, 'OpenDiagramStateService', 'SolutionService', 'UserConfigService')
 export class BpmnIo {
   @bindable public propertyPanelViewModel: PropertyPanel;
   public modeler: IBpmnModeler;
@@ -61,6 +63,7 @@ export class BpmnIo {
   public diagramIsInvalid: boolean = false;
   public diagramHasChanged: boolean = false;
   public saveStateForNewUri: boolean = false;
+  public linterIsActive: boolean = true;
 
   private bpmnLintButton: HTMLElement;
   private linting: ILinting;
@@ -77,17 +80,20 @@ export class BpmnIo {
   private diagramPrintService: IDiagramPrintService;
   private openDiagramStateService: OpenDiagramStateService;
   private solutionService: ISolutionService;
+  private userConfigService: UserConfigService;
 
   constructor(
     notificationService: NotificationService,
     eventAggregator: EventAggregator,
     openDiagramStateService: OpenDiagramStateService,
     solutionService: ISolutionService,
+    userConfigService: UserConfigService,
   ) {
     this.notificationService = notificationService;
     this.eventAggregator = eventAggregator;
     this.openDiagramStateService = openDiagramStateService;
     this.solutionService = solutionService;
+    this.userConfigService = userConfigService;
   }
 
   public created(): void {
@@ -196,6 +202,8 @@ export class BpmnIo {
   }
 
   public async attached(): Promise<void> {
+    this.linterIsActive = this.userConfigService.getUserConfig('activateLinter');
+
     if (this.diagramHasState(this.diagramUri)) {
       const diagramState: IDiagramState = this.loadDiagramState(this.diagramUri);
 
@@ -588,6 +596,10 @@ export class BpmnIo {
   }
 
   private async validateDiagram(): Promise<void> {
+    if (!this.linterIsActive) {
+      return;
+    }
+
     const validationResult: IValidateResult = await this.linting.lint();
     this.linting.update();
 
