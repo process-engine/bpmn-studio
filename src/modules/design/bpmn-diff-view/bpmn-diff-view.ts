@@ -356,8 +356,8 @@ export class BpmnDiffView {
     for (const elementId of elementIds) {
       const elementChange: any = elementChanges[elementId];
 
-      const isTypeInModel: boolean = elementChange.$type === undefined;
-      const changeListEntry: IChangeListEntry = isTypeInModel
+      const isElementAChangedElement: boolean = elementChange.$type === undefined;
+      const changeListEntry: IChangeListEntry = isElementAChangedElement
         ? this.createChangeListEntry(elementChange.model.name, elementChange.model.$type)
         : this.createChangeListEntry(elementChange.name, elementChange.$type);
 
