@@ -9,10 +9,11 @@ import {NavigationInstruction, Router, activationStrategy} from 'aurelia-router'
 
 import {IDiagram, ISolution} from '@process-engine/solutionexplorer.contracts';
 
-import {ISolutionEntry, ISolutionService, NotificationType} from '../../contracts/index';
+import {IDiagramState, ISolutionEntry, ISolutionService, NotificationType} from '../../contracts/index';
 import environment from '../../environment';
 import {NotificationService} from '../../services/notification-service/notification.service';
 import {DiagramDetail} from './diagram-detail/diagram-detail';
+import {OpenDiagramStateService} from '../../services/solution-explorer-services/OpenDiagramStateService';
 
 export interface IDesignRouteParameters {
   view?: string;
@@ -27,7 +28,7 @@ type DiagramWithSolution = {
   solutionUri: string;
 };
 
-@inject(EventAggregator, 'SolutionService', Router, 'NotificationService')
+@inject(EventAggregator, 'SolutionService', Router, 'NotificationService', 'OpenDiagramStateService')
 export class Design {
   @observable() public activeDiagram: IDiagram;
   @bindable() public activeSolutionEntry: ISolutionEntry;
@@ -55,17 +56,20 @@ export class Design {
   private router: Router;
   private routeView: string;
   private ipcRenderer: any;
+  private openDiagramStateService: OpenDiagramStateService;
 
   constructor(
     eventAggregator: EventAggregator,
     solutionService: ISolutionService,
     router: Router,
     notificationService: NotificationService,
+    openDiagramStateService: OpenDiagramStateService,
   ) {
     this.eventAggregator = eventAggregator;
     this.solutionService = solutionService;
     this.router = router;
     this.notificationService = notificationService;
+    this.openDiagramStateService = openDiagramStateService;
   }
 
   // TODO: Refactor this function
@@ -176,16 +180,16 @@ export class Design {
       this.eventAggregator.publish(environment.events.bpmnio.unbindKeyboard);
     } else if (routeViewIsDiff) {
       this.eventAggregator.publish(environment.events.bpmnio.unbindKeyboard);
-      /**
-       * We need to check this, because after a reload the diagramdetail component is not attached yet.
-       */
-      const diagramDetailIsNotAttached: boolean = this.diagramDetail === undefined;
-      if (diagramDetailIsNotAttached) {
+
+      const diagramState: IDiagramState | null = this.openDiagramStateService.loadDiagramState(this.activeDiagram.uri);
+      const diagramHasNoState: boolean = diagramState === null;
+      if (diagramHasNoState) {
         this.xmlForDiff = this.activeDiagram.xml;
+
         return;
       }
 
-      this.xmlForDiff = await this.diagramDetail.getXML();
+      this.xmlForDiff = diagramState.data.xml;
 
       this.showDiffView();
     }
