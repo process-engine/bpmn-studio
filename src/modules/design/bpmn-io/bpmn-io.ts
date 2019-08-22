@@ -540,14 +540,15 @@ export class BpmnIo {
         this.linting.deactivateLinting();
       }, 0);
     } else {
-      const xmlExists: boolean = this.xml !== undefined;
-      if (xmlExists) {
-        this.xmlChanged(this.xml);
-        this.propertyPanelViewModel.selectPreviouslySelectedOrFirstElement();
-      }
-
       setTimeout(() => {
         this.modeler.attachTo(this.canvasModel);
+
+        const xmlExists: boolean = this.xml !== undefined;
+        if (xmlExists) {
+          this.xmlChanged(this.xml);
+          this.propertyPanelViewModel.selectPreviouslySelectedOrFirstElement();
+        }
+
         this.movePaletteToLeftToolbar();
         this.bpmnLintButton = document.querySelector('.bpmn-js-bpmnlint-button');
 
