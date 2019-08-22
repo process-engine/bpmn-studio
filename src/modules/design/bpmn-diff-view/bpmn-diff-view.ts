@@ -447,19 +447,19 @@ export class BpmnDiffView {
   private markAddedElements(addedElements: object): void {
     const elementsToBeColored: Array<IShape> = this.getElementsToBeColored(addedElements);
 
-    this.colorElements(elementsToBeColored, defaultBpmnColors.green);
+    this.colorizeElements(elementsToBeColored, defaultBpmnColors.green);
   }
 
   private markRemovedElements(deletedElements: object): void {
     const elementsToBeColored: Array<IShape> = this.getElementsToBeColored(deletedElements);
 
-    this.colorElements(elementsToBeColored, defaultBpmnColors.red);
+    this.colorizeElements(elementsToBeColored, defaultBpmnColors.red);
   }
 
   private markElementsWithLayoutChanges(elementsWithLayoutChanges: object): void {
     const elementsToBeColored: Array<IShape> = this.getElementsToBeColored(elementsWithLayoutChanges);
 
-    this.colorElements(elementsToBeColored, defaultBpmnColors.purple);
+    this.colorizeElements(elementsToBeColored, defaultBpmnColors.purple);
   }
 
   private markChangedElements(changedElements: object): void {
@@ -467,7 +467,7 @@ export class BpmnDiffView {
 
     const elementsToBeColored: Array<IShape> = this.getElementsToBeColored(changedElementsWithChanges);
 
-    this.colorElements(elementsToBeColored, defaultBpmnColors.orange);
+    this.colorizeElements(elementsToBeColored, defaultBpmnColors.orange);
   }
 
   /*
@@ -616,10 +616,10 @@ export class BpmnDiffView {
       return elementHasColor;
     });
 
-    this.colorElements(elementsToColor, defaultBpmnColors.none);
+    this.colorizeElements(elementsToColor, defaultBpmnColors.none);
   }
 
-  private colorElements(elementsToColor: Array<IShape>, color: IColorPickerColor): void {
+  private colorizeElements(elementsToColor: Array<IShape>, color: IColorPickerColor): void {
     const noElementsToColorize: boolean = elementsToColor.length === 0;
 
     if (noElementsToColorize) {
