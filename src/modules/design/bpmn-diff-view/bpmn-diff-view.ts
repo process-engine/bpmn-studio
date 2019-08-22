@@ -625,7 +625,7 @@ export class BpmnDiffView {
   }
 
   private clearColors(): void {
-    const elementsToColor: Array<IShape> = this.elementRegistry.filter((element: IShape): boolean => {
+    const elementsToBeColored: Array<IShape> = this.elementRegistry.filter((element: IShape): boolean => {
       const elementHasFillColor: boolean = element.businessObject.di.fill !== undefined;
       const elementHasBorderColor: boolean = element.businessObject.di.stroke !== undefined;
 
@@ -634,17 +634,17 @@ export class BpmnDiffView {
       return elementHasColor;
     });
 
-    this.colorizeElements(elementsToColor, defaultBpmnColors.none);
+    this.colorizeElements(elementsToBeColored, defaultBpmnColors.none);
   }
 
-  private colorizeElements(elementsToColor: Array<IShape>, color: IColorPickerColor): void {
-    const noElementsToColorize: boolean = elementsToColor.length === 0;
+  private colorizeElements(elementsToBeColored: Array<IShape>, color: IColorPickerColor): void {
+    const noElementsToBeColored: boolean = elementsToBeColored.length === 0;
 
-    if (noElementsToColorize) {
+    if (noElementsToBeColored) {
       return;
     }
 
-    this.modeling.setColor(elementsToColor, {
+    this.modeling.setColor(elementsToBeColored, {
       stroke: color.border,
       fill: color.fill,
     });
