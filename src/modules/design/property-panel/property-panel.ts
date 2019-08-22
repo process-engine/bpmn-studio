@@ -62,8 +62,9 @@ export class PropertyPanel {
 
       if (selectedElementChanged) {
         this.elementInPanel = event.newSelection[0];
-        this.updateIndexTabsSuitability();
       }
+
+      this.updateIndexTabsSuitability();
     });
 
     setTimeout(() => {
