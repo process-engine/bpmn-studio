@@ -32,7 +32,6 @@ export class PropertyPanel {
 
   private moddle: IBpmnModdle;
   private eventBus: IEventBus;
-  private currentIndextabTitle: string = this.generalIndextab.title;
   private openDiagramStateService: OpenDiagramStateService;
 
   private diagramChanged: boolean = false;
