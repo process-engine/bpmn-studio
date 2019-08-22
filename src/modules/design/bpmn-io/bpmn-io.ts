@@ -600,7 +600,12 @@ export class BpmnIo {
 
     await this.importXmlIntoModeler(xml);
 
-    this.modeler.get('canvas').viewbox(viewbox);
+    const viewboxIsSet: boolean = viewbox !== undefined;
+    if (viewboxIsSet) {
+      this.modeler.get('canvas').viewbox(viewbox);
+    } else {
+      this.fitDiagramToViewport();
+    }
   }
 
   private async validateDiagram(): Promise<void> {
