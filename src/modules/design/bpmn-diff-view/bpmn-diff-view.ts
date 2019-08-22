@@ -481,15 +481,17 @@ export class BpmnDiffView {
    * @returns The same object without the elements that did not get changed.
    */
   private removeElementsWithoutChanges(changedElements: object): object {
-    Object.keys(changedElements).forEach((element: string) => {
-      const currentElementHasNoChanges: boolean = Object.keys(changedElements[element].attrs).length === 0;
+    const copyOfChangedElements: object = Object.assign({}, changedElements);
+
+    Object.keys(copyOfChangedElements).forEach((element: string) => {
+      const currentElementHasNoChanges: boolean = Object.keys(copyOfChangedElements[element].attrs).length === 0;
 
       if (currentElementHasNoChanges) {
-        delete changedElements[element];
+        delete copyOfChangedElements[element];
       }
     });
 
-    return changedElements;
+    return copyOfChangedElements;
   }
 
   private updateDiffView(): void {
