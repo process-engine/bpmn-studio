@@ -26,8 +26,8 @@ export class StatusBar {
   public xmlIsShown: boolean = false;
   public showInspectCorrelationButtons: boolean = false;
   public showChangeList: boolean = false;
-  public currentXmlIdentifier: string;
-  public previousXmlIdentifier: string;
+  public currentXmlIdentifier: string = 'New';
+  public previousXmlIdentifier: string = 'Old';
   public showInspectPanel: boolean = true;
   public activeSolutionEntry: ISolutionEntry;
   public activeDiagram: IDiagram;
