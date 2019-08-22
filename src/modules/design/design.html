@@ -8,7 +8,7 @@
 
     <diagram-detail show.bind="showDetail" view-model.ref="diagramDetail" is-displayed.to-view="showDetail" active-diagram.bind="activeDiagram" xml.two-way="xml" active-solution-entry.bind="activeSolutionEntry"></diagram-detail>
     <bpmn-xml-view show.bind="showXML" xml.bind="xml"></bpmn-xml-view>
-    <bpmn-diff-view if.bind="showDiff" saved-xml.bind="activeDiagram.xml" unconverted-current-xml.bind="xmlForDiff" process-model-id.bind="activeDiagram.name"></bpmn-diff-view>
+    <bpmn-diff-view if.bind="showDiff" saved-xml.to-view="activeDiagram.xml" unconverted-current-xml.to-view="xmlForDiff" process-model-id.to-view="activeDiagram.name"></bpmn-diff-view>
 
     <div class="design-layout__tools-right">
       <div class="tool-list tool-list--vertical">
