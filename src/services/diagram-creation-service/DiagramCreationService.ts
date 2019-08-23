@@ -36,7 +36,11 @@ export class DiagramCreationService implements IDiagramCreationService {
 
   private async renameDiagram(xml: string, name: string): Promise<string> {
     // eslint-disable-next-line 6river/new-cap
-    const modeler: IBpmnModeler = new bundle.modeler({});
+    const modeler: IBpmnModeler = new bundle.modeler({
+      moddleExtensions: {
+        camunda: bundle.camundaModdleDescriptor,
+      },
+    });
 
     modeler.importXML(xml, (error: Error) => {
       const errorOccured: boolean = error !== undefined;
