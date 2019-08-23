@@ -202,6 +202,7 @@ export class BpmnIo {
       await this.importXmlIntoModeler(diagramState.data.xml);
     } else {
       const xmlIsNotEmpty: boolean = this.xml !== undefined && this.xml !== null;
+
       if (xmlIsNotEmpty) {
         await this.importXmlIntoModeler(this.xml);
 
