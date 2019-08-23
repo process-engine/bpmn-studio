@@ -1,5 +1,5 @@
 const defaultConfig = {
-  activateLinter: true,
+  'design.activate_linter': true,
 };
 
 export class UserConfigService {

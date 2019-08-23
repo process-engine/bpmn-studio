@@ -202,7 +202,7 @@ export class BpmnIo {
   }
 
   public async attached(): Promise<void> {
-    this.linterIsActive = this.userConfigService.getUserConfig('activateLinter');
+    this.linterIsActive = this.userConfigService.getUserConfig('design.activate_linter');
 
     if (this.diagramHasState(this.diagramUri)) {
       const diagramState: IDiagramState = this.loadDiagramState(this.diagramUri);
