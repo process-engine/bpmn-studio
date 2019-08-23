@@ -64,6 +64,7 @@ export class BpmnIo {
 
   private bpmnLintButton: HTMLElement;
   private linting: ILinting;
+  private diagramConverter: IBpmnModeler;
 
   private propertyPanelShouldOpen: boolean = false;
   private propertyPanelHiddenForSpaceReasons: boolean = false;
@@ -106,6 +107,12 @@ export class BpmnIo {
       },
       keyboard: {
         bindTo: document,
+      },
+    });
+
+    this.diagramConverter = new bundle.modeler({
+      moddleExtensions: {
+        camunda: bundle.camundaModdleDescriptor,
       },
     });
 
@@ -196,9 +203,9 @@ export class BpmnIo {
     } else {
       const xmlIsNotEmpty: boolean = this.xml !== undefined && this.xml !== null;
       if (xmlIsNotEmpty) {
-        this.modeler.importXML(this.xml, async (err: Error) => {
-          this.savedXml = await this.getXML();
-        });
+        await this.importXmlIntoModeler(this.xml);
+
+        this.savedXml = await this.convertXml(this.xml);
       }
     }
 
@@ -384,6 +391,8 @@ export class BpmnIo {
     this.modeler.detach();
     this.modeler.destroy();
 
+    this.diagramConverter.destroy();
+
     const viewerIsInitialized: boolean = this.viewer !== undefined;
     if (viewerIsInitialized) {
       this.viewer.destroy();
@@ -414,8 +423,7 @@ export class BpmnIo {
 
   public async xmlChanged(newValue: string, oldValue?: string): Promise<void> {
     if (this.diagramHasChanged) {
-      await this.importXmlIntoModeler(newValue);
-      this.savedXml = await this.getXML();
+      this.savedXml = await this.convertXml(newValue);
 
       if (this.solutionIsRemote) {
         this.viewer.importXML(this.xml);
@@ -740,6 +748,30 @@ export class BpmnIo {
         }
 
         resolve();
+      });
+    });
+  }
+
+  private convertXml(xml: string): Promise<string> {
+    return new Promise((resolve: Function, reject: Function): void => {
+      this.diagramConverter.importXML(xml, (importError: Error) => {
+        const importErrorOccured: boolean = importError !== undefined;
+        if (importErrorOccured) {
+          reject(importError);
+
+          return;
+        }
+
+        this.diagramConverter.saveXML({format: true}, (exportError: Error, convertedXml: string) => {
+          const exportErrorOccured: boolean = exportError !== undefined;
+          if (exportErrorOccured) {
+            reject(exportError);
+
+            return;
+          }
+
+          resolve(convertedXml);
+        });
       });
     });
   }
