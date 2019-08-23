@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+/* eslint-disable 6river/new-cap */
 /* eslint-disable no-underscore-dangle */
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {bindable, bindingMode, inject, observable} from 'aurelia-framework';
@@ -89,7 +90,6 @@ export class BpmnIo {
   }
 
   public created(): void {
-    // eslint-disable-next-line 6river/new-cap
     this.modeler = new bundle.modeler({
       additionalModules: [
         bundle.MiniMap,
@@ -474,7 +474,6 @@ export class BpmnIo {
     if (this.solutionIsRemote) {
       const viewerNotInitialized: boolean = this.viewer === undefined;
       if (viewerNotInitialized) {
-        // eslint-disable-next-line 6river/new-cap
         this.viewer = new bundle.viewer({
           additionalModules: [bundle.ZoomScrollModule, bundle.MoveCanvasModule, bundle.MiniMap],
         });
