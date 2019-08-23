@@ -1,3 +1,4 @@
+/* eslint-disable 6river/new-cap */
 /* eslint-disable no-underscore-dangle */
 import {inject} from 'aurelia-dependency-injection';
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
@@ -90,7 +91,6 @@ export class BpmnDiffView {
     this.rightViewer = this.createNewViewer();
     this.lowerViewer = this.createNewViewer();
 
-    // eslint-disable-next-line 6river/new-cap
     this.diffModeler = new bundle.modeler();
 
     this.modeling = this.diffModeler.get('modeling');
@@ -165,7 +165,6 @@ export class BpmnDiffView {
 
   public async processModelIdChanged(): Promise<void> {
     const hasNoProcessModelId: boolean = this.processModelId === undefined;
-
     if (hasNoProcessModelId) {
       this.deployedXml = undefined;
 
@@ -414,18 +413,6 @@ export class BpmnDiffView {
     return changeListEntry;
   }
 
-  private markAddedElements(addedElements: object): void {
-    const elementsToColor: Array<IShape> = this.getElementsToColor(addedElements);
-
-    this.colorElements(elementsToColor, defaultBpmnColors.green);
-  }
-
-  private markRemovedElements(deletedElements: object): void {
-    const elementsToColor: Array<IShape> = this.getElementsToColor(deletedElements);
-
-    this.colorElements(elementsToColor, defaultBpmnColors.red);
-  }
-
   private startSynchronizingViewers(): void {
     const lowerCanvas: ICanvas = this.lowerViewer.get('canvas');
     const leftCanvas: ICanvas = this.leftViewer.get('canvas');
@@ -457,18 +444,30 @@ export class BpmnDiffView {
     changingCanvasContainer.onmouseup = stopCheckingForMousemovement;
   }
 
-  private markLayoutChangedElements(layoutChangedElements: object): void {
-    const elementsToColor: Array<IShape> = this.getElementsToColor(layoutChangedElements);
+  private markAddedElements(addedElements: object): void {
+    const elementsToBeColored: Array<IShape> = this.getElementsToBeColored(addedElements);
 
-    this.colorElements(elementsToColor, defaultBpmnColors.purple);
+    this.colorizeElements(elementsToBeColored, defaultBpmnColors.green);
+  }
+
+  private markRemovedElements(deletedElements: object): void {
+    const elementsToBeColored: Array<IShape> = this.getElementsToBeColored(deletedElements);
+
+    this.colorizeElements(elementsToBeColored, defaultBpmnColors.red);
+  }
+
+  private markElementsWithLayoutChanges(elementsWithLayoutChanges: object): void {
+    const elementsToBeColored: Array<IShape> = this.getElementsToBeColored(elementsWithLayoutChanges);
+
+    this.colorizeElements(elementsToBeColored, defaultBpmnColors.purple);
   }
 
   private markChangedElements(changedElements: object): void {
     const changedElementsWithChanges: object = this.removeElementsWithoutChanges(changedElements);
 
-    const elementsToColor: Array<IShape> = this.getElementsToColor(changedElementsWithChanges);
+    const elementsToBeColored: Array<IShape> = this.getChangedElementsToBeColored(changedElementsWithChanges);
 
-    this.colorElements(elementsToColor, defaultBpmnColors.orange);
+    this.colorizeElements(elementsToBeColored, defaultBpmnColors.orange);
   }
 
   /*
@@ -482,15 +481,17 @@ export class BpmnDiffView {
    * @returns The same object without the elements that did not get changed.
    */
   private removeElementsWithoutChanges(changedElements: object): object {
-    Object.keys(changedElements).forEach((element: string) => {
-      const currentElementHasNoChanges: boolean = Object.keys(changedElements[element].attrs).length === 0;
+    const copyOfChangedElements: object = Object.assign({}, changedElements);
+
+    Object.keys(copyOfChangedElements).forEach((element: string) => {
+      const currentElementHasNoChanges: boolean = Object.keys(copyOfChangedElements[element].attrs).length === 0;
 
       if (currentElementHasNoChanges) {
-        delete changedElements[element];
+        delete copyOfChangedElements[element];
       }
     });
 
-    return changedElements;
+    return copyOfChangedElements;
   }
 
   private updateDiffView(): void {
@@ -522,7 +523,7 @@ export class BpmnDiffView {
     await this.importXml(xml, this.diffModeler);
     this.clearColors();
 
-    this.markLayoutChangedElements(layoutChangedElements);
+    this.markElementsWithLayoutChanges(layoutChangedElements);
     this.markChangedElements(changedElements);
 
     if (diffModeIsCurrentVsPrevious) {
@@ -594,22 +595,37 @@ export class BpmnDiffView {
   }
 
   private createNewViewer(): IBpmnModeler {
-    // eslint-disable-next-line 6river/new-cap
     return new bundle.viewer({
       additionalModules: [bundle.ZoomScrollModule, bundle.MoveCanvasModule],
     });
   }
 
-  private getElementsToColor(elements: object): Array<IShape> {
-    return Object.values(elements).map((element: IModdleElement) => {
-      const currentElement: IShape = this.elementRegistry.get(element.id);
+  private getChangedElementsToBeColored(elements: any): Array<IShape> {
+    return Object.values(elements)
+      .filter((element: any) => {
+        return element.model.$type !== 'bpmn:Collaboration' && element.model.$type !== 'bpmn:Process';
+      })
+      .map((element: any) => {
+        const currentElement: IShape = this.elementRegistry.get(element.model.id);
 
-      return currentElement;
-    });
+        return currentElement;
+      });
+  }
+
+  private getElementsToBeColored(elements: object): Array<IShape> {
+    return Object.values(elements)
+      .filter((element: IModdleElement) => {
+        return element.$type !== 'bpmn:Collaboration' && element.$type !== 'bpmn:Process';
+      })
+      .map((element: IModdleElement) => {
+        const currentElement: IShape = this.elementRegistry.get(element.id);
+
+        return currentElement;
+      });
   }
 
   private clearColors(): void {
-    const elementsToColor: Array<IShape> = this.elementRegistry.filter((element: IShape): boolean => {
+    const elementsToBeColored: Array<IShape> = this.elementRegistry.filter((element: IShape): boolean => {
       const elementHasFillColor: boolean = element.businessObject.di.fill !== undefined;
       const elementHasBorderColor: boolean = element.businessObject.di.stroke !== undefined;
 
@@ -618,17 +634,17 @@ export class BpmnDiffView {
       return elementHasColor;
     });
 
-    this.colorElements(elementsToColor, defaultBpmnColors.none);
+    this.colorizeElements(elementsToBeColored, defaultBpmnColors.none);
   }
 
-  private colorElements(elementsToColor: Array<IShape>, color: IColorPickerColor): void {
-    const noElementsToColorize: boolean = elementsToColor.length === 0;
+  private colorizeElements(elementsToBeColored: Array<IShape>, color: IColorPickerColor): void {
+    const noElementsToBeColored: boolean = elementsToBeColored.length === 0;
 
-    if (noElementsToColorize) {
+    if (noElementsToBeColored) {
       return;
     }
 
-    this.modeling.setColor(elementsToColor, {
+    this.modeling.setColor(elementsToBeColored, {
       stroke: color.border,
       fill: color.fill,
     });
