@@ -175,7 +175,9 @@ export class BpmnIo {
     this.modeler.on(
       'import.done',
       () => {
-        this.fitDiagramToViewport();
+        if (!this.diagramHasState(this.diagramUri)) {
+          this.fitDiagramToViewport();
+        }
 
         if (!this.solutionIsRemote) {
           this.validateDiagram();
@@ -519,7 +521,9 @@ export class BpmnIo {
         });
 
         this.viewer.on('import.done', () => {
-          this.fitDiagramToViewport();
+          if (!this.diagramHasState(this.diagramUri)) {
+            this.fitDiagramToViewport();
+          }
         });
       }
 
@@ -540,14 +544,15 @@ export class BpmnIo {
         this.linting.deactivateLinting();
       }, 0);
     } else {
-      const xmlExists: boolean = this.xml !== undefined;
-      if (xmlExists) {
-        this.xmlChanged(this.xml);
-        this.propertyPanelViewModel.selectPreviouslySelectedOrFirstElement();
-      }
-
       setTimeout(() => {
         this.modeler.attachTo(this.canvasModel);
+
+        const xmlExists: boolean = this.xml !== undefined;
+        if (xmlExists) {
+          this.xmlChanged(this.xml);
+          this.propertyPanelViewModel.selectPreviouslySelectedOrFirstElement();
+        }
+
         this.movePaletteToLeftToolbar();
         this.bpmnLintButton = document.querySelector('.bpmn-js-bpmnlint-button');
 
@@ -595,7 +600,12 @@ export class BpmnIo {
 
     await this.importXmlIntoModeler(xml);
 
-    this.modeler.get('canvas').viewbox(viewbox);
+    const viewboxIsSet: boolean = viewbox !== undefined;
+    if (viewboxIsSet) {
+      this.modeler.get('canvas').viewbox(viewbox);
+    } else {
+      this.fitDiagramToViewport();
+    }
   }
 
   private async validateDiagram(): Promise<void> {
