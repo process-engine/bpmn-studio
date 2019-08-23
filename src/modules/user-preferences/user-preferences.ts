@@ -23,7 +23,17 @@ export class Preferences {
 
   public save(): void {
     if (this.validJSON()) {
-      window.localStorage.setItem('customUserConfig', this.preferences);
+      const customConfig: object = {};
+      const defaultConfig: object = this.userConfigService.getDefaultConfig();
+
+      Object.entries(JSON.parse(this.preferences)).forEach((entry: [string, string]) => {
+        const defaultConfigEntry = defaultConfig[entry[0]];
+        if (defaultConfigEntry !== entry[1]) {
+          customConfig[entry[0]] = entry[1];
+        }
+      });
+
+      window.localStorage.setItem('customUserConfig', JSON.stringify(customConfig));
     }
   }
 
