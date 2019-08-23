@@ -10,25 +10,29 @@ export class UserConfigService {
   }
 
   public getUserConfig(key: string): any {
-    this.customConfig = JSON.parse(window.localStorage.getItem('customUserConfig'));
+    const currentConfig = this.getCurrentConfig();
 
-    if (this.customConfig) {
-      const config: any = this.customConfig[key];
-
-      if (config !== undefined) {
-        return this.customConfig[key];
-      }
-    }
-
-    return defaultConfig[key];
+    return currentConfig[key];
   }
 
   public setUserConfig(key: string, value: any): void {
+    this.customConfig = JSON.parse(window.localStorage.getItem('customUserConfig'));
+
     if (!this.customConfig) {
       this.customConfig = {};
     }
 
     this.customConfig[key] = value;
     window.localStorage.setItem('customUserConfig', JSON.stringify(this.customConfig));
+  }
+
+  public getCurrentConfig(): object {
+    this.customConfig = JSON.parse(window.localStorage.getItem('customUserConfig'));
+
+    return Object.assign({}, defaultConfig, this.customConfig);
+  }
+
+  public getDefaultConfig(): object {
+    return defaultConfig;
   }
 }
