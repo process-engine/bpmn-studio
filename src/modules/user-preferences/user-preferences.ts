@@ -2,18 +2,22 @@ import {inject} from 'aurelia-framework';
 
 import {NotificationService} from '../../services/notification-service/notification.service';
 import {NotificationType} from '../../contracts/index';
+import {UserConfigService} from '../../services/user-config-service/userconfig.service';
 
-@inject('NotificationService')
+@inject('NotificationService', 'UserConfigService')
 export class Preferences {
   public preferences: string;
   private notificationService: NotificationService;
+  private userConfigService: UserConfigService;
 
-  constructor(notificationService: NotificationService) {
+  constructor(notificationService: NotificationService, userConfigService: UserConfigService) {
     this.notificationService = notificationService;
+    this.userConfigService = userConfigService;
   }
 
   public attached(): void {
-    const loadedPreferences = JSON.parse(window.localStorage.getItem('customUserConfig'));
+    const loadedPreferences = this.userConfigService.getCurrentConfig();
+
     this.preferences = JSON.stringify(loadedPreferences, null, 2);
   }
 
