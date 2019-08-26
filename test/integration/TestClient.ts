@@ -3,12 +3,9 @@ import {Application, SpectronWebContents} from 'spectron';
 
 export class TestClient {
   private app: Application;
-  private client: any;
 
   constructor(app: Application) {
     this.app = app;
-    // this is done due to conflicting types for @types/webdriverio < 5.0.0
-    this.client = app.client as any;
   }
 
   public async awaitReadyness(): Promise<void> {
@@ -33,18 +30,51 @@ export class TestClient {
 
   public async getWindowIds(): Promise<void> {}
 
+  public async getElement(selector): Promise<any> {
+    const client: any = this.app.client;
+
+    return client.element(selector);
+  }
+
+  public async getAttributeFromElement(selector, attribute): Promise<string> {
+    const client: any = this.app.client;
+
+    return client.getAttribute(selector, attribute);
+  }
+
+  public async getTextFromElement(selector): Promise<string> {
+    const client: any = this.app.client;
+
+    return client.getText(selector);
+  }
+
+  public async getValueFromElement(selector): Promise<string> {
+    const client: any = this.app.client;
+
+    return client.getValue(selector);
+  }
+
+  public async elementHasText(selector, text): Promise<void> {
+    return this.app.client.waitUntilTextExists(selector, text);
+  }
+
   public async ensureVisible(selector: string): Promise<boolean> {
-    return this.client.waitForVisible(selector);
+    const client: any = this.app.client;
+    return client.waitForVisible(selector);
   }
 
   public async ensureNotVisible(selector: string): Promise<boolean> {
-    const collection = await this.client.elements(selector);
+    const client: any = this.app.client;
+
+    const collection = await client.elements(selector);
 
     return collection.value.length === 0;
   }
 
   public async clickOn(selector: string): Promise<any> {
-    return this.client.$(selector).leftClick();
+    const client: any = this.app.client;
+
+    return client.$(selector).leftClick();
   }
 
   public async sendKeyboardInput(keys): Promise<void> {
