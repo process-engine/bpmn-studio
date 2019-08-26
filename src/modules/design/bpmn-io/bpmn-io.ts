@@ -376,6 +376,8 @@ export class BpmnIo {
     const wasPropertyPanelVisible: boolean = propertyPanelHideState === null || propertyPanelHideState === 'show';
     this.propertyPanelShouldOpen = wasPropertyPanelVisible;
     this.togglePanel();
+
+    this.updateViewboxStateOnChange();
   }
 
   public detached(): void {
@@ -689,6 +691,29 @@ export class BpmnIo {
     const isChanged: boolean = isUnsavedDiagram || !this.areXmlsIdentical(xml, savedXml);
 
     this.openDiagramStateService.saveDiagramState(diagramUri, xml, viewbox, selectedElement, isChanged);
+  }
+
+  private updateViewboxStateOnChange(): void {
+    this.modeler.on('canvas.viewbox.changed', () => {
+      this.updateViewboxState();
+    });
+  }
+
+  private updateViewboxState(): void {
+    const modelerCanvas: ICanvas = this.modeler.get('canvas');
+    const viewbox: IViewbox = modelerCanvas.viewbox();
+
+    const diagramState: IDiagramState | null = this.openDiagramStateService.loadDiagramState(this.diagramUri);
+
+    const diagramHasNoState: boolean = !this.diagramHasState(this.diagramUri);
+    const diagramIsVisible: boolean = viewbox.width > 0 && viewbox.height > 0;
+    if (!diagramIsVisible || diagramHasNoState) {
+      return;
+    }
+
+    diagramState.metaData.location = viewbox;
+
+    this.openDiagramStateService.updateDiagramState(this.diagramUri, diagramState);
   }
 
   private areXmlsIdentical(firstXml: string, secondXml: string): boolean {
