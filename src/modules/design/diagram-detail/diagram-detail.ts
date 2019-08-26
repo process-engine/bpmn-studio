@@ -43,6 +43,7 @@ export class DiagramDetail {
   @observable({changeHandler: 'diagramHasChangedChanged'}) public diagramHasChanged: boolean;
   @bindable({defaultBindingMode: bindingMode.oneWay}) public xml: string;
   @bindable() public initialToken: string;
+  @bindable public isDisplayed: boolean;
   public bpmnio: BpmnIo;
   public showSaveForStartModal: boolean = false;
   public showSaveBeforeDeployModal: boolean = false;
