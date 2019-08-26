@@ -16,7 +16,7 @@
           <div show.bind="isRunningInElectron && isRunningOnWindows" class="quick-start__shortcut">Strg + Shift + O</div>
         </div>
         <div class="quick-start__item">
-          <div class="quick-start__topic" click.delegate="createNewDiagram()">New Diagram</div>
+          <div class="quick-start__topic" click.delegate="createNewDiagram()" data-test-create-new-diagram>New Diagram</div>
           <div show.bind="isRunningInElectron && isRunningOnMacOS" class="quick-start__shortcut">⌘ + N</div>
           <div show.bind="isRunningInElectron && isRunningOnWindows" class="quick-start__shortcut">Strg + N</div>
         </div>
