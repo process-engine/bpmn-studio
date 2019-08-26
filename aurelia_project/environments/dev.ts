@@ -32,6 +32,11 @@ export default {
     differsFromOriginal: 'differsFromOriginal',
     diagramChangedOutsideTheStudio: 'diagramChangedOutsideTheStudio',
     xmlChanged: 'xmlChanged',
+    deployModals: {
+      showSaveBeforeDeployModal: 'deployModals:saveBeforeDeployModal:show',
+      showRemoteSolutionSelectionModal: 'deployModals:remoteSolutionSelectionModal:show',
+      showOverwriteDiagramModal: 'deployModals:overwriteDiagramModal:show',
+    },
     startPage: {
       openLocalSolution: 'startpage:openlocalsolution',
       openDiagram: 'startpage:openDiagram',

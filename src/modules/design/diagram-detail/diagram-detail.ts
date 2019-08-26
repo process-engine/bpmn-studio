@@ -29,6 +29,7 @@ import {NotificationService} from '../../../services/notification-service/notifi
 import {OpenDiagramsSolutionExplorerService} from '../../../services/solution-explorer-services/OpenDiagramsSolutionExplorerService';
 import {BpmnIo} from '../bpmn-io/bpmn-io';
 import {OpenDiagramStateService} from '../../../services/solution-explorer-services/OpenDiagramStateService';
+import {DeployDiagramService} from '../../../services/deploy-diagram-service/deploy-diagram.service';
 import {SaveDiagramService} from '../../../services/save-diagram-service/save-diagram.service';
 
 @inject(
@@ -40,6 +41,7 @@ import {SaveDiagramService} from '../../../services/save-diagram-service/save-di
   ValidationController,
   'OpenDiagramService',
   'OpenDiagramStateService',
+  DeployDiagramService,
   SaveDiagramService,
 )
 export class DiagramDetail {
@@ -81,6 +83,7 @@ export class DiagramDetail {
   private clickedOnCustomStart: boolean = false;
   private openDiagramService: OpenDiagramsSolutionExplorerService;
   private openDiagramStateService: OpenDiagramStateService;
+  private deployDiagramService: DeployDiagramService;
   private saveDiagramService: SaveDiagramService;
 
   constructor(
@@ -92,6 +95,7 @@ export class DiagramDetail {
     validationController: ValidationController,
     openDiagramService: OpenDiagramsSolutionExplorerService,
     openDiagramStateService: OpenDiagramStateService,
+    deployDiagramService: DeployDiagramService,
     saveDiagramService: SaveDiagramService,
   ) {
     this.notificationService = notificationService;
@@ -102,6 +106,7 @@ export class DiagramDetail {
     this.managementApiClient = managementApiClient;
     this.openDiagramService = openDiagramService;
     this.openDiagramStateService = openDiagramStateService;
+    this.deployDiagramService = deployDiagramService;
     this.saveDiagramService = saveDiagramService;
 
     // eslint-disable-next-line no-underscore-dangle
@@ -140,7 +145,7 @@ export class DiagramDetail {
         this.saveDiagram();
       }),
       this.eventAggregator.subscribe(environment.events.diagramDetail.uploadProcess, () => {
-        this.checkIfDiagramIsSavedBeforeDeploy();
+        this.deployDiagram();
       }),
       this.eventAggregator.subscribe(environment.events.differsFromOriginal, (savingNeeded: boolean) => {
         this.diagramHasChanged = savingNeeded;
@@ -225,114 +230,6 @@ export class DiagramDetail {
   @computedFrom('activeDiagram.uri')
   public get activeDiagramUri(): string {
     return this.activeDiagram.uri;
-  }
-
-  /**
-   * Saves the current diagram to disk and deploys it to the
-   * process engine.
-   */
-  public async saveDiagramAndDeploy(): Promise<void> {
-    this.showSaveBeforeDeployModal = false;
-    await this.saveDiagram();
-
-    this.checkForMultipleRemoteSolutions();
-  }
-
-  /**
-   * Dismisses the saveBeforeDeploy modal.
-   */
-  public cancelSaveBeforeDeployModal(): void {
-    this.showSaveBeforeDeployModal = false;
-  }
-
-  /**
-   * Uploads the current diagram to the connected ProcessEngine.
-   */
-  public async uploadProcess(solutionToDeployTo: ISolutionEntry): Promise<void> {
-    this.cancelDialog();
-    // eslint-disable-next-line no-underscore-dangle
-    const rootElements: Array<IModdleElement> = this.bpmnio.modeler._definitions.rootElements;
-
-    const processModel: IModdleElement = rootElements.find((definition: IModdleElement) => {
-      return definition.$type === 'bpmn:Process';
-    });
-    const processModelId: string = processModel.id;
-
-    try {
-      await solutionToDeployTo.service.loadDiagram(processModelId);
-
-      this.showDiagramExistingModal = true;
-
-      const modalResultPromise: Promise<boolean> = new Promise((resolve: Function, reject: Function):
-        | boolean
-        | void => {
-        const cancelModal: EventListenerOrEventListenerObject = (): void => {
-          this.showDiagramExistingModal = false;
-          resolve(false);
-
-          document.getElementById('cancelDiagramDeploy').removeEventListener('click', cancelModal);
-          document.getElementById('overrideDiagramOnSolution').removeEventListener('click', proceedUpload);
-        };
-
-        const proceedUpload: EventListenerOrEventListenerObject = (): void => {
-          this.showDiagramExistingModal = false;
-          resolve(true);
-
-          document.getElementById('cancelDiagramDeploy').removeEventListener('click', cancelModal);
-          document.getElementById('overrideDiagramOnSolution').removeEventListener('click', proceedUpload);
-        };
-
-        setTimeout(() => {
-          document.getElementById('cancelDiagramDeploy').addEventListener('click', cancelModal, {once: true});
-          document.getElementById('overrideDiagramOnSolution').addEventListener('click', proceedUpload, {once: true});
-        }, 0);
-      });
-
-      const modalResult: boolean = await modalResultPromise;
-      if (!modalResult) {
-        return;
-      }
-    } catch {
-      //
-    }
-
-    try {
-      this.activeDiagram.id = processModelId;
-
-      const bpmnFileSuffix: string = '.bpmn';
-      const removeBPMNSuffix: (filename: string) => string = (filename: string): string => {
-        if (filename.endsWith(bpmnFileSuffix)) {
-          return filename.slice(0, bpmnFileSuffix.length);
-        }
-
-        return filename;
-      };
-
-      const copyOfDiagram: IDiagram = {
-        id: this.activeDiagram.id,
-        name: this.activeDiagram.name,
-        uri: removeBPMNSuffix(this.activeDiagram.uri),
-        xml: this.activeDiagram.xml,
-      };
-
-      await solutionToDeployTo.service.saveDiagram(copyOfDiagram, solutionToDeployTo.uri);
-
-      this.activeDiagram = await solutionToDeployTo.service.loadDiagram(processModelId);
-
-      this.router.navigateToRoute('design', {
-        diagramName: this.activeDiagram.name,
-        solutionUri: solutionToDeployTo.uri,
-      });
-
-      this.notificationService.showNotification(
-        NotificationType.SUCCESS,
-        'Diagram was successfully uploaded to the connected ProcessEngine.',
-      );
-
-      this.eventAggregator.publish(environment.events.diagramDetail.onDiagramDeployed, processModelId);
-    } catch (error) {
-      this.notificationService.showNotification(NotificationType.ERROR, `Unable to update diagram: ${error}.`);
-    }
   }
 
   public async setOptionsAndStart(): Promise<void> {
@@ -575,28 +472,10 @@ export class DiagramDetail {
     this.processesStartEvents = startEventResponse.events;
   }
 
-  /**
-   * Checks, if the diagram is saved before it can be deployed.
-   *
-   * If not, the user will be ask to save the diagram.
-   */
-  private async checkIfDiagramIsSavedBeforeDeploy(): Promise<void> {
-    if (this.diagramHasChanged) {
-      this.showSaveBeforeDeployModal = true;
-    } else {
-      await this.checkForMultipleRemoteSolutions();
-    }
-  }
+  private async deployDiagram(): Promise<void> {
+    const xml: string | undefined = this.diagramHasChanged ? await this.bpmnio.getXML() : undefined;
 
-  private async checkForMultipleRemoteSolutions(): Promise<void> {
-    this.remoteSolutions = this.solutionService.getRemoteSolutionEntries();
-
-    const multipleRemoteSolutionsConnected: boolean = this.remoteSolutions.length > 1;
-    if (multipleRemoteSolutionsConnected) {
-      this.showRemoteSolutionOnDeployModal = true;
-    } else {
-      await this.uploadProcess(this.remoteSolutions[0]);
-    }
+    this.deployDiagramService.deployDiagram(this.activeSolutionEntry, this.activeDiagram, xml);
   }
 
   /**
