@@ -8,16 +8,18 @@ const isWindows = process.platform === 'win32';
 const applicationArgs = getApplicationArgs(process.env.SPECTRON_APP_PATH);
 
 function getApplicationArgs(givenPath: string | null): any {
+  const commonArgs = {requireName: 'nodeRequire'};
+
   if (givenPath != null) {
     console.log(`Using path: ${givenPath}`);
-    return {path: givenPath};
+    return {...commonArgs, path: givenPath};
   }
 
   const electronExecutable = isWindows ? 'electron.cmd' : 'electron';
   const electronPath = path.join(__dirname, '..', '..', 'node_modules', '.bin', electronExecutable);
   const electronBundlePath = path.join(__dirname, '..', '..', 'electron_app', 'electron.js');
 
-  return {path: electronPath, args: [electronBundlePath]};
+  return {...commonArgs, path: electronPath, args: [electronBundlePath]};
 }
 
 describe('Application launch', function foo() {
@@ -49,7 +51,7 @@ describe('Application launch', function foo() {
         })
         .then(async () => {
           const title = await this.app.client.getTitle();
-          assert.equal(title, 'Charon 2.0');
+          assert.equal(title, 'Start Page | BPMN-Studio');
           resolve();
         })
         .catch((error) => {
