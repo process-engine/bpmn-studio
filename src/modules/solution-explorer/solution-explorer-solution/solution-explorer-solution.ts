@@ -438,7 +438,16 @@ export class SolutionExplorerSolution {
       return;
     }
 
-    await this.deployDiagramService.deployDiagram(this.displayedSolutionEntry, this.diagramInContextMenu);
+    const diagramState: IDiagramState | null = this.openDiagramStateService.loadDiagramState(
+      this.diagramInContextMenu.uri,
+    );
+    const diagramHasState: boolean = diagramState !== null;
+    console.log(diagramHasState);
+    console.log(this.diagramInContextMenu.uri);
+
+    const xml: string | undefined = diagramHasState ? diagramState.data.xml : undefined;
+
+    await this.deployDiagramService.deployDiagram(this.displayedSolutionEntry, this.diagramInContextMenu, xml);
   }
 
   /*
