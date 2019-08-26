@@ -25,6 +25,7 @@
     "electron-build-macos": "npm run electron-prepare && electron-builder --config build/electron-builder.yml --publish never --macos && npm run electron-cleanup",
     "electron-cleanup": "node electron-builder/reset-name-in-package-json.js",
     "electron-prepare": "electron-builder install-app-deps && node electron-builder/set-name-in-package-json.js && electron-rebuild && npm run build && node electron-builder/prepare-electron-build.js",
+    "electron-rebuild": "electron-rebuild",
     "electron-start-dev": "npm run build && electron dist/electron_app/electron_app/electron.js",
     "jenkins-electron-install-app-deps": "electron-builder install-app-deps",
     "jenkins-electron-rebuild-native": "electron-rebuild --force",
@@ -33,7 +34,7 @@
     "jenkins-run-end-to-end-tests": "au e2eDocker",
     "jenkins-start-process-engine": "process-engine",
     "test": "echo \"We need reliable tests.\"",
-    "test-electron-macos": "echo \"We need macOS tests.\"",
+    "test-electron-macos": "tsc -p test/ && mocha dist/test/**/*.spec.js",
     "test-electron-windows": "echo \"We need Windows tests.\""
   },
   "files": [
