@@ -24,6 +24,7 @@ import {NotificationService} from '../../../services/notification-service/notifi
 import {OpenDiagramsSolutionExplorerService} from '../../../services/solution-explorer-services/OpenDiagramsSolutionExplorerService';
 import {OpenDiagramStateService} from '../../../services/solution-explorer-services/OpenDiagramStateService';
 import {DeleteDiagramModal} from './delete-diagram-modal/delete-diagram-modal';
+import {DeployDiagramService} from '../../../services/deploy-diagram-service/deploy-diagram.service';
 
 const ENTER_KEY: string = 'Enter';
 const ESCAPE_KEY: string = 'Escape';
@@ -53,6 +54,7 @@ interface IDiagramCreationState extends IDiagramNameInputState {
   'SolutionService',
   'OpenDiagramStateService',
   BindingSignaler,
+  DeployDiagramService,
 )
 export class SolutionExplorerSolution {
   public activeDiagram: IDiagram;
@@ -76,6 +78,7 @@ export class SolutionExplorerSolution {
   private diagramCreationService: IDiagramCreationService;
   private notificationService: NotificationService;
   private openDiagramStateService: OpenDiagramStateService;
+  private deployDiagramService: DeployDiagramService;
 
   private diagramRoute: string = 'design';
   private inspectView: string;
@@ -117,6 +120,7 @@ export class SolutionExplorerSolution {
     solutionService: ISolutionService,
     openDiagramStateService: OpenDiagramStateService,
     bindingSignaler: BindingSignaler,
+    deployDiagramService: DeployDiagramService,
   ) {
     this.router = router;
     this.eventAggregator = eventAggregator;
@@ -126,6 +130,7 @@ export class SolutionExplorerSolution {
     this.globalSolutionService = solutionService;
     this.openDiagramStateService = openDiagramStateService;
     this.bindingSignaler = bindingSignaler;
+    this.deployDiagramService = deployDiagramService;
   }
 
   public async attached(): Promise<void> {
@@ -425,6 +430,15 @@ export class SolutionExplorerSolution {
 
     await this.solutionService.saveDiagram(duplicatedDiagram, duplicatedDiagram.uri);
     await this.updateSolution();
+  }
+
+  public async deployDiagram(): Promise<void> {
+    const noDiagramInContextMenu: boolean = this.diagramInContextMenu === undefined;
+    if (noDiagramInContextMenu) {
+      return;
+    }
+
+    await this.deployDiagramService.deployDiagram(this.displayedSolutionEntry, this.diagramInContextMenu);
   }
 
   /*
