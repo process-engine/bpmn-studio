@@ -1,6 +1,8 @@
 /* eslint-disable no-empty-function */
 import {Application, SpectronWebContents} from 'spectron';
 
+import url from 'url';
+
 export class TestClient {
   private app: Application;
 
@@ -34,6 +36,31 @@ export class TestClient {
     const client: any = this.app.client;
 
     return client.element(selector);
+  }
+
+  public async navigateToStartPage(): Promise<void> {
+    return this.app.browserWindow.loadURL(`file://${__dirname}/../../index.html`);
+  }
+
+  public async navigateToDetailView(diagramName, diagramUri, solutionUri?): Promise<void> {
+    const unformattedURL = `file://${__dirname}/../../index.html#/design/detail/diagram/${diagramName}?diagramUri=${diagramUri}&solutionUri=${solutionUri}`;
+    const formattedURL = url.format(unformattedURL);
+
+    return this.app.browserWindow.loadURL(formattedURL);
+  }
+
+  public async navigateToXMLView(diagramName, diagramUri, solutionUri?): Promise<void> {
+    const unformattedURL = `file://${__dirname}/../../index.html#/design/xml/diagram/${diagramName}?diagramUri=${diagramUri}&solutionUri=${solutionUri}`;
+    const formattedURL = url.format(unformattedURL);
+
+    return this.app.browserWindow.loadURL(formattedURL);
+  }
+
+  public async navigateToDiffView(diagramName, diagramUri, solutionUri?): Promise<void> {
+    const unformattedURL = `file://${__dirname}/../../index.html#/design/diff/diagram/${diagramName}?diagramUri=${diagramUri}&solutionUri=${solutionUri}`;
+    const formattedURL = url.format(unformattedURL);
+
+    return this.app.browserWindow.loadURL(formattedURL);
   }
 
   public async getAttributeFromElement(selector, attribute): Promise<string> {
