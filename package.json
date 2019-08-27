@@ -35,7 +35,7 @@
     "jenkins-start-process-engine": "process-engine",
     "test": "echo \"We need reliable tests.\"",
     "test-electron-macos": "tsc -p test/ && mocha dist/test/**/*.spec.js",
-    "test-electron-windows": "echo \"We need Windows tests.\""
+    "test-electron-windows": "tsc -p test/ && mocha dist/test/**/*.spec.js"
   },
   "files": [
     "dist/web",
