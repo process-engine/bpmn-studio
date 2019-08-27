@@ -13,7 +13,7 @@
   <modal if.bind="showRemoteSolutionOnDeployModal"
          header-text="Multiple Connected ProcessEngines Found">
     <template replace-part="modal-body">
-      Choose a remote ProcessEngines; the diagram will be deployed to your selection.
+      Choose the remote ProcessEngine to which to deploy the diagram.
       <select class="form-control" value.bind="selectedRemoteSolution">
         <option repeat.for="entry of remoteSolutions" model.bind="entry">${entry.uri}</option>
       </select>
