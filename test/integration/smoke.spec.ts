@@ -8,7 +8,12 @@ const isWindows = process.platform === 'win32';
 const applicationArgs = getApplicationArgs(process.env.SPECTRON_APP_PATH);
 
 function getApplicationArgs(givenPath: string | null): any {
-  const commonArgs = {requireName: 'nodeRequire'};
+  const commonArgs = {
+    requireName: 'nodeRequire',
+    webdriverOptions: {
+      deprecationWarnings: false,
+    },
+  };
 
   if (givenPath != null) {
     console.log(`Using path: ${givenPath}`);
