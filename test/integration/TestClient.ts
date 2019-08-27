@@ -1,7 +1,9 @@
+/* eslint-disable no-useless-escape */
 /* eslint-disable no-empty-function */
-import {Application, SpectronWebContents} from 'spectron';
-
 import url from 'url';
+
+import {Application, SpectronWebContents} from 'spectron';
+import assert from 'assert';
 
 export class TestClient {
   private app: Application;
@@ -11,31 +13,58 @@ export class TestClient {
   }
 
   public async awaitReadyness(): Promise<void> {
-    return this.app.client.waitUntilWindowLoaded();
+    await this.app.client.waitUntilWindowLoaded();
+    await this.app.browserWindow.isVisible();
   }
 
-  public async openViaCommandPalette(query: string): Promise<void> {
-    await this.sendKeyboardInput(['cmd-shift-k']);
-    await this.sendKeyboardInput(query.split(''));
-    await this.sendKeyboardInput(['enter']);
+  public async clickOnBPMNElementWithName(name): Promise<void> {
+    const list: any = await this.getElements('tspan');
+    const element = await this.webdriverClient.element('tspan*=Start Event');
+    const elements = await this.webdriverClient.$$('tspan');
+
+    console.log(list);
+    console.log(element);
+    console.log(elements);
+
+    await this.clickOn(`[data-element-id="${name}"]`);
   }
 
-  public async openViaQuickJump(query: string): Promise<void> {
-    await this.sendKeyboardInput(['cmd-k']);
-    await this.sendKeyboardInput(query.split(''));
-    await this.sendKeyboardInput(['enter']);
+  public async assertSelectedBPMNElementHasName(name): Promise<void> {
+    const selectedElementText = await this.getValueFromElement('[data-test-pp-element-id]');
+
+    assert.equal(selectedElementText, name);
   }
 
-  public async focusElement(windowId, selector): Promise<void> {}
+  public async assertSelectedBPMNElementHasNotName(name): Promise<void> {
+    const selectedElementText = await this.getValueFromElement('[data-test-pp-element-id]');
 
-  public async getElements(windowId, selector): Promise<void> {}
+    assert.notEqual(selectedElementText, name);
+  }
 
-  public async getWindowIds(): Promise<void> {}
+  public async showPropertyPanel(): Promise<void> {
+    const propertyPanelIsVisible = await this.webdriverClient.isVisible('property-panel');
+    if (propertyPanelIsVisible) {
+      return;
+    }
+
+    await this.clickOn('[data-test-toggle-propertypanel]');
+  }
+
+  public async hidePropertyPanel(): Promise<void> {
+    const propertyPanelIsHidden = !(await this.webdriverClient.isVisible('property-panel'));
+    if (propertyPanelIsHidden) {
+      return;
+    }
+
+    await this.clickOn('[data-test-toggle-propertypanel]');
+  }
 
   public async getElement(selector): Promise<any> {
-    const client: any = this.app.client;
+    return this.webdriverClient.element(selector);
+  }
 
-    return client.element(selector);
+  public async getElements(selector): Promise<any> {
+    return this.webdriverClient.elements(selector);
   }
 
   public async navigateToStartPage(): Promise<void> {
@@ -64,21 +93,15 @@ export class TestClient {
   }
 
   public async getAttributeFromElement(selector, attribute): Promise<string> {
-    const client: any = this.app.client;
-
-    return client.getAttribute(selector, attribute);
+    return this.webdriverClient.getAttribute(selector, attribute);
   }
 
   public async getTextFromElement(selector): Promise<string> {
-    const client: any = this.app.client;
-
-    return client.getText(selector);
+    return this.webdriverClient.getText(selector);
   }
 
   public async getValueFromElement(selector): Promise<string> {
-    const client: any = this.app.client;
-
-    return client.getValue(selector);
+    return this.webdriverClient.getValue(selector);
   }
 
   public async elementHasText(selector, text): Promise<void> {
@@ -86,22 +109,17 @@ export class TestClient {
   }
 
   public async ensureVisible(selector: string): Promise<boolean> {
-    const client: any = this.app.client;
-    return client.waitForVisible(selector);
+    return this.webdriverClient.waitForVisible(selector);
   }
 
   public async ensureNotVisible(selector: string): Promise<boolean> {
-    const client: any = this.app.client;
-
-    const collection = await client.elements(selector);
+    const collection = await this.webdriverClient.elements(selector);
 
     return collection.value.length === 0;
   }
 
   public async clickOn(selector: string): Promise<any> {
-    const client: any = this.app.client;
-
-    return client.$(selector).leftClick();
+    return this.webdriverClient.$(selector).leftClick();
   }
 
   public async sendKeyboardInput(keys): Promise<void> {
@@ -180,5 +198,9 @@ export class TestClient {
     }
 
     return opts;
+  }
+
+  public get webdriverClient(): any {
+    return this.app.client;
   }
 }
