@@ -184,4 +184,8 @@ export class TestClient {
 
     return this.openView(uriFragment);
   }
+
+  public get webdriverClient(): any {
+    return this.app.client;
+  }
 }
