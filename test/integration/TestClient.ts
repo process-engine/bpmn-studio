@@ -2,7 +2,7 @@
 /* eslint-disable no-empty-function */
 import url from 'url';
 
-import {Application, SpectronWebContents} from 'spectron';
+import {Application} from 'spectron';
 import assert from 'assert';
 
 export class TestClient {
@@ -145,82 +145,8 @@ export class TestClient {
     return this.webdriverClient.$(selector).leftClick();
   }
 
-  public async sendKeyboardInput(keys): Promise<void> {
-    const webContents = this.getWebContents();
-
-    for (const key of keys) {
-      const eventOptsArray = this.getEventsForKeystrokes(key);
-
-      for (const eventOpts of eventOptsArray) {
-        for (const type of ['keydown', 'char', 'keyup']) {
-          const typeOpts = {type};
-          const opts = {...typeOpts, ...eventOpts};
-
-          webContents.sendInputEvent(opts);
-        }
-
-        await this.pause(50);
-      }
-    }
-  }
-
   public async pause(timeInMilliseconds: number): Promise<void> {
     await new Promise((c: any): any => setTimeout(c, timeInMilliseconds));
-  }
-
-  private getWebContents(): SpectronWebContents {
-    return this.app.webContents;
-  }
-
-  public getEventsForKeystrokes(keystrokes: string): Array<any> {
-    if (keystrokes === ' ') {
-      return [this.getOptionsForKey(' ')];
-    }
-
-    return keystrokes.split(' ').map((keystroke) => {
-      const keys = keystroke.split('-');
-      const options = keys.reduce((memo: any, key: string) => {
-        memo = memo || {};
-        const opts = this.getOptionsForKey(key);
-        const result = {...memo, ...opts};
-        const modifiers = memo.modifiers || [];
-
-        result.modifiers = modifiers.concat(opts.modifiers);
-
-        return result;
-      }, {});
-
-      return options;
-    });
-  }
-
-  public getOptionsForKey(key): any {
-    const opts: any = {modifiers: []};
-
-    if (key === 'cmd' || key === 'meta') {
-      opts.modifiers.push('cmd');
-    }
-    if (key === 'ctrl') {
-      opts.modifiers.push('ctrl');
-    }
-    if (key === 'shift') {
-      opts.modifiers.push('shift');
-    }
-    if (key === 'alt') {
-      opts.modifiers.push('alt');
-    }
-    if (key === 'space') {
-      opts.key = ' ';
-    }
-
-    if (!opts.key) {
-      opts.key = key;
-    }
-    if (!opts.keyCode) {
-      opts.keyCode = opts.key;
-    }
-
-    return opts;
   }
 
   public get webdriverClient(): any {
