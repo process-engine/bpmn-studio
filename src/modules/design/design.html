@@ -13,7 +13,7 @@
     <div class="design-layout__tools-right">
       <div class="tool-list tool-list--vertical">
         <div show.bind="showPropertyPanelButton" id="toggleButtonPropertyPanel" class="design-layout__tool">
-          <button class="button menu-bar__menu-left--tool" class.bind="propertyPanelShown ? 'design-layout__tool--active' : ''" click.delegate="togglePanel()" title="Toggle visibility of the Property Panel">
+          <button class="button menu-bar__menu-left--tool" class.bind="propertyPanelShown ? 'design-layout__tool--active' : ''" click.delegate="togglePanel()" title="Toggle visibility of the Property Panel" data-test-toggle-propertypanel>
             <i class="fas fa-sliders-h"></i>
           </button>
         </div>
