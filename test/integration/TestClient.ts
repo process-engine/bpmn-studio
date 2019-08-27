@@ -17,26 +17,44 @@ export class TestClient {
     await this.app.browserWindow.isVisible();
   }
 
+  // openDesignViewForCurrentDiagram?
+  public async openDesignViewFromStatusbar(): Promise<void> {
+    await this.ensureVisible('[data-test-status-bar-disable-xml-view-button]');
+    await this.clickOn('[data-test-status-bar-disable-xml-view-button]');
+    await this.ensureVisible('diagram-detail');
+  }
+
+  // openXMLViewForCurrentDiagram?
+  public async openXMLViewFromStatusbar(): Promise<void> {
+    await this.ensureVisible('[data-test-status-bar-xml-view-button]');
+    await this.clickOn('[data-test-status-bar-xml-view-button]');
+    await this.ensureVisible('bpmn-xml-view');
+  }
+
   public async clickOnBPMNElementWithName(name): Promise<void> {
-    const list: any = await this.getElements('tspan');
-    const element = await this.webdriverClient.element('tspan*=Start Event');
-    const elements = await this.webdriverClient.$$('tspan');
+    await this.clickOn(`.djs-label=${name}`);
+  }
 
-    console.log(list);
-    console.log(element);
-    console.log(elements);
+  public async assertWindowTitleIs(name): Promise<void> {
+    const windowTitle = await this.webdriverClient.getTitle();
 
-    await this.clickOn(`[data-element-id="${name}"]`);
+    assert.equal(windowTitle, name);
+  }
+
+  public async assertNavbarTitleIs(name): Promise<void> {
+    const navbarTitle = await this.getTextFromElement('.process-details-title');
+
+    assert.equal(navbarTitle, name);
   }
 
   public async assertSelectedBPMNElementHasName(name): Promise<void> {
-    const selectedElementText = await this.getValueFromElement('[data-test-pp-element-id]');
+    const selectedElementText = await this.getValueFromElement('[data-test-pp-element-name]');
 
     assert.equal(selectedElementText, name);
   }
 
   public async assertSelectedBPMNElementHasNotName(name): Promise<void> {
-    const selectedElementText = await this.getValueFromElement('[data-test-pp-element-id]');
+    const selectedElementText = await this.getValueFromElement('[data-test-pp-element-name]');
 
     assert.notEqual(selectedElementText, name);
   }
@@ -47,6 +65,7 @@ export class TestClient {
       return;
     }
 
+    await this.ensureVisible('[data-test-toggle-propertypanel]');
     await this.clickOn('[data-test-toggle-propertypanel]');
   }
 
@@ -56,6 +75,7 @@ export class TestClient {
       return;
     }
 
+    await this.ensureVisible('[data-test-toggle-propertypanel]');
     await this.clickOn('[data-test-toggle-propertypanel]');
   }
 
@@ -67,29 +87,32 @@ export class TestClient {
     return this.webdriverClient.elements(selector);
   }
 
-  public async navigateToStartPage(): Promise<void> {
+  public async openStartPage(): Promise<void> {
     return this.app.browserWindow.loadURL(`file://${__dirname}/../../index.html`);
   }
 
-  public async navigateToDetailView(diagramName, diagramUri, solutionUri?): Promise<void> {
+  public async openDesignViewForDiagram(diagramName, diagramUri, solutionUri?): Promise<void> {
     const unformattedURL = `file://${__dirname}/../../index.html#/design/detail/diagram/${diagramName}?diagramUri=${diagramUri}&solutionUri=${solutionUri}`;
     const formattedURL = url.format(unformattedURL);
 
-    return this.app.browserWindow.loadURL(formattedURL);
+    await this.app.browserWindow.loadURL(formattedURL);
+    await this.ensureVisible('diagram-detail');
   }
 
-  public async navigateToXMLView(diagramName, diagramUri, solutionUri?): Promise<void> {
+  public async openXMLViewForDiagram(diagramName, diagramUri, solutionUri?): Promise<void> {
     const unformattedURL = `file://${__dirname}/../../index.html#/design/xml/diagram/${diagramName}?diagramUri=${diagramUri}&solutionUri=${solutionUri}`;
     const formattedURL = url.format(unformattedURL);
 
-    return this.app.browserWindow.loadURL(formattedURL);
+    await this.app.browserWindow.loadURL(formattedURL);
+    await this.ensureVisible('bpmn-xml-view');
   }
 
-  public async navigateToDiffView(diagramName, diagramUri, solutionUri?): Promise<void> {
+  public async openDiffViewForDiagram(diagramName, diagramUri, solutionUri?): Promise<void> {
     const unformattedURL = `file://${__dirname}/../../index.html#/design/diff/diagram/${diagramName}?diagramUri=${diagramUri}&solutionUri=${solutionUri}`;
     const formattedURL = url.format(unformattedURL);
 
-    return this.app.browserWindow.loadURL(formattedURL);
+    await this.app.browserWindow.loadURL(formattedURL);
+    await this.ensureVisible('bpmn-diff-view');
   }
 
   public async getAttributeFromElement(selector, attribute): Promise<string> {

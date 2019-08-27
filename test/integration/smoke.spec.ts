@@ -64,18 +64,14 @@ describe('Application launch', function foo() {
   it('should start the application', async () => {
     await app.client.waitUntilTextExists('h3', 'Welcome');
 
-    const title = await testClient.webdriverClient.getTitle();
-    assert.equal(title, 'Start Page | BPMN-Studio');
+    await testClient.assertWindowTitleIs('Start Page | BPMN-Studio');
   });
 
   it('should create and open a new diagam by clicking on new diagram link', async () => {
     await createAndOpenDiagram();
 
-    const navbarTitle = await testClient.getTextFromElement('.process-details-title');
-    assert.equal(navbarTitle, 'Untitled-1');
-
-    const title = await testClient.webdriverClient.getTitle();
-    assert.equal(title, 'Design | BPMN-Studio');
+    await testClient.assertNavbarTitleIs('Untitled-1');
+    await testClient.assertWindowTitleIs('Design | BPMN-Studio');
   });
 
   it('should render a diagram correctly', async () => {
@@ -87,100 +83,63 @@ describe('Application launch', function foo() {
   it('should select StartEvent after opening a diagram', async () => {
     await createAndOpenDiagram();
     await testClient.showPropertyPanel();
-    await testClient.assertSelectedBPMNElementHasName('StartEvent_1mox3jl');
+
+    await testClient.assertSelectedBPMNElementHasName('Start Event');
   });
 
   it('select EndEvent', async () => {
-    const endEventId = 'EndEvent_0eie6q6';
-
     await createAndOpenDiagram();
     await testClient.showPropertyPanel();
-    await testClient.assertSelectedBPMNElementHasNotName(endEventId);
-    await testClient.pause(2000);
-    await testClient.clickOnBPMNElementWithName(endEventId);
-    await testClient.assertSelectedBPMNElementHasName(endEventId);
+
+    await testClient.assertSelectedBPMNElementHasNotName('End Event');
+    await testClient.clickOnBPMNElementWithName('End Event');
+    await testClient.assertSelectedBPMNElementHasName('End Event');
   });
 
   it('should create and open a second diagram', async () => {
-    let navbarTitle;
-
-    await app.client.waitUntilTextExists('h3', 'Welcome');
-
-    const isVisible = await app.browserWindow.isVisible();
-    assert.equal(isVisible, true);
-
     await createAndOpenDiagram();
 
-    navbarTitle = await testClient.getTextFromElement('.process-details-title');
-    assert.equal(navbarTitle, 'Untitled-1');
-
-    const title = await testClient.webdriverClient.getTitle();
-    assert.equal(title, 'Design | BPMN-Studio');
+    await testClient.assertNavbarTitleIs('Untitled-1');
+    await testClient.assertWindowTitleIs('Design | BPMN-Studio');
 
     creatingFirstDiagram = false;
     await createAndOpenDiagram();
 
-    navbarTitle = await testClient.getTextFromElement('.process-details-title');
-    assert.equal(navbarTitle, 'Untitled-2');
+    await testClient.assertNavbarTitleIs('Untitled-2');
   });
 
-  it('should navigate to detail view', async () => {
-    const isVisible = await app.browserWindow.isVisible();
-    assert.equal(isVisible, true);
-
+  it('should open detail view', async () => {
     await createAndOpenDiagram();
-    await testClient.navigateToStartPage();
+    await testClient.openStartPage();
 
-    await testClient.navigateToDetailView('Untitled-1', 'about:open-diagrams/Untitled-1.bpmn', 'about:open-diagrams');
-
-    await testClient.ensureVisible('diagram-detail');
+    await testClient.openDesignViewForDiagram(
+      'Untitled-1',
+      'about:open-diagrams/Untitled-1.bpmn',
+      'about:open-diagrams',
+    );
   });
 
-  it('should navigate to XML view', async () => {
-    const isVisible = await app.browserWindow.isVisible();
-    assert.equal(isVisible, true);
-
+  it('should open XML view', async () => {
     await createAndOpenDiagram();
-    await testClient.navigateToStartPage();
 
-    await testClient.navigateToXMLView('Untitled-1', 'about:open-diagrams/Untitled-1.bpmn', 'about:open-diagrams');
-
-    await testClient.ensureVisible('bpmn-xml-view');
+    await testClient.openXMLViewForDiagram('Untitled-1', 'about:open-diagrams/Untitled-1.bpmn', 'about:open-diagrams');
   });
 
-  it('should navigate to diff view', async () => {
-    const isVisible = await app.browserWindow.isVisible();
-    assert.equal(isVisible, true);
-
+  it('should open diff view', async () => {
     await createAndOpenDiagram();
-    await testClient.navigateToStartPage();
 
-    await testClient.navigateToDiffView('Untitled-1', 'about:open-diagrams/Untitled-1.bpmn', 'about:open-diagrams');
-
-    await testClient.ensureVisible('bpmn-diff-view');
+    await testClient.openDiffViewForDiagram('Untitled-1', 'about:open-diagrams/Untitled-1.bpmn', 'about:open-diagrams');
   });
 
-  it('should show the XML view after clicking on the button in the status bar', async () => {
-    const isVisible = await app.browserWindow.isVisible();
-    assert.equal(isVisible, true);
-
+  it('should open the xml view from the status bar', async () => {
     await createAndOpenDiagram();
-    await testClient.ensureVisible('[data-test-status-bar-xml-view-button]');
-
-    await testClient.clickOn('[data-test-status-bar-xml-view-button]');
-    await testClient.ensureVisible('bpmn-xml-view');
+    await testClient.openXMLViewFromStatusbar();
   });
 
-  it('should switch from XML view to detail view, after clicking on the button in the status bar', async () => {
-    const isVisible = await app.browserWindow.isVisible();
-    assert.equal(isVisible, true);
-
+  it('should open design view from the status bar', async () => {
     await createAndOpenDiagram();
 
-    await testClient.clickOn('[data-test-status-bar-xml-view-button]');
-
-    await testClient.ensureVisible('[data-test-status-bar-disable-xml-view-button]');
-    await testClient.clickOn('[data-test-status-bar-disable-xml-view-button]');
-    await testClient.ensureVisible('diagram-detail');
+    await testClient.openXMLViewFromStatusbar();
+    await testClient.openDesignViewFromStatusbar();
   });
 });
