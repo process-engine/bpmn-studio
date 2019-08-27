@@ -5,6 +5,8 @@ import path from 'path';
 import {Application} from 'spectron';
 import assert from 'assert';
 
+import url from 'url';
+
 const APP_BASE_URL = `file://${__dirname}/../../index.html`;
 
 export class TestClient {

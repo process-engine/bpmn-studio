@@ -272,15 +272,15 @@ describe('Application launch', function foo() {
   });
 
   it('should create and open a second diagram', async () => {
-    const callback = (resolve: Function, reject: Function): void => {
-      app.client
-        .waitUntilTextExists('h3', 'Welcome')
-        .then(async () => {
+    return new Promise(
+      async (resolve: Function, reject: Function): Promise<void> => {
+        let navbarTitle;
+
+        try {
+          await app.client.waitUntilTextExists('h3', 'Welcome');
+
           const isVisible = await app.browserWindow.isVisible();
           assert.equal(isVisible, true);
-        })
-        .then(async () => {
-          let navbarTitle;
 
           await createAndOpenDiagram();
 
@@ -291,20 +291,135 @@ describe('Application launch', function foo() {
           const title = await client.getTitle();
           assert.equal(title, 'Design | BPMN-Studio');
 
+          creatingFirstDiagram = false;
           await createAndOpenDiagram();
 
           navbarTitle = await testClient.getTextFromElement('.process-details-title');
           assert.equal(navbarTitle, 'Untitled-2');
 
           resolve();
-        })
-        .catch((error) => {
+        } catch (error) {
           reject(error);
-        });
-    };
+        }
+      },
+    );
+  });
 
-    const result = new Promise(callback);
+  it('should navigate to detail view', async () => {
+    return new Promise(
+      async (resolve: Function, reject: Function): Promise<void> => {
+        try {
+          await app.client.waitUntilTextExists('h3', 'Welcome');
 
-    return result;
+          const isVisible = await app.browserWindow.isVisible();
+          assert.equal(isVisible, true);
+
+          await createAndOpenDiagram();
+          await testClient.navigateToStartPage();
+
+          await testClient.navigateToDetailView(
+            'Untitled-1',
+            'about:open-diagrams/Untitled-1.bpmn',
+            'about:open-diagrams',
+          );
+
+          await testClient.ensureVisible('diagram-detail');
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
+      },
+    );
+  });
+
+  it('should navigate to XML view', async () => {
+    return new Promise(
+      async (resolve: Function, reject: Function): Promise<void> => {
+        try {
+          const isVisible = await app.browserWindow.isVisible();
+          assert.equal(isVisible, true);
+
+          await createAndOpenDiagram();
+          await testClient.navigateToStartPage();
+
+          await testClient.navigateToXMLView(
+            'Untitled-1',
+            'about:open-diagrams/Untitled-1.bpmn',
+            'about:open-diagrams',
+          );
+
+          await testClient.ensureVisible('bpmn-xml-view');
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
+      },
+    );
+  });
+
+  it('should navigate to diff view', async () => {
+    return new Promise(
+      async (resolve: Function, reject: Function): Promise<void> => {
+        try {
+          const isVisible = await app.browserWindow.isVisible();
+          assert.equal(isVisible, true);
+
+          await createAndOpenDiagram();
+          await testClient.navigateToStartPage();
+
+          await testClient.navigateToDiffView(
+            'Untitled-1',
+            'about:open-diagrams/Untitled-1.bpmn',
+            'about:open-diagrams',
+          );
+
+          await testClient.ensureVisible('bpmn-diff-view');
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
+      },
+    );
+  });
+
+  it('should show the XML view after clicking on the button in the status bar', async () => {
+    return new Promise(
+      async (resolve: Function, reject: Function): Promise<void> => {
+        try {
+          const isVisible = await app.browserWindow.isVisible();
+          assert.equal(isVisible, true);
+
+          await createAndOpenDiagram();
+          await testClient.ensureVisible('[data-test-status-bar-xml-view-button]');
+
+          await testClient.clickOn('[data-test-status-bar-xml-view-button]');
+          await testClient.ensureVisible('bpmn-xml-view');
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
+      },
+    );
+  });
+
+  it('should switch from XML view to detail view, after clicking on the button in the status bar', async () => {
+    return new Promise(
+      async (resolve: Function, reject: Function): Promise<void> => {
+        try {
+          const isVisible = await app.browserWindow.isVisible();
+          assert.equal(isVisible, true);
+
+          await createAndOpenDiagram();
+          await testClient.clickOn('[data-test-status-bar-xml-view-button]');
+
+          await testClient.ensureVisible('[data-test-status-bar-disable-xml-view-button]');
+          await testClient.clickOn('[data-test-status-bar-disable-xml-view-button]');
+          await testClient.ensureVisible('diagram-detail');
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
+      },
+    );
   });
 });
