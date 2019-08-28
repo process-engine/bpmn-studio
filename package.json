@@ -34,8 +34,8 @@
     "jenkins-run-end-to-end-tests": "au e2eDocker",
     "jenkins-start-process-engine": "process-engine",
     "test": "echo \"We need reliable tests.\"",
-    "test-electron-macos": "tsc -p test/ && mocha dist/test/**/*.spec.js",
-    "test-electron-windows": "tsc -p test/ && mocha dist/test/**/*.spec.js"
+    "test-electron-macos": "tsc -p test/ && mocha -r choma dist/test/**/*.spec.js",
+    "test-electron-windows": "tsc -p test/ && mocha -r choma dist/test/**/*.spec.js"
   },
   "files": [
     "dist/web",
