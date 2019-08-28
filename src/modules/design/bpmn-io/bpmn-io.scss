@@ -10,7 +10,11 @@
 
 .modeler__properties {
   position: relative;
+  display: flex;
   width: 250px;
+  height: 100%;
+  flex-direction: column;
+  overflow-y: scroll;
   background: rgb(220, 219, 219);
 
   &::-webkit-scrollbar {
