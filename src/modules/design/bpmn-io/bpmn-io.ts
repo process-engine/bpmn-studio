@@ -36,8 +36,6 @@ import {PropertyPanel} from '../property-panel/property-panel';
 import {DiagramExportService, DiagramPrintService} from './services/index';
 
 const sideBarRightSize: number = 35;
-const elementRegistryTimeoutMilliseconds: number = 50;
-
 @inject('NotificationService', EventAggregator, 'OpenDiagramStateService', 'SolutionService')
 export class BpmnIo {
   @bindable public propertyPanelViewModel: PropertyPanel;
@@ -162,16 +160,6 @@ export class BpmnIo {
       }, 0);
     });
 
-    this.modeler.on(['shape.added', 'shape.removed'], (event: IInternalEvent) => {
-      if (!this.solutionIsRemote) {
-        const shapeIsParticipant: boolean = event.element.type === 'bpmn:Participant';
-        if (shapeIsParticipant) {
-          return this.checkForMultipleParticipants(event);
-        }
-      }
-      return false;
-    });
-
     this.modeler.on(
       'import.done',
       () => {
@@ -186,22 +174,6 @@ export class BpmnIo {
       },
       1,
     );
-
-    this.modeler.on('shape.remove', (event: IInternalEvent) => {
-      if (!this.solutionIsRemote) {
-        const shapeIsParticipant: boolean = event.element.type === 'bpmn:Participant';
-        if (shapeIsParticipant) {
-          const rootElements: Array<IProcessRef> = this.modeler._definitions.rootElements;
-          this.tempProcess = rootElements.find((element: IProcessRef) => {
-            return element.$type === 'bpmn:Process';
-          });
-
-          return event;
-        }
-      }
-
-      return false;
-    });
 
     this.modeler.on('element.paste', (event: IInternalEvent) => {
       if (!this.solutionIsRemote) {
@@ -443,7 +415,6 @@ export class BpmnIo {
 
   public async saveCurrentXML(): Promise<void> {
     this.savedXml = await this.getXML();
-    this.tempProcess = undefined;
   }
 
   public async xmlChanged(newValue: string, oldValue?: string): Promise<void> {
@@ -476,7 +447,6 @@ export class BpmnIo {
 
   public async diagramChanged(newUri: string, previousUri: string): Promise<void> {
     this.diagramHasChanged = true;
-    this.tempProcess = undefined;
 
     const previousDiagramExists: boolean = previousUri !== undefined;
     if (!this.solutionIsRemote && previousDiagramExists) {
@@ -787,25 +757,6 @@ export class BpmnIo {
     }
 
     return randomId;
-  }
-
-  private checkForMultipleParticipants(event: IInternalEvent): IInternalEvent {
-    const elementRegistry: IElementRegistry = this.modeler.get('elementRegistry');
-
-    setTimeout(() => {
-      const participants: Array<IShape> = elementRegistry.filter((element: IShape) => {
-        return element.type === 'bpmn:Participant';
-      });
-
-      if (this.diagramHasChanges) {
-        participants.forEach((participant: IShape) => {
-          participant.businessObject.processRef.id = this.tempProcess.id;
-          participant.businessObject.processRef.isExecutable = this.tempProcess.isExecutable;
-        });
-      }
-    }, elementRegistryTimeoutMilliseconds);
-
-    return event;
   }
 
   private setNewPropertyPanelWidthFromMousePosition(mousePosition: number): void {
