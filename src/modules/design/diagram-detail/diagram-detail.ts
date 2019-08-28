@@ -99,6 +99,9 @@ export class DiagramDetail {
     this.managementApiClient = managementApiClient;
     this.openDiagramService = openDiagramService;
     this.openDiagramStateService = openDiagramStateService;
+
+    // eslint-disable-next-line no-underscore-dangle
+    (window as any).__dangerousInvoke['diagramDetail'] = this;
   }
 
   public determineActivationStrategy(): string {
