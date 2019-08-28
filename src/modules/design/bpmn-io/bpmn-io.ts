@@ -75,9 +75,6 @@ export class BpmnIo {
   private openDiagramStateService: OpenDiagramStateService;
   private solutionService: ISolutionService;
 
-  private tempProcess: IProcessRef;
-  private diagramHasChanges: boolean = false;
-
   constructor(
     notificationService: NotificationService,
     eventAggregator: EventAggregator,
@@ -323,7 +320,6 @@ export class BpmnIo {
 
       this.eventAggregator.subscribe(environment.events.diagramDetail.saveDiagram, async () => {
         this.savedXml = await this.getXML();
-        this.diagramHasChanges = false;
 
         await this.saveDiagramState(this.diagramUri);
       }),
@@ -361,10 +357,6 @@ export class BpmnIo {
         const keyboard: IKeyboard = this.modeler.get('keyboard');
 
         keyboard.unbind();
-      }),
-
-      this.eventAggregator.subscribe(environment.events.differsFromOriginal, (changes: boolean) => {
-        this.diagramHasChanges = changes;
       }),
     ];
 
@@ -531,8 +523,6 @@ export class BpmnIo {
         }
       }, 0);
     }
-
-    this.diagramHasChanges = false;
   }
 
   public nameChanged(newValue: string): void {
