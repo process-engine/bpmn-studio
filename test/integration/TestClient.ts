@@ -1,6 +1,7 @@
 /* eslint-disable no-useless-escape */
 /* eslint-disable no-empty-function */
 import url from 'url';
+import path from 'path';
 
 import {Application} from 'spectron';
 import assert from 'assert';
@@ -15,6 +16,28 @@ export class TestClient {
   public async awaitReadyness(): Promise<void> {
     await this.app.client.waitUntilWindowLoaded();
     await this.app.browserWindow.isVisible();
+  }
+
+  public async openDirectoryAsSolution(dir: string, diagramName?: string): Promise<void> {
+    const pathToSolution: string = path.join(__dirname, '..', '..', dir);
+    const identity = {
+      token: 'ZHVtbXlfdG9rZW4=',
+    };
+
+    await this.webdriverClient.executeAsync(
+      async (solutionPath, solutionIdentity, done) => {
+        // eslint-disable-next-line no-underscore-dangle
+        await (window as any).__dangerousInvoke.solutionExplorerList.openSolution(
+          solutionPath,
+          false,
+          solutionIdentity,
+        );
+
+        done();
+      },
+      pathToSolution,
+      identity,
+    );
   }
 
   // openDesignViewForCurrentDiagram?

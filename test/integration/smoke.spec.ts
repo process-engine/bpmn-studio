@@ -142,4 +142,11 @@ describe('Application launch', function foo() {
     await testClient.openXMLViewFromStatusbar();
     await testClient.openDesignViewFromStatusbar();
   });
+
+  it('should open a solution', async () => {
+    await testClient.ensureVisible('h3=Welcome to BPMN Studio!');
+
+    await testClient.openDirectoryAsSolution('fixtures');
+    await testClient.ensureVisible('.solution-entry__solution-name=fixtures');
+  });
 });
