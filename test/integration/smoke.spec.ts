@@ -64,14 +64,14 @@ describe('Application launch', function foo() {
   it('should start the application', async () => {
     await app.client.waitUntilTextExists('h3', 'Welcome');
 
-    await testClient.assertWindowTitleIs('Start Page | BPMN-Studio');
+    await testClient.assertWindowTitleIs('Start Page | BPMN Studio');
   });
 
   it('should create and open a new diagam by clicking on new diagram link', async () => {
     await createAndOpenDiagram();
 
     await testClient.assertNavbarTitleIs('Untitled-1');
-    await testClient.assertWindowTitleIs('Design | BPMN-Studio');
+    await testClient.assertWindowTitleIs('Design | BPMN Studio');
   });
 
   it('should render a diagram correctly', async () => {
@@ -100,7 +100,7 @@ describe('Application launch', function foo() {
     await createAndOpenDiagram();
 
     await testClient.assertNavbarTitleIs('Untitled-1');
-    await testClient.assertWindowTitleIs('Design | BPMN-Studio');
+    await testClient.assertWindowTitleIs('Design | BPMN Studio');
 
     creatingFirstDiagram = false;
     await createAndOpenDiagram();
