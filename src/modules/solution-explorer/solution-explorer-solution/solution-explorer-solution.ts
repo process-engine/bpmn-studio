@@ -1038,12 +1038,13 @@ export class SolutionExplorerSolution {
       return;
     }
 
-    this.eventAggregator.publish(environment.events.diagramChangedByStudio);
     await this.openDiagramAndUpdateSolution(emptyDiagram);
   };
 
   private async openDiagramAndUpdateSolution(createdDiagram: IDiagram): Promise<void> {
     await this.openDiagramService.openDiagramFromSolution(createdDiagram.uri, this.createIdentityForSolutionExplorer());
+
+    this.openDiagramStateService.addDiagramChange(createdDiagram.uri, {change: 'create'});
 
     await this.updateSolution();
     this.resetDiagramCreation();
@@ -1066,7 +1067,6 @@ export class SolutionExplorerSolution {
         return;
       }
 
-      this.eventAggregator.publish(environment.events.diagramChangedByStudio);
       await this.openDiagramAndUpdateSolution(emptyDiagram);
     } else if (pressedKey === ESCAPE_KEY) {
       this.resetDiagramCreation();
@@ -1179,7 +1179,8 @@ export class SolutionExplorerSolution {
         this.currentlyRenamingDiagram,
         this.diagramRenamingState.currentDiagramInputValue,
       );
-      this.eventAggregator.publish(environment.events.diagramChangedByStudio, 'rename');
+
+      this.openDiagramStateService.addDiagramChange(this.currentlyRenamingDiagram.uri, {change: 'rename'});
     } catch (error) {
       this.notificationService.showNotification(NotificationType.WARNING, error.message);
 

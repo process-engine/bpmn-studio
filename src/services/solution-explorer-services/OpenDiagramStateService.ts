@@ -1,6 +1,6 @@
 import {IShape} from '@process-engine/bpmn-elements_contracts';
 
-import {IDiagramState, IDiagramStateList, IDiagramStateListEntry} from '../../contracts';
+import {DiagramStateChange, IDiagramState, IDiagramStateList, IDiagramStateListEntry} from '../../contracts';
 
 export class OpenDiagramStateService {
   public saveDiagramState(
@@ -9,6 +9,7 @@ export class OpenDiagramStateService {
     location: any,
     selectedElements: Array<IShape>,
     isChanged: boolean,
+    changes?: Array<DiagramStateChange>,
   ): void {
     const diagramState: IDiagramState = {
       data: {
@@ -18,6 +19,7 @@ export class OpenDiagramStateService {
         location: location,
         selectedElements: selectedElements,
         isChanged: isChanged,
+        changes: changes,
       },
     };
 
@@ -72,6 +74,22 @@ export class OpenDiagramStateService {
     const key: string = this.getLocalStorageKeyByUri(uri);
 
     window.localStorage.removeItem(key);
+  }
+
+  public addDiagramChange(uri: string, change: DiagramStateChange): void {
+    const diagramState: IDiagramState | null = this.loadDiagramState(uri);
+
+    if (diagramState === null) {
+      throw new Error(`Diagram ${uri} has no state.`);
+    }
+
+    if (diagramState.metadata.changes === undefined) {
+      diagramState.metadata.changes = [];
+    }
+
+    diagramState.metadata.changes.push(change);
+
+    this.updateDiagramState(uri, diagramState);
   }
 
   private getUrisForAllDiagramStates(): Array<string> {
