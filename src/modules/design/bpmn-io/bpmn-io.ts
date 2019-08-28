@@ -415,6 +415,10 @@ export class BpmnIo {
   public movePaletteToLeftToolbar(): void {
     const bpmnIoPaletteContainer: Element = this.canvasModel.getElementsByClassName('djs-palette')[0];
 
+    if (bpmnIoPaletteContainer.className.includes('djs-palette-override')) {
+      return;
+    }
+
     bpmnIoPaletteContainer.className += ' djs-palette-override';
   }
 
