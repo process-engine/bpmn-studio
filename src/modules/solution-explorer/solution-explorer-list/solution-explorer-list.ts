@@ -82,7 +82,13 @@ export class SolutionExplorerList {
     }
 
     // eslint-disable-next-line no-underscore-dangle
-    (window as any).__dangerousInvoke['solutionExplorerList'] = this;
+    (window as any).__dangerousInvoke['openSolution'] = (
+      uri: string,
+      insertAtBeginning?: boolean,
+      identity?: IIdentity,
+    ): void => {
+      this.openSolution(uri, insertAtBeginning, identity);
+    };
 
     this.internalSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
   }

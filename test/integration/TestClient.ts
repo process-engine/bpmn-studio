@@ -27,11 +27,7 @@ export class TestClient {
     await this.webdriverClient.executeAsync(
       async (solutionPath, solutionIdentity, done) => {
         // eslint-disable-next-line no-underscore-dangle
-        await (window as any).__dangerousInvoke.solutionExplorerList.openSolution(
-          solutionPath,
-          false,
-          solutionIdentity,
-        );
+        await (window as any).__dangerousInvoke.openSolution(solutionPath, false, solutionIdentity);
 
         done();
       },
