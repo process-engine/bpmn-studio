@@ -427,7 +427,7 @@ export class BpmnIo {
       }
 
       const diagramState: IDiagramState = this.loadDiagramState(this.diagramUri);
-      const diagramContainsChanges: boolean = diagramState !== null && diagramState.metaData.isChanged;
+      const diagramContainsChanges: boolean = diagramState !== null && diagramState.metadata.isChanged;
 
       this.eventAggregator.publish(environment.events.differsFromOriginal, diagramContainsChanges);
     }
@@ -567,7 +567,7 @@ export class BpmnIo {
     const xml: string = diagramState.data.xml;
     await this.importXmlIntoModeler(xml);
 
-    const viewbox: IViewbox = diagramState.metaData.location;
+    const viewbox: IViewbox = diagramState.metadata.location;
     const viewboxIsSet: boolean = viewbox !== undefined;
     if (viewboxIsSet) {
       this.modeler.get('canvas').viewbox(viewbox);
@@ -684,7 +684,7 @@ export class BpmnIo {
     if (diagramIsVisible) {
       viewbox = currentViewbox;
     } else if (previousDiagramStateExists) {
-      viewbox = previousDiagramState.metaData.location;
+      viewbox = previousDiagramState.metadata.location;
     }
 
     const xml: string = await this.getXML();
@@ -711,7 +711,7 @@ export class BpmnIo {
       return;
     }
 
-    diagramState.metaData.location = viewbox;
+    diagramState.metadata.location = viewbox;
 
     this.openDiagramStateService.updateDiagramState(this.diagramUri, diagramState);
   }

@@ -77,15 +77,15 @@ export class PropertyPanel {
 
     const noSelectedElementState: boolean =
       diagramState === null ||
-      diagramState.metaData.selectedElements === undefined ||
-      diagramState.metaData.selectedElements.length === 0;
+      diagramState.metadata.selectedElements === undefined ||
+      diagramState.metadata.selectedElements.length === 0;
     if (noSelectedElementState) {
       this.setFirstElement();
 
       return;
     }
 
-    const selectedElementId: string = diagramState.metaData.selectedElements[0].id;
+    const selectedElementId: string = diagramState.metadata.selectedElements[0].id;
 
     this.selectElementById(selectedElementId);
   }

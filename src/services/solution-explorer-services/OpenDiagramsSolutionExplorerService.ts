@@ -166,7 +166,7 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
 
         const diagramHasState: boolean = diagramState !== null;
         if (diagramHasState) {
-          diagramState.metaData.isChanged = true;
+          diagramState.metadata.isChanged = true;
 
           this.openDiagramStateService.updateDiagramState(diagram.uri, diagramState);
         }
