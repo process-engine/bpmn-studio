@@ -156,7 +156,7 @@ describe('Application launch', function foo() {
     await createAndOpenDiagram();
 
     await testClient.assertNavbarTitleIs('Untitled-1');
-    await testClient.assertWindowTitleIs('Design | BPMN-Studio');
+    await testClient.assertWindowTitleIs('Design | BPMN Studio');
   });
 
   it('should render a diagram correctly', async () => {
@@ -185,7 +185,7 @@ describe('Application launch', function foo() {
     await createAndOpenDiagram();
 
     await testClient.assertNavbarTitleIs('Untitled-1');
-    await testClient.assertWindowTitleIs('Design | BPMN-Studio');
+    await testClient.assertWindowTitleIs('Design | BPMN Studio');
 
     creatingFirstDiagram = false;
     await createAndOpenDiagram();
