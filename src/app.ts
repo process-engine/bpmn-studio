@@ -46,6 +46,9 @@ export class App {
     // eslint-disable-next-line no-underscore-dangle
     (window as any).__dangerousInvoke = {};
 
+    // eslint-disable-next-line no-underscore-dangle
+    (window as any).__dangerousInvoke = {};
+
     this.preventDefaultBehaviour = (event: Event): boolean => {
       event.preventDefault();
 
