@@ -329,8 +329,6 @@ export class BpmnIo {
 
       this.eventAggregator.subscribe(environment.events.diagramDetail.saveDiagram, async () => {
         this.savedXml = await this.getXML();
-
-        await this.saveDiagramState(this.diagramUri);
       }),
 
       this.eventAggregator.subscribe(environment.events.diagramChange, async () => {

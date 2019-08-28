@@ -5,7 +5,14 @@ import {IDiagram, ISolution} from '@process-engine/solutionexplorer.contracts';
 import {ISolutionExplorerService} from '@process-engine/solutionexplorer.service.contracts';
 
 import {EventAggregator} from 'aurelia-event-aggregator';
-import {IDiagramState, IDiagramValidationService, ISolutionService, NotificationType} from '../../contracts/index';
+import * as fs from 'fs';
+import {
+  DiagramStateChange,
+  IDiagramState,
+  IDiagramValidationService,
+  ISolutionService,
+  NotificationType,
+} from '../../contracts/index';
 import {OpenDiagramStateService} from './OpenDiagramStateService';
 import {SolutionExplorerServiceFactory} from './SolutionExplorerServiceFactory';
 import {NotificationService} from '../notification-service/notification.service';
@@ -44,7 +51,7 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
   private notificationService: NotificationService;
   private eventAggregator: EventAggregator;
 
-  private diagramWasChangedByStudio: boolean = false;
+  private savingPromise: Promise<void>;
 
   constructor(
     validationService: IDiagramValidationService,
@@ -60,17 +67,6 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
     this.openDiagramStateService = openDiagramStateService;
     this.notificationService = notificationService;
     this.eventAggregator = eventAggregator;
-
-    this.eventAggregator.subscribe(environment.events.diagramChangedByStudio, (cause: string) => {
-      this.diagramWasChangedByStudio = true;
-
-      const saveAsUsed: boolean = cause === 'save-as';
-      const resetTimeout: number = saveAsUsed ? 1500 : 500;
-
-      setTimeout(() => {
-        this.diagramWasChangedByStudio = false;
-      }, resetTimeout);
-    });
   }
 
   public getOpenedDiagrams(): Array<IDiagram> {
@@ -157,15 +153,72 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
 
     const diagramIsStoredOnFilesystem: boolean = !diagram.uri.startsWith('about:open-diagrams');
     if (diagramIsStoredOnFilesystem) {
-      this.watchFile(diagram.uri, (event: string, previousFilepath: string, newFilename: string): void => {
-        if (this.diagramWasChangedByStudio) {
+      let isSaving: boolean = false;
+      this.watchFile(diagram.uri, async (event: string, previousFilepath: string, newFilename: string): Promise<void> => {
+        if (isSaving) {
           return;
         }
+
+        if (this.savingPromise !== undefined) {
+          await this.savingPromise;
+          this.savingPromise = undefined;
+        }
+
+        isSaving = true;
+        const eventIsRename: boolean = event === 'rename';
+        const eventIsChange: boolean = event === 'change';
+        const eventIsRestore: boolean = event === 'restore';
 
         const diagramState: IDiagramState = this.openDiagramStateService.loadDiagramState(diagram.uri);
 
         const diagramHasState: boolean = diagramState !== null;
         if (diagramHasState) {
+          if (eventIsRename) {
+            const changes: Array<DiagramStateChange> = diagramState.metadata.changes;
+
+            const diagramWasChangedByStudio: boolean =
+              changes !== undefined &&
+              changes.some((change) => {
+                return change.change === 'rename';
+              });
+
+            if (diagramWasChangedByStudio) {
+              const indexToRemove: number = diagramState.metadata.changes.findIndex((change) => {
+                return change.change === 'rename';
+              });
+
+              diagramState.metadata.changes.splice(indexToRemove, 0);
+
+              this.openDiagramStateService.updateDiagramState(diagram.uri, diagramState);
+              isSaving = false;
+              return;
+            }
+          }
+
+          if (eventIsChange) {
+            const changes: Array<DiagramStateChange> = diagramState.metadata.changes;
+
+            const diagramWasChangedByStudio: boolean =
+              changes !== undefined &&
+              changes.some((change) => {
+                const xml: string = fs.readFileSync(diagram.uri, 'utf8');
+
+                return (change.change === 'save' && change.xml === xml) || change.change === 'create';
+              });
+
+            if (diagramWasChangedByStudio) {
+              const indexToRemove: number = diagramState.metadata.changes.findIndex((change) => {
+                return change.change === 'save';
+              });
+
+              diagramState.metadata.changes.splice(indexToRemove, 1);
+
+              this.openDiagramStateService.updateDiagramState(diagram.uri, diagramState);
+              isSaving = false;
+              return;
+            }
+          }
+
           diagramState.metadata.isChanged = true;
 
           this.openDiagramStateService.updateDiagramState(diagram.uri, diagramState);
@@ -173,12 +226,9 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
 
         this.eventAggregator.publish(environment.events.diagramChangedOutsideTheStudio, previousFilepath);
 
-        let notificationMessage: string;
-
         const basename = previousFilepath.split('/').reverse()[0];
-        const eventIsRename: boolean = event === 'rename';
-        const eventIsChange: boolean = event === 'change';
-        const eventIsRestore: boolean = event === 'restore';
+
+        let notificationMessage: string;
         if (eventIsRename) {
           notificationMessage = `The diagram "${basename}" was moved/renamed on disk.`;
         } else if (eventIsChange) {
@@ -188,6 +238,8 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
         }
 
         this.notificationService.showNonDisappearingNotification(NotificationType.WARNING, notificationMessage);
+
+        isSaving = false;
       });
     }
 
@@ -227,7 +279,9 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
   }
 
   public saveDiagram(diagram: IDiagram, pathspec?: string): Promise<void> {
-    return this.solutionExplorerToOpenDiagrams.saveDiagram(diagram, pathspec);
+    this.savingPromise = this.solutionExplorerToOpenDiagrams.saveDiagram(diagram, pathspec);
+
+    return this.savingPromise;
   }
 
   public async openDiagramFromSolution(diagramUri: string, identity: IIdentity): Promise<IDiagram> {

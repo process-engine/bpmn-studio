@@ -1,5 +1,5 @@
 import {IShape} from '@process-engine/bpmn-elements_contracts';
-import {IViewbox} from '../index';
+import {DiagramStateChange, IViewbox} from '../index';
 
 export interface IDiagramState {
   data: {
@@ -8,6 +8,7 @@ export interface IDiagramState {
   metadata: {
     location: IViewbox;
     selectedElements: Array<IShape>;
+    changes?: Array<DiagramStateChange>;
     isChanged: boolean;
   };
 }
