@@ -48,6 +48,7 @@ export class BpmnIo {
   @bindable({changeHandler: 'diagramChanged'}) public diagramUri: string;
   @bindable({defaultBindingMode: bindingMode.twoWay}) public xml: string;
   @bindable({changeHandler: 'nameChanged'}) public name: string;
+  @bindable public isDisplayed: boolean;
   @observable public propertyPanelWidth: number;
   public showLinter: boolean;
   public solutionIsRemote: boolean = false;
@@ -375,6 +376,8 @@ export class BpmnIo {
     const wasPropertyPanelVisible: boolean = propertyPanelHideState === null || propertyPanelHideState === 'show';
     this.propertyPanelShouldOpen = wasPropertyPanelVisible;
     this.togglePanel();
+
+    this.updateViewboxStateOnChange();
   }
 
   public detached(): void {
@@ -424,7 +427,7 @@ export class BpmnIo {
       }
 
       const diagramState: IDiagramState = this.loadDiagramState(this.diagramUri);
-      const diagramContainsChanges: boolean = diagramState !== null && diagramState.metaData.isChanged;
+      const diagramContainsChanges: boolean = diagramState !== null && diagramState.metadata.isChanged;
 
       this.eventAggregator.publish(environment.events.differsFromOriginal, diagramContainsChanges);
     }
@@ -435,6 +438,12 @@ export class BpmnIo {
     }
 
     this.diagramHasChanged = false;
+  }
+
+  public isDisplayedChanged(): void {
+    if (this.isDisplayed && this.diagramHasState(this.diagramUri)) {
+      this.recoverDiagramState();
+    }
   }
 
   public async diagramChanged(newUri: string, previousUri: string): Promise<void> {
@@ -556,10 +565,9 @@ export class BpmnIo {
     }
 
     const xml: string = diagramState.data.xml;
-    const viewbox: IViewbox = diagramState.metaData.location;
-
     await this.importXmlIntoModeler(xml);
 
+    const viewbox: IViewbox = diagramState.metadata.location;
     const viewboxIsSet: boolean = viewbox !== undefined;
     if (viewboxIsSet) {
       this.modeler.get('canvas').viewbox(viewbox);
@@ -665,11 +673,47 @@ export class BpmnIo {
     const isUnsavedDiagram: boolean = diagramUri.startsWith('about:open-diagrams');
 
     const selectedElement: Array<IShape> = this.modeler.get('selection')._selectedElements;
-    const viewbox: IViewbox = modelerCanvas.viewbox();
+
+    const currentViewbox: IViewbox = modelerCanvas.viewbox();
+    const previousDiagramState: IDiagramState | null = this.openDiagramStateService.loadDiagramState(diagramUri);
+
+    const diagramIsVisible: boolean = currentViewbox.width > 0 && currentViewbox.height > 0;
+    const previousDiagramStateExists: boolean = previousDiagramState !== null;
+
+    let viewbox: IViewbox;
+    if (diagramIsVisible) {
+      viewbox = currentViewbox;
+    } else if (previousDiagramStateExists) {
+      viewbox = previousDiagramState.metadata.location;
+    }
+
     const xml: string = await this.getXML();
     const isChanged: boolean = isUnsavedDiagram || !this.areXmlsIdentical(xml, savedXml);
 
     this.openDiagramStateService.saveDiagramState(diagramUri, xml, viewbox, selectedElement, isChanged);
+  }
+
+  private updateViewboxStateOnChange(): void {
+    this.modeler.on('canvas.viewbox.changed', () => {
+      this.updateViewboxState();
+    });
+  }
+
+  private updateViewboxState(): void {
+    const modelerCanvas: ICanvas = this.modeler.get('canvas');
+    const viewbox: IViewbox = modelerCanvas.viewbox();
+
+    const diagramState: IDiagramState | null = this.openDiagramStateService.loadDiagramState(this.diagramUri);
+
+    const diagramHasNoState: boolean = !this.diagramHasState(this.diagramUri);
+    const diagramIsVisible: boolean = viewbox.width > 0 && viewbox.height > 0;
+    if (!diagramIsVisible || diagramHasNoState) {
+      return;
+    }
+
+    diagramState.metadata.location = viewbox;
+
+    this.openDiagramStateService.updateDiagramState(this.diagramUri, diagramState);
   }
 
   private areXmlsIdentical(firstXml: string, secondXml: string): boolean {

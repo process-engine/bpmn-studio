@@ -310,7 +310,7 @@ export class SolutionExplorerSolution {
     }
 
     const diagramState: IDiagramState = this.openDiagramStateService.loadDiagramState(diagram.uri);
-    const diagramHasUnsavedChanges: boolean = diagramState !== null && diagramState.metaData.isChanged;
+    const diagramHasUnsavedChanges: boolean = diagramState !== null && diagramState.metadata.isChanged;
 
     if (diagramHasUnsavedChanges) {
       const cancelClosing: boolean = (await this.showCloseDiagramModal(diagram)) === CloseModalResult.Cancel;
@@ -495,21 +495,21 @@ export class SolutionExplorerSolution {
     const diagramState: IDiagramState = this.openDiagramStateService.loadDiagramState(diagramUri);
 
     const updateDiagramState: Function = () => {
-      diagramState.metaData.isChanged = this.isActiveDiagramChanged;
+      diagramState.metadata.isChanged = this.isActiveDiagramChanged;
       this.openDiagramStateService.updateDiagramState(diagramUri, diagramState);
     };
 
     const diagramIsOpenedDiagram: boolean = diagramUri === this.activeDiagramUri;
     if (diagramIsOpenedDiagram) {
-      if (!diagramState.metaData.isChanged && this.isActiveDiagramChanged) {
+      if (!diagramState.metadata.isChanged && this.isActiveDiagramChanged) {
         updateDiagramState();
         this.isActiveDiagramChanged = false;
-      } else if (diagramState.metaData.isChanged && !this.isActiveDiagramChanged) {
+      } else if (diagramState.metadata.isChanged && !this.isActiveDiagramChanged) {
         updateDiagramState();
       }
     }
 
-    return diagramState !== null && diagramState.metaData.isChanged;
+    return diagramState !== null && diagramState.metadata.isChanged;
   }
 
   public canDeleteDiagram(): boolean {
@@ -634,7 +634,7 @@ export class SolutionExplorerSolution {
       const nextDiagram: IDiagram = isLastDiagram ? undefined : diagrams[nextDiagramIndex];
 
       const diagramState: IDiagramState = this.openDiagramStateService.loadDiagramState(currentDiagram.uri);
-      const diagramHasUnsavedChanges: boolean = diagramState !== null && diagramState.metaData.isChanged;
+      const diagramHasUnsavedChanges: boolean = diagramState !== null && diagramState.metadata.isChanged;
 
       let saveDiagram: boolean = false;
       let closeDiagram: boolean = true;
@@ -809,7 +809,7 @@ export class SolutionExplorerSolution {
       await this.openDiagramService.saveDiagram(diagramToSave);
       const diagramState: IDiagramState = diagramStateListEntry.diagramState;
 
-      diagramState.metaData.isChanged = false;
+      diagramState.metadata.isChanged = false;
 
       this.openDiagramStateService.updateDiagramState(diagramStateListEntry.uri, diagramState);
     }

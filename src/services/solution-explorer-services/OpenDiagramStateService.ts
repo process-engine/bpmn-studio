@@ -14,7 +14,7 @@ export class OpenDiagramStateService {
       data: {
         xml: xml,
       },
-      metaData: {
+      metadata: {
         location: location,
         selectedElements: selectedElements,
         isChanged: isChanged,
