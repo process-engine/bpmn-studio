@@ -5,7 +5,7 @@ export interface IDiagramState {
   data: {
     xml: string;
   };
-  metaData: {
+  metadata: {
     location: IViewbox;
     selectedElements: Array<IShape>;
     isChanged: boolean;
