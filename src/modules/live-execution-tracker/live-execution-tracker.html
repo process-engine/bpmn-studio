@@ -10,7 +10,7 @@
         <div ref="canvasModel" class="let__diagram-viewer-canvas"></div>
         <div class="let__button-row">
           <button if.bind="hasPreviousProcess" class="btn btn-default let__parent-process-button" click.delegate="navigateBackToPreviousProcess()">Back to parent process</button>
-          <button if.bind="processIsActive" class="btn btn-default let__stop-process-button" click.delegate="stopProcessInstance()">Stop Process</button>
+          <button if.bind="processIsActive" class="btn btn-default let__stop-process-button" click.delegate="stopProcessInstance()" data-test-stop-process-button>Stop Process</button>
         </div>
       </div>
       <div show.bind="showTokenViewer" class="let__token-viewer-resize-div" ref="tokenViewerResizeDiv"></div>
