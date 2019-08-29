@@ -1,6 +1,8 @@
 /* eslint-disable no-useless-escape */
 /* eslint-disable no-empty-function */
 import path from 'path';
+import fs from 'fs';
+import {exec} from 'child_process';
 
 import {Application} from 'spectron';
 import assert from 'assert';
@@ -23,6 +25,40 @@ export class TestClient {
     await this.app.browserWindow.isVisible();
   }
 
+  public async showSolutionExplorer(): Promise<void> {
+    const solutionExplorerIsVisible = await this.webdriverClient.isVisible('solution-explorer-panel');
+    if (solutionExplorerIsVisible) {
+      return;
+    }
+
+    await this.ensureVisible('[data-test-toggle-solution-explorer]');
+    await this.clickOn('[data-test-toggle-solution-explorer]');
+    await this.ensureVisible('solution-explorer-panel');
+  }
+
+  public async hideSolutionExplorer(): Promise<void> {
+    const solutionExplorerIsVisible = await this.webdriverClient.isVisible('solution-explorer-panel');
+    const solutionExplorerIsHidden = !solutionExplorerIsVisible;
+    if (solutionExplorerIsHidden) {
+      return;
+    }
+
+    await this.ensureVisible('[data-test-toggle-solution-explorer]');
+    await this.clickOn('[data-test-toggle-solution-explorer]');
+    await this.ensureNotVisible('solution-explorer-panel');
+    // solution-explorer-panel
+  }
+
+  public async assertInternalProcessEngineHasStarted(): Promise<void> {
+    const response = await this.webdriverClient.execute(() => {
+      return window.localStorage.getItem('InternalProcessEngineRoute');
+    });
+
+    const internalProcessEngineRoute = response.value;
+
+    await this.ensureVisible(`.solution-entry__solution-name=${internalProcessEngineRoute}`);
+  }
+
   public async openDirectoryAsSolution(dir: string, diagramName?: string): Promise<void> {
     const pathToSolution: string = path.join(__dirname, '..', '..', dir);
     const identity = {
@@ -39,6 +75,76 @@ export class TestClient {
       pathToSolution,
       identity,
     );
+
+    await this.ensureVisible(`.solution-entry__solution-name=${dir}`);
+
+    if (diagramName) {
+      const searchString = `${pathToSolution}/${diagramName}`;
+      await this.clickOn(`[data-test-diagram-uri*="${searchString}"]`);
+    }
+  }
+
+  public async startProcess(): Promise<void> {
+    await this.clickOn('[data-test-diagram-start-button]');
+    await this.ensureVisible('.live-execution-tracker');
+  }
+
+  public async stopProcess(): Promise<void> {
+    await this.clickOn('[data-test-stop-process-button]');
+    await this.ensureNotVisible('[data-test-stop-process-button]');
+  }
+
+  public async deployDiagram(): Promise<void> {
+    await this.clickOn('[data-test-diagram-deploy-button]');
+  }
+
+  public async clearDatabase(): Promise<void> {
+    await this.execCommand('rm -rf dist/test/process_engine_databases');
+  }
+
+  public async clearSavedDiagrams(): Promise<void> {
+    await this.execCommand('rm -rf dist/test/saved_diagrams');
+  }
+
+  public async assertDiagramIsOnFileSystem(): Promise<void> {
+    await this.ensureVisible('[data-test-navbar-icon]');
+    const classAttribute = await this.getAttributeFromElement('[data-test-navbar-icon]', 'class');
+    const isOnFileSystem: boolean = classAttribute.includes('fa-folder');
+
+    assert.equal(isOnFileSystem, true);
+  }
+
+  public async assertDiagramIsOnProcessEngine(): Promise<void> {
+    await this.ensureVisible('[data-test-navbar-icon]');
+    const classAttribute = await this.getAttributeFromElement('[data-test-navbar-icon]', 'class');
+    const isOnProcessEngine: boolean = classAttribute.includes('fa-database');
+
+    assert.equal(isOnProcessEngine, true);
+    Promise.resolve();
+  }
+
+  public async saveDiagramAs(fileName: string): Promise<void> {
+    const fileUri: string = path.join(SAVE_DIAGRAM_DIR, fileName);
+    const directoryExists: boolean = await fs.existsSync(SAVE_DIAGRAM_DIR);
+
+    if (!directoryExists) {
+      fs.mkdirSync(SAVE_DIAGRAM_DIR);
+    }
+
+    await this.webdriverClient.executeAsync(async (pathToSave, done) => {
+      // eslint-disable-next-line no-underscore-dangle
+      await (window as any).__dangerousInvoke.saveDiagramAs(pathToSave);
+
+      done();
+    }, fileUri);
+  }
+
+  public async assertDiagramIsSaved(): Promise<void> {
+    await this.ensureNotVisible('.edited-label');
+  }
+
+  public async assertDiagramIsUnsaved(): Promise<void> {
+    await this.ensureVisible('.edited-label');
   }
 
   // openDesignViewForCurrentDiagram?
@@ -66,6 +172,7 @@ export class TestClient {
   }
 
   public async assertNavbarTitleIs(name): Promise<void> {
+    await this.ensureVisible('.process-details-title');
     const navbarTitle = await this.getTextFromElement('.process-details-title');
 
     assert.equal(navbarTitle, name);
@@ -131,6 +238,26 @@ export class TestClient {
     await this.ensureVisible('bpmn-diff-view');
   }
 
+  public async openThinkView(diagramName?: string, diagramUri?: string, solutionUri?: string): Promise<void> {
+    if (diagramName && diagramUri) {
+      const encodedName = encodeURIComponent(diagramName);
+      const encodedUri = encodeURIComponent(diagramUri);
+      const encodedSolutionUri = solutionUri ? encodeURIComponent(solutionUri) : '';
+      const uriFragment = `#/think/diagram-list/diagram/${encodedName}?diagramUri=${encodedUri}&solutionUri=${encodedSolutionUri}`;
+
+      await this.openView(uriFragment);
+    } else {
+      await this.openView('#/think/diagram-list/diagram');
+    }
+
+    await this.ensureVisible('diagram-list');
+  }
+
+  public async openThinkViewFromNavbar(): Promise<void> {
+    await this.clickOn('[data-test-navbar="Think"]');
+    await this.ensureVisible('diagram-list');
+  }
+
   public async getAttributeFromElement(selector, attribute): Promise<string> {
     return this.webdriverClient.getAttribute(selector, attribute);
   }
@@ -185,5 +312,13 @@ export class TestClient {
     const uriFragment = `#/design/${subPath}/diagram/${encodedName}?diagramUri=${encodedUri}&solutionUri=${encodedSolutionUri}`;
 
     return this.openView(uriFragment);
+  }
+
+  private async execCommand(command: string): Promise<any> {
+    return new Promise((resolve: Function): any => {
+      exec(command, (err, stdin, stderr) => {
+        return resolve(stdin);
+      });
+    });
   }
 }
