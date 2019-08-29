@@ -197,7 +197,7 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
               }
             }
 
-            if (eventIsChange) {
+            if (eventIsChange || eventIsRestore) {
               const changes: Array<DiagramStateChange> = diagramState.metadata.changes;
 
               const diagramWasChangedByStudio: boolean =
