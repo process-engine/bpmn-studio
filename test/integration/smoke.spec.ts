@@ -46,7 +46,7 @@ let creatingFirstDiagram: boolean = true;
 
 describe('Application launch', function foo() {
   this.slow(10000);
-  this.timeout(15000);
+  this.timeout(15000000);
 
   beforeEach(async () => {
     app = new Application(applicationArgs);
@@ -57,11 +57,16 @@ describe('Application launch', function foo() {
     await testClient.awaitReadyness();
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    await testClient.clearDatabase();
     if (app && app.isRunning()) {
       return app.stop();
     }
     return null;
+  });
+
+  this.afterAll(async () => {
+    await testClient.clearSavedDiagrams();
   });
 
   it('should start the application', async () => {
@@ -237,6 +242,90 @@ describe('Application launch', function foo() {
     await testClient.ensureVisible('h3=Welcome to BPMN Studio!');
 
     await testClient.openDirectoryAsSolution('fixtures');
-    await testClient.ensureVisible('.solution-entry__solution-name=fixtures');
+  });
+
+  it('should open a diagram from solution', async () => {
+    await testClient.ensureVisible('h3=Welcome to BPMN Studio!');
+
+    const diagramName = 'call_activity_subprocess_error';
+    await testClient.openDirectoryAsSolution('fixtures', diagramName);
+    await testClient.assertNavbarTitleIs(diagramName);
+  });
+
+  it('should start a ProcessEngine', async () => {
+    await testClient.ensureVisible('h3=Welcome to BPMN Studio!');
+
+    await testClient.assertInternalProcessEngineHasStarted();
+  });
+
+  it('should show the SolutionExplorer', async () => {
+    await testClient.ensureVisible('h3=Welcome to BPMN Studio!');
+
+    await testClient.hideSolutionExplorer();
+    await testClient.showSolutionExplorer();
+  });
+
+  it('should hide the SolutionExplorer', async () => {
+    await testClient.ensureVisible('h3=Welcome to BPMN Studio!');
+
+    await testClient.hideSolutionExplorer();
+  });
+
+  it('should open the Think view', async () => {
+    await createAndOpenDiagram();
+
+    await testClient.openThinkView('Untitled-1', 'about:open-diagrams/Untitled-1.bpmn', 'about:open-diagrams');
+    await testClient.assertWindowTitleIs('Think | BPMN Studio');
+  });
+
+  it('should open the Think view from navbar', async () => {
+    await createAndOpenDiagram();
+
+    await testClient.openThinkViewFromNavbar();
+    await testClient.assertWindowTitleIs('Design | BPMN Studio');
+  });
+
+  it('should save a diagram', async () => {
+    await createAndOpenDiagram();
+
+    await testClient.assertDiagramIsUnsaved();
+    await testClient.saveDiagramAs('test1.bpmn');
+    await testClient.assertDiagramIsSaved();
+  });
+
+  it('should deploy a diagram', async () => {
+    const diagramName = 'receive_task_wait_test';
+    await testClient.ensureVisible('h3=Welcome to BPMN Studio!');
+    await testClient.openDirectoryAsSolution('fixtures', diagramName);
+
+    await testClient.assertDiagramIsOnFileSystem();
+    await testClient.deployDiagram();
+    await testClient.assertNavbarTitleIs(diagramName);
+    await testClient.assertDiagramIsOnProcessEngine();
+  });
+
+  it('should start a process', async () => {
+    const diagramName = 'receive_task_wait_test';
+    await testClient.ensureVisible('h3=Welcome to BPMN Studio!');
+    await testClient.openDirectoryAsSolution('fixtures', diagramName);
+    await testClient.assertDiagramIsOnFileSystem();
+    await testClient.deployDiagram();
+    await testClient.assertNavbarTitleIs(diagramName);
+    await testClient.assertDiagramIsOnProcessEngine();
+
+    await testClient.startProcess();
+  });
+
+  it('should stop a process on LiveExecutionTracker', async () => {
+    const diagramName = 'receive_task_wait_test';
+    await testClient.ensureVisible('h3=Welcome to BPMN Studio!');
+    await testClient.openDirectoryAsSolution('fixtures', diagramName);
+    await testClient.assertDiagramIsOnFileSystem();
+    await testClient.deployDiagram();
+    await testClient.assertNavbarTitleIs(diagramName);
+    await testClient.assertDiagramIsOnProcessEngine();
+
+    await testClient.startProcess();
+    await testClient.stopProcess();
   });
 });
