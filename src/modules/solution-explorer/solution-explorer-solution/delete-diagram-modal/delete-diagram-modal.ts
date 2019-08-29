@@ -3,7 +3,7 @@
  * We are disabling this rule here because we need this kind of statement in the
  * functions used in the promise of the modal.
  */
-import {inject} from 'aurelia-framework';
+import {bindable, inject} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
@@ -16,6 +16,7 @@ import {OpenDiagramStateService} from '../../../../services/solution-explorer-se
 
 @inject('NotificationService', 'OpenDiagramStateService', Router, 'OpenDiagramService', 'SolutionService')
 export class DeleteDiagramModal {
+  @bindable public activeDiagram: IDiagram;
   public showModal: boolean = false;
   public diagram: IDiagram;
   public deleteDiagramModal: DeleteDiagramModal = this;
@@ -93,34 +94,37 @@ export class DeleteDiagramModal {
 
     const openDiagramServiceIsAvailable: boolean = typeof this.openDiagramService !== 'string';
 
-    const diagramIndex: number = openDiagramServiceIsAvailable
-      ? this.openDiagramService.getOpenedDiagrams().findIndex((diagram: IDiagram) => diagram.uri === this.diagram.uri)
-      : undefined;
+    const diagramWasActiveDiagram: boolean = this.diagram === this.activeDiagram;
+    if (diagramWasActiveDiagram) {
+      const diagramIndex: number = openDiagramServiceIsAvailable
+        ? this.openDiagramService.getOpenedDiagrams().findIndex((diagram: IDiagram) => diagram.uri === this.diagram.uri)
+        : undefined;
 
-    const previousOrNextDiagramIndex: number = diagramIndex === 0 ? diagramIndex + 1 : diagramIndex - 1;
+      const previousOrNextDiagramIndex: number = diagramIndex === 0 ? diagramIndex + 1 : diagramIndex - 1;
 
-    const diagramToNavigateTo: IDiagram = openDiagramServiceIsAvailable
-      ? this.openDiagramService
-          .getOpenedDiagrams()
-          .find((diagram: IDiagram, index: number) => index === previousOrNextDiagramIndex)
-      : undefined;
+      const diagramToNavigateTo: IDiagram = openDiagramServiceIsAvailable
+        ? this.openDiagramService
+            .getOpenedDiagrams()
+            .find((diagram: IDiagram, index: number) => index === previousOrNextDiagramIndex)
+        : undefined;
 
-    const diagramIsDeployed: boolean = this.diagram.uri.startsWith('http');
+      const diagramIsDeployed: boolean = this.diagram.uri.startsWith('http');
 
-    if (diagramIsDeployed || !diagramToNavigateTo) {
-      this.router.navigateToRoute('start-page');
-    } else {
-      const lastIndexOfSlash: number = diagramToNavigateTo.uri.lastIndexOf('/');
-      const lastIndexOfBackSlash: number = diagramToNavigateTo.uri.lastIndexOf('\\');
-      const indexBeforeFilename: number = Math.max(lastIndexOfSlash, lastIndexOfBackSlash);
-      const activeSolutionUri: string = diagramToNavigateTo.uri.substring(0, indexBeforeFilename);
+      if (diagramIsDeployed || !diagramToNavigateTo) {
+        this.router.navigateToRoute('start-page');
+      } else {
+        const lastIndexOfSlash: number = diagramToNavigateTo.uri.lastIndexOf('/');
+        const lastIndexOfBackSlash: number = diagramToNavigateTo.uri.lastIndexOf('\\');
+        const indexBeforeFilename: number = Math.max(lastIndexOfSlash, lastIndexOfBackSlash);
+        const activeSolutionUri: string = diagramToNavigateTo.uri.substring(0, indexBeforeFilename);
 
-      this.router.navigateToRoute('design', {
-        diagramName: diagramToNavigateTo.name,
-        diagramUri: diagramToNavigateTo.uri,
-        solutionUri: activeSolutionUri,
-        view: this.router.currentInstruction.params.view,
-      });
+        this.router.navigateToRoute('design', {
+          diagramName: diagramToNavigateTo.name,
+          diagramUri: diagramToNavigateTo.uri,
+          solutionUri: activeSolutionUri,
+          view: this.router.currentInstruction.params.view,
+        });
+      }
     }
 
     if (openDiagramServiceIsAvailable) {
