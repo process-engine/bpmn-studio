@@ -154,93 +154,96 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
     const diagramIsStoredOnFilesystem: boolean = !diagram.uri.startsWith('about:open-diagrams');
     if (diagramIsStoredOnFilesystem) {
       let isSaving: boolean = false;
-      this.watchFile(diagram.uri, async (event: string, previousFilepath: string, newFilename: string): Promise<void> => {
-        if (isSaving) {
-          return;
-        }
+      this.watchFile(
+        diagram.uri,
+        async (event: string, previousFilepath: string, newFilename: string): Promise<void> => {
+          if (isSaving) {
+            return;
+          }
 
-        if (this.savingPromise !== undefined) {
-          await this.savingPromise;
-          this.savingPromise = undefined;
-        }
+          if (this.savingPromise !== undefined) {
+            await this.savingPromise;
+            this.savingPromise = undefined;
+          }
 
-        isSaving = true;
-        const eventIsRename: boolean = event === 'rename';
-        const eventIsChange: boolean = event === 'change';
-        const eventIsRestore: boolean = event === 'restore';
+          isSaving = true;
+          const eventIsRename: boolean = event === 'rename';
+          const eventIsChange: boolean = event === 'change';
+          const eventIsRestore: boolean = event === 'restore';
 
-        const diagramState: IDiagramState = this.openDiagramStateService.loadDiagramState(diagram.uri);
+          const diagramState: IDiagramState = this.openDiagramStateService.loadDiagramState(diagram.uri);
 
-        const diagramHasState: boolean = diagramState !== null;
-        if (diagramHasState) {
+          const diagramHasState: boolean = diagramState !== null;
+          if (diagramHasState) {
+            if (eventIsRename) {
+              const changes: Array<DiagramStateChange> = diagramState.metadata.changes;
+
+              const diagramWasChangedByStudio: boolean =
+                changes !== undefined &&
+                changes.some((change) => {
+                  return change.change === 'rename';
+                });
+
+              if (diagramWasChangedByStudio) {
+                const indexToRemove: number = diagramState.metadata.changes.findIndex((change) => {
+                  return change.change === 'rename';
+                });
+
+                diagramState.metadata.changes.splice(indexToRemove, 0);
+
+                this.openDiagramStateService.updateDiagramState(diagram.uri, diagramState);
+                isSaving = false;
+                return;
+              }
+            }
+
+            if (eventIsChange) {
+              const changes: Array<DiagramStateChange> = diagramState.metadata.changes;
+
+              const diagramWasChangedByStudio: boolean =
+                changes !== undefined &&
+                changes.some((change) => {
+                  const xml: string = fs.readFileSync(diagram.uri, 'utf8');
+
+                  return (change.change === 'save' && change.xml === xml) || change.change === 'create';
+                });
+
+              if (diagramWasChangedByStudio) {
+                const indexToRemove: number = diagramState.metadata.changes.findIndex((change) => {
+                  return change.change === 'save';
+                });
+
+                diagramState.metadata.changes.splice(indexToRemove, 1);
+
+                this.openDiagramStateService.updateDiagramState(diagram.uri, diagramState);
+                isSaving = false;
+                return;
+              }
+            }
+
+            diagramState.metadata.isChanged = true;
+
+            this.openDiagramStateService.updateDiagramState(diagram.uri, diagramState);
+          }
+
+          this.eventAggregator.publish(environment.events.diagramChangedOutsideTheStudio, previousFilepath);
+
+          const basename = previousFilepath.split('/').reverse()[0];
+
+          let notificationMessage: string;
           if (eventIsRename) {
-            const changes: Array<DiagramStateChange> = diagramState.metadata.changes;
-
-            const diagramWasChangedByStudio: boolean =
-              changes !== undefined &&
-              changes.some((change) => {
-                return change.change === 'rename';
-              });
-
-            if (diagramWasChangedByStudio) {
-              const indexToRemove: number = diagramState.metadata.changes.findIndex((change) => {
-                return change.change === 'rename';
-              });
-
-              diagramState.metadata.changes.splice(indexToRemove, 0);
-
-              this.openDiagramStateService.updateDiagramState(diagram.uri, diagramState);
-              isSaving = false;
-              return;
-            }
+            notificationMessage = `The diagram "${basename}" was moved/renamed on disk.`;
+          } else if (eventIsChange) {
+            notificationMessage = `The diagram "${basename}" was changed on disk.`;
+          } else if (eventIsRestore) {
+            notificationMessage = `The diagram "${basename}" was restored on disk.`;
           }
 
-          if (eventIsChange) {
-            const changes: Array<DiagramStateChange> = diagramState.metadata.changes;
+          this.notificationService.showNonDisappearingNotification(NotificationType.WARNING, notificationMessage);
 
-            const diagramWasChangedByStudio: boolean =
-              changes !== undefined &&
-              changes.some((change) => {
-                const xml: string = fs.readFileSync(diagram.uri, 'utf8');
-
-                return (change.change === 'save' && change.xml === xml) || change.change === 'create';
-              });
-
-            if (diagramWasChangedByStudio) {
-              const indexToRemove: number = diagramState.metadata.changes.findIndex((change) => {
-                return change.change === 'save';
-              });
-
-              diagramState.metadata.changes.splice(indexToRemove, 1);
-
-              this.openDiagramStateService.updateDiagramState(diagram.uri, diagramState);
-              isSaving = false;
-              return;
-            }
-          }
-
-          diagramState.metadata.isChanged = true;
-
-          this.openDiagramStateService.updateDiagramState(diagram.uri, diagramState);
-        }
-
-        this.eventAggregator.publish(environment.events.diagramChangedOutsideTheStudio, previousFilepath);
-
-        const basename = previousFilepath.split('/').reverse()[0];
-
-        let notificationMessage: string;
-        if (eventIsRename) {
-          notificationMessage = `The diagram "${basename}" was moved/renamed on disk.`;
-        } else if (eventIsChange) {
-          notificationMessage = `The diagram "${basename}" was changed on disk.`;
-        } else if (eventIsRestore) {
-          notificationMessage = `The diagram "${basename}" was restored on disk.`;
-        }
-
-        this.notificationService.showNonDisappearingNotification(NotificationType.WARNING, notificationMessage);
-
-        isSaving = false;
-      });
+          isSaving = false;
+        },
+      );
     }
 
     this.openedDiagrams.push(diagram);
