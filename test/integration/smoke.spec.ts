@@ -282,7 +282,7 @@ describe('Application launch', function foo() {
     await createAndOpenDiagram();
 
     await testClient.openThinkViewFromNavbar();
-    await testClient.assertWindowTitleIs('Design | BPMN Studio');
+    await testClient.assertWindowTitleIs('Think | BPMN Studio');
   });
 
   it('should save a diagram', async () => {
