@@ -9,6 +9,9 @@ const applicationArgs = getApplicationArgs(process.env.SPECTRON_APP_PATH);
 function getApplicationArgs(givenPath: string | null): any {
   const commonArgs = {
     requireName: 'nodeRequire',
+    env: {
+      SPECTRON_TESTS: true,
+    },
     webdriverOptions: {
       deprecationWarnings: false,
     },
