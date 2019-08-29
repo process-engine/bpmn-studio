@@ -9,21 +9,12 @@ import {Router} from 'aurelia-router';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 import {ISolutionExplorerService} from '@process-engine/solutionexplorer.service.contracts';
 
-import {EventAggregator} from 'aurelia-event-aggregator';
 import {IEventFunction, ISolutionService, NotificationType} from '../../../../contracts/index';
 import {NotificationService} from '../../../../services/notification-service/notification.service';
 import {OpenDiagramsSolutionExplorerService} from '../../../../services/solution-explorer-services/OpenDiagramsSolutionExplorerService';
 import {OpenDiagramStateService} from '../../../../services/solution-explorer-services/OpenDiagramStateService';
-import environment from '../../../../environment';
 
-@inject(
-  'NotificationService',
-  'OpenDiagramStateService',
-  Router,
-  'OpenDiagramService',
-  'SolutionService',
-  EventAggregator,
-)
+@inject('NotificationService', 'OpenDiagramStateService', Router, 'OpenDiagramService', 'SolutionService')
 export class DeleteDiagramModal {
   public showModal: boolean = false;
   public diagram: IDiagram;
@@ -35,7 +26,6 @@ export class DeleteDiagramModal {
   private openDiagramService: OpenDiagramsSolutionExplorerService;
   private router: Router;
   private solutionService: ISolutionService;
-  private eventAggregator: EventAggregator;
 
   constructor(
     notificationService: NotificationService,
@@ -43,14 +33,12 @@ export class DeleteDiagramModal {
     router: Router,
     openDiagramService: OpenDiagramsSolutionExplorerService,
     solutionService: ISolutionService,
-    eventAggregator: EventAggregator,
   ) {
     this.notificationService = notificationService;
     this.openDiagramStateService = openDiagramStateService;
     this.router = router;
     this.openDiagramService = openDiagramService;
     this.solutionService = solutionService;
-    this.eventAggregator = eventAggregator;
   }
 
   public async show(diagram: IDiagram, solutionExplorerService: ISolutionExplorerService): Promise<boolean> {
