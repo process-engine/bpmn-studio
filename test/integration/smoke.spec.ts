@@ -67,7 +67,7 @@ describe('Application launch', function foo() {
     await testClient.assertWindowTitleIs('Start Page | BPMN Studio');
   });
 
-  it('should create and open a new diagam by clicking on new diagram link', async () => {
+  it('should create and open a new diagram by clicking on new diagram link', async () => {
     await createAndOpenDiagram();
 
     await testClient.assertNavbarTitleIs('Untitled-1');
