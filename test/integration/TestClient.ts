@@ -8,6 +8,8 @@ import assert from 'assert';
 import url from 'url';
 
 const APP_BASE_URL = `file://${__dirname}/../../index.html`;
+const DATABASE_PATH = path.join(__dirname, '..', '..', 'dist', 'test', 'process_engine_databases');
+const SAVE_DIAGRAM_DIR = path.join(__dirname, '..', '..', 'dist', 'test', 'saved_diagrams');
 
 export class TestClient {
   private app: Application;
