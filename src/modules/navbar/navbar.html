@@ -3,17 +3,17 @@
   <div class="bpmn-studio-navbar" class.bind="showLeftMarginInNavbar ? 'bpmn-studio-navbar--left-margin' : ''" id="navBarContainer">
     <div class="menu-bar__menu--left" id="navBarLeft">
       <div class="menu__menu-tabbed-link">
-        <button id="navbarSolutionExplorerButton" class="button menu-tabbed-link action-button" class.bind="solutionExplorerIsActive ? 'button--active' : ''" click.delegate="toggleSolutionExplorer()" title="Toggle visibility of the Solution Explorer">
+        <button class="button menu-tabbed-link action-button" class.bind="solutionExplorerIsActive ? 'button--active' : ''" click.delegate="toggleSolutionExplorer()" title="Toggle visibility of the Solution Explorer" data-test-toggle-solution-explorer>
           <i class="fas fa-project-diagram"></i>
         </button>
       </div>
       <div repeat.for="nav of router.navigation" class="button menu__menu-tabbed-link" class.bind="nav.isActive ? 'button--active menu__menu-tabbed-link--active' : ''">
-        <a id="navbar-${nav.title}" class="menu-tabbed-link" click.delegate="navigate(nav)">${nav.title}</a>
+        <a class="menu-tabbed-link" click.delegate="navigate(nav)" data-test-navbar="${nav.title}">${nav.title}</a>
       </div>
     </div>
     <div class="menu-bar__menu--center" id="navBarCenter">
       <div class="menu__element menu__element--title btn-group" if.bind="showProcessName" ref="diagramInfo">
-        <span class="fas menu__origin-icon" class.bind="getClassNameForNavbarIcon"></span>
+        <span class="fas menu__origin-icon" class.bind="getClassNameForNavbarIcon" data-test-navbar-icon></span>
         <span class="process-details-title" title.bind="navbarTitle">${navbarTitle}</span>
         <span if.bind="diagramContainsUnsavedChanges" class="edited-label">- edited</span>
       </div>
@@ -49,11 +49,11 @@
         <button class="button menu-bar__menu-center--action-button"  click.delegate="printDiagram()" title="Print Diagram">
           <i class="fas fa-print"></i>
         </button>
-        <button class="button menu-bar__menu-center--action-button" class.bind="validationError || disableDiagramUploadButton ? 'button--disabled' : ''" click.delegate="uploadProcess()" title.bind="diagramUploadButtonTitle">
+        <button class="button menu-bar__menu-center--action-button" class.bind="validationError || disableDiagramUploadButton ? 'button--disabled' : ''" click.delegate="uploadProcess()" title.bind="diagramUploadButtonTitle" data-test-diagram-deploy-button>
           <i class="fas fa-dolly-flatbed"></i>
         </button>
         <div class="btn-group">
-          <button class="button menu-bar__menu-center--action-button" class.bind="validationError || disableStartButton ? 'button--disabled' : ''" click.delegate="startProcess()" disabled.bind="validationError || disableStartButton" title.bind="startButtonTitle">
+          <button class="button menu-bar__menu-center--action-button" class.bind="validationError || disableStartButton ? 'button--disabled' : ''" click.delegate="startProcess()" disabled.bind="validationError || disableStartButton" title.bind="startButtonTitle" data-test-diagram-start-button>
             <i class="fas fa-play"></i>
           </button>
           <button type="button" class="button menu-bar__menu-center--action-button dropdown-toggle dropdown-toggle-split dropdown__start-button" class.bind="validationError || disableStartButton ? 'button--disabled' : ''" disabled.bind="validationError || disableStartButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
