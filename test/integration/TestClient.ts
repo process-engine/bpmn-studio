@@ -1,10 +1,11 @@
 /* eslint-disable no-useless-escape */
 /* eslint-disable no-empty-function */
-import url from 'url';
 import path from 'path';
 
 import {Application} from 'spectron';
 import assert from 'assert';
+
+const APP_BASE_URL = `file://${__dirname}/../../index.html`;
 
 export class TestClient {
   private app: Application;
@@ -44,13 +45,13 @@ export class TestClient {
   }
 
   // openXMLViewForCurrentDiagram?
-  public async openXMLViewFromStatusbar(): Promise<void> {
+  public async openXmlViewFromStatusbar(): Promise<void> {
     await this.ensureVisible('[data-test-status-bar-xml-view-button]');
     await this.clickOn('[data-test-status-bar-xml-view-button]');
     await this.ensureVisible('bpmn-xml-view');
   }
 
-  public async clickOnBPMNElementWithName(name): Promise<void> {
+  public async clickOnBpmnElementWithName(name): Promise<void> {
     await this.clickOn(`.djs-label=${name}`);
   }
 
@@ -66,13 +67,13 @@ export class TestClient {
     assert.equal(navbarTitle, name);
   }
 
-  public async assertSelectedBPMNElementHasName(name): Promise<void> {
+  public async assertSelectedBpmnElementHasName(name): Promise<void> {
     const selectedElementText = await this.getValueFromElement('[data-test-pp-element-name]');
 
     assert.equal(selectedElementText, name);
   }
 
-  public async assertSelectedBPMNElementHasNotName(name): Promise<void> {
+  public async rejectSelectedBpmnElementHasName(name): Promise<void> {
     const selectedElementText = await this.getValueFromElement('[data-test-pp-element-name]');
 
     assert.notEqual(selectedElementText, name);
@@ -89,7 +90,8 @@ export class TestClient {
   }
 
   public async hidePropertyPanel(): Promise<void> {
-    const propertyPanelIsHidden = !(await this.webdriverClient.isVisible('property-panel'));
+    const propertyPanelIsVisible = await this.webdriverClient.isVisible('property-panel');
+    const propertyPanelIsHidden = !propertyPanelIsVisible;
     if (propertyPanelIsHidden) {
       return;
     }
@@ -107,30 +109,21 @@ export class TestClient {
   }
 
   public async openStartPage(): Promise<void> {
-    return this.app.browserWindow.loadURL(`file://${__dirname}/../../index.html`);
+    return this.openView('');
   }
 
-  public async openDesignViewForDiagram(diagramName, diagramUri, solutionUri?): Promise<void> {
-    const unformattedURL = `file://${__dirname}/../../index.html#/design/detail/diagram/${diagramName}?diagramUri=${diagramUri}&solutionUri=${solutionUri}`;
-    const formattedURL = url.format(unformattedURL);
-
-    await this.app.browserWindow.loadURL(formattedURL);
+  public async openDesignViewForDiagram(diagramName: string, diagramUri: string, solutionUri?: string): Promise<void> {
+    await this.openDesignView('detail', diagramName, diagramUri, solutionUri);
     await this.ensureVisible('diagram-detail');
   }
 
-  public async openXMLViewForDiagram(diagramName, diagramUri, solutionUri?): Promise<void> {
-    const unformattedURL = `file://${__dirname}/../../index.html#/design/xml/diagram/${diagramName}?diagramUri=${diagramUri}&solutionUri=${solutionUri}`;
-    const formattedURL = url.format(unformattedURL);
-
-    await this.app.browserWindow.loadURL(formattedURL);
+  public async openXmlViewForDiagram(diagramName: string, diagramUri: string, solutionUri?: string): Promise<void> {
+    await this.openDesignView('xml', diagramName, diagramUri, solutionUri);
     await this.ensureVisible('bpmn-xml-view');
   }
 
-  public async openDiffViewForDiagram(diagramName, diagramUri, solutionUri?): Promise<void> {
-    const unformattedURL = `file://${__dirname}/../../index.html#/design/diff/diagram/${diagramName}?diagramUri=${diagramUri}&solutionUri=${solutionUri}`;
-    const formattedURL = url.format(unformattedURL);
-
-    await this.app.browserWindow.loadURL(formattedURL);
+  public async openDiffViewForDiagram(diagramName: string, diagramUri: string, solutionUri?: string): Promise<void> {
+    await this.openDesignView('diff', diagramName, diagramUri, solutionUri);
     await this.ensureVisible('bpmn-diff-view');
   }
 
@@ -147,7 +140,7 @@ export class TestClient {
   }
 
   public async elementHasText(selector, text): Promise<void> {
-    return this.app.client.waitUntilTextExists(selector, text);
+    return this.webdriverClient.waitUntilTextExists(selector, text);
   }
 
   public async ensureVisible(selector: string): Promise<boolean> {
@@ -168,7 +161,25 @@ export class TestClient {
     await new Promise((c: any): any => setTimeout(c, timeInMilliseconds));
   }
 
-  public get webdriverClient(): any {
+  private get webdriverClient(): any {
     return this.app.client;
+  }
+
+  private async openView(uriPath: string): Promise<void> {
+    return this.app.browserWindow.loadURL(`${APP_BASE_URL}${uriPath}`);
+  }
+
+  private async openDesignView(
+    subPath: string,
+    diagramName: string,
+    diagramUri: string,
+    solutionUri?: string,
+  ): Promise<void> {
+    const encodedName = encodeURIComponent(diagramName);
+    const encodedUri = encodeURIComponent(diagramUri);
+    const encodedSolutionUri = solutionUri ? encodeURIComponent(solutionUri) : '';
+    const uriFragment = `#/design/${subPath}/diagram/${encodedName}?diagramUri=${encodedUri}&solutionUri=${encodedSolutionUri}`;
+
+    return this.openView(uriFragment);
   }
 }

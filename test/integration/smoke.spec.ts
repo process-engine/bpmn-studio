@@ -1,5 +1,4 @@
 import {Application} from 'spectron';
-import assert from 'assert';
 import path from 'path';
 
 import {TestClient} from './TestClient';
@@ -29,7 +28,7 @@ function getApplicationArgs(givenPath: string | null): any {
 
 async function createAndOpenDiagram(): Promise<void> {
   if (!creatingFirstDiagram) {
-    await app.browserWindow.loadURL(`file://${__dirname}/../../index.html`);
+    await testClient.openStartPage();
   }
 
   await testClient.ensureVisible('[data-test-create-new-diagram]');
@@ -43,7 +42,8 @@ let testClient: TestClient;
 let creatingFirstDiagram: boolean = true;
 
 describe('Application launch', function foo() {
-  this.timeout(1000000);
+  this.slow(10000);
+  this.timeout(15000);
 
   beforeEach(async () => {
     app = new Application(applicationArgs);
@@ -84,16 +84,18 @@ describe('Application launch', function foo() {
     await createAndOpenDiagram();
     await testClient.showPropertyPanel();
 
-    await testClient.assertSelectedBPMNElementHasName('Start Event');
+    await testClient.assertSelectedBpmnElementHasName('Start Event');
   });
 
-  it('select EndEvent', async () => {
+  it('should select element on click', async () => {
     await createAndOpenDiagram();
     await testClient.showPropertyPanel();
 
-    await testClient.assertSelectedBPMNElementHasNotName('End Event');
-    await testClient.clickOnBPMNElementWithName('End Event');
-    await testClient.assertSelectedBPMNElementHasName('End Event');
+    const elementName = 'End Event';
+
+    await testClient.rejectSelectedBpmnElementHasName(elementName);
+    await testClient.clickOnBpmnElementWithName(elementName);
+    await testClient.assertSelectedBpmnElementHasName(elementName);
   });
 
   it('should create and open a second diagram', async () => {
@@ -122,7 +124,7 @@ describe('Application launch', function foo() {
   it('should open XML view', async () => {
     await createAndOpenDiagram();
 
-    await testClient.openXMLViewForDiagram('Untitled-1', 'about:open-diagrams/Untitled-1.bpmn', 'about:open-diagrams');
+    await testClient.openXmlViewForDiagram('Untitled-1', 'about:open-diagrams/Untitled-1.bpmn', 'about:open-diagrams');
   });
 
   it('should open diff view', async () => {
@@ -133,13 +135,13 @@ describe('Application launch', function foo() {
 
   it('should open the xml view from the status bar', async () => {
     await createAndOpenDiagram();
-    await testClient.openXMLViewFromStatusbar();
+    await testClient.openXmlViewFromStatusbar();
   });
 
   it('should open design view from the status bar', async () => {
     await createAndOpenDiagram();
 
-    await testClient.openXMLViewFromStatusbar();
+    await testClient.openXmlViewFromStatusbar();
     await testClient.openDesignViewFromStatusbar();
   });
 
