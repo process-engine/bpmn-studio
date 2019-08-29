@@ -329,8 +329,6 @@ export class BpmnIo {
 
       this.eventAggregator.subscribe(environment.events.diagramDetail.saveDiagram, async () => {
         this.savedXml = await this.getXML();
-
-        await this.saveDiagramState(this.diagramUri);
       }),
 
       this.eventAggregator.subscribe(environment.events.diagramChange, async () => {
@@ -673,37 +671,40 @@ export class BpmnIo {
     }
   }
 
-  private get isRunningInElectron(): boolean {
-    const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
-
-    return isRunningInElectron;
-  }
-
-  private async saveDiagramState(diagramUri: string): Promise<void> {
+  public async saveDiagramState(diagramUri: string): Promise<void> {
     const savedXml: string = this.savedXml;
     const modelerCanvas: ICanvas = this.modeler.get('canvas');
 
     const isUnsavedDiagram: boolean = diagramUri.startsWith('about:open-diagrams');
-
-    const selectedElement: Array<IShape> = this.modeler.get('selection')._selectedElements;
-
     const currentViewbox: IViewbox = modelerCanvas.viewbox();
-    const previousDiagramState: IDiagramState | null = this.openDiagramStateService.loadDiagramState(diagramUri);
-
     const diagramIsVisible: boolean = currentViewbox.width > 0 && currentViewbox.height > 0;
-    const previousDiagramStateExists: boolean = previousDiagramState !== null;
-
-    let viewbox: IViewbox;
-    if (diagramIsVisible) {
-      viewbox = currentViewbox;
-    } else if (previousDiagramStateExists) {
-      viewbox = previousDiagramState.metadata.location;
-    }
 
     const xml: string = await this.getXML();
+    const viewbox: IViewbox = diagramIsVisible ? currentViewbox : undefined;
+    const selectedElements: Array<IShape> = this.modeler.get('selection')._selectedElements;
     const isChanged: boolean = isUnsavedDiagram || !this.areXmlsIdentical(xml, savedXml);
 
-    this.openDiagramStateService.saveDiagramState(diagramUri, xml, viewbox, selectedElement, isChanged);
+    const diagramState: IDiagramState | null = this.openDiagramStateService.loadDiagramState(diagramUri);
+    const diagramStateExists: boolean = diagramState !== null;
+    if (diagramStateExists) {
+      diagramState.data.xml = xml;
+      diagramState.metadata.selectedElements = selectedElements;
+      diagramState.metadata.isChanged = isChanged;
+
+      if (viewbox) {
+        diagramState.metadata.location = viewbox;
+      }
+
+      this.openDiagramStateService.updateDiagramState(diagramUri, diagramState);
+    } else {
+      this.openDiagramStateService.saveDiagramState(diagramUri, xml, viewbox, selectedElements, isChanged);
+    }
+  }
+
+  private get isRunningInElectron(): boolean {
+    const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
+
+    return isRunningInElectron;
   }
 
   private updateViewboxStateOnChange(): void {

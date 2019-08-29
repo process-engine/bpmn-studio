@@ -30,7 +30,6 @@ export default {
   },
   events: {
     differsFromOriginal: 'differsFromOriginal',
-    diagramChangedByStudio: 'diagramChangedByStudio',
     diagramChangedOutsideTheStudio: 'diagramChangedOutsideTheStudio',
     xmlChanged: 'xmlChanged',
     startPage: {
