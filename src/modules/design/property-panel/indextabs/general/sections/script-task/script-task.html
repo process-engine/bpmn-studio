@@ -8,7 +8,7 @@
         <tr>
           <th>Script</th>
           <td>
-            <textarea class="props-textarea name-input" value.bind="businessObjInPanel.script" change.delegate="updateScript()" disabled.bind="!isEditable"></textarea>
+            <textarea class="props-textarea name-input" ref="scriptInput" value.bind="businessObjInPanel.script" change.delegate="updateScript()" disabled.bind="!isEditable"></textarea>
           </td>
         </tr>
       </table>

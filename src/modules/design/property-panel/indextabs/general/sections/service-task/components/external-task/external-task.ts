@@ -15,11 +15,23 @@ export class ExternalTask {
   public selectedPayload: string;
   public showModal: boolean = false;
 
+  public payloadInput: HTMLElement;
+
   private eventAggregator: EventAggregator;
   private serviceTaskService: ServiceTaskService;
 
   constructor(eventAggregator?: EventAggregator) {
     this.eventAggregator = eventAggregator;
+  }
+
+  public attached(): void {
+    this.recoverInputHeight();
+
+    this.saveInputHeightOnChange();
+  }
+
+  public detached(): void {
+    this.payloadInput.removeEventListener('mousedown', this.saveInputHeightOnMouseUp);
   }
 
   public modelChanged(): void {
@@ -63,6 +75,22 @@ export class ExternalTask {
 
     payloadProperty.value = value;
   }
+
+  private saveInputHeightOnChange(): void {
+    this.payloadInput.addEventListener('mousedown', this.saveInputHeightOnMouseUp);
+  }
+
+  private recoverInputHeight(): void {
+    this.payloadInput.style.height = `${localStorage.getItem('externalTaskPayloadInputHeight')}px`;
+  }
+
+  private saveInputHeightOnMouseUp: EventListenerOrEventListenerObject = () => {
+    const resizeListenerFunction: EventListenerOrEventListenerObject = (): void => {
+      localStorage.setItem('externalTaskPayloadInputHeight', this.payloadInput.clientHeight.toString());
+      window.removeEventListener('mouseup', resizeListenerFunction);
+    };
+    window.addEventListener('mouseup', resizeListenerFunction);
+  };
 
   private publishDiagramChange(): void {
     this.eventAggregator.publish(environment.events.diagramChange);

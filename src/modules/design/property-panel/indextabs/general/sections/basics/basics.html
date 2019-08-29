@@ -27,7 +27,7 @@
         <tr>
           <td>
               Docs <a class="docs-enlarge-link" click.delegate="showModal = true"><small class="docs-enlarge-text">Enlarge</small></a>
-            <textarea type="text" class="props-input-textarea" value.bind="elementDocumentation" change.delegate="updateDocumentation()" disabled.bind="!isEditable" aria-multiline="true"></textarea>
+            <textarea type="text" ref="docsInput" class="props-input-textarea" value.bind="elementDocumentation" change.delegate="updateDocumentation()" disabled.bind="!isEditable" aria-multiline="true"></textarea>
           </td>
         </tr>
       </table>
