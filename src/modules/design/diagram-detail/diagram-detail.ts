@@ -15,6 +15,8 @@ import {DataModels, IManagementApi} from '@process-engine/management_api_contrac
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 
 import {
+  DiagramStateChange,
+  IDiagramState,
   IElementRegistry,
   ISolutionEntry,
   ISolutionService,
@@ -26,6 +28,7 @@ import environment from '../../../environment';
 import {NotificationService} from '../../../services/notification-service/notification.service';
 import {OpenDiagramsSolutionExplorerService} from '../../../services/solution-explorer-services/OpenDiagramsSolutionExplorerService';
 import {BpmnIo} from '../bpmn-io/bpmn-io';
+import {OpenDiagramStateService} from '../../../services/solution-explorer-services/OpenDiagramStateService';
 
 @inject(
   'ManagementApiClientService',
@@ -35,6 +38,7 @@ import {BpmnIo} from '../bpmn-io/bpmn-io';
   Router,
   ValidationController,
   'OpenDiagramService',
+  'OpenDiagramStateService',
 )
 export class DiagramDetail {
   @bindable() public activeDiagram: IDiagram;
@@ -74,6 +78,8 @@ export class DiagramDetail {
 
   private clickedOnCustomStart: boolean = false;
   private openDiagramService: OpenDiagramsSolutionExplorerService;
+  private openDiagramStateService: OpenDiagramStateService;
+  private isSaving: boolean;
 
   constructor(
     managementApiClient: IManagementApi,
@@ -83,6 +89,7 @@ export class DiagramDetail {
     router: Router,
     validationController: ValidationController,
     openDiagramService: OpenDiagramsSolutionExplorerService,
+    openDiagramStateService: OpenDiagramStateService,
   ) {
     this.notificationService = notificationService;
     this.solutionService = solutionService;
@@ -91,6 +98,7 @@ export class DiagramDetail {
     this.validationController = validationController;
     this.managementApiClient = managementApiClient;
     this.openDiagramService = openDiagramService;
+    this.openDiagramStateService = openDiagramStateService;
   }
 
   public determineActivationStrategy(): string {
@@ -383,8 +391,17 @@ export class DiagramDetail {
    * Saves the current diagram.
    */
   public async saveDiagram(): Promise<void> {
+    if (this.isSaving) {
+      return;
+    }
+    this.isSaving = true;
+
     const savingTargetIsRemoteSolution: boolean = this.activeSolutionEntry.uri.startsWith('http');
     if (this.diagramIsInvalid || savingTargetIsRemoteSolution) {
+      setTimeout(() => {
+        this.isSaving = false;
+      }, 500);
+
       return;
     }
 
@@ -399,8 +416,14 @@ export class DiagramDetail {
       const xml: string = await this.bpmnio.getXML();
       this.activeDiagram.xml = xml;
 
+      await this.bpmnio.saveDiagramState(this.activeDiagramUri);
+
+      this.openDiagramStateService.addDiagramChange(this.activeDiagramUri, {
+        change: 'save',
+        xml: xml,
+      });
+
       await this.activeSolutionEntry.service.saveDiagram(this.activeDiagram);
-      this.eventAggregator.publish(environment.events.diagramChangedByStudio, 'save');
 
       this.diagramHasChanged = false;
 
@@ -409,8 +432,17 @@ export class DiagramDetail {
       this.eventAggregator.publish(environment.events.navBar.diagramChangesResolved);
     } catch (error) {
       this.notificationService.showNotification(NotificationType.ERROR, `Unable to save the file: ${error}.`);
+
+      setTimeout(() => {
+        this.isSaving = false;
+      }, 500);
+
       throw error;
     }
+
+    setTimeout(() => {
+      this.isSaving = false;
+    }, 500);
   }
 
   public async saveDiagramAs(path: string): Promise<void> {
@@ -448,7 +480,19 @@ export class DiagramDetail {
 
     try {
       await this.activeSolutionEntry.service.saveDiagram(diagram, path);
-      this.eventAggregator.publish(environment.events.diagramChangedByStudio, 'save-as');
+
+      const diagramChange: Array<DiagramStateChange> = [{change: 'save', xml: diagram.xml}];
+      const previousDiagramsState: IDiagramState | null = this.openDiagramStateService.loadDiagramState(diagram.uri);
+
+      const previousDiagramHasState: boolean = previousDiagramsState !== null;
+      if (previousDiagramHasState) {
+        previousDiagramsState.metadata.changes = diagramChange;
+
+        this.openDiagramStateService.updateDiagramState(path, previousDiagramsState);
+      } else {
+        this.openDiagramStateService.saveDiagramState(path, diagram.xml, undefined, undefined, false);
+      }
+
       this.eventAggregator.publish(environment.events.navBar.diagramChangesResolved);
     } catch (error) {
       this.notificationService.showNotification(NotificationType.ERROR, `Unable to save the file: ${error}.`);
@@ -679,6 +723,8 @@ export class DiagramDetail {
       return;
     }
 
+    this.isSaving = true;
+
     this.ipcRenderer.send('open_save-diagram-as_dialog');
 
     this.ipcRenderer.once('save_diagram_as', async (event: Event, savePath: string) => {
@@ -688,6 +734,10 @@ export class DiagramDetail {
       }
 
       await this.saveDiagramAs(savePath);
+
+      setTimeout(() => {
+        this.isSaving = false;
+      }, 500);
     });
   };
 
