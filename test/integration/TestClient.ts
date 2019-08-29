@@ -79,7 +79,9 @@ export class TestClient {
     await this.ensureVisible(`.solution-entry__solution-name=${dir}`);
 
     if (diagramName) {
-      const searchString = `${pathToSolution}/${diagramName}`;
+      const isWindows = process.platform === 'win32';
+
+      const searchString = isWindows ? `${pathToSolution}\\${diagramName}` : `${pathToSolution}/${diagramName}`;
       await this.clickOn(`[data-test-diagram-uri*="${searchString}"]`);
     }
   }
