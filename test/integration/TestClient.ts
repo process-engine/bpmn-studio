@@ -276,8 +276,8 @@ export class TestClient {
     return this.webdriverClient.waitUntilTextExists(selector, text);
   }
 
-  public async ensureVisible(selector: string): Promise<boolean> {
-    return this.webdriverClient.waitForVisible(selector);
+  public async ensureVisible(selector: string, timeout?: number): Promise<boolean> {
+    return this.webdriverClient.waitForVisible(selector, timeout);
   }
 
   public async ensureNotVisible(selector: string): Promise<boolean> {
