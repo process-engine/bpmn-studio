@@ -7,12 +7,14 @@
     "email": "hello@process-engine.io",
     "url": "http://process-engine.io"
   },
-  "main": "electron_app/electron.js",
+  "main": "dist/electron_app/electron_app/electron.js",
   "scripts": {
-    "start": "./bin/bpmn-studio.js",
+    "start": "node ./dist/bin/bpmn-studio.js",
     "postinstall": "npm rebuild",
     "start_dev": "au run --watch",
-    "build": "au build",
+    "build-electron-app": "tsc -p electron_app/tsconfig.json",
+    "build-bin": "tsc -p bin/tsconfig.json",
+    "build": "npm run build-bin && npm run build-electron-app && au build",
     "reset": "bash dev_tooling/scripts/reset_setup.bash",
     "reinstall": "OLD_PATH=$PATH bash dev_tooling/scripts/reinstall_setup.bash && unset OLD_PATH",
     "reinstall-clean": "OLD_PATH=$PATH bash dev_tooling/scripts/reinstall_clean_setup.bash && unset OLD_PATH",
@@ -20,13 +22,13 @@
     "test-init": "npm rebuild && (process-engine & (webdriver-manager update && webdriver-manager start))",
     "test-docker": "bash test/start_docker_bundle.sh && au e2eDocker",
     "test-crossbrowser": "au e2eCrossbrowser",
-    "lint": "eslint \"test/**/*.ts\" \"src/**/*.ts\" \"electron_app/**/*.js\" \"bin/**/*.js\" \"aurelia_project/**/*.js\" \"aurelia_project/**/*.ts\"",
-    "lint-fix": "eslint --fix \"test/**/*.ts\" \"src/**/*.ts\" \"electron_app/**/*.js\" \"bin/**/*.js\" \"aurelia_project/**/*.js\" \"aurelia_project/**/*.ts\"",
+    "lint": "eslint \"test/**/*.ts\" \"src/**/*.ts\" \"electron_app/**/*.ts\" \"bin/**/*.ts\" \"aurelia_project/**/*.js\" \"aurelia_project/**/*.ts\"",
+    "lint-fix": "eslint --fix \"test/**/*.ts\" \"src/**/*.ts\" \"electron_app/**/*.ts\" \"bin/**/*.ts\" \"aurelia_project/**/*.js\" \"aurelia_project/**/*.ts\"",
     "electron-build-windows": "npm run electron-prepare && electron-builder --config build/electron-builder.yml --publish never --windows && npm run electron-cleanup",
     "electron-build-macos": "npm run electron-prepare && electron-builder --config build/electron-builder.yml --publish never --macos && npm run electron-cleanup",
     "electron-cleanup": "node electron-builder/reset-name-in-package-json.js",
     "electron-prepare": "electron-builder install-app-deps && node electron-builder/set-name-in-package-json.js && electron-rebuild && npm run build && node electron-builder/prepare-electron-build.js",
-    "electron-start-dev": "npm run build && electron electron_app/electron.js",
+    "electron-start-dev": "npm run build && electron dist/electron_app/electron_app/electron.js",
     "jenkins-electron-install-app-deps": "electron-builder install-app-deps",
     "jenkins-electron-rebuild-native": "electron-rebuild --force",
     "jenkins-electron-build-windows": "electron-builder --publish never --windows",
@@ -40,11 +42,11 @@
   "files": [
     "dist/web",
     "index.html",
-    "bin",
+    "dist/bin",
     "src/resources",
     "dist/web/@fortawesome"
   ],
-  "bin": "./bin/bpmn-studio.js",
+  "bin": "./dist/bin/bpmn-studio.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/process-engine/bpmn-studio"

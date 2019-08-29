@@ -4,7 +4,7 @@
     "sourceMap": true,
     "target": "es5",
     "resolveJsonModule": true,
-    "module": "amd",
+    "module": "commonjs",
     "declaration": false,
     "noImplicitAny": false,
     "removeComments": true,
@@ -12,18 +12,7 @@
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "lib": ["esnext", "dom"]
-  },
-  "exclude": [
-    "node_modules",
-    "aurelia_project"
-  ],
-  "filesGlob": [
-    "./src/**/*.ts",
-    "./test/**/*.ts",
-    "./custom_typings/**/*.d.ts"
-  ],
-  "atom": {
-    "rewriteTsconfig": false
+    "lib": ["esnext", "dom"],
+    "outDir": "../dist/electron_app",
   }
 }

@@ -11,24 +11,20 @@ import {
   ISolutionEntry,
   ISolutionService,
   NotificationType,
+  StudioVersion,
 } from '../../../contracts/index';
 
 import environment from '../../../environment';
 import {NotificationService} from '../../../services/notification-service/notification.service';
 import {SolutionExplorerList} from '../solution-explorer-list/solution-explorer-list';
 
+import {getPortListByVersion} from '../../../services/default-ports-module/default-ports-module';
+
 type RemoteSolutionListEntry = {
   uri: string;
   status: boolean;
-  version?: Version;
+  version?: StudioVersion;
 };
-
-enum Version {
-  Dev = 'Development',
-  Alpha = 'BPMN Studio Alpha',
-  Beta = 'BPMN Studio Beta',
-  Stable = 'BPMN Studio',
-}
 
 /**
  * This component handels:
@@ -366,18 +362,33 @@ export class SolutionExplorerPanel {
     });
   }
 
-  public getBadgeForVersion(version: Version): string {
+  public getBadgeForVersion(version: StudioVersion): string {
     switch (version) {
-      case Version.Dev:
+      case StudioVersion.Dev:
         return 'remote-solution-badge__dev';
-      case Version.Alpha:
+      case StudioVersion.Alpha:
         return 'remote-solution-badge__alpha';
-      case Version.Beta:
+      case StudioVersion.Beta:
         return 'remote-solution-badge__beta';
-      case Version.Stable:
+      case StudioVersion.Stable:
         return 'remote-solution-badge__stable';
       default:
         return 'remote-solution-badge__dev';
+    }
+  }
+
+  public getVersionNameForVersion(version: StudioVersion): string {
+    switch (version) {
+      case StudioVersion.Dev:
+        return 'Development';
+      case StudioVersion.Alpha:
+        return 'BPMN Studio Alpha';
+      case StudioVersion.Beta:
+        return 'BPMN Studio Beta';
+      case StudioVersion.Stable:
+        return 'BPMN Studio';
+      default:
+        return 'Development';
     }
   }
 
@@ -439,16 +450,16 @@ export class SolutionExplorerPanel {
     this.availableDefaultRemoteSolutions = [];
 
     const stableRemoteSolution: Promise<RemoteSolutionListEntry | null> = this.searchDefaultRemoteSolutionForVersion(
-      Version.Stable,
+      StudioVersion.Stable,
     );
     const betaRemoteSolution: Promise<RemoteSolutionListEntry | null> = this.searchDefaultRemoteSolutionForVersion(
-      Version.Beta,
+      StudioVersion.Beta,
     );
     const alphaRemoteSolution: Promise<RemoteSolutionListEntry | null> = this.searchDefaultRemoteSolutionForVersion(
-      Version.Alpha,
+      StudioVersion.Alpha,
     );
     const devRemoteSolution: Promise<RemoteSolutionListEntry | null> = this.searchDefaultRemoteSolutionForVersion(
-      Version.Dev,
+      StudioVersion.Dev,
     );
 
     const availableRemoteSolutions: Array<RemoteSolutionListEntry> = await Promise.all([
@@ -465,8 +476,8 @@ export class SolutionExplorerPanel {
     );
   }
 
-  private async searchDefaultRemoteSolutionForVersion(version: Version): Promise<RemoteSolutionListEntry | null> {
-    const portsToCheck: Array<number> = this.getDefaultPortsFor(version);
+  private async searchDefaultRemoteSolutionForVersion(version: StudioVersion): Promise<RemoteSolutionListEntry | null> {
+    const portsToCheck: Array<number> = getPortListByVersion(version);
 
     const processEngineUri: string = await this.getActiveProcessEngineForPortList(portsToCheck);
 
@@ -493,31 +504,6 @@ export class SolutionExplorerPanel {
     }
 
     return null;
-  }
-
-  private getDefaultPortsFor(version: Version): Array<number> {
-    switch (version) {
-      case Version.Dev:
-        return this.getPortList(56300);
-      case Version.Alpha:
-        return this.getPortList(56200);
-      case Version.Beta:
-        return this.getPortList(56100);
-      case Version.Stable:
-        return this.getPortList(56000);
-      default:
-        return [];
-    }
-  }
-
-  private getPortList(port: number): Array<number> {
-    const portList = [];
-
-    for (let index = 0; index < 10; index++) {
-      portList.push(port + index * 10);
-    }
-
-    return portList;
   }
 
   private async isRemoteSolutionActive(remoteSolutionUri: string): Promise<boolean> {
