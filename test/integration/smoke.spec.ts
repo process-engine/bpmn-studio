@@ -46,7 +46,7 @@ let creatingFirstDiagram: boolean = true;
 
 describe('Application launch', function foo() {
   this.slow(10000);
-  this.timeout(15000000);
+  this.timeout(15000);
 
   beforeEach(async () => {
     app = new Application(applicationArgs);
