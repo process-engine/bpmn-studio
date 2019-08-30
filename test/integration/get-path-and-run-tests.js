@@ -14,7 +14,7 @@ async function getBuildedStudioPath() {
   const isWindows = process.platform === 'win32';
   if (isWindows) {
     const result = await execCommand('find ./dist/electron/win-unpacked/**.exe');
-    return result.substr(2).trim();
+    return `"${result.substr(2).trim()}"`;
   }
 
   const result = await execCommand('find ./dist/electron/mac/**.app/Contents/MacOS/BPMN**');
