@@ -10,7 +10,7 @@ import {
   WebContents,
 } from 'electron';
 import fs from 'fs';
-import {CancellationToken, autoUpdater} from 'electron-updater';
+import {CancellationToken, autoUpdater} from '@process-engine/electron-updater';
 import path from 'path';
 import openAboutWindow, {AboutWindowInfo} from 'about-window';
 import getPort from 'get-port';
