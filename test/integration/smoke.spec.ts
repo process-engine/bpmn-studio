@@ -299,6 +299,9 @@ describe('Application launch', function foo() {
     await testClient.openDirectoryAsSolution('fixtures', diagramName);
 
     await testClient.assertDiagramIsOnFileSystem();
+    if (isWindows) {
+      await testClient.pause(800);
+    }
     await testClient.deployDiagram();
     await testClient.assertNavbarTitleIs(diagramName);
     await testClient.assertDiagramIsOnProcessEngine();
