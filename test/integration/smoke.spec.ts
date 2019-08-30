@@ -58,9 +58,9 @@ describe('Application launch', function foo() {
   });
 
   afterEach(async () => {
-    await testClient.clearDatabase();
     if (app && app.isRunning()) {
-      return app.stop();
+      await app.stop();
+      return testClient.clearDatabase();
     }
     return null;
   });
