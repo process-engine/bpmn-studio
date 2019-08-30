@@ -2,16 +2,27 @@
 /* eslint-disable no-empty-function */
 import path from 'path';
 import fs from 'fs';
+import os from 'os';
 import {exec} from 'child_process';
 
 import {Application} from 'spectron';
 import assert from 'assert';
 
-import url from 'url';
+function getUserConfigFolder(): string {
+  const userHomeDir = os.homedir();
+  switch (process.platform) {
+    case 'darwin':
+      return path.join(userHomeDir, 'Library', 'Application Support');
+    case 'win32':
+      return path.join(userHomeDir, 'AppData', 'Roaming');
+    default:
+      return path.join(userHomeDir, '.config');
+  }
+}
 
 const APP_BASE_URL = `file://${__dirname}/../../index.html`;
-const DATABASE_PATH = path.join(__dirname, '..', '..', 'dist', 'test', 'process_engine_databases');
-const SAVE_DIAGRAM_DIR = path.join(__dirname, '..', '..', 'dist', 'test', 'saved_diagrams');
+const DATABASE_PATH = path.join(getUserConfigFolder(), 'bpmn-studio-tests', 'process_engine_databases');
+const SAVE_DIAGRAM_DIR = path.join(getUserConfigFolder(), 'bpmn-studio-tests', 'saved_diagrams');
 
 export class TestClient {
   private app: Application;
@@ -99,11 +110,11 @@ export class TestClient {
   }
 
   public async clearDatabase(): Promise<void> {
-    await this.execCommand('rm -rf dist/test/process_engine_databases');
+    await this.execCommand(`rm -rf ${DATABASE_PATH.replace(/[\s]/gm, '\\ ')}`);
   }
 
   public async clearSavedDiagrams(): Promise<void> {
-    await this.execCommand('rm -rf dist/test/saved_diagrams');
+    await this.execCommand(`rm -rf ${SAVE_DIAGRAM_DIR.replace(/[\s]/gm, '\\ ')}`);
   }
 
   public async assertDiagramIsOnFileSystem(): Promise<void> {
