@@ -317,8 +317,11 @@ export class TestClient {
   }
 
   private async execCommand(command: string): Promise<any> {
-    return new Promise((resolve: Function): any => {
+    return new Promise((resolve: Function, reject: Function): any => {
       exec(command, (err, stdin, stderr) => {
+        if (err || stderr) {
+          reject(err, stderr);
+        }
         return resolve(stdin);
       });
     });
