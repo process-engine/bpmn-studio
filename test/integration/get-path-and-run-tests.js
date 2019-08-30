@@ -1,6 +1,15 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 const exec = require('child_process').exec;
 
+function getTestCommand() {
+  const isWindows = process.platform === 'win32';
+  if (isWindows) {
+    return 'windows';
+  }
+
+  return 'macos';
+}
+
 async function getBuildedStudioPath() {
   const isWindows = process.platform === 'win32';
   if (isWindows) {
@@ -32,13 +41,16 @@ async function execCommand(command) {
 async function runTests() {
   const pathToStudio = await getBuildedStudioPath();
 
-  exec(`cross-env SPECTRON_APP_PATH=${pathToStudio} npm run test-electron-macos`, (err, stdout, stderr) => {
-    if (err || stderr) {
-      console.error(err, stderr);
-    }
+  exec(
+    `cross-env SPECTRON_APP_PATH=${pathToStudio} npm run test-electron-${getTestCommand()}`,
+    (err, stdout, stderr) => {
+      if (err || stderr) {
+        console.error(err, stderr);
+      }
 
-    console.log(stdout);
-  });
+      console.log(stdout);
+    },
+  );
 }
 
 runTests();
