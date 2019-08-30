@@ -1,8 +1,21 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 const exec = require('child_process').exec;
 
-function getBuildedStudioPath() {
-  return execCommand('find ./dist/electron/mac/**.app/Contents/MacOS/BPMN**');
+async function getBuildedStudioPath() {
+  const isWindows = process.platform === 'win32';
+  if (isWindows) {
+    const result = await execCommand('find ./dist/electron/win-unpacked/**.exe');
+    return result.substr(2).trim();
+  }
+
+  const result = await execCommand('find ./dist/electron/mac/**.app/Contents/MacOS/BPMN**');
+  return result
+    .substr(2)
+    .replace(/[\s]/gm, '\\ ')
+    .replace(/[(]/gm, '\\(')
+    .replace(/[)]/gm, '\\)')
+    .trim()
+    .slice(0, -1);
 }
 
 async function execCommand(command) {
