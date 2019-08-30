@@ -147,7 +147,6 @@
     "text": "github:requirejs/text#latest",
     "through2": "^2.0.1",
     "toastr": "^2.1.4",
-    "ts-node": "^8.3.0",
     "typescript": "^3.5.3",
     "uglify-js": "^3.6.0",
     "velocity-animate": "^1.5.2",
