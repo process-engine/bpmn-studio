@@ -79,9 +79,7 @@ export class TestClient {
     await this.ensureVisible(`.solution-entry__solution-name=${dir}`);
 
     if (diagramName) {
-      const isWindows = process.platform === 'win32';
-
-      const searchString = isWindows ? `${pathToSolution}\\${diagramName}` : `${pathToSolution}/${diagramName}`;
+      const searchString = this.getSearchString(pathToSolution, diagramName);
       await this.clickOn(`[data-test-diagram-uri*="${searchString}"]`);
     }
   }
@@ -325,5 +323,17 @@ export class TestClient {
         return resolve(stdin);
       });
     });
+  }
+
+  private getSearchString(pathToSolution: string, diagramName: string): string {
+    const isWindows = process.platform === 'win32';
+    if (isWindows) {
+      const searchString: string = `${pathToSolution}\\${diagramName}`;
+      const replacedSearchString = searchString.replace(/[\\]/gm, '\\\\');
+
+      return replacedSearchString;
+    }
+
+    return `${pathToSolution}/${diagramName}`;
   }
 }
