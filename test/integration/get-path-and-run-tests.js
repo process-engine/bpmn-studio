@@ -30,24 +30,15 @@ async function execCommand(command) {
 }
 
 async function runTests() {
-  let pathToStudio = await getBuildedStudioPath();
-  pathToStudio = pathToStudio
-    .substr(2)
-    .replace(/[\s]/gm, '\\ ')
-    .replace(/[(]/gm, '\\(')
-    .replace(/[)]/gm, '\\)')
-    .trim();
+  const pathToStudio = await getBuildedStudioPath();
 
-  exec(
-    `SPECTRON_APP_PATH=${pathToStudio.substr(0, pathToStudio.length - 1)} npm run test-electron-macos`,
-    (err, stdout, stderr) => {
-      if (err || stderr) {
-        console.error(err, stderr);
-      }
+  exec(`cross-env SPECTRON_APP_PATH=${pathToStudio} npm run test-electron-macos`, (err, stdout, stderr) => {
+    if (err || stderr) {
+      console.error(err, stderr);
+    }
 
-      console.log(stdout);
-    },
-  );
+    console.log(stdout);
+  });
 }
 
 runTests();
