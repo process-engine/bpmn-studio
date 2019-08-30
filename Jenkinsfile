@@ -64,7 +64,7 @@ pipeline {
               sh('npm run electron-build-macos')
             }
 
-            sh('SPECTRON_APP_PATH=dist/electron/mac/BPMN\ Studio\ \(Beta\).app/Contents/MacOS/BPMN\ Studio\ \(Beta\) npm run test-electron-macos')
+            sh('SPECTRON_APP_PATH=dist/electron/mac/BPMN Studio \(Beta\).app/Contents/MacOS/BPMN Studio \(Beta\) npm run test-electron-macos')
 
             stash(includes: 'dist/electron/*.*, dist/electron/mac/*', excludes: 'electron-builder-effective-config.yaml', name: 'macos_electron_results')
           }
