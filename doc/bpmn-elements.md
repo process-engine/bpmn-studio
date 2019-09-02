@@ -39,7 +39,7 @@ Wartet auf das Eintreffen eine Message, die durch einen SendTask verschickt wurd
 
 <img src="./bpmn-elements-svg/scripttask.svg">
 
-Führt JavaScript aus.
+Führt JavaScript Code Snippets aus.
 
 ### ServiceTask
 
