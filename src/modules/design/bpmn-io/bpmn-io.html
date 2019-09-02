@@ -26,7 +26,7 @@
         <div else class="modeler__diagram" id="bpmnIoDiagram">
           <div ref="canvasModel" class="canvasModel"></div>
 
-          <div class="linter-toggle">
+          <div if.bind="linterIsActive" class="linter-toggle">
             <button class.bind="diagramIsInvalid ? 'linter-toggle__button linter-toggle__button--invalid-diagram' : 'linter-toggle__button'"
                     css.bind="showLinter || diagramIsInvalid? 'opacity: 1;' : ''"
                     title.bind="showLinter ? 'Hide Linter' : 'Show Linter'"
