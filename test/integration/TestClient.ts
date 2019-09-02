@@ -7,6 +7,7 @@ import {exec} from 'child_process';
 
 import {Application} from 'spectron';
 import assert from 'assert';
+import {IIdentity} from '@essential-projects/iam_contracts';
 
 function getUserConfigFolder(): string {
   const userHomeDir = os.homedir();
@@ -65,9 +66,6 @@ export class TestClient {
 
   public async openDirectoryAsSolution(dir: string, diagramName?: string): Promise<void> {
     const pathToSolution: string = path.join(__dirname, '..', '..', dir);
-    const identity = {
-      token: 'ZHVtbXlfdG9rZW4=',
-    };
 
     await this.webdriverClient.executeAsync(
       async (solutionPath, solutionIdentity, done) => {
@@ -77,7 +75,7 @@ export class TestClient {
         done();
       },
       pathToSolution,
-      identity,
+      this.getDefaultIdentity(),
     );
 
     await this.ensureVisible(`[data-test-solution-entry-name=${dir}]`);
@@ -297,6 +295,15 @@ export class TestClient {
 
   public async pause(timeInMilliseconds: number): Promise<void> {
     await new Promise((c: any): any => setTimeout(c, timeInMilliseconds));
+  }
+
+  private getDefaultIdentity(): IIdentity {
+    const identity = {
+      token: 'ZHVtbXlfdG9rZW4=',
+      userId: '',
+    };
+
+    return identity;
   }
 
   private get webdriverClient(): any {
