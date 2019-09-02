@@ -525,6 +525,7 @@ export class SolutionExplorerSolution {
 
     const updateDiagramState: Function = () => {
       diagramState.metadata.isChanged = this.isActiveDiagramChanged;
+
       this.openDiagramStateService.updateDiagramState(diagramUri, diagramState);
     };
 
