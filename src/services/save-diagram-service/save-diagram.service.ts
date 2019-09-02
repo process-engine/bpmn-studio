@@ -47,7 +47,7 @@ export class SaveDiagramService {
   /**
    * Saves the current diagram.
    */
-  public async saveDiagram(solutionToSaveTo: ISolutionEntry, activeDiagram: IDiagram, xml: string): Promise<void> {
+  public async saveDiagram(solutionToSaveTo: ISolutionEntry, diagramToSave: IDiagram, xml: string): Promise<void> {
     if (this.isSaving) {
       return;
     }
@@ -62,24 +62,24 @@ export class SaveDiagramService {
       return;
     }
 
-    const diagramIsUnsavedDiagram: boolean = activeDiagram.uri.startsWith('about:open-diagrams');
+    const diagramIsUnsavedDiagram: boolean = diagramToSave.uri.startsWith('about:open-diagrams');
     if (diagramIsUnsavedDiagram) {
       this.isSaving = false;
 
-      await this.saveDiagramAs(solutionToSaveTo, activeDiagram, xml);
+      await this.saveDiagramAs(solutionToSaveTo, diagramToSave, xml);
 
       return;
     }
 
     try {
-      activeDiagram.xml = xml;
+      diagramToSave.xml = xml;
 
-      this.openDiagramStateService.setDiagramChange(activeDiagram.uri, {
+      this.openDiagramStateService.setDiagramChange(diagramToSave.uri, {
         change: 'save',
         xml: xml,
       });
 
-      await solutionToSaveTo.service.saveDiagram(activeDiagram);
+      await solutionToSaveTo.service.saveDiagram(diagramToSave);
 
       this.eventAggregator.publish(environment.events.navBar.diagramChangesResolved);
     } catch (error) {
@@ -95,11 +95,11 @@ export class SaveDiagramService {
 
   public async saveDiagramAs(
     solutionToSaveTo: ISolutionEntry,
-    activeDiagram: IDiagram,
+    diagramToSave: IDiagram,
     xml: string,
     path?: string,
   ): Promise<void> {
-    const isRemoteSolution: boolean = activeDiagram.uri.startsWith('http');
+    const isRemoteSolution: boolean = diagramToSave.uri.startsWith('http');
     if (isRemoteSolution || this.isSaving) {
       return;
     }
@@ -109,7 +109,7 @@ export class SaveDiagramService {
     const pathIsSet: boolean = path !== undefined;
     const pathToSaveTo: string = pathIsSet ? path : await this.getPathToSaveTo();
 
-    const diagramIsUnsaved: boolean = activeDiagram.uri.startsWith('about:open-diagrams');
+    const diagramIsUnsaved: boolean = diagramToSave.uri.startsWith('about:open-diagrams');
     if (diagramIsUnsaved) {
       const lastIndexOfSlash: number = pathToSaveTo.lastIndexOf('/');
       const lastIndexOfBackSlash: number = pathToSaveTo.lastIndexOf('\\');
@@ -117,15 +117,15 @@ export class SaveDiagramService {
 
       const filename: string = pathToSaveTo.slice(indexBeforeFilename, pathToSaveTo.length).replace('.bpmn', '');
 
-      const temporaryDiagramName: string = activeDiagram.uri.replace('about:open-diagrams/', '').replace('.bpmn', '');
+      const temporaryDiagramName: string = diagramToSave.uri.replace('about:open-diagrams/', '').replace('.bpmn', '');
 
       xml = xml.replace(new RegExp(temporaryDiagramName, 'g'), filename);
     }
 
     const diagram: IDiagram = {
-      name: activeDiagram.name,
-      id: activeDiagram.id,
-      uri: activeDiagram.uri,
+      name: diagramToSave.name,
+      id: diagramToSave.id,
+      uri: diagramToSave.uri,
       xml: xml,
     };
 
@@ -155,26 +155,26 @@ export class SaveDiagramService {
       throw error;
     }
 
-    await this.openDiagramService.closeDiagram(activeDiagram);
-    this.solutionService.removeOpenDiagramByUri(activeDiagram.uri);
+    await this.openDiagramService.closeDiagram(diagramToSave);
+    this.solutionService.removeOpenDiagramByUri(diagramToSave.uri);
 
     try {
-      activeDiagram = await this.openDiagramService.openDiagram(pathToSaveTo, solutionToSaveTo.identity);
-      this.solutionService.addOpenDiagram(activeDiagram);
+      diagramToSave = await this.openDiagramService.openDiagram(pathToSaveTo, solutionToSaveTo.identity);
+      this.solutionService.addOpenDiagram(diagramToSave);
     } catch {
       const alreadyOpenedDiagram: IDiagram = await this.openDiagramService.getOpenedDiagramByURI(pathToSaveTo);
 
       await this.openDiagramService.closeDiagram(alreadyOpenedDiagram);
 
-      activeDiagram = await this.openDiagramService.openDiagram(pathToSaveTo, solutionToSaveTo.identity);
+      diagramToSave = await this.openDiagramService.openDiagram(pathToSaveTo, solutionToSaveTo.identity);
     }
 
-    xml = activeDiagram.xml;
+    xml = diagramToSave.xml;
     solutionToSaveTo = this.solutionService.getSolutionEntryForUri('about:open-diagrams');
 
     await this.router.navigateToRoute('design', {
-      diagramName: activeDiagram.name,
-      diagramUri: activeDiagram.uri,
+      diagramName: diagramToSave.name,
+      diagramUri: diagramToSave.uri,
       solutionUri: solutionToSaveTo.uri,
     });
 
