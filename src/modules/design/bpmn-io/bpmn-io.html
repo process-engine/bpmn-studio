@@ -20,11 +20,11 @@
     -->
     <div class="bpmn-io-layout__main js-main">
       <div class="modeler">
-        <div if.bind="solutionIsRemote" class="modeler__diagram" id="bpmnIoDiagram">
-          <div ref="canvasModel" class="canvasModel"></div>
+        <div if.bind="solutionIsRemote" class="modeler__diagram">
+          <div ref="canvasModel" class="canvasModel" data-test-canvas-model></div>
         </div>
-        <div else class="modeler__diagram" id="bpmnIoDiagram">
-          <div ref="canvasModel" class="canvasModel"></div>
+        <div else class="modeler__diagram">
+          <div ref="canvasModel" class="canvasModel" data-test-canvas-model></div>
 
           <div if.bind="linterIsActive" class="linter-toggle">
             <button class.bind="diagramIsInvalid ? 'linter-toggle__button linter-toggle__button--invalid-diagram' : 'linter-toggle__button'"

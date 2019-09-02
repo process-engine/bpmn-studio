@@ -235,6 +235,26 @@ export class TestClient {
     return this.openView('');
   }
 
+  public async assertCanvasModelIsVisible(): Promise<void> {
+    const canvasModelIsVisible = await this.webdriverClient.isVisible('[data-test-canvas-model]');
+    assert.equal(canvasModelIsVisible, true);
+  }
+
+  public async assertXmlViewHasContent(): Promise<void> {
+    const xmlViewContent = await this.getTextFromElement('[data-test-xml-view-content]');
+    assert.notEqual(xmlViewContent, null);
+  }
+
+  public async assertDiffViewHasRenderedAllContainer(): Promise<void> {
+    const leftDiffViewContainerIsVisible = await this.webdriverClient.isVisible('[data-test-left-diff-view]');
+    const rightDiffViewContainerIsVisible = await this.webdriverClient.isVisible('[data-test-right-diff-view]');
+    const lowerDiffViewContainerIsVisible = await this.webdriverClient.isVisible('[data-test-lower-diff-view]');
+
+    assert.equal(leftDiffViewContainerIsVisible, true);
+    assert.equal(rightDiffViewContainerIsVisible, true);
+    assert.equal(lowerDiffViewContainerIsVisible, true);
+  }
+
   public async openDesignViewForDiagram(diagramName: string, diagramUri: string, solutionUri?: string): Promise<void> {
     await this.openDesignView('detail', diagramName, diagramUri, solutionUri);
     await this.ensureVisible('[data-test-diagram-detail]');

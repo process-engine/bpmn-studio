@@ -2,19 +2,19 @@
   <require from="@process-engine/bpmn-js-custom-bundle/bpmn-modeler-custom.css"></require>
   <require from="./bpmn-diff-view.css"></require>
   <div class="diff-view">
-    <div class="left-diff-view">
+    <div class="left-diff-view" data-test-left-diff-view>
       <div ref="leftCanvasModel" class="left-diff-view__canvasModel"></div>
       <span class="diff-canvas-title">
         <p class="diff-mode">${currentXmlIdentifier}</p>
       </span>
     </div>
-    <div class="right-diff-view">
+    <div class="right-diff-view" data-test-right-diff-view>
       <div ref="rightCanvasModel" class="right-diff-view__canvasModel"></div>
       <span class="diff-canvas-title">
         <p class="diff-mode">${previousXmlIdentifier}</p>
       </span>
     </div>
-    <div class="lower-diff-view">
+    <div class="lower-diff-view" data-test-lower-diff-view>
       <div ref="lowerCanvasModel" class="lower-diff-view__canvasModel"></div>
       <div class="diff-legend">
         <span class="diff-legend-entry diff-legend-entry-first">Legend:</span>
