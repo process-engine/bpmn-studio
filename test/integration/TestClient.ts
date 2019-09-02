@@ -190,13 +190,13 @@ export class TestClient {
   }
 
   public async assertSelectedBpmnElementHasName(name): Promise<void> {
-    const selectedElementText = await this.getValueFromElement('[data-test-pp-element-name]');
+    const selectedElementText = await this.getValueFromElement('[data-test-property-panel-element-name]');
 
     assert.equal(selectedElementText, name);
   }
 
   public async rejectSelectedBpmnElementHasName(name): Promise<void> {
-    const selectedElementText = await this.getValueFromElement('[data-test-pp-element-name]');
+    const selectedElementText = await this.getValueFromElement('[data-test-property-panel-element-name]');
 
     assert.notEqual(selectedElementText, name);
   }
