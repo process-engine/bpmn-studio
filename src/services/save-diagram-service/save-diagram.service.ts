@@ -91,6 +91,10 @@ export class SaveDiagramService {
 
       throw error;
     }
+
+    setTimeout(() => {
+      this.isSaving = false;
+    }, 500);
   }
 
   public async saveDiagramAs(
