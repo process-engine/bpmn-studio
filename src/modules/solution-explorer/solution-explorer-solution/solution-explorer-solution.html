@@ -98,5 +98,15 @@
       <button type="button" class="btn btn-primary" data-dismiss="modal" id="saveButtonCloseView">Save</button>
     </template>
   </modal>
+  <modal if.bind="isSavingDiagrams"
+         body-style="min-height: 230px"
+         header-text="Saving Diagrams">
+    <template replace-part="modal-body">
+      <div class="saving-diagram-modal__loading-spinner">
+        <img class="saving-diagram-modal__loading-spinner-icon" src="src/resources/images/gears.svg">
+        <h3 class="saving-diagram-modal__loading-spinner-text">Saving "${currentlySavingDiagramName}"...</h3>
+        </div>
+    </template>
+  </modal>
 
 </template>

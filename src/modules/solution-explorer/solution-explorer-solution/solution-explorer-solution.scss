@@ -152,3 +152,27 @@
 .diagram-contextmenu__entry:hover {
   background-color: #dcdbdb;
 }
+
+.saving-diagram-modal__loading-spinner {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.saving-diagram-modal__loading-spinner-icon {
+  position: absolute;
+  left: 50%;
+  top: calc(50% - 22px);
+  height: 150px;
+  transform: translate(-50%, -50%);
+}
+
+.saving-diagram-modal__loading-spinner-text {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 5px;
+  bottom: 10px;
+}

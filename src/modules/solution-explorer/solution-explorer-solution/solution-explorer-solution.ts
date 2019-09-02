@@ -74,6 +74,9 @@ export class SolutionExplorerSolution {
   public deleteDiagramModal: DeleteDiagramModal;
   public processEngineRunning: boolean = false;
 
+  public isSavingDiagrams: boolean = false;
+  public currentlySavingDiagramName: string = '';
+
   private router: Router;
   private eventAggregator: EventAggregator;
   private validationController: ValidationController;
@@ -815,9 +818,25 @@ export class SolutionExplorerSolution {
   }
 
   private async saveAllUnsavedDiagrams(): Promise<void> {
+    if (this.isSavingDiagrams) {
+      return;
+    }
+
+    this.isSavingDiagrams = true;
+
     const diagramStateList: IDiagramStateList = this.openDiagramStateService.loadDiagramStateForAllDiagrams();
 
     for (const diagramStateListEntry of diagramStateList) {
+      const isActiveDiagram: boolean =
+        this.activeDiagram !== undefined && this.activeDiagram.uri === diagramStateListEntry.uri;
+      if (isActiveDiagram) {
+        this.currentlySavingDiagramName = this.activeDiagram.name;
+        await this.saveActiveDiagram();
+        await this.waitForSaving();
+
+        continue;
+      }
+
       const diagramToSave: IDiagram = this.openedDiagrams.find((diagram: IDiagram) => {
         return diagram.uri === diagramStateListEntry.uri;
       });
@@ -826,6 +845,8 @@ export class SolutionExplorerSolution {
       if (diagramNotFound) {
         return;
       }
+
+      this.currentlySavingDiagramName = diagramToSave.name;
 
       diagramToSave.xml = diagramStateListEntry.diagramState.data.xml;
 
@@ -839,9 +860,22 @@ export class SolutionExplorerSolution {
 
       await this.waitForSaving();
     }
+
+    this.isSavingDiagrams = false;
+    this.currentlySavingDiagramName = '';
   }
 
-  private wait500ms(): Promise<void> {
+  private saveActiveDiagram(): Promise<void> {
+    return new Promise((resolve: Function) => {
+      this.eventAggregator.subscribeOnce(environment.events.diagramDetail.saveDiagramDone, () => {
+        resolve();
+      });
+
+      this.eventAggregator.publish(environment.events.diagramDetail.saveDiagram);
+    });
+  }
+
+  private waitForSaving(): Promise<void> {
     return new Promise((resolve: Function) => {
       setTimeout(() => {
         resolve();
