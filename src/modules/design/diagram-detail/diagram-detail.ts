@@ -101,7 +101,7 @@ export class DiagramDetail {
     this.openDiagramStateService = openDiagramStateService;
 
     // eslint-disable-next-line no-underscore-dangle
-    (window as any).__dangerousInvoke['saveDiagramAs'] = (path: string): void => {
+    (window as any).__dangerouslyInvoke['saveDiagramAs'] = (path: string): void => {
       this.saveDiagramAs(path);
     };
   }

@@ -82,7 +82,7 @@ export class SolutionExplorerList {
     }
 
     // eslint-disable-next-line no-underscore-dangle
-    (window as any).__dangerousInvoke['openSolution'] = (
+    (window as any).__dangerouslyInvoke['openSolution'] = (
       uri: string,
       insertAtBeginning?: boolean,
       identity?: IIdentity,
