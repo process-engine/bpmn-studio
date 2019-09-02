@@ -867,7 +867,7 @@ export class SolutionExplorerSolution {
   }
 
   private saveActiveDiagram(): Promise<void> {
-    return new Promise((resolve: Function) => {
+    return new Promise((resolve: Function): void => {
       this.eventAggregator.subscribeOnce(environment.events.diagramDetail.saveDiagramDone, () => {
         resolve();
       });
@@ -877,7 +877,7 @@ export class SolutionExplorerSolution {
   }
 
   private waitForSaving(): Promise<void> {
-    return new Promise((resolve: Function) => {
+    return new Promise((resolve: Function): void => {
       setTimeout(() => {
         resolve();
       }, 550);

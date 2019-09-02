@@ -130,7 +130,6 @@ export class Design {
         this.ipcRenderer.send('menu_show-all-menu-entries');
       }
 
-      const diagramNameIsSet: boolean = routeParameters.diagramName !== undefined;
       if (diagramNameIsSet) {
         await this.setActiveDiagram(routeParameters.diagramName, routeParameters.diagramUri);
       }
