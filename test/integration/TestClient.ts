@@ -81,7 +81,7 @@ export class TestClient {
     await this.ensureVisible(`[data-test-solution-entry-name=${dir}]`);
 
     if (diagramName) {
-      const searchString = this.getSearchString(pathToSolution, diagramName);
+      const searchString = this.getUriForSelector(pathToSolution, diagramName);
       await this.ensureVisible(`[data-test-open-diagram-with-uri*="${searchString}"]`);
       await this.clickOn(`[data-test-open-diagram-with-uri*="${searchString}"]`);
     }
@@ -359,7 +359,7 @@ export class TestClient {
     });
   }
 
-  private getSearchString(pathToSolution: string, diagramName: string): string {
+  private getUriForSelector(pathToSolution: string, diagramName: string): string {
     const isWindows = process.platform === 'win32';
     if (isWindows) {
       const searchString: string = `${pathToSolution}\\${diagramName}`;
