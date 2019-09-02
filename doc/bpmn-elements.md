@@ -33,7 +33,7 @@ Die Ausführung wird pausiert, bis der SendTask eine Empfangsbestätigung von ei
 
 <img src="./bpmn-elements-svg/receivetask.svg">
 
-Empfängt eine Message.
+Wartet auf das Eintreffen eine Message, die durch einen SendTask verschickt wurde.
 
 ### ScriptTask
 
