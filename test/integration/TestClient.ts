@@ -96,7 +96,7 @@ export class TestClient {
   }
 
   public async startProcess(): Promise<void> {
-    await this.clickOn('[data-test-diagram-start-button]');
+    await this.clickOn('[data-test-start-diagram-button]');
     await this.ensureVisible('.live-execution-tracker');
   }
 
@@ -106,7 +106,7 @@ export class TestClient {
   }
 
   public async deployDiagram(): Promise<void> {
-    await this.clickOn('[data-test-diagram-deploy-button]');
+    await this.clickOn('[data-test-deploy-diagram-buttonn]');
   }
 
   public async clearDatabase(): Promise<void> {
