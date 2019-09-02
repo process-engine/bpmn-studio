@@ -100,7 +100,7 @@ export class TestClient {
   }
 
   public async stopProcess(): Promise<void> {
-    await this.ensureVisible('[data-test-stop-diagram-button]');
+    await this.ensureVisible('[data-test-stop-process-button]');
     await this.clickOn('[data-test-stop-process-button]');
     await this.ensureNotVisible('[data-test-stop-process-button]');
   }
