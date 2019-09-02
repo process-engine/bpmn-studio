@@ -26,7 +26,8 @@ Im Gegensatz zu ManualTask und UserTask, stellt dies keine Aktiviität dar, sond
 
 <img src="./bpmn-elements-svg/sendtask.svg">
 
-Sendet eine vorher definierte Message an die ProcessEngine.
+Verschickt eine vordefinierte Message.
+Die Ausführung wird pausiert, bis der SendTask eine Empfangsbestätigung von einem ReceiveTask erhalten hat.
 
 ### ReceiveTask
 
