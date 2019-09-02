@@ -57,7 +57,6 @@ export class TestClient {
     await this.ensureVisible('[data-test-toggle-solution-explorer]');
     await this.clickOn('[data-test-toggle-solution-explorer]');
     await this.ensureNotVisible('solution-explorer-panel');
-    // solution-explorer-panel
   }
 
   public async assertInternalProcessEngineHasStarted(): Promise<void> {
