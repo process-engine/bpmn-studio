@@ -90,7 +90,7 @@ export class TestClient {
 
     if (diagramName) {
       const searchString = this.getSearchString(pathToSolution, diagramName);
-      await this.clickOn(`[data-test-diagram-uri*="${searchString}"]`);
+      await this.clickOn(`[data-test-open-diagram-with-uri*="${searchString}"]`);
     }
   }
 
