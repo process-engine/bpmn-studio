@@ -37,18 +37,18 @@ export class TestClient {
   }
 
   public async showSolutionExplorer(): Promise<void> {
-    const solutionExplorerIsVisible = await this.webdriverClient.isVisible('solution-explorer-panel');
+    const solutionExplorerIsVisible = await this.webdriverClient.isVisible('[data-test-solution-explorer-panel]');
     if (solutionExplorerIsVisible) {
       return;
     }
 
     await this.ensureVisible('[data-test-toggle-solution-explorer]');
     await this.clickOn('[data-test-toggle-solution-explorer]');
-    await this.ensureVisible('solution-explorer-panel');
+    await this.ensureVisible('[data-test-solution-explorer-panel]');
   }
 
   public async hideSolutionExplorer(): Promise<void> {
-    const solutionExplorerIsVisible = await this.webdriverClient.isVisible('solution-explorer-panel');
+    const solutionExplorerIsVisible = await this.webdriverClient.isVisible('[data-test-solution-explorer-panel]');
     const solutionExplorerIsHidden = !solutionExplorerIsVisible;
     if (solutionExplorerIsHidden) {
       return;
@@ -56,7 +56,7 @@ export class TestClient {
 
     await this.ensureVisible('[data-test-toggle-solution-explorer]');
     await this.clickOn('[data-test-toggle-solution-explorer]');
-    await this.ensureNotVisible('solution-explorer-panel');
+    await this.ensureNotVisible('[data-test-solution-explorer-panel]');
   }
 
   public async assertInternalProcessEngineIsOpenedAsSolution(): Promise<void> {
@@ -152,14 +152,14 @@ export class TestClient {
   public async openDesignViewFromStatusbar(): Promise<void> {
     await this.ensureVisible('[data-test-status-bar-disable-xml-view-button]');
     await this.clickOn('[data-test-status-bar-disable-xml-view-button]');
-    await this.ensureVisible('diagram-detail');
+    await this.ensureVisible('[data-test-diagram-detail]');
   }
 
   // openXMLViewForCurrentDiagram?
   public async openXmlViewFromStatusbar(): Promise<void> {
     await this.ensureVisible('[data-test-status-bar-xml-view-button]');
     await this.clickOn('[data-test-status-bar-xml-view-button]');
-    await this.ensureVisible('bpmn-xml-view');
+    await this.ensureVisible('[data-test-bpmn-xml-view]');
   }
 
   public async clickOnBpmnElementWithName(name): Promise<void> {
@@ -226,17 +226,17 @@ export class TestClient {
 
   public async openDesignViewForDiagram(diagramName: string, diagramUri: string, solutionUri?: string): Promise<void> {
     await this.openDesignView('detail', diagramName, diagramUri, solutionUri);
-    await this.ensureVisible('diagram-detail');
+    await this.ensureVisible('[data-test-diagram-detail]');
   }
 
   public async openXmlViewForDiagram(diagramName: string, diagramUri: string, solutionUri?: string): Promise<void> {
     await this.openDesignView('xml', diagramName, diagramUri, solutionUri);
-    await this.ensureVisible('bpmn-xml-view');
+    await this.ensureVisible('[data-test-bpmn-xml-view]');
   }
 
   public async openDiffViewForDiagram(diagramName: string, diagramUri: string, solutionUri?: string): Promise<void> {
     await this.openDesignView('diff', diagramName, diagramUri, solutionUri);
-    await this.ensureVisible('bpmn-diff-view');
+    await this.ensureVisible('[data-test-bpmn-diff-view]');
   }
 
   public async openThinkView(diagramName?: string, diagramUri?: string, solutionUri?: string): Promise<void> {
