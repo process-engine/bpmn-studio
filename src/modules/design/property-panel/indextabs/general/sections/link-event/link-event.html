@@ -1,0 +1,17 @@
+<template>
+  <require from="./link-event.css"></require>
+  <require from="../../../../styles/sections.css"></require>
+  <div class="section-panel">
+    <div class="panel__heading">Link Event</div>
+    <div class="panel__content">
+      <table class="props-table">
+        <tr>
+          <th>Link Name</th>
+          <td>
+            <input type="text" class="props-input" value.bind="linkEventName & updateTrigger:'blur':'paste'" disabled.bind="!isEditable">
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</template>
