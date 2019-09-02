@@ -1,12 +1,12 @@
-import {Application} from 'spectron';
 import path from 'path';
 
+import {AppConstructorOptions} from 'spectron';
 import {TestClient} from './TestClient';
 
 const isWindows = process.platform === 'win32';
 const applicationArgs = getApplicationArgs(process.env.SPECTRON_APP_PATH);
 
-function getApplicationArgs(givenPath: string | null): any {
+function getApplicationArgs(givenPath: string | null): AppConstructorOptions {
   const commonArgs = {
     requireName: 'nodeRequire',
     env: {
@@ -37,7 +37,6 @@ async function createAndOpenDiagram(): Promise<void> {
   await testClient.createAndOpenNewDiagram();
 }
 
-let app: Application;
 let testClient: TestClient;
 
 let creatingFirstDiagram: boolean = true;
@@ -47,17 +46,16 @@ describe('Application launch', function foo() {
   this.timeout(15000);
 
   beforeEach(async () => {
-    app = new Application(applicationArgs);
-    testClient = new TestClient(app);
+    testClient = new TestClient(applicationArgs);
 
     creatingFirstDiagram = true;
-    await app.start();
+    await testClient.startSpectronApp();
     await testClient.awaitReadyness();
   });
 
   afterEach(async () => {
-    if (app && app.isRunning()) {
-      await app.stop();
+    if (await testClient.isSpectronAppRunning()) {
+      await testClient.stopSpectronApp();
       return testClient.clearDatabase();
     }
     return null;
@@ -68,7 +66,7 @@ describe('Application launch', function foo() {
   });
 
   it('should start the application', async () => {
-    await app.client.waitUntilTextExists('h3', 'Welcome');
+    await testClient.elementHasText('h3', 'Welcome');
 
     await testClient.assertWindowTitleIs('Start Page | BPMN Studio');
   });

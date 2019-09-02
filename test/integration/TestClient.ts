@@ -5,7 +5,7 @@ import fs from 'fs';
 import os from 'os';
 import {exec} from 'child_process';
 
-import {Application} from 'spectron';
+import {AppConstructorOptions, Application} from 'spectron';
 import assert from 'assert';
 import {IIdentity} from '@essential-projects/iam_contracts';
 
@@ -28,8 +28,8 @@ const SAVE_DIAGRAM_DIR = path.join(getUserConfigFolder(), 'bpmn-studio-tests', '
 export class TestClient {
   private app: Application;
 
-  constructor(app: Application) {
-    this.app = app;
+  constructor(applicationArgs: AppConstructorOptions) {
+    this.app = new Application(applicationArgs);
   }
 
   public async awaitReadyness(): Promise<void> {
@@ -302,7 +302,19 @@ export class TestClient {
   }
 
   public async pause(timeInMilliseconds: number): Promise<void> {
-    await new Promise((c: any): any => setTimeout(c, timeInMilliseconds));
+    await new Promise((c: Function): any => setTimeout(c, timeInMilliseconds));
+  }
+
+  public async startSpectronApp(): Promise<Application> {
+    return this.app.start();
+  }
+
+  public async isSpectronAppRunning(): Promise<boolean> {
+    return this.app.isRunning();
+  }
+
+  public async stopSpectronApp(): Promise<Application> {
+    return this.app.stop();
   }
 
   private getDefaultIdentity(): IIdentity {
