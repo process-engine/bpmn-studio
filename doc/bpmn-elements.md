@@ -121,6 +121,8 @@ Dient dazu Fehler an einer Activity abzufangen.
 Tritt in der Activity ein Fehler auf, welcher einen passenden Code und/oder einen passenden Namen hat,
 so wird die Prozessausführung über dieses BoundaryEvent geleitet.
 
+Werden Name, Code und Message leer gelassen, wird das BoundaryEvent **alle** Fehler abfangen.
+
 #### SignalBoundaryEvent
 
 <img src="./bpmn-elements-svg/signalboundaryevent.svg">
@@ -261,6 +263,8 @@ Unterstützt aktuell ExternalTasks und Http Tasks.
 
 Führt ein anderes, externes Prozessmodell als Subprozess aus. Das referenzierte Prozessmodell muss auf der ProcessEngine deployed sein.
 Der Task wird so lange pausiert, bis der referenzierte Prozess abgeschlossen wurde.
+
+Wird der referenzierte Prozess mit einem Fehler beendet, so wird die Activity ebenfalls mit einem Fehler beendet.
 
 ### SubProcess
 
