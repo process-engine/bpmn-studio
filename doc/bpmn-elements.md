@@ -20,7 +20,7 @@ dann den Task bestätigen muss.
 <img src="./bpmn-elements-svg/emptyactivity.svg">
 
 Pausiert die Prozessausführung, bis der Benutzer sie manuell fortsetzt.
-Es wird gewartet bis der Benutzer die Ausführung weiterführt.
+Im Gegensatz zu ManualTask und UserTask, stellt dies keine Aktiviität dar, sondern ist eine einfache, untypisierte Pausierung des Prozesses.
 
 ### SendTask
 
