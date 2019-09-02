@@ -15,6 +15,7 @@ import {
   IDiagramCreationService,
   IDiagramState,
   IDiagramStateList,
+  IDiagramStateListEntry,
   ISolutionEntry,
   ISolutionService,
   NotificationType,
@@ -825,7 +826,11 @@ export class SolutionExplorerSolution {
 
     this.isSavingDiagrams = true;
 
-    const diagramStateList: IDiagramStateList = this.openDiagramStateService.loadDiagramStateForAllDiagrams();
+    const diagramStateList: IDiagramStateList = this.openDiagramStateService
+      .loadDiagramStateForAllDiagrams()
+      .filter((diagramStateListEntry: IDiagramStateListEntry) => {
+        return diagramStateListEntry.diagramState.metadata.isChanged;
+      });
 
     for (const diagramStateListEntry of diagramStateList) {
       const isActiveDiagram: boolean =
