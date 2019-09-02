@@ -33,10 +33,10 @@
     "jenkins-electron-build-macos": "electron-builder --publish never --macos",
     "jenkins-run-end-to-end-tests": "au e2eDocker",
     "jenkins-start-process-engine": "process-engine",
-    "test": "echo \"We need reliable tests.\"",
+    "test": "npm run test-electron",
     "test-electron-macos": "tsc -p test/ && mocha -r choma dist/test/**/*.spec.js",
     "test-electron-windows": "tsc -p test/ && mocha -r choma dist/test/**/*.spec.js",
-    "jenkins-test-electron": "node test/integration/get-path-and-run-tests.js"
+    "test-electron": "node test/integration/get-path-and-run-tests.js"
   },
   "files": [
     "dist/web",

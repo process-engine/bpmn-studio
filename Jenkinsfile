@@ -64,7 +64,7 @@ pipeline {
               sh('npm run electron-build-macos')
             }
 
-            sh('npm run jenkins-test-electron')
+            sh('npm run test-electron')
 
             stash(includes: 'dist/electron/*.*, dist/electron/mac/*', excludes: 'electron-builder-effective-config.yaml', name: 'macos_electron_results')
           }
@@ -88,7 +88,7 @@ pipeline {
 
             bat('npm run electron-build-windows')
 
-            bat('npm run jenkins-test-electron')
+            bat('npm run test-electron')
 
             stash(includes: 'dist/electron/*.*', excludes: 'electron-builder-effective-config.yaml', name: 'windows_electron_results')
           }
