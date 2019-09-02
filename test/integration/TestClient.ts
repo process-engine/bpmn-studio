@@ -107,11 +107,13 @@ export class TestClient {
   }
 
   public async clearDatabase(): Promise<void> {
-    await this.execCommand(`rm -rf ${DATABASE_PATH.replace(/[\s]/gm, '\\ ')}`);
+    // This RegEx replaces all whitespaces with escaped whitespaces
+    await this.execCommand(`rm -rf ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
   }
 
   public async clearSavedDiagrams(): Promise<void> {
-    await this.execCommand(`rm -rf ${SAVE_DIAGRAM_DIR.replace(/[\s]/gm, '\\ ')}`);
+    // This RegEx replaces all whitespaces with escaped whitespaces
+    await this.execCommand(`rm -rf ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
   }
 
   public async assertDiagramIsOnFileSystem(): Promise<void> {

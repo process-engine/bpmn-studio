@@ -18,9 +18,9 @@ async function getBuiltStudioPath() {
   const result = await execCommand('find ./dist/electron/mac/**.app/Contents/MacOS/BPMN**');
   return result
     .substr(2)
-    .replace(/[\s]/gm, '\\ ')
-    .replace(/[(]/gm, '\\(')
-    .replace(/[)]/gm, '\\)')
+    .replace(/\s/g, '\\ ')
+    .replace(/\(/g, '\\(')
+    .replace(/\)/g, '\\)')
     .trim()
     .slice(0, -1);
 }
