@@ -22,7 +22,7 @@ export class Preferences {
   }
 
   public save(): void {
-    if (this.validJSON()) {
+    if (this.isValidJSON()) {
       const customConfig: object = {};
       const defaultConfig: object = this.userConfigService.getDefaultConfig();
 
@@ -34,18 +34,19 @@ export class Preferences {
       });
 
       window.localStorage.setItem('customUserConfig', JSON.stringify(customConfig));
+    } else {
+      this.notificationService.showNotification(
+        NotificationType.ERROR,
+        'Error:\n The preferences can not be saved! \nNot a valid JSON format!',
+      );
     }
   }
 
-  private validJSON(): boolean {
+  private isValidJSON(): boolean {
     try {
       JSON.parse(this.preferences);
       return true;
     } catch (error) {
-      this.notificationService.showNotification(
-        NotificationType.ERROR,
-        'Error:\n The preferences can not be saved! No valid JSON',
-      );
       return false;
     }
   }

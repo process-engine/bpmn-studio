@@ -3,12 +3,6 @@ const defaultConfig = {
 };
 
 export class UserConfigService {
-  private customConfig: object;
-
-  constructor() {
-    this.customConfig = JSON.parse(window.localStorage.getItem('customUserConfig'));
-  }
-
   public getUserConfig(key: string): any {
     const currentConfig = this.getCurrentConfig();
 
@@ -16,20 +10,24 @@ export class UserConfigService {
   }
 
   public setUserConfig(key: string, value: any): void {
-    this.customConfig = JSON.parse(window.localStorage.getItem('customUserConfig'));
+    let customConfig = JSON.parse(window.localStorage.getItem('customUserConfig'));
 
-    if (!this.customConfig) {
-      this.customConfig = {};
+    if (!customConfig) {
+      customConfig = {};
     }
 
-    this.customConfig[key] = value;
-    window.localStorage.setItem('customUserConfig', JSON.stringify(this.customConfig));
+    customConfig[key] = value;
+    window.localStorage.setItem('customUserConfig', JSON.stringify(customConfig));
+  }
+
+  public persistUserConfig(userConfig: object): void {
+    window.localStorage.setItem('customUserConfig', JSON.stringify(userConfig));
   }
 
   public getCurrentConfig(): object {
-    this.customConfig = JSON.parse(window.localStorage.getItem('customUserConfig'));
+    const customConfig = JSON.parse(window.localStorage.getItem('customUserConfig'));
 
-    return Object.assign({}, defaultConfig, this.customConfig);
+    return Object.assign({}, defaultConfig, customConfig);
   }
 
   public getDefaultConfig(): object {
