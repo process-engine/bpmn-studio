@@ -107,6 +107,7 @@ Pausiert die Prozessausführung, bis eine vordefinierte Message empfangen wurde.
 <img src="./bpmn-elements-svg/messagethrowevent.svg">
 
 Schickt eine vordefinierte Message aus und führt den Prozess ohne Unterbrechung weiter.
+
 Anders als beim SendTask, wird hier nicht auf eine Empfangsbestätigung gewartet ("Fire and forget").
 
 ### BoundaryEvents
@@ -153,7 +154,7 @@ Der Pfad, der von der Activity aus geht, wird dann **nicht** weiter fortgesetzt.
 
 Führt den angehangenen Prozesspfad aus, sobald ein passendes Signal empfangen wird.
 
-Die Activity, an welcher das Boundaryevent hängt, wird nicht unterbrochen und läuft regulär weiter.
+Die Activity, an welcher das BoundaryEvent hängt, wird nicht unterbrochen und läuft regulär weiter.
 
 #### NonInterruptingMessageBoundaryEvent
 
@@ -161,7 +162,7 @@ Die Activity, an welcher das Boundaryevent hängt, wird nicht unterbrochen und l
 
 Führt den angehangenen Prozesspfad aus, sobald eine passende Message empfangen wird.
 
-Die Activity, an welcher das Boundaryevent hängt, wird nicht unterbrochen und läuft regulär weiter.
+Die Activity, an welcher das BoundaryEvent hängt, wird nicht unterbrochen und läuft regulär weiter.
 
 #### NonInterruptingTimerBoundaryEvent
 
@@ -169,7 +170,7 @@ Die Activity, an welcher das Boundaryevent hängt, wird nicht unterbrochen und l
 
 Führt den angehangenen Prozesspfad aus, sobald der modellierte Timer getriggert wird.
 
-Die Activity, an welcher das Boundaryevent hängt, wird nicht unterbrochen und läuft regulär weiter.
+Die Activity, an welcher das BoundaryEvent hängt, wird nicht unterbrochen und läuft regulär weiter.
 
 ### EndEvents
 
@@ -183,7 +184,7 @@ Der Prozess wird bei erreichen des Events beendet.
 
 Der Prozess wird mit dem modellierten Fehler beendet.
 
-Der Prozess wird dabei auch in der Datenbank als fehlerhaft markiert.
+Ebenfalls wird die zugehörige Prozessinstanz in der Datenbank als fehlerhaft markiert.
 
 #### SignalEndEvent
 
@@ -266,7 +267,7 @@ Der Task wird so lange pausiert, bis der referenzierte Prozess abgeschlossen wur
 <img src="./bpmn-elements-svg/subprocess.svg">
 
 Ein Subprozess, der, anders als eine CallActivity, direkt in das Prozessmodell eingebettet wird.
-Der Task wird so lange pausiert, bis der Subprozess abgeschlossen wurde.
+Tritt in dem Subprozess ein Fehler auf, so wird auch die Activity mit einem Fehler beendet.
 
 ## Artifacts
 
@@ -274,7 +275,7 @@ Der Task wird so lange pausiert, bis der Subprozess abgeschlossen wurde.
 
 <img src="./bpmn-elements-svg/textannotation.svg">
 
-Die TextAnnotation kann benutzt werden, um z.B. Kommentare an eine FlowNode zu knüpfen.
+Die TextAnnotation kann benutzt werden um z.B. Kommentare an eine FlowNode zu knüpfen.
 Für die Heatmap kann man hier ebenfalls eine erwartete Laufzeit anhängen.
 
 Beispiel:
