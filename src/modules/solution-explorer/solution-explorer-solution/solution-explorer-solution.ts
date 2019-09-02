@@ -159,7 +159,7 @@ export class SolutionExplorerSolution {
         }
       }),
 
-      this.eventAggregator.subscribe(environment.events.navBar.diagramChangesResolved, () => {
+      this.eventAggregator.subscribe(environment.events.diagramWasSaved, () => {
         this.isActiveDiagramChanged = false;
         this.bindingSignaler.signal('diagramChanges');
       }),
@@ -889,7 +889,7 @@ export class SolutionExplorerSolution {
       };
 
       const saveFunction: EventListenerOrEventListenerObject = async (): Promise<void> => {
-        this.eventAggregator.subscribeOnce(environment.events.navBar.diagramChangesResolved, async () => {
+        this.eventAggregator.subscribeOnce(environment.events.diagramWasSaved, async () => {
           if (shouldNavigate) {
             await this.navigateBack();
           }

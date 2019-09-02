@@ -88,7 +88,7 @@ export class SaveDiagramService {
         this.openDiagramStateService.updateDiagramState(diagramToSave.uri, diagramState);
       }
 
-      this.eventAggregator.publish(environment.events.navBar.diagramChangesResolved);
+      this.eventAggregator.publish(environment.events.diagramWasSaved, diagramToSave.uri);
     } catch (error) {
       this.notificationService.showNotification(NotificationType.ERROR, `Unable to save the file: ${error}.`);
 
@@ -168,8 +168,6 @@ export class SaveDiagramService {
       } else {
         this.openDiagramStateService.saveDiagramState(path, diagram.xml, undefined, undefined, false);
       }
-
-      this.eventAggregator.publish(environment.events.navBar.diagramChangesResolved);
     } catch (error) {
       this.notificationService.showNotification(NotificationType.ERROR, `Unable to save the file: ${error}.`);
 
@@ -204,7 +202,7 @@ export class SaveDiagramService {
     });
 
     this.eventAggregator.subscribeOnce('router:navigation:success', () => {
-      this.eventAggregator.publish(environment.events.navBar.diagramChangesResolved);
+      this.eventAggregator.publish(environment.events.diagramWasSaved, diagramToSave.uri);
     });
 
     setTimeout(() => {
