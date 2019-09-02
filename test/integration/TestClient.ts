@@ -107,7 +107,7 @@ export class TestClient {
 
   public async deployDiagram(): Promise<void> {
     await this.ensureVisible('[data-test-deploy-diagram-button]');
-    await this.clickOn('[data-test-deploy-diagram-buttonn]');
+    await this.clickOn('[data-test-deploy-diagram-button]');
   }
 
   public async startPageLoaded(): Promise<void> {
