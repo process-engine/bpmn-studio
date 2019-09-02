@@ -19,7 +19,7 @@ dann den Task bestätigen muss.
 
 <img src="./bpmn-elements-svg/emptyactivity.svg">
 
-Der Prozess halt bei der Ausführung an dem Task an.
+Pausiert die Prozessausführung, bis der Benutzer sie manuell fortsetzt.
 Es wird gewartet bis der Benutzer die Ausführung weiterführt.
 
 ### SendTask
