@@ -818,18 +818,14 @@ export class SolutionExplorerSolution {
     const diagramStateList: IDiagramStateList = this.openDiagramStateService.loadDiagramStateForAllDiagrams();
 
     for (const diagramStateListEntry of diagramStateList) {
-      const isActiveDiagram: boolean =
-        this.activeDiagram !== undefined && this.activeDiagram.uri === diagramStateListEntry.uri;
-      if (isActiveDiagram) {
-        await this.saveActiveDiagram();
-        await this.waitForSaving();
-
-        continue;
-      }
-
       const diagramToSave: IDiagram = this.openedDiagrams.find((diagram: IDiagram) => {
         return diagram.uri === diagramStateListEntry.uri;
       });
+
+      const diagramNotFound: boolean = diagramToSave === undefined;
+      if (diagramNotFound) {
+        return;
+      }
 
       diagramToSave.xml = diagramStateListEntry.diagramState.data.xml;
 
@@ -843,16 +839,6 @@ export class SolutionExplorerSolution {
 
       await this.waitForSaving();
     }
-  }
-
-  private saveActiveDiagram(): Promise<void> {
-    return new Promise((resolve: Function) => {
-      this.eventAggregator.subscribeOnce(environment.events.diagramDetail.saveDiagramDone, () => {
-        resolve();
-      });
-
-      this.eventAggregator.publish(environment.events.diagramDetail.saveDiagram);
-    });
   }
 
   private wait500ms(): Promise<void> {
