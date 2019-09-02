@@ -32,6 +32,7 @@ export default {
     differsFromOriginal: 'differsFromOriginal',
     diagramChangedOutsideTheStudio: 'diagramChangedOutsideTheStudio',
     xmlChanged: 'xmlChanged',
+    diagramWasSaved: 'diagramWasSaved',
     deployModals: {
       showSaveBeforeDeployModal: 'deployModals:saveBeforeDeployModal:show',
       showRemoteSolutionSelectionModal: 'deployModals:remoteSolutionSelectionModal:show',
@@ -62,7 +63,6 @@ export default {
       toggleDashboardView: 'navbar:tools:inspectButtons:toggleDashboardView',
       toggleHeatmapView: 'navbar:tools:inspectButtons:toggleHeatmapView',
       toggleInspectCorrelationView: 'navbar:tools:inspectButtons:toggleInspectCorrelationView',
-      diagramChangesResolved: 'navbar:diagram:changesResolved',
       updateActiveSolutionAndDiagram: 'navbar:activeSolution:diagram:update',
     },
     diagramDetail: {

@@ -130,43 +130,12 @@ export class Design {
         this.ipcRenderer.send('menu_show-all-menu-entries');
       }
 
-      const isOpenDiagram: boolean = this.activeSolutionEntry.uri === 'about:open-diagrams';
-
-      if (isOpenDiagram) {
-        const persistedDiagrams: Array<IDiagram> = this.solutionService.getOpenDiagrams();
-
-        const persistedActiveDiagram = persistedDiagrams.find((diagram: IDiagram) => {
-          return (
-            diagram.name === routeParameters.diagramName &&
-            (diagram.uri === routeParameters.diagramUri || routeParameters.diagramUri === undefined)
-          );
-        });
-
-        let savedXml: string;
-        const diagramIsSavedLocally: boolean = !persistedActiveDiagram.uri.startsWith('about:open-diagrams');
-        if (diagramIsSavedLocally && diagramNameIsSet) {
-          try {
-            const uri = persistedActiveDiagram.uri.substring(0, persistedActiveDiagram.uri.lastIndexOf('/'));
-
-            const solutionEntry: ISolutionEntry = this.solutionService.getSolutionEntryForUri(uri);
-            const diagramFromSolution: IDiagram = await solutionEntry.service.loadDiagram(routeParameters.diagramName);
-            savedXml = diagramFromSolution.xml;
-          } catch {
-            savedXml = fs.readFileSync(persistedActiveDiagram.uri, 'utf8');
-          }
-        }
-
-        persistedActiveDiagram.xml = savedXml !== undefined ? savedXml : persistedActiveDiagram.xml;
-
-        this.activeDiagram = persistedActiveDiagram;
-      } else {
-        this.activeDiagram = diagramNameIsSet
-          ? await this.activeSolutionEntry.service.loadDiagram(routeParameters.diagramName)
-          : undefined;
+      const diagramNameIsSet: boolean = routeParameters.diagramName !== undefined;
+      if (diagramNameIsSet) {
+        await this.setActiveDiagram(routeParameters.diagramName, routeParameters.diagramUri);
       }
 
       const diagramNotFound: boolean = this.activeDiagram === undefined;
-
       if (diagramNotFound) {
         this.router.navigateToRoute('start-page');
         this.notificationService.showNotification(NotificationType.INFO, 'Diagram could not be opened!');
@@ -383,6 +352,37 @@ export class Design {
 
   public get diagramHasChanged(): boolean {
     return this.diagramDetail.diagramHasChanged;
+  }
+
+  private async setActiveDiagram(diagramName: string, diagramUri: string): Promise<void> {
+    const isOpenDiagram: boolean = this.activeSolutionEntry.uri === 'about:open-diagrams';
+    if (isOpenDiagram) {
+      const persistedDiagrams: Array<IDiagram> = this.solutionService.getOpenDiagrams();
+
+      const persistedActiveDiagram = persistedDiagrams.find((diagram: IDiagram) => {
+        return diagram.name === diagramName && (diagram.uri === diagramUri || diagramUri === undefined);
+      });
+
+      let savedXml: string;
+      const diagramIsSavedLocally: boolean = !persistedActiveDiagram.uri.startsWith('about:open-diagrams');
+      if (diagramIsSavedLocally) {
+        try {
+          const uri = persistedActiveDiagram.uri.substring(0, persistedActiveDiagram.uri.lastIndexOf('/'));
+
+          const solutionEntry: ISolutionEntry = this.solutionService.getSolutionEntryForUri(uri);
+          const diagramFromSolution: IDiagram = await solutionEntry.service.loadDiagram(diagramName);
+          savedXml = diagramFromSolution.xml;
+        } catch {
+          savedXml = fs.readFileSync(persistedActiveDiagram.uri, 'utf8');
+        }
+      }
+
+      persistedActiveDiagram.xml = savedXml !== undefined ? savedXml : persistedActiveDiagram.xml;
+
+      this.activeDiagram = persistedActiveDiagram;
+    } else {
+      this.activeDiagram = await this.activeSolutionEntry.service.loadDiagram(diagramName);
+    }
   }
 
   private showDiffView(): void {
