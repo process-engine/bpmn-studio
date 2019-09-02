@@ -261,7 +261,7 @@ Unterstützt aktuell ExternalTasks und Http Tasks.
 
 <img src="./bpmn-elements-svg/callactivity.svg">
 
-Führt ein anderes, externes Prozessmodell als Subprozess aus. Das referenzierte Prozessmodell muss auf der ProcessEngine deployed sein.
+Führt ein anderes, externes Prozessmodell als Subprozess aus. Das referenzierte Prozessmodell muss auf derselben ProcessEngine deployed sein.
 Der Task wird so lange pausiert, bis der referenzierte Prozess abgeschlossen wurde.
 
 Wird der referenzierte Prozess mit einem Fehler beendet, so wird die Activity ebenfalls mit einem Fehler beendet.
