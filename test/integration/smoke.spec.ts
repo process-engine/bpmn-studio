@@ -175,7 +175,7 @@ describe('Application launch', function foo() {
   it('should open the internal ProcessEngine as solution', async () => {
     await testClient.startPageLoaded();
 
-    await testClient.assertInternalProcessEngineHasStarted();
+    await testClient.assertInternalProcessEngineIsOpenedAsSolution();
   });
 
   it('should show the SolutionExplorer', async () => {
