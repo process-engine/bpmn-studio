@@ -7,6 +7,8 @@ import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {bindable, bindingMode, inject, observable} from 'aurelia-framework';
 import {NavigationInstruction, Router, activationStrategy} from 'aurelia-router';
 
+import * as fs from 'fs';
+
 import {IDiagram, ISolution} from '@process-engine/solutionexplorer.contracts';
 
 import {IDiagramState, ISolutionEntry, ISolutionService, NotificationType} from '../../contracts/index';
@@ -133,12 +135,30 @@ export class Design {
       if (isOpenDiagram) {
         const persistedDiagrams: Array<IDiagram> = this.solutionService.getOpenDiagrams();
 
-        this.activeDiagram = persistedDiagrams.find((diagram: IDiagram) => {
+        const persistedActiveDiagram = persistedDiagrams.find((diagram: IDiagram) => {
           return (
             diagram.name === routeParameters.diagramName &&
             (diagram.uri === routeParameters.diagramUri || routeParameters.diagramUri === undefined)
           );
         });
+
+        let savedXml: string;
+        const diagramIsSavedLocally: boolean = !persistedActiveDiagram.uri.startsWith('about:open-diagrams');
+        if (diagramIsSavedLocally && diagramNameIsSet) {
+          try {
+            const uri = persistedActiveDiagram.uri.substring(0, persistedActiveDiagram.uri.lastIndexOf('/'));
+
+            const solutionEntry: ISolutionEntry = this.solutionService.getSolutionEntryForUri(uri);
+            const diagramFromSolution: IDiagram = await solutionEntry.service.loadDiagram(routeParameters.diagramName);
+            savedXml = diagramFromSolution.xml;
+          } catch {
+            savedXml = fs.readFileSync(persistedActiveDiagram.uri, 'utf8');
+          }
+        }
+
+        persistedActiveDiagram.xml = savedXml !== undefined ? savedXml : persistedActiveDiagram.xml;
+
+        this.activeDiagram = persistedActiveDiagram;
       } else {
         this.activeDiagram = diagramNameIsSet
           ? await this.activeSolutionEntry.service.loadDiagram(routeParameters.diagramName)
