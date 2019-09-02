@@ -212,7 +212,7 @@ export class TestClient {
   }
 
   public async showPropertyPanel(): Promise<void> {
-    const propertyPanelIsVisible = await this.webdriverClient.isVisible('property-panel');
+    const propertyPanelIsVisible = await this.webdriverClient.isVisible('[data-test-property-panel]');
     if (propertyPanelIsVisible) {
       return;
     }
@@ -222,7 +222,7 @@ export class TestClient {
   }
 
   public async hidePropertyPanel(): Promise<void> {
-    const propertyPanelIsVisible = await this.webdriverClient.isVisible('property-panel');
+    const propertyPanelIsVisible = await this.webdriverClient.isVisible('[data-test-property-panel]');
     const propertyPanelIsHidden = !propertyPanelIsVisible;
     if (propertyPanelIsHidden) {
       return;
