@@ -147,11 +147,11 @@ export class TestClient {
   }
 
   public async assertDiagramIsSaved(): Promise<void> {
-    await this.ensureNotVisible('.edited-label');
+    await this.ensureNotVisible('[data-test-edited-label]');
   }
 
   public async assertDiagramIsUnsaved(): Promise<void> {
-    await this.ensureVisible('.edited-label');
+    await this.ensureVisible('[data-test-edited-label]');
   }
 
   // openDesignViewForCurrentDiagram?
