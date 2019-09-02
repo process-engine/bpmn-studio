@@ -90,7 +90,7 @@ export class TestClient {
 
   public async startProcess(): Promise<void> {
     await this.clickOn('[data-test-start-diagram-button]');
-    await this.ensureVisible('.live-execution-tracker');
+    await this.ensureVisible('[data-test-live-execution-tracker]');
   }
 
   public async stopProcess(): Promise<void> {
