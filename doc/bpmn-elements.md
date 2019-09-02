@@ -45,7 +45,7 @@ Führt JavaScript Code Snippets aus.
 
 <img src="./bpmn-elements-svg/servicetask.svg">
 
-Zur Benutzung von der ProcessEngine bereitgestellten Services.
+Erlaubt die automatische Ausführung von bereit gestellten Services der ProcessEngine.
 Aktuell HTTP Tasks und ExternalTasks.
 
 ### CallActivity
