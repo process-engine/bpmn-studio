@@ -173,8 +173,8 @@ export class TestClient {
   }
 
   public async assertNavbarTitleIs(name): Promise<void> {
-    await this.ensureVisible('.process-details-title');
-    const navbarTitle = await this.getTextFromElement('.process-details-title');
+    await this.ensureVisible('[data-test-navbar-title]');
+    const navbarTitle = await this.getTextFromElement('[data-test-navbar-title]');
 
     assert.equal(navbarTitle, name);
   }

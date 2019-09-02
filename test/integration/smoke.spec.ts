@@ -36,7 +36,7 @@ async function createAndOpenDiagram(): Promise<void> {
 
   await testClient.ensureVisible('[data-test-create-new-diagram]');
   await testClient.clickOn('[data-test-create-new-diagram]');
-  await testClient.ensureVisible('.process-details-title');
+  await testClient.ensureVisible('[data-test-navbar-title]');
 }
 
 let app: Application;
