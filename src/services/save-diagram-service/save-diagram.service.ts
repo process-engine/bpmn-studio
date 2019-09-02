@@ -81,6 +81,13 @@ export class SaveDiagramService {
 
       await solutionToSaveTo.service.saveDiagram(diagramToSave);
 
+      const diagramState: IDiagramState | null = this.openDiagramStateService.loadDiagramState(diagramToSave.uri);
+      if (diagramState !== null) {
+        diagramState.metadata.isChanged = false;
+
+        this.openDiagramStateService.updateDiagramState(diagramToSave.uri, diagramState);
+      }
+
       this.eventAggregator.publish(environment.events.navBar.diagramChangesResolved);
     } catch (error) {
       this.notificationService.showNotification(NotificationType.ERROR, `Unable to save the file: ${error}.`);
