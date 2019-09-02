@@ -59,14 +59,8 @@ export class TestClient {
     await this.ensureNotVisible('solution-explorer-panel');
   }
 
-  public async assertInternalProcessEngineHasStarted(): Promise<void> {
-    const response = await this.webdriverClient.execute(() => {
-      return window.localStorage.getItem('InternalProcessEngineRoute');
-    });
-
-    const internalProcessEngineRoute = response.value;
-
-    await this.ensureVisible(`.solution-entry__solution-name=${internalProcessEngineRoute}`);
+  public async assertInternalProcessEngineIsOpenedAsSolution(): Promise<void> {
+    await this.ensureVisible('[data-test-solution-is-internal=true]');
   }
 
   public async openDirectoryAsSolution(dir: string, diagramName?: string): Promise<void> {
@@ -86,7 +80,7 @@ export class TestClient {
       identity,
     );
 
-    await this.ensureVisible(`.solution-entry__solution-name=${dir}`);
+    await this.ensureVisible(`[data-test-solution-entry-name=${dir}]`);
 
     if (diagramName) {
       const searchString = this.getSearchString(pathToSolution, diagramName);
