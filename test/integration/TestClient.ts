@@ -118,19 +118,16 @@ export class TestClient {
 
   public async assertDiagramIsOnFileSystem(): Promise<void> {
     await this.ensureVisible('[data-test-navbar-icon]');
-    const classAttribute = await this.getAttributeFromElement('[data-test-navbar-icon]', 'class');
-    const isOnFileSystem: boolean = classAttribute.includes('fa-folder');
+    const classAttribute = await this.getAttributeFromElement('[data-test-navbar-icon]', 'data-test-navbar-icon');
 
-    assert.equal(isOnFileSystem, true);
+    assert.equal(classAttribute, 'false');
   }
 
   public async assertDiagramIsOnProcessEngine(): Promise<void> {
     await this.ensureVisible('[data-test-navbar-icon]');
-    const classAttribute = await this.getAttributeFromElement('[data-test-navbar-icon]', 'class');
-    const isOnProcessEngine: boolean = classAttribute.includes('fa-database');
+    const classAttribute = await this.getAttributeFromElement('[data-test-navbar-icon]', 'data-test-navbar-icon');
 
-    assert.equal(isOnProcessEngine, true);
-    Promise.resolve();
+    assert.equal(classAttribute, 'true');
   }
 
   public async saveDiagramAs(fileName: string): Promise<void> {

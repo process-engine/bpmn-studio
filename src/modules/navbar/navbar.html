@@ -13,7 +13,7 @@
     </div>
     <div class="menu-bar__menu--center" id="navBarCenter">
       <div class="menu__element menu__element--title btn-group" if.bind="showProcessName" ref="diagramInfo">
-        <span class="fas menu__origin-icon" class.bind="getClassNameForNavbarIcon" data-test-navbar-icon></span>
+        <span class="fas menu__origin-icon" class.bind="getClassNameForNavbarIcon" data-test-navbar-icon="${savingTargetIsRemoteSolution}"></span>
         <span class="process-details-title" title.bind="navbarTitle">${navbarTitle}</span>
         <span if.bind="diagramContainsUnsavedChanges" class="edited-label">- edited</span>
       </div>
