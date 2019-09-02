@@ -5,7 +5,7 @@ function getNpmTestScriptName() {
   const isWindows = process.platform === 'win32';
   const platform = isWindows ? 'windows' : 'macos';
 
-  return `npm run test-electron-${platform}`;
+  return `test-electron-${platform}`;
 }
 
 async function getBuiltStudioPath() {
@@ -39,7 +39,7 @@ async function execCommand(command) {
 async function runTests() {
   const pathToStudio = await getBuiltStudioPath();
 
-  exec(`cross-env SPECTRON_APP_PATH=${pathToStudio} ${getNpmTestScriptName()}`, (err, stdout, stderr) => {
+  exec(`cross-env SPECTRON_APP_PATH=${pathToStudio} npm run ${getNpmTestScriptName()}`, (err, stdout, stderr) => {
     if (err || stderr) {
       console.error(err, stderr);
     }
