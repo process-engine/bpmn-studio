@@ -33,7 +33,7 @@ export class Preferences {
         }
       });
 
-      window.localStorage.setItem('customUserConfig', JSON.stringify(customConfig));
+      this.userConfigService.persistUserConfig(customConfig);
     } else {
       this.notificationService.showNotification(
         NotificationType.ERROR,
