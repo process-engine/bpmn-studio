@@ -88,6 +88,12 @@ export class TestClient {
     }
   }
 
+  public async createAndOpenNewDiagram(): Promise<void> {
+    await this.ensureVisible('[data-test-create-new-diagram]');
+    await this.clickOn('[data-test-create-new-diagram]');
+    await this.ensureVisible('[data-test-navbar-title]');
+  }
+
   public async startProcess(): Promise<void> {
     await this.clickOn('[data-test-start-diagram-button]');
     await this.ensureVisible('[data-test-live-execution-tracker]');
