@@ -110,6 +110,10 @@ export class TestClient {
     await this.clickOn('[data-test-deploy-diagram-buttonn]');
   }
 
+  public async startPageLoaded(): Promise<void> {
+    await this.ensureVisible('[data-test-start-page]');
+  }
+
   public async clearDatabase(): Promise<void> {
     // This RegEx replaces all whitespaces with escaped whitespaces
     await this.execCommand(`rm -rf ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);

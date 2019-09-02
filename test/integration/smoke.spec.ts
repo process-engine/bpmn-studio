@@ -143,9 +143,11 @@ describe('Application launch', function foo() {
   });
 
   it('should open design view from the status bar', async () => {
+    // Arrange
     await createAndOpenDiagram();
-
     await testClient.openXmlViewFromStatusbar();
+
+    // Act and Assert
     await testClient.openDesignViewFromStatusbar();
   });
 
@@ -157,34 +159,36 @@ describe('Application launch', function foo() {
   });
 
   it('should open a solution', async () => {
-    await testClient.ensureVisible('h3=Welcome to BPMN Studio!');
+    await testClient.startPageLoaded();
 
     await testClient.openDirectoryAsSolution('fixtures');
   });
 
   it('should open a diagram from solution', async () => {
-    await testClient.ensureVisible('h3=Welcome to BPMN Studio!');
+    await testClient.startPageLoaded();
 
     const diagramName = 'call_activity_subprocess_error';
     await testClient.openDirectoryAsSolution('fixtures', diagramName);
     await testClient.assertNavbarTitleIs(diagramName);
   });
 
-  it('should start a ProcessEngine', async () => {
-    await testClient.ensureVisible('h3=Welcome to BPMN Studio!');
+  it('should open the internal ProcessEngine as solution', async () => {
+    await testClient.startPageLoaded();
 
     await testClient.assertInternalProcessEngineHasStarted();
   });
 
   it('should show the SolutionExplorer', async () => {
-    await testClient.ensureVisible('h3=Welcome to BPMN Studio!');
-
+    // Arrange
+    await testClient.startPageLoaded();
     await testClient.hideSolutionExplorer();
+
+    // Act and Assert
     await testClient.showSolutionExplorer();
   });
 
   it('should hide the SolutionExplorer', async () => {
-    await testClient.ensureVisible('h3=Welcome to BPMN Studio!');
+    await testClient.startPageLoaded();
 
     await testClient.hideSolutionExplorer();
   });
@@ -204,30 +208,36 @@ describe('Application launch', function foo() {
   });
 
   it('should save a diagram', async () => {
+    // Arrange
     await createAndOpenDiagram();
-
     await testClient.assertDiagramIsUnsaved();
+
+    // Act and Assert
     await testClient.saveDiagramAs('test1.bpmn');
     await testClient.assertDiagramIsSaved();
   });
 
   it('should deploy a diagram', async () => {
+    // Arrange
     const diagramName = 'receive_task_wait_test';
-    await testClient.ensureVisible('h3=Welcome to BPMN Studio!');
+    await testClient.startPageLoaded();
     await testClient.openDirectoryAsSolution('fixtures', diagramName);
-
     await testClient.assertDiagramIsOnFileSystem();
+
     if (isWindows) {
       await testClient.pause(800);
     }
+
+    // Act
     await testClient.deployDiagram();
+    // Assert
     await testClient.assertNavbarTitleIs(diagramName);
     await testClient.assertDiagramIsOnProcessEngine();
   });
 
   it('should start a process', async () => {
     const diagramName = 'receive_task_wait_test';
-    await testClient.ensureVisible('h3=Welcome to BPMN Studio!');
+    await testClient.startPageLoaded();
     await testClient.openDirectoryAsSolution('fixtures', diagramName);
     await testClient.assertDiagramIsOnFileSystem();
     await testClient.deployDiagram();
@@ -239,14 +249,14 @@ describe('Application launch', function foo() {
 
   it('should stop a process on LiveExecutionTracker', async () => {
     const diagramName = 'receive_task_wait_test';
-    await testClient.ensureVisible('h3=Welcome to BPMN Studio!');
+    await testClient.startPageLoaded();
     await testClient.openDirectoryAsSolution('fixtures', diagramName);
     await testClient.assertDiagramIsOnFileSystem();
     await testClient.deployDiagram();
     await testClient.assertNavbarTitleIs(diagramName);
     await testClient.assertDiagramIsOnProcessEngine();
-
     await testClient.startProcess();
+
     await testClient.stopProcess();
   });
 });
