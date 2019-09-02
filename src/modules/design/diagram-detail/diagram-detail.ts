@@ -99,6 +99,11 @@ export class DiagramDetail {
     this.managementApiClient = managementApiClient;
     this.openDiagramService = openDiagramService;
     this.openDiagramStateService = openDiagramStateService;
+
+    // eslint-disable-next-line no-underscore-dangle
+    (window as any).__dangerouslyInvoke['saveDiagramAs'] = (path: string): void => {
+      this.saveDiagramAs(path);
+    };
   }
 
   public determineActivationStrategy(): string {

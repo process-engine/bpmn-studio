@@ -900,6 +900,9 @@ function getConfigFolder(): string {
 }
 
 function getConfigPathSuffix(): string {
+  if (process.env.SPECTRON_TESTS) {
+    return '-tests';
+  }
   if (releaseChannel.isDev()) {
     return '-dev';
   }

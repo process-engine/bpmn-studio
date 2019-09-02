@@ -81,8 +81,14 @@ export class SolutionExplorerList {
       this.createOpenDiagramServiceEntry();
     }
 
-    // Allows us to debug the solution explorer list.
-    (window as any).solutionList = this;
+    // eslint-disable-next-line no-underscore-dangle
+    (window as any).__dangerouslyInvoke['openSolution'] = (
+      uri: string,
+      insertAtBeginning?: boolean,
+      identity?: IIdentity,
+    ): void => {
+      this.openSolution(uri, insertAtBeginning, identity);
+    };
 
     this.internalSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
   }

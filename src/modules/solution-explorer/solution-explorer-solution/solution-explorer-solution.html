@@ -29,7 +29,7 @@
         repeat.for="diagram of openedDiagrams"
         class.bind="activeDiagramUri === diagram.uri ? 'diagram-entry diagram-entry--highlight' : 'diagram-entry'"
         click.delegate="openDiagram(diagram)"
-        id="diagramList-${diagram.name}">
+        data-test-open-diagram-with-uri="${diagram.uri}">
 
         <div if.bind="currentlyRenamingDiagramUri === diagram.uri" class="diagram-rename-container">
           <div class="input-holder">

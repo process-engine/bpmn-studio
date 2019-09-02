@@ -44,6 +44,9 @@ export class App {
   public activate(): void {
     this.migrateOpenDiagramStatesInLocalStorage();
 
+    // eslint-disable-next-line no-underscore-dangle
+    (window as any).__dangerouslyInvoke = {};
+
     this.preventDefaultBehaviour = (event: Event): boolean => {
       event.preventDefault();
 

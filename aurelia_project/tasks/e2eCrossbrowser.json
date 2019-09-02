@@ -1,5 +1,0 @@
-{
-  "name": "e2eCrossbrowser",
-  "description": "Runs all end-to-end (e2e) tests at crossbrowser.com and reports the results.",
-  "flags": []
-}

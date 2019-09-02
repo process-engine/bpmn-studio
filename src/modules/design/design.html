@@ -6,14 +6,14 @@
 
   <div class="design">
 
-    <diagram-detail show.bind="showDetail" view-model.ref="diagramDetail" is-displayed.to-view="showDetail" active-diagram.bind="activeDiagram" xml.two-way="xml" active-solution-entry.bind="activeSolutionEntry"></diagram-detail>
-    <bpmn-xml-view show.bind="showXML" xml.bind="xml"></bpmn-xml-view>
-    <bpmn-diff-view if.bind="showDiff" saved-xml.to-view="activeDiagram.xml" unconverted-current-xml.to-view="xmlForDiff" process-model-id.to-view="activeDiagram.name"></bpmn-diff-view>
+    <diagram-detail show.bind="showDetail" view-model.ref="diagramDetail" is-displayed.to-view="showDetail" active-diagram.bind="activeDiagram" xml.two-way="xml" active-solution-entry.bind="activeSolutionEntry" data-test-diagram-detail></diagram-detail>
+    <bpmn-xml-view show.bind="showXML" xml.bind="xml" data-test-bpmn-xml-view></bpmn-xml-view>
+    <bpmn-diff-view if.bind="showDiff" saved-xml.to-view="activeDiagram.xml" unconverted-current-xml.to-view="xmlForDiff" process-model-id.to-view="activeDiagram.name" data-test-bpmn-diff-view></bpmn-diff-view>
 
     <div class="design-layout__tools-right">
       <div class="tool-list tool-list--vertical">
         <div show.bind="showPropertyPanelButton" id="toggleButtonPropertyPanel" class="design-layout__tool">
-          <button class="button menu-bar__menu-left--tool" class.bind="propertyPanelShown ? 'design-layout__tool--active' : ''" click.delegate="togglePanel()" title="Toggle visibility of the Property Panel">
+          <button class="button menu-bar__menu-left--tool" class.bind="propertyPanelShown ? 'design-layout__tool--active' : ''" click.delegate="togglePanel()" title="Toggle visibility of the Property Panel" data-test-toggle-propertypanel>
             <i class="fas fa-sliders-h"></i>
           </button>
         </div>
