@@ -169,6 +169,13 @@ export class TestClient {
     await this.ensureVisible('[data-test-diagram-detail]');
   }
 
+  public async assertXmlContainsText(text: string): Promise<void> {
+    const xmlViewContent = await this.getTextFromElement('[data-test-xml-view-content]');
+    const xmlViewContentContainsText: boolean = xmlViewContent.includes(text);
+
+    assert.equal(xmlViewContentContainsText, true);
+  }
+
   // openXMLViewForCurrentDiagram?
   public async openXmlViewFromStatusbar(): Promise<void> {
     await this.ensureVisible('[data-test-status-bar-xml-view-button]');

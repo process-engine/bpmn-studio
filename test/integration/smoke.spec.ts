@@ -123,23 +123,30 @@ describe('Application launch', function foo() {
       'about:open-diagrams/Untitled-1.bpmn',
       'about:open-diagrams',
     );
+
+    await testClient.assertCanvasModelIsVisible();
   });
 
   it('should open XML view', async () => {
     await createAndOpenDiagram();
 
     await testClient.openXmlViewForDiagram('Untitled-1', 'about:open-diagrams/Untitled-1.bpmn', 'about:open-diagrams');
+
+    await testClient.assertXmlViewHasContent();
   });
 
   it('should open diff view', async () => {
     await createAndOpenDiagram();
 
     await testClient.openDiffViewForDiagram('Untitled-1', 'about:open-diagrams/Untitled-1.bpmn', 'about:open-diagrams');
+
+    await testClient.assertDiffViewHasRenderedAllContainer();
   });
 
   it('should open the xml view from the status bar', async () => {
     await createAndOpenDiagram();
     await testClient.openXmlViewFromStatusbar();
+    await testClient.assertXmlContainsText('id="Untitled-1"');
   });
 
   it('should open design view from the status bar', async () => {
