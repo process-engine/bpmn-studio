@@ -82,6 +82,7 @@ export class TestClient {
 
     if (diagramName) {
       const searchString = this.getSearchString(pathToSolution, diagramName);
+      await this.ensureVisible(`[data-test-open-diagram-with-uri*="${searchString}"]`);
       await this.clickOn(`[data-test-open-diagram-with-uri*="${searchString}"]`);
     }
   }
@@ -93,16 +94,19 @@ export class TestClient {
   }
 
   public async startProcess(): Promise<void> {
+    await this.ensureVisible('[data-test-start-diagram-button]');
     await this.clickOn('[data-test-start-diagram-button]');
     await this.ensureVisible('[data-test-live-execution-tracker]');
   }
 
   public async stopProcess(): Promise<void> {
+    await this.ensureVisible('[data-test-stop-diagram-button]');
     await this.clickOn('[data-test-stop-process-button]');
     await this.ensureNotVisible('[data-test-stop-process-button]');
   }
 
   public async deployDiagram(): Promise<void> {
+    await this.ensureVisible('[data-test-deploy-diagram-button]');
     await this.clickOn('[data-test-deploy-diagram-buttonn]');
   }
 
@@ -169,6 +173,7 @@ export class TestClient {
   }
 
   public async clickOnBpmnElementWithName(name): Promise<void> {
+    await this.ensureVisible(`.djs-label=${name}`);
     await this.clickOn(`.djs-label=${name}`);
   }
 
@@ -261,6 +266,7 @@ export class TestClient {
   }
 
   public async openThinkViewFromNavbar(): Promise<void> {
+    await this.ensureVisible('[data-test-navbar="Think"]');
     await this.clickOn('[data-test-navbar="Think"]');
     await this.ensureVisible('diagram-list');
   }
