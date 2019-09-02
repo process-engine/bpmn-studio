@@ -141,7 +141,21 @@ export class SaveDiagramService {
     };
 
     try {
+      this.openDiagramStateService.saveDiagramState(pathToSaveTo, diagram.xml, undefined, undefined, false, [
+        {
+          change: 'save',
+          xml: xml,
+        },
+      ]);
+
       await solutionToSaveTo.service.saveDiagram(diagram, pathToSaveTo);
+
+      const diagramState: IDiagramState | null = this.openDiagramStateService.loadDiagramState(pathToSaveTo);
+      if (diagramState !== null) {
+        diagramState.metadata.isChanged = false;
+
+        this.openDiagramStateService.updateDiagramState(pathToSaveTo, diagramState);
+      }
 
       const diagramChange: Array<DiagramStateChange> = [{change: 'save', xml: diagram.xml}];
       const previousDiagramsState: IDiagramState | null = this.openDiagramStateService.loadDiagramState(diagram.uri);
