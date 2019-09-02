@@ -25,6 +25,7 @@ import {OpenDiagramsSolutionExplorerService} from '../../../services/solution-ex
 import {OpenDiagramStateService} from '../../../services/solution-explorer-services/OpenDiagramStateService';
 import {DeleteDiagramModal} from './delete-diagram-modal/delete-diagram-modal';
 import {DeployDiagramService} from '../../../services/deploy-diagram-service/deploy-diagram.service';
+import {SaveDiagramService} from '../../../services/save-diagram-service/save-diagram.service';
 
 const ENTER_KEY: string = 'Enter';
 const ESCAPE_KEY: string = 'Escape';
@@ -55,6 +56,7 @@ interface IDiagramCreationState extends IDiagramNameInputState {
   'OpenDiagramStateService',
   BindingSignaler,
   DeployDiagramService,
+  SaveDiagramService,
 )
 export class SolutionExplorerSolution {
   public activeDiagram: IDiagram;
@@ -79,6 +81,7 @@ export class SolutionExplorerSolution {
   private notificationService: NotificationService;
   private openDiagramStateService: OpenDiagramStateService;
   private deployDiagramService: DeployDiagramService;
+  private saveDiagramService: SaveDiagramService;
 
   private diagramRoute: string = 'design';
   private inspectView: string;
@@ -121,6 +124,7 @@ export class SolutionExplorerSolution {
     openDiagramStateService: OpenDiagramStateService,
     bindingSignaler: BindingSignaler,
     deployDiagramService: DeployDiagramService,
+    saveDiagramService: SaveDiagramService,
   ) {
     this.router = router;
     this.eventAggregator = eventAggregator;
@@ -131,6 +135,7 @@ export class SolutionExplorerSolution {
     this.openDiagramStateService = openDiagramStateService;
     this.bindingSignaler = bindingSignaler;
     this.deployDiagramService = deployDiagramService;
+    this.saveDiagramService = saveDiagramService;
   }
 
   public async attached(): Promise<void> {
@@ -442,8 +447,6 @@ export class SolutionExplorerSolution {
       this.diagramInContextMenu.uri,
     );
     const diagramHasState: boolean = diagramState !== null;
-    console.log(diagramHasState);
-    console.log(this.diagramInContextMenu.uri);
 
     const xml: string | undefined = diagramHasState ? diagramState.data.xml : undefined;
 
@@ -818,7 +821,8 @@ export class SolutionExplorerSolution {
       const isActiveDiagram: boolean =
         this.activeDiagram !== undefined && this.activeDiagram.uri === diagramStateListEntry.uri;
       if (isActiveDiagram) {
-        this.eventAggregator.publish(environment.events.diagramDetail.saveDiagram);
+        await this.saveActiveDiagram();
+        await this.waitForSaving();
 
         continue;
       }
@@ -829,13 +833,34 @@ export class SolutionExplorerSolution {
 
       diagramToSave.xml = diagramStateListEntry.diagramState.data.xml;
 
-      await this.openDiagramService.saveDiagram(diagramToSave);
-      const diagramState: IDiagramState = diagramStateListEntry.diagramState;
+      await this.saveDiagramService.saveDiagram(this.displayedSolutionEntry, diagramToSave, diagramToSave.xml);
+
+      const diagramState: IDiagramState = this.openDiagramStateService.loadDiagramState(diagramToSave.uri);
 
       diagramState.metadata.isChanged = false;
 
       this.openDiagramStateService.updateDiagramState(diagramStateListEntry.uri, diagramState);
+
+      await this.waitForSaving();
     }
+  }
+
+  private saveActiveDiagram(): Promise<void> {
+    return new Promise((resolve: Function) => {
+      this.eventAggregator.subscribeOnce(environment.events.diagramDetail.saveDiagramDone, () => {
+        resolve();
+      });
+
+      this.eventAggregator.publish(environment.events.diagramDetail.saveDiagram);
+    });
+  }
+
+  private wait500ms(): Promise<void> {
+    return new Promise((resolve: Function) => {
+      setTimeout(() => {
+        resolve();
+      }, 550);
+    });
   }
 
   private refreshDisplayedDiagrams(): void {

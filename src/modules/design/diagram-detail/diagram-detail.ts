@@ -141,8 +141,10 @@ export class DiagramDetail {
       this.validationController.subscribe((event: ValidateEvent) => {
         this.handleFormValidateEvents(event);
       }),
-      this.eventAggregator.subscribe(environment.events.diagramDetail.saveDiagram, () => {
-        this.saveDiagram();
+      this.eventAggregator.subscribe(environment.events.diagramDetail.saveDiagram, async () => {
+        await this.saveDiagram();
+
+        this.eventAggregator.publish(environment.events.diagramDetail.saveDiagramDone);
       }),
       this.eventAggregator.subscribe(environment.events.diagramDetail.uploadProcess, () => {
         this.deployDiagram();
