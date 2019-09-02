@@ -310,7 +310,7 @@ export class DiagramDetail {
     this.diagramHasChanged = false;
   }
 
-  public async saveDiagramAs(): Promise<void> {
+  public async saveDiagramAs(path?: string): Promise<void> {
     if (this.diagramIsInvalid) {
       return;
     }
@@ -321,7 +321,7 @@ export class DiagramDetail {
       return;
     }
 
-    await this.saveDiagramService.saveDiagramAs(this.activeSolutionEntry, this.activeDiagram, xml);
+    await this.saveDiagramService.saveDiagramAs(this.activeSolutionEntry, this.activeDiagram, xml, path);
 
     this.bpmnio.saveStateForNewUri = true;
     this.bpmnio.saveCurrentXML();
