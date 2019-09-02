@@ -1,67 +1,5 @@
 # Unterstütze BPMN-Elemente
 
-## Activities
-
-### UserTask
-
-<img src="./bpmn-elements-svg/usertask.svg">
-
-Stellt eine Aufgabe dar, die von Benutzern abgearbeitet werden kann. Der Benutzer kann Eingaben machen.
-
-### ManualTask
-
-<img src="./bpmn-elements-svg/manualtask.svg">
-
-Stellt eine Aufgabe dar, die der Benutzer manuell erledigen und 
-dann den Task bestätigen muss.
-
-### Empty-Activity
-
-<img src="./bpmn-elements-svg/emptyactivity.svg">
-
-Pausiert die Prozessausführung, bis der Benutzer sie manuell fortsetzt.
-Im Gegensatz zu ManualTask und UserTask, stellt dies keine Aktiviität dar, sondern ist eine einfache, untypisierte Pausierung des Prozesses.
-
-### SendTask
-
-<img src="./bpmn-elements-svg/sendtask.svg">
-
-Verschickt eine vordefinierte Message.
-Die Ausführung wird pausiert, bis der SendTask eine Empfangsbestätigung von einem ReceiveTask erhalten hat.
-
-### ReceiveTask
-
-<img src="./bpmn-elements-svg/receivetask.svg">
-
-Wartet auf das Eintreffen eine Message, die durch einen SendTask verschickt wurde.
-
-### ScriptTask
-
-<img src="./bpmn-elements-svg/scripttask.svg">
-
-Führt JavaScript Code Snippets aus.
-
-### ServiceTask
-
-<img src="./bpmn-elements-svg/servicetask.svg">
-
-Erlaubt die automatische Ausführung von bereit gestellten Services der ProcessEngine.
-Unterstützt aktuell ExternalTasks und Http Tasks.
-
-### CallActivity
-
-<img src="./bpmn-elements-svg/callactivity.svg">
-
-Führt ein anderes, externes Prozessmodell als Subprozess aus. Das referenzierte Prozessmodell muss auf der ProcessEngine deployed sein.
-Der Task wird so lange pausiert, bis der referenzierte Prozess abgeschlossen wurde.
-
-### SubProcess
-
-<img src="./bpmn-elements-svg/subprocess.svg">
-
-Ein Subprozess, der, anders als eine CallActivity, direkt in das Prozessmodell eingebettet wird.
-Der Task wird so lange pausiert, bis der Subprozess abgeschlossen wurde.
-
 ## Participants/Lanes
 
 ### Pool
@@ -84,42 +22,10 @@ Der Name der Lane entscheidet dabei, ob ein User die darin enthaltenden FlowNode
 
 <img src="./bpmn-elements-svg/laneset.svg">
 
-Lanes können weitere Lanes in sich Tragen.
-Die Parentlane wird dann Laneset genannt.
+Eine Laneset beschreibt eine Sammlung von Lanes.
+Jeder Pool hat per default ein Laneset.
+Jede Lane kann ebenfalls ein Laneset beinhalten. In diesem Fall spricht man von Sublanesets.
 
-## Artifacts
-
-### TextAnnotation
-
-<img src="./bpmn-elements-svg/textannotation.svg">
-
-Die TextAnnotation kann benutzt werden, um z.B. Kommentare an eine FlowNode zu knüpfen.
-Für die Heatmap kann man hier ebenfalls eine erwartete Laufzeit anhängen.
-
-Beispiel:
-
-````text
-RT: 00:01:45
-````
-
-## Gateways
-
-### Exclusive Gateway
-
-<img src="./bpmn-elements-svg/exclusivegateway.svg">
-
-Der Prozess wird zu einem der modellierten, ausgehenden Pfade umgeleitet.
-Welcher Pfad genommen wird, hängt davon ab, welcher SequenceFlow eine passende Bedingung enthält.
-Ein ExclusiveGateway kann beliebig viele ausgehende Pfade besitzen, jedoch kann immer nur **ein** Pfad pro Prozessinstanz ausgeführt werden.
-
-Es ist möglich einen default SequenceFlow zu definieren, der benutzt wird, falls keiner der SequenceFlows eine zutreffende Bedingung enthält.
-
-### Parallel Gateway
-
-<img src="./bpmn-elements-svg/parallelgateway.svg">
-
-Führt alle modellierten Pfade parallel aus.
-Anders als beim ExclusiveGateway, sind die Ausführungen dieser Pfade nicht an Bedingungen geknüpft.
 
 ## Events
 
@@ -200,7 +106,8 @@ Pausiert die Prozessausführung, bis eine vordefinierte Message empfangen wurde.
 
 <img src="./bpmn-elements-svg/messagethrowevent.svg">
 
-Wirft eine Message und führt den Prozess am ausgehenden Pfad weiter.
+Schickt eine vordefinierte Message aus und führt den Prozess ohne Unterbrechung weiter.
+Anders als beim SendTask, wird hier nicht auf eine Empfangsbestätigung gewartet ("Fire and forget").
 
 ### BoundaryEvents
 
@@ -208,50 +115,61 @@ Wirft eine Message und führt den Prozess am ausgehenden Pfad weiter.
 
 <img src="./bpmn-elements-svg/errorboundaryevent.svg">
 
-Im Fall eines Errors am zugehörigen Task wird der Prozess am ausgehenden
-Pfad des BoundaryEvents weitergeführt.
+Dient dazu Fehler an einer Activity abzufangen.
+
+Tritt in der Activity ein Fehler auf, welcher einen passenden Code und/oder einen passenden Namen hat,
+so wird die Prozessausführung über dieses BoundaryEvent geleitet.
 
 #### SignalBoundaryEvent
 
 <img src="./bpmn-elements-svg/signalboundaryevent.svg">
 
-Wenn ein Signal empfangen wird läuft der Prozess am ausgehenden
-Pfad des BoundaryEvents weiter. 
+Führt den angehangenen Prozesspfad aus, sobald ein passendes Signal empfangen wird.
+
+Die Ausführung der Activity, an welcher das BoundaryEvent hängt, wird forciert beendet.
+Der Pfad, der von der Activity aus geht, wird dann **nicht** weiter fortgesetzt.
 
 #### MessageBoundaryEvent
 
 <img src="./bpmn-elements-svg/messageboundaryevent.svg">
 
-Wenn eine Message empfangen wird läuft der Prozess am ausgehenden
-Pfad des BoundaryEvents weiter. 
+Führt den angehangenen Prozesspfad aus, sobald eine passende Message empfangen wird.
+
+Die Ausführung der Activity, an welcher das BoundaryEvent hängt, wird forciert beendet.
+Der Pfad, der von der Activity aus geht, wird dann **nicht** weiter fortgesetzt.
 
 #### TimerBoundaryEvent
 
 <img src="./bpmn-elements-svg/timerboundaryevent.svg">
 
-Wenn das konfigurierte Datum oder die zu wartende Dauer erreicht wurde, 
-läuft der Prozess am ausgehenden Pfad des BoundaryEvents weiter. 
+Führt den angehangenen Prozesspfad aus, sobald der modellierte Timer getriggert wird.
 
-#### NonInterruptingMessageBoundaryEvent
-
-<img src="./bpmn-elements-svg/noninterruptingmessageboundaryevent.svg">
-
-Bricht den Task beim Empfangen einer Message nicht ab und führt den Prozess
-zusätzlich am ausgehenden Pfad weiter.
+Die Ausführung der Activity, an welcher das BoundaryEvent hängt, wird forciert beendet.
+Der Pfad, der von der Activity aus geht, wird dann **nicht** weiter fortgesetzt.
 
 #### NonInterruptingSignalBoundaryEvent
 
 <img src="./bpmn-elements-svg/noninterruptingsignalboundaryevent.svg">
 
-Bricht den Task beim Empfangen eines Signals nicht ab und führt den Prozess
-zusätzlich am ausgehenden Pfad weiter.
+Führt den angehangenen Prozesspfad aus, sobald ein passendes Signal empfangen wird.
+
+Die Activity, an welcher das Boundaryevent hängt, wird nicht unterbrochen und läuft regulär weiter.
+
+#### NonInterruptingMessageBoundaryEvent
+
+<img src="./bpmn-elements-svg/noninterruptingmessageboundaryevent.svg">
+
+Führt den angehangenen Prozesspfad aus, sobald eine passende Message empfangen wird.
+
+Die Activity, an welcher das Boundaryevent hängt, wird nicht unterbrochen und läuft regulär weiter.
 
 #### NonInterruptingTimerBoundaryEvent
 
 <img src="./bpmn-elements-svg/noninterruptingtimerboundaryevent.svg">
 
-Bricht den Task nach Ablauf des Datums/der Dauer nicht ab und führt den Prozess
-zusätzlich am ausgehenden Pfad weiter.
+Führt den angehangenen Prozesspfad aus, sobald der modellierte Timer getriggert wird.
+
+Die Activity, an welcher das Boundaryevent hängt, wird nicht unterbrochen und läuft regulär weiter.
 
 ### EndEvents
 
@@ -286,3 +204,100 @@ Sendet beim beenden des Prozesses eine Message.
 Für die Ausführung mit ParallelGateways:
 
 Wie ErrorEndEvent, forciert jedoch das sofortige Beenden aller parallel laufenden Pfade.
+
+
+## Activities
+
+### UserTask
+
+<img src="./bpmn-elements-svg/usertask.svg">
+
+Stellt eine Aufgabe dar, die von Benutzern abgearbeitet werden kann. Der Benutzer kann Eingaben machen.
+
+### ManualTask
+
+<img src="./bpmn-elements-svg/manualtask.svg">
+
+Stellt eine Aufgabe dar, die der Benutzer manuell erledigen muss.
+Der Task besitzt keine Eingaben und erzeugt kein Ergebnis.
+
+### Empty-Activity
+
+<img src="./bpmn-elements-svg/emptyactivity.svg">
+
+Pausiert die Prozessausführung, bis der Benutzer sie manuell fortsetzt.
+Im Gegensatz zu ManualTask und UserTask, stellt dies keine Aktiviität dar, sondern ist eine einfache, untypisierte Pausierung des Prozesses.
+
+### SendTask
+
+<img src="./bpmn-elements-svg/sendtask.svg">
+
+Verschickt eine vordefinierte Message.
+Die Ausführung wird pausiert, bis der SendTask eine Empfangsbestätigung von einem ReceiveTask erhalten hat.
+
+### ReceiveTask
+
+<img src="./bpmn-elements-svg/receivetask.svg">
+
+Wartet auf das Eintreffen eine Message, die durch einen SendTask verschickt wurde.
+
+### ScriptTask
+
+<img src="./bpmn-elements-svg/scripttask.svg">
+
+Führt JavaScript Code Snippets aus.
+
+### ServiceTask
+
+<img src="./bpmn-elements-svg/servicetask.svg">
+
+Erlaubt die automatische Ausführung von bereit gestellten Services der ProcessEngine.
+Unterstützt aktuell ExternalTasks und Http Tasks.
+
+### CallActivity
+
+<img src="./bpmn-elements-svg/callactivity.svg">
+
+Führt ein anderes, externes Prozessmodell als Subprozess aus. Das referenzierte Prozessmodell muss auf der ProcessEngine deployed sein.
+Der Task wird so lange pausiert, bis der referenzierte Prozess abgeschlossen wurde.
+
+### SubProcess
+
+<img src="./bpmn-elements-svg/subprocess.svg">
+
+Ein Subprozess, der, anders als eine CallActivity, direkt in das Prozessmodell eingebettet wird.
+Der Task wird so lange pausiert, bis der Subprozess abgeschlossen wurde.
+
+## Artifacts
+
+### TextAnnotation
+
+<img src="./bpmn-elements-svg/textannotation.svg">
+
+Die TextAnnotation kann benutzt werden, um z.B. Kommentare an eine FlowNode zu knüpfen.
+Für die Heatmap kann man hier ebenfalls eine erwartete Laufzeit anhängen.
+
+Beispiel:
+
+````text
+RT: 00:01:45
+````
+
+## Gateways
+
+### Exclusive Gateway
+
+<img src="./bpmn-elements-svg/exclusivegateway.svg">
+
+Der Prozess wird zu einem der modellierten, ausgehenden Pfade umgeleitet.
+Welcher Pfad genommen wird, hängt davon ab, welcher SequenceFlow eine passende Bedingung enthält.
+Ein ExclusiveGateway kann beliebig viele ausgehende Pfade besitzen, jedoch kann immer nur **ein** Pfad pro Prozessinstanz ausgeführt werden.
+
+Es ist möglich einen default SequenceFlow zu definieren, der benutzt wird, falls keiner der SequenceFlows eine zutreffende Bedingung enthält.
+
+### Parallel Gateway
+
+<img src="./bpmn-elements-svg/parallelgateway.svg">
+
+Führt alle modellierten Pfade parallel aus.
+Anders als beim ExclusiveGateway, sind die Ausführungen dieser Pfade nicht an Bedingungen geknüpft.
