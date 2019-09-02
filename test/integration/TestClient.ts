@@ -115,12 +115,10 @@ export class TestClient {
   }
 
   public async clearDatabase(): Promise<void> {
-    // This RegEx replaces all whitespaces with escaped whitespaces
     await this.execCommand(`rm -rf ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
   }
 
   public async clearSavedDiagrams(): Promise<void> {
-    // This RegEx replaces all whitespaces with escaped whitespaces
     await this.execCommand(`rm -rf ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
   }
 
