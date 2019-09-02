@@ -25,11 +25,19 @@ export class LinkEventSection implements ISection {
   }
 
   public isSuitableForElement(elementShape: IShape): boolean {
-    if (!this.elementIsLinkEvent(elementShape)) {
+    const elementHasNoBusinessObject: boolean = elementShape === undefined || elementShape.businessObject === undefined;
+    if (elementHasNoBusinessObject) {
       return false;
     }
 
-    return true;
+    const eventElement: ILinkEventElement = elementShape.businessObject as ILinkEventElement;
+
+    const elementIsLinkEvent: boolean =
+      eventElement.eventDefinitions !== undefined &&
+      eventElement.eventDefinitions[0] !== undefined &&
+      eventElement.eventDefinitions[0].$type === 'bpmn:LinkEventDefinition';
+
+    return elementIsLinkEvent;
   }
 
   public linkEventNameChanged(newValue, oldValue): void {
@@ -39,22 +47,6 @@ export class LinkEventSection implements ISection {
 
     this.businessObjInPanel.eventDefinitions[0].name = newValue;
     this.publishDiagramChange();
-  }
-
-  private elementIsLinkEvent(element: IShape): boolean {
-    const elementHasNoBusinessObject: boolean = element === undefined || element.businessObject === undefined;
-    if (elementHasNoBusinessObject) {
-      return false;
-    }
-
-    const eventElement: ILinkEventElement = element.businessObject as ILinkEventElement;
-
-    const elementIsLinkEvent: boolean =
-      eventElement.eventDefinitions !== undefined &&
-      eventElement.eventDefinitions[0] !== undefined &&
-      eventElement.eventDefinitions[0].$type === 'bpmn:LinkEventDefinition';
-
-    return elementIsLinkEvent;
   }
 
   private publishDiagramChange(): void {
