@@ -511,6 +511,15 @@ function getApplicationMenu(): MenuItem {
       type: 'separator',
     },
     {
+      label: 'Preferences',
+      click: (): void => {
+        browserWindow.webContents.send('menubar__open_preferences');
+      },
+    },
+    {
+      type: 'separator',
+    },
+    {
       label: 'Quit',
       role: 'quit',
     },
