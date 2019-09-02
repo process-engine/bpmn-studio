@@ -46,19 +46,21 @@ Führt JavaScript Code Snippets aus.
 <img src="./bpmn-elements-svg/servicetask.svg">
 
 Erlaubt die automatische Ausführung von bereit gestellten Services der ProcessEngine.
-Aktuell HTTP Tasks und ExternalTasks.
+Unterstützt aktuell ExternalTasks und Http Tasks.
 
 ### CallActivity
 
 <img src="./bpmn-elements-svg/callactivity.svg">
 
-Führt ein anderes auf der ProcessEngine befindliches Prozessmodell aus.
+Führt ein anderes, externes Prozessmodell als Subprozess aus. Das referenzierte Prozessmodell muss auf der ProcessEngine deployed sein.
+Der Task wird so lange pausiert, bis der referenzierte Prozess abgeschlossen wurde.
 
 ### SubProcess
 
 <img src="./bpmn-elements-svg/subprocess.svg">
 
-Ein SubProcess.
+Ein Subprozess, der, anders als eine CallActivity, direkt in das Prozessmodell eingebettet wird.
+Der Task wird so lange pausiert, bis der Subprozess abgeschlossen wurde.
 
 ## Participants/Lanes
 
@@ -67,13 +69,16 @@ Ein SubProcess.
 <img src="./bpmn-elements-svg/participant.svg">
 
 Ein Pool definiert den auszuführenden Prozess.
-Ein Diagramm kann mehrere Pools enthalten und Pools können mehrere Lanes enthalten.
+Ein Pool kann mehrere Lanes enthalten.
 
 ### Lanes
 
 <img src="./bpmn-elements-svg/lanes.svg">
 
 Lanes dienen zur Organisation und Veranschaulichung verschiedener Verantwortungsbereiche.
+Eine Lane kann beliebig viele FlowNodes enthalten, aber eine FlowNode kann immer nur zu einer Lane gehören.
+
+Der Name der Lane entscheidet dabei, ob ein User die darin enthaltenden FlowNodes sehen, bzw ausführen kann.
 
 ### Lanesets
 
@@ -88,7 +93,8 @@ Die Parentlane wird dann Laneset genannt.
 
 <img src="./bpmn-elements-svg/textannotation.svg">
 
-Die TextAnnotation kann benutzt werden um an Elementen/Activites eine erwartete Laufzeit zu definieren.
+Die TextAnnotation kann benutzt werden, um z.B. Kommentare an eine FlowNode zu knüpfen.
+Für die Heatmap kann man hier ebenfalls eine erwartete Laufzeit anhängen.
 
 Beispiel:
 
@@ -102,13 +108,18 @@ RT: 00:01:45
 
 <img src="./bpmn-elements-svg/exclusivegateway.svg">
 
-Der Prozessfluss wird in Abhängigkeit einer vorher an Sequenzflows definierten Bedingung geleitet. Es können mehrere Pfade verbunden werden.
+Der Prozess wird zu einem der modellierten, ausgehenden Pfade umgeleitet.
+Welcher Pfad genommen wird, hängt davon ab, welcher SequenceFlow eine passende Bedingung enthält.
+Ein ExclusiveGateway kann beliebig viele ausgehende Pfade besitzen, jedoch kann immer nur **ein** Pfad pro Prozessinstanz ausgeführt werden.
+
+Es ist möglich einen default SequenceFlow zu definieren, der benutzt wird, falls keiner der SequenceFlows eine zutreffende Bedingung enthält.
 
 ### Parallel Gateway
 
 <img src="./bpmn-elements-svg/parallelgateway.svg">
 
-Hängt nicht von einer Bedingung ab, sondern leitet den Prozessfluss an alle ausgehende Pfade.
+Führt alle modellierten Pfade parallel aus.
+Anders als beim ExclusiveGateway, sind die Ausführungen dieser Pfade nicht an Bedingungen geknüpft.
 
 ## Events
 
@@ -116,67 +127,74 @@ Hängt nicht von einer Bedingung ab, sondern leitet den Prozessfluss an alle aus
 
 <img src="./bpmn-elements-svg/startevent.svg">
 
-Der Prozess wird optional mit einem initiellen Token über ein normales StartEvent gestartet.
+Stellt den Beginn eines Prozesses dar.
+Kann optional mit einem initialen Token gestartet werden.
 
 #### MessageStartEvent
 
 <img src="./bpmn-elements-svg/messagestartevent.svg">
 
-Der Prozess wird anhand einer Message gestartet.
+Der Prozess wird automatisch gestartet, wenn eine passende Message eintrifft.
 
 #### SignalStartEvent
 
 <img src="./bpmn-elements-svg/signalstartevent.svg">
 
-Der Prozess wird anhand eines Signals gestartet.
+Der Prozess wird automatisch gestartet, wenn ein passendes Signal empfangen wird.
 
 #### TimeStartEvent
 
 <img src="./bpmn-elements-svg/timerstartevent.svg">
 
-Der Prozess wird anhand eines Timers im Cronjob format gestartet.
+Der Prozess wird automatisch gestartet, wenn der angehangene Cronjob getriggert wird.
 
 ### IntermediateEvents
 
 <img src="./bpmn-elements-svg/intermediatethrowevent.svg">
 
-Wird ausgeführt.
+Ein untypisiertes Event, das einfach ausgeführt wird, ohne eine Aktion zu tätigen.
 
 #### IntermediateLinkCatchEvent
 
 <img src="./bpmn-elements-svg/intermediatelinkcatchevent.svg">
 
-Wenn der Link gecatcht wird, wird der Prozessfluss an den ausgehenden Pfaden des Events weitergeführt.
+Führt den Prozess an dieser Stelle weiter, wenn ein passendes `IntermediateLinkThrowEvent` erreicht wurde.
+
+Wichtig:
+Es darf pro Prozessmodell immer nur **ein** `IntermediateLinkCatchEvent` pro Link geben!
 
 #### IntermediateLinkThrowEvent
 
 <img src="./bpmn-elements-svg/intermediatelinkthrowevent.svg">
 
-Es wird ein Link mit einem vorher definierten Linkname geworfen.
+Der Prozessfluss wird über den definierten Link zu einem `IntermediateLinkCatchEvent` weitergeleitet, welches die gleiche Linkdefinition enthält.
 
 #### IntermediateTimerEvent
 
 <img src="./bpmn-elements-svg/intermediatetimerevent.svg">
 
-Es kann ein Datum oder eine Dauer/Duration gesetzt werden, an dem die Ausführung des Prozesses fortgeführt wird.
+Startet einen Timer, der die Prozessausführung für eine bestimmte Zeit pausiert.
+Es kann eine konkrete Dauer angegeben werden, oder ein bestimmtes Datum, an dem die Prozessausführung fortgesetzt werden soll.
 
 #### SignalIntermediateCatchEvent
 
 <img src="./bpmn-elements-svg/signalintermediatecatchevent.svg">
 
-Fängt ein Signal und führt den Prozess am ausgehenden Pfad weiter.
+Pausiert die Prozessausführung, bis ein vordefiniertes Signal empfangen wurde.
 
 #### SignalIntermediateThrowEvent
 
 <img src="./bpmn-elements-svg/signalintermediatethrowevent.svg">
 
-Wirft ein Signal und führt den Prozess am ausgehenden Pfad weiter.
+Schickt ein vordefiniertes Signal aus und führt den Prozess ohne Unterbrechung weiter.
+
+Anders als beim SendTask, wird hier nicht auf eine Empfangsbestätigung gewartet ("Fire and forget").
 
 #### MessageIntermediateCatchEvent
 
 <img src="./bpmn-elements-svg/messagecatchevent.svg">
 
-Fängt eine Message und führt den Prozess am ausgehenden Pfad weiter.
+Pausiert die Prozessausführung, bis eine vordefinierte Message empfangen wurde.
 
 #### MessageIntermediateThrowEvent
 
@@ -245,7 +263,9 @@ Der Prozess wird bei erreichen des Events beendet.
 
 <img src="./bpmn-elements-svg/errorendevent.svg">
 
-???
+Der Prozess wird mit dem modellierten Fehler beendet.
+
+Der Prozess wird dabei auch in der Datenbank als fehlerhaft markiert.
 
 #### SignalEndEvent
 
@@ -263,4 +283,6 @@ Sendet beim beenden des Prozesses eine Message.
 
 <img src="./bpmn-elements-svg/terminateendevent.svg">
 
-???
+Für die Ausführung mit ParallelGateways:
+
+Wie ErrorEndEvent, forciert jedoch das sofortige Beenden aller parallel laufenden Pfade.
