@@ -1,3 +1,7 @@
+import fs from 'fs';
+import path from 'path';
+import {homedir} from 'os';
+
 import {
   App,
   BrowserWindow,
@@ -9,13 +13,11 @@ import {
   MenuItemConstructorOptions,
   WebContents,
 } from 'electron';
-import fs from 'fs';
-import {CancellationToken, autoUpdater} from '@process-engine/electron-updater';
-import path from 'path';
 import openAboutWindow, {AboutWindowInfo} from 'about-window';
 import getPort from 'get-port';
-import {homedir} from 'os';
+import open from 'open';
 
+import {CancellationToken, autoUpdater} from '@process-engine/electron-updater';
 import * as pe from '@process-engine/process_engine_runtime';
 
 import electronOidc from './electron-oidc';
@@ -345,6 +347,13 @@ function createMainWindow(): void {
 
   browserWindow.on('closed', (event) => {
     browserWindow = null;
+  });
+
+  browserWindow.webContents.on('new-window', (event: any, url: string) => {
+    if (url !== browserWindow.webContents.getURL()) {
+      event.preventDefault();
+      open(url);
+    }
   });
 
   setOpenDiagramListener();
@@ -719,13 +728,10 @@ function getHelpMenu(): MenuItem {
 }
 
 function getAboutWindowInfo(): AboutWindowInfo {
-  const iconPath: string = releaseChannel.isDev()
-    ? path.join(__dirname, '..', 'build/icon.png')
-    : path.join(__dirname, '../../../build/icon.png');
   const copyrightYear: number = new Date().getFullYear();
 
   return {
-    icon_path: iconPath,
+    icon_path: path.join(__dirname, '../../../build/icon.png'),
     product_name: getProductName(),
     bug_report_url: 'https://github.com/process-engine/bpmn-studio/issues/new',
     homepage: 'www.process-engine.io',
