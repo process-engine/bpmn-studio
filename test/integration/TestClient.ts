@@ -27,6 +27,8 @@ const APP_BASE_URL = `file://${__dirname}/../../../../index.html`;
 const DATABASE_PATH = path.join(getUserConfigFolder(), 'bpmn-studio-tests', 'process_engine_databases');
 const SAVE_DIAGRAM_DIR = path.join(getUserConfigFolder(), 'bpmn-studio-tests', 'saved_diagrams');
 const VISIBLE_TIMEOUT = 40000;
+const REMOVE_COMMAND = process.platform === 'win32' ? 'rmdir /s /q' : 'rm -rf';
+
 export class TestClient {
   public solutionExplorer: SolutionExplorer = new SolutionExplorer(this);
   public designView: DesignViewClient = new DesignViewClient(this, SAVE_DIAGRAM_DIR);
@@ -89,11 +91,11 @@ export class TestClient {
   }
 
   public async clearDatabase(): Promise<void> {
-    await this.execCommand(`rm -rf ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
+    await this.execCommand(`${REMOVE_COMMAND} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
   }
 
   public async clearSavedDiagrams(): Promise<void> {
-    await this.execCommand(`rm -rf ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
+    await this.execCommand(`${REMOVE_COMMAND} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
   }
 
   public async isSpectronAppRunning(): Promise<boolean> {
