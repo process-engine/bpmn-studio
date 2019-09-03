@@ -176,46 +176,26 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
           const diagramHasState: boolean = diagramState !== null;
           if (diagramHasState) {
             if (eventIsRename) {
-              const changes: Array<DiagramStateChange> = diagramState.metadata.changes;
+              const change: DiagramStateChange = diagramState.metadata.change;
 
-              const diagramWasChangedByStudio: boolean =
-                changes !== undefined &&
-                changes.some((change) => {
-                  return change.change === 'rename';
-                });
+              const diagramWasChangedByStudio: boolean = change !== undefined && change.change === 'rename';
 
               if (diagramWasChangedByStudio) {
-                const indexToRemove: number = diagramState.metadata.changes.findIndex((change) => {
-                  return change.change === 'rename';
-                });
-
-                diagramState.metadata.changes.splice(indexToRemove, 0);
-
-                this.openDiagramStateService.updateDiagramState(diagram.uri, diagramState);
                 isSaving = false;
                 return;
               }
             }
 
             if (eventIsChange || eventIsRestore) {
-              const changes: Array<DiagramStateChange> = diagramState.metadata.changes;
+              const change: DiagramStateChange = diagramState.metadata.change;
+
+              const xml: string = fs.readFileSync(diagram.uri, 'utf8');
 
               const diagramWasChangedByStudio: boolean =
-                changes !== undefined &&
-                changes.some((change) => {
-                  const xml: string = fs.readFileSync(diagram.uri, 'utf8');
-
-                  return (change.change === 'save' && change.xml === xml) || change.change === 'create';
-                });
+                (change !== undefined && (change.change === 'save' && change.xml === xml)) ||
+                change.change === 'create';
 
               if (diagramWasChangedByStudio) {
-                const indexToRemove: number = diagramState.metadata.changes.findIndex((change) => {
-                  return change.change === 'save';
-                });
-
-                diagramState.metadata.changes.splice(indexToRemove, 1);
-
-                this.openDiagramStateService.updateDiagramState(diagram.uri, diagramState);
                 isSaving = false;
                 return;
               }

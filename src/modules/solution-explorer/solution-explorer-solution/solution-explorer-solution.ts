@@ -1044,7 +1044,7 @@ export class SolutionExplorerSolution {
   private async openDiagramAndUpdateSolution(createdDiagram: IDiagram): Promise<void> {
     await this.openDiagramService.openDiagramFromSolution(createdDiagram.uri, this.createIdentityForSolutionExplorer());
 
-    this.openDiagramStateService.addDiagramChange(createdDiagram.uri, {change: 'create'});
+    this.openDiagramStateService.setDiagramChange(createdDiagram.uri, {change: 'create'});
 
     await this.updateSolution();
     this.resetDiagramCreation();
@@ -1180,7 +1180,7 @@ export class SolutionExplorerSolution {
         this.diagramRenamingState.currentDiagramInputValue,
       );
 
-      this.openDiagramStateService.addDiagramChange(this.currentlyRenamingDiagram.uri, {change: 'rename'});
+      this.openDiagramStateService.setDiagramChange(this.currentlyRenamingDiagram.uri, {change: 'rename'});
     } catch (error) {
       this.notificationService.showNotification(NotificationType.WARNING, error.message);
 

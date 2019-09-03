@@ -9,7 +9,7 @@ export class OpenDiagramStateService {
     location: any,
     selectedElements: Array<IShape>,
     isChanged: boolean,
-    changes?: Array<DiagramStateChange>,
+    change?: DiagramStateChange,
   ): void {
     const diagramState: IDiagramState = {
       data: {
@@ -19,7 +19,7 @@ export class OpenDiagramStateService {
         location: location,
         selectedElements: selectedElements,
         isChanged: isChanged,
-        changes: changes,
+        change: change,
       },
     };
 
@@ -76,18 +76,14 @@ export class OpenDiagramStateService {
     window.localStorage.removeItem(key);
   }
 
-  public addDiagramChange(uri: string, change: DiagramStateChange): void {
+  public setDiagramChange(uri: string, change: DiagramStateChange): void {
     const diagramState: IDiagramState | null = this.loadDiagramState(uri);
 
     if (diagramState === null) {
       throw new Error(`Diagram ${uri} has no state.`);
     }
 
-    if (diagramState.metadata.changes === undefined) {
-      diagramState.metadata.changes = [];
-    }
-
-    diagramState.metadata.changes.push(change);
+    diagramState.metadata.change = change;
 
     this.updateDiagramState(uri, diagramState);
   }
