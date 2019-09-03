@@ -109,9 +109,9 @@ function initializeApplication(): void {
     }
   });
 
-  if (!releaseChannel.isDev()) {
-    initializeAutoUpdater();
-  }
+  // if (!releaseChannel.isDev()) {
+  initializeAutoUpdater();
+  // }
 
   initializeFileOpenFeature();
   initializeOidc();
@@ -126,7 +126,7 @@ function initializeAutoUpdater(): void {
 
     const currentVersionIsPrerelease = currentReleaseChannel.isAlpha() || currentReleaseChannel.isBeta();
     autoUpdater.allowPrerelease = currentVersionIsPrerelease;
-    autoUpdater.channel = currentReleaseChannel.isStable() ? '' : currentReleaseChannel.getName();
+    autoUpdater.channel = 'beta.2'; // currentReleaseChannel.isStable() ? '' : currentReleaseChannel.getName();
 
     const updateCheckResult = await autoUpdater.checkForUpdates();
 
