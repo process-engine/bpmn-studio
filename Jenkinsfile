@@ -203,8 +203,6 @@ pipeline {
           def docker_image_name = '5minds/bpmn-studio-bundle';
           def docker_node_version = '10-alpine';
 
-          // def process_engine_version = bpmn_studio_version
-          def bpmn_studio_version = bpmn_studio_version
 
           full_image_name = "${docker_image_name}:${bpmn_studio_version}";
 
