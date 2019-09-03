@@ -1,3 +1,7 @@
+import fs from 'fs';
+import path from 'path';
+import {homedir} from 'os';
+
 import {
   App,
   BrowserWindow,
@@ -9,13 +13,11 @@ import {
   MenuItemConstructorOptions,
   WebContents,
 } from 'electron';
-import fs from 'fs';
-import {CancellationToken, autoUpdater} from '@process-engine/electron-updater';
-import path from 'path';
 import openAboutWindow, {AboutWindowInfo} from 'about-window';
 import getPort from 'get-port';
-import {homedir} from 'os';
+import open from 'open';
 
+import {CancellationToken, autoUpdater} from '@process-engine/electron-updater';
 import * as pe from '@process-engine/process_engine_runtime';
 
 import electronOidc from './electron-oidc';
