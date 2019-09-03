@@ -8,7 +8,7 @@ export interface IDiagramState {
   metadata: {
     location: IViewbox;
     selectedElements: Array<IShape>;
-    changes?: Array<DiagramStateChange>;
+    change?: DiagramStateChange;
     isChanged: boolean;
   };
 }
