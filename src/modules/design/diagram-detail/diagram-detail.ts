@@ -423,7 +423,7 @@ export class DiagramDetail {
 
       await this.bpmnio.saveDiagramState(this.activeDiagramUri);
 
-      this.openDiagramStateService.addDiagramChange(this.activeDiagramUri, {
+      this.openDiagramStateService.setDiagramChange(this.activeDiagramUri, {
         change: 'save',
         xml: xml,
       });
@@ -486,12 +486,12 @@ export class DiagramDetail {
     try {
       await this.activeSolutionEntry.service.saveDiagram(diagram, path);
 
-      const diagramChange: Array<DiagramStateChange> = [{change: 'save', xml: diagram.xml}];
+      const diagramChange: DiagramStateChange = {change: 'save', xml: diagram.xml};
       const previousDiagramsState: IDiagramState | null = this.openDiagramStateService.loadDiagramState(diagram.uri);
 
       const previousDiagramHasState: boolean = previousDiagramsState !== null;
       if (previousDiagramHasState) {
-        previousDiagramsState.metadata.changes = diagramChange;
+        previousDiagramsState.metadata.change = diagramChange;
 
         this.openDiagramStateService.updateDiagramState(path, previousDiagramsState);
       } else {
