@@ -58,6 +58,7 @@
     "@process-engine/bpmn-lint_rules": "^1.6.2",
     "@process-engine/ci_tools": "2.0.0-alpha.51",
     "@process-engine/dynamic_ui_core": "^1.5.0",
+    "@process-engine/electron-updater": "^0.1.0",
     "@process-engine/management_api_client": "^5.4.0",
     "@process-engine/process_engine_runtime": "8.5.0-alpha.5",
     "@process-engine/solutionexplorer.repository.filesystem": "^4.2.0",
