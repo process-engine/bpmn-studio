@@ -349,6 +349,13 @@ function createMainWindow(): void {
     browserWindow = null;
   });
 
+  browserWindow.webContents.on('new-window', (event: any, url: string) => {
+    if (url !== browserWindow.webContents.getURL()) {
+      event.preventDefault();
+      open(url);
+    }
+  });
+
   setOpenDiagramListener();
   setOpenSolutionsListener();
   setSaveDiagramAsListener();
