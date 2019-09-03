@@ -4,7 +4,7 @@ ARG NODE_IMAGE_VERSION=
 FROM node:${NODE_IMAGE_VERSION} as base
 
 RUN apk add --no-cache tini python make g++ supervisor
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY Docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Install process engine
 FROM base as process_engine
