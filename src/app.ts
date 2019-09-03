@@ -104,7 +104,9 @@ export class App {
       oidcConfig.userManagerSettings.authority = openIdConnectRoute;
     }
 
-    this.ipcRenderer.on('menubar__open_preferences', this.openPreferences);
+    if (this.isRunningInElectron) {
+      this.ipcRenderer.on('menubar__open_preferences', this.openPreferences);
+    }
   }
 
   public deactivate(): void {
