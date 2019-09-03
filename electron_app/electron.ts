@@ -284,7 +284,7 @@ function initializeFileOpenFeature(): void {
 
   app.on('will-finish-launching', () => {
     // for windows
-    if (process.platform === 'win32' && process.argv.length >= 2) {
+    if (process.platform === 'win32' && process.argv.length >= 2 && process.argv[1].endsWith('.bpmn')) {
       fileAssociationFilePath = process.argv[1];
     }
 
