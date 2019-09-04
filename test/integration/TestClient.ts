@@ -8,6 +8,7 @@ import {exec} from 'child_process';
 import {AppConstructorOptions, Application} from 'spectron';
 import assert from 'assert';
 import {IIdentity} from '@essential-projects/iam_contracts';
+import {callExposedFunction} from '../../src/services/expose-functionality-module/expose-functionality-module';
 
 function getUserConfigFolder(): string {
   const userHomeDir = os.homedir();
@@ -67,16 +68,21 @@ export class TestClient {
   public async openDirectoryAsSolution(dir: string, diagramName?: string): Promise<void> {
     const pathToSolution: string = path.join(__dirname, '..', '..', dir);
 
-    await this.webdriverClient.executeAsync(
+    const result = await this.webdriverClient.executeAsync(
       async (solutionPath, solutionIdentity, done) => {
+        console.log('reingegangen');
         // eslint-disable-next-line no-underscore-dangle
-        await (window as any).__dangerouslyInvoke.openSolution(solutionPath, false, solutionIdentity);
+        // await (window as any).__dangerouslyInvoke.openSolution(solutionPath, false, solutionIdentity);
+        const result2 = await callExposedFunction('openSolution', [solutionPath, false, solutionIdentity]);
+        console.log(result2);
 
-        done();
+        done(result2);
       },
       pathToSolution,
       this.getDefaultIdentity(),
     );
+
+    console.log(result);
 
     await this.ensureVisible(`[data-test-solution-entry-name=${dir}]`);
 
