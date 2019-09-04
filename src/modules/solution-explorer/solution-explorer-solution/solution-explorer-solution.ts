@@ -597,16 +597,6 @@ export class SolutionExplorerSolution {
       return undefined;
     }
 
-    /**
-     * We have to check if THIS solution is the "Open Diagrams"-Solution
-     * because it is our special case here and if the ACTIVE solution is the
-     * "Open Diagrams"-Solution we need to return the uri anyway.
-     */
-    const openDiagramSolutionIsActive: boolean = solutionUri === 'about:open-diagrams';
-    if (this.displayedSolutionEntry.isOpenDiagramService && openDiagramSolutionIsActive) {
-      return this.activeDiagram.uri;
-    }
-
     return this.activeDiagram.uri;
   }
 
