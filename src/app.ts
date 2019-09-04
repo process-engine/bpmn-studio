@@ -257,22 +257,4 @@ export class App {
         localStorage.setItem(localStorageKey, JSON.stringify(diagramState));
       });
   }
-
-  private migrateOpenDiagramStatesInLocalStorage(): void {
-    Object.keys(localStorage)
-      .filter((localStorageKey: string) => {
-        return localStorageKey.startsWith('Open Diagram:');
-      })
-      .forEach((localStorageKey) => {
-        const diagramState = JSON.parse(localStorage.getItem(localStorageKey));
-
-        const diagramStateHasOldMetadata: boolean = diagramState.metaData !== undefined;
-        if (diagramStateHasOldMetadata) {
-          diagramState.metadata = diagramState.metaData;
-          delete diagramState.metaData;
-        }
-
-        localStorage.setItem(localStorageKey, JSON.stringify(diagramState));
-      });
-  }
 }
