@@ -50,13 +50,7 @@ export class DeployDiagramService {
   public async deployDiagram(solution: ISolutionEntry, diagram: IDiagram, xml?: string): Promise<void> {
     const diagramHasChanges: boolean = xml !== undefined;
     if (diagramHasChanges) {
-      const shouldSaveDiagram: boolean = await this.shouldSaveDiagram();
-
-      if (shouldSaveDiagram) {
-        this.saveDiagramService.saveDiagram(solution, diagram, xml);
-      } else {
-        return;
-      }
+      diagram.xml = xml;
     }
 
     const remoteSolutionToDeployTo: ISolutionEntry = await this.getRemoteSolutionToDeployTo();

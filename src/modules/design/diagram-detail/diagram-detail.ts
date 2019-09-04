@@ -14,33 +14,20 @@ import {
 import {DataModels, IManagementApi} from '@process-engine/management_api_contracts';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 
-import {
-  DiagramStateChange,
-  IDiagramState,
-  IElementRegistry,
-  ISolutionEntry,
-  ISolutionService,
-  IUserInputValidationRule,
-  NotificationType,
-} from '../../../contracts/index';
+import {IElementRegistry, ISolutionEntry, IUserInputValidationRule, NotificationType} from '../../../contracts/index';
 
 import environment from '../../../environment';
 import {NotificationService} from '../../../services/notification-service/notification.service';
-import {OpenDiagramsSolutionExplorerService} from '../../../services/solution-explorer-services/OpenDiagramsSolutionExplorerService';
 import {BpmnIo} from '../bpmn-io/bpmn-io';
-import {OpenDiagramStateService} from '../../../services/solution-explorer-services/OpenDiagramStateService';
 import {DeployDiagramService} from '../../../services/deploy-diagram-service/deploy-diagram.service';
 import {SaveDiagramService} from '../../../services/save-diagram-service/save-diagram.service';
 
 @inject(
   'ManagementApiClientService',
   'NotificationService',
-  'SolutionService',
   EventAggregator,
   Router,
   ValidationController,
-  'OpenDiagramService',
-  'OpenDiagramStateService',
   DeployDiagramService,
   SaveDiagramService,
 )
@@ -72,7 +59,6 @@ export class DiagramDetail {
   private router: Router;
   private validationController: ValidationController;
   private ipcRenderer: any;
-  private solutionService: ISolutionService;
   private managementApiClient: IManagementApi;
   private correlationIdValidationRegExpList: IUserInputValidationRule = {
     alphanumeric: /^[a-z0-9]/i,
@@ -81,31 +67,23 @@ export class DiagramDetail {
   };
 
   private clickedOnCustomStart: boolean = false;
-  private openDiagramService: OpenDiagramsSolutionExplorerService;
-  private openDiagramStateService: OpenDiagramStateService;
   private deployDiagramService: DeployDiagramService;
   private saveDiagramService: SaveDiagramService;
 
   constructor(
     managementApiClient: IManagementApi,
     notificationService: NotificationService,
-    solutionService: ISolutionService,
     eventAggregator: EventAggregator,
     router: Router,
     validationController: ValidationController,
-    openDiagramService: OpenDiagramsSolutionExplorerService,
-    openDiagramStateService: OpenDiagramStateService,
     deployDiagramService: DeployDiagramService,
     saveDiagramService: SaveDiagramService,
   ) {
     this.notificationService = notificationService;
-    this.solutionService = solutionService;
     this.eventAggregator = eventAggregator;
     this.router = router;
     this.validationController = validationController;
     this.managementApiClient = managementApiClient;
-    this.openDiagramService = openDiagramService;
-    this.openDiagramStateService = openDiagramStateService;
     this.deployDiagramService = deployDiagramService;
     this.saveDiagramService = saveDiagramService;
 
