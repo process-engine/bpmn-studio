@@ -141,12 +141,10 @@ export class SaveDiagramService {
     };
 
     try {
-      this.openDiagramStateService.saveDiagramState(pathToSaveTo, diagram.xml, undefined, undefined, false, [
-        {
-          change: 'save',
-          xml: xml,
-        },
-      ]);
+      this.openDiagramStateService.saveDiagramState(pathToSaveTo, diagram.xml, undefined, undefined, false, {
+        change: 'save',
+        xml: xml,
+      });
 
       await solutionToSaveTo.service.saveDiagram(diagram, pathToSaveTo);
 
@@ -157,12 +155,12 @@ export class SaveDiagramService {
         this.openDiagramStateService.updateDiagramState(pathToSaveTo, diagramState);
       }
 
-      const diagramChange: Array<DiagramStateChange> = [{change: 'save', xml: diagram.xml}];
+      const diagramChange: DiagramStateChange = {change: 'save', xml: diagram.xml};
       const previousDiagramsState: IDiagramState | null = this.openDiagramStateService.loadDiagramState(diagram.uri);
 
       const previousDiagramHasState: boolean = previousDiagramsState !== null;
       if (previousDiagramHasState) {
-        previousDiagramsState.metadata.changes = diagramChange;
+        previousDiagramsState.metadata.change = diagramChange;
 
         this.openDiagramStateService.updateDiagramState(path, previousDiagramsState);
       } else {
