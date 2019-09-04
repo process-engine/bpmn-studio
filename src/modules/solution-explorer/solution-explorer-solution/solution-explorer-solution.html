@@ -8,8 +8,8 @@
       <i class="fa fa-spinner fa-spin"></i>
     </div>
 
-    <div class="diagram-contextmenu" ref="diagramContextMenu" show.bind="showContextMenu && canRenameDiagram()">
-      <div class="diagram-contextmenu__entry" click.delegate="duplicateDiagram()">
+    <div class="diagram-contextmenu" ref="diagramContextMenu" show.bind="showContextMenu">
+      <div if.bind="canRenameDiagram()" class="diagram-contextmenu__entry" click.delegate="duplicateDiagram()">
         Duplicate
       </div>
       <div class="diagram-contextmenu__entry" click.delegate="deployDiagram()">
