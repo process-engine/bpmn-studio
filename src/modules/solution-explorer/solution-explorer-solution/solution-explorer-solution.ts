@@ -513,7 +513,8 @@ export class SolutionExplorerSolution {
     return false;
   }
 
-  public canRenameDiagram(): boolean {
+  @computedFrom('displayedSolutionEntry.isOpenDiagramService', 'openedSolution')
+  public get canRenameDiagram(): boolean {
     return (
       !this.displayedSolutionEntry.isOpenDiagramService &&
       this.openedSolution &&
