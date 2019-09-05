@@ -1,7 +1,6 @@
 /* eslint-disable no-useless-escape */
 /* eslint-disable no-empty-function */
 import path from 'path';
-import fs from 'fs';
 import os from 'os';
 import {exec} from 'child_process';
 
@@ -9,6 +8,17 @@ import {AppConstructorOptions, Application} from 'spectron';
 import assert from 'assert';
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {callExposedFunction} from '../../src/services/expose-functionality-module/expose-functionality-module';
+import {SolutionExplorer} from './test-classes/solution-explorer';
+import {PropertyPanel} from './test-classes/property-panel';
+import {Design} from './test-classes/design-view';
+import {DiffView} from './test-classes/diff-view';
+import {LiveExecutionTracker} from './test-classes/live-execution-tracker';
+import {Navbar} from './test-classes/navbar';
+import {StartPage} from './test-classes/startpage';
+import {Statusbar} from './test-classes/status-bar';
+import {ThinkView} from './test-classes/think-view';
+import {XmlView} from './test-classes/xml-view';
+import {GlobalMethods} from './test-classes/global-methods';
 
 function getUserConfigFolder(): string {
   const userHomeDir = os.homedir();
@@ -27,10 +37,37 @@ const DATABASE_PATH = path.join(getUserConfigFolder(), 'bpmn-studio-tests', 'pro
 const SAVE_DIAGRAM_DIR = path.join(getUserConfigFolder(), 'bpmn-studio-tests', 'saved_diagrams');
 
 export class TestClient {
+  public solutionExplorer: SolutionExplorer;
+  public designView: Design;
+  public propertyPanel: PropertyPanel;
+  public diffView: DiffView;
+  public liveExecutionTracker: LiveExecutionTracker;
+  public navbar: Navbar;
+  public startPage: StartPage;
+  public statusbar: Statusbar;
+  public thinkView: ThinkView;
+  public xmlView: XmlView;
+
+  public globalMehtods: GlobalMethods;
   private app: Application;
 
   constructor(applicationArgs: AppConstructorOptions) {
     this.app = new Application(applicationArgs);
+  }
+
+  public async startSpectronApp(): Promise<any> {
+    await this.app.start();
+    this.globalMehtods = new GlobalMethods(this.app);
+    this.solutionExplorer = new SolutionExplorer(this.app);
+    this.designView = new Design(this.app, SAVE_DIAGRAM_DIR);
+    this.propertyPanel = new PropertyPanel(this.app);
+    this.diffView = new DiffView(this.app);
+    this.liveExecutionTracker = new LiveExecutionTracker(this.app);
+    this.navbar = new Navbar(this.app);
+    this.startPage = new StartPage(this.app);
+    this.statusbar = new Statusbar(this.app);
+    this.thinkView = new ThinkView(this.app);
+    this.xmlView = new XmlView(this.app);
   }
 
   public async awaitReadyness(): Promise<void> {
@@ -38,71 +75,8 @@ export class TestClient {
     await this.app.browserWindow.isVisible();
   }
 
-  public async showSolutionExplorer(): Promise<void> {
-    const solutionExplorerIsVisible = await this.webdriverClient.isVisible('[data-test-solution-explorer-panel]');
-    if (solutionExplorerIsVisible) {
-      return;
-    }
-
-    await this.ensureVisible('[data-test-toggle-solution-explorer]');
-    await this.clickOn('[data-test-toggle-solution-explorer]');
-    await this.ensureVisible('[data-test-solution-explorer-panel]');
-  }
-
-  public async hideSolutionExplorer(): Promise<void> {
-    const solutionExplorerIsVisible = await this.webdriverClient.isVisible('[data-test-solution-explorer-panel]');
-    const solutionExplorerIsHidden = !solutionExplorerIsVisible;
-    if (solutionExplorerIsHidden) {
-      return;
-    }
-
-    await this.ensureVisible('[data-test-toggle-solution-explorer]');
-    await this.clickOn('[data-test-toggle-solution-explorer]');
-    await this.ensureNotVisible('[data-test-solution-explorer-panel]');
-  }
-
-  public async assertInternalProcessEngineIsOpenedAsSolution(): Promise<void> {
-    await this.ensureVisible('[data-test-solution-is-internal=true]');
-  }
-
-  public async openDirectoryAsSolution(dir: string, diagramName?: string): Promise<void> {
-    const pathToSolution: string = path.join(__dirname, '..', '..', '..', '..', dir);
-
-    await callExposedFunction(this.webdriverClient, 'openSolution', pathToSolution, false, this.getDefaultIdentity());
-    await this.ensureVisible(`[data-test-solution-entry-name=${dir}]`);
-
-    if (diagramName) {
-      const searchString = this.getUriForSelector(pathToSolution, diagramName);
-      await this.ensureVisible(`[data-test-open-diagram-with-uri*="${searchString}"]`);
-      await this.clickOn(`[data-test-open-diagram-with-uri*="${searchString}"]`);
-    }
-  }
-
-  public async createAndOpenNewDiagram(): Promise<void> {
-    await this.ensureVisible('[data-test-create-new-diagram]');
-    await this.clickOn('[data-test-create-new-diagram]');
-    await this.ensureVisible('[data-test-navbar-title]');
-  }
-
-  public async startProcess(): Promise<void> {
-    await this.ensureVisible('[data-test-start-diagram-button]');
-    await this.clickOn('[data-test-start-diagram-button]');
-    await this.ensureVisible('[data-test-live-execution-tracker]');
-  }
-
-  public async stopProcess(): Promise<void> {
-    await this.ensureVisible('[data-test-stop-process-button]');
-    await this.clickOn('[data-test-stop-process-button]');
-    await this.ensureNotVisible('[data-test-stop-process-button]');
-  }
-
-  public async deployDiagram(): Promise<void> {
-    await this.ensureVisible('[data-test-deploy-diagram-button]');
-    await this.clickOn('[data-test-deploy-diagram-button]');
-  }
-
   public async startPageLoaded(): Promise<void> {
-    await this.ensureVisible('[data-test-start-page]');
+    await this.globalMehtods.ensureVisible('[data-test-start-page]');
   }
 
   public async clearDatabase(): Promise<void> {
@@ -113,222 +87,6 @@ export class TestClient {
     await this.execCommand(`rm -rf ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
   }
 
-  public async assertDiagramIsOnFileSystem(): Promise<void> {
-    await this.ensureVisible('[data-test-navbar-icon]');
-    const classAttribute = await this.getAttributeFromElement('[data-test-navbar-icon]', 'data-test-navbar-icon');
-
-    assert.equal(classAttribute, 'false');
-  }
-
-  public async assertDiagramIsOnProcessEngine(): Promise<void> {
-    await this.ensureVisible('[data-test-navbar-icon]');
-    const classAttribute = await this.getAttributeFromElement('[data-test-navbar-icon]', 'data-test-navbar-icon');
-
-    assert.equal(classAttribute, 'true');
-  }
-
-  public async saveDiagramAs(fileName: string): Promise<void> {
-    const fileUri: string = path.join(SAVE_DIAGRAM_DIR, fileName);
-    const directoryExists: boolean = await fs.existsSync(SAVE_DIAGRAM_DIR);
-
-    if (!directoryExists) {
-      fs.mkdirSync(SAVE_DIAGRAM_DIR);
-    }
-
-    await this.webdriverClient.executeAsync(async (pathToSave, done) => {
-      // eslint-disable-next-line no-underscore-dangle
-      await (window as any).__dangerouslyInvoke.saveDiagramAs(pathToSave);
-
-      done();
-    }, fileUri);
-  }
-
-  public async assertDiagramIsSaved(): Promise<void> {
-    await this.ensureNotVisible('[data-test-edited-label]');
-  }
-
-  public async assertDiagramIsUnsaved(): Promise<void> {
-    await this.ensureVisible('[data-test-edited-label]');
-  }
-
-  // openDesignViewForCurrentDiagram?
-  public async openDesignViewFromStatusbar(): Promise<void> {
-    await this.ensureVisible('[data-test-status-bar-disable-xml-view-button]');
-    await this.clickOn('[data-test-status-bar-disable-xml-view-button]');
-    await this.ensureVisible('[data-test-diagram-detail]');
-  }
-
-  public async assertXmlContainsText(text: string): Promise<void> {
-    const xmlViewContent = await this.getTextFromElement('[data-test-xml-view-content]');
-    const xmlViewContentContainsText: boolean = xmlViewContent.includes(text);
-
-    assert.equal(xmlViewContentContainsText, true);
-  }
-
-  // openXMLViewForCurrentDiagram?
-  public async openXmlViewFromStatusbar(): Promise<void> {
-    await this.ensureVisible('[data-test-status-bar-xml-view-button]');
-    await this.clickOn('[data-test-status-bar-xml-view-button]');
-    await this.ensureVisible('[data-test-bpmn-xml-view]');
-  }
-
-  public async clickOnBpmnElementWithName(name): Promise<void> {
-    await this.ensureVisible(`.djs-label=${name}`);
-    await this.clickOn(`.djs-label=${name}`);
-  }
-
-  public async assertWindowTitleIs(name): Promise<void> {
-    const windowTitle = await this.webdriverClient.getTitle();
-
-    assert.equal(windowTitle, name);
-  }
-
-  public async assertNavbarTitleIs(name): Promise<void> {
-    await this.ensureVisible('[data-test-navbar-title]');
-    const navbarTitle = await this.getTextFromElement('[data-test-navbar-title]');
-
-    assert.equal(navbarTitle, name);
-  }
-
-  public async assertSelectedBpmnElementHasName(name): Promise<void> {
-    const selectedElementText = await this.getValueFromElement('[data-test-property-panel-element-name]');
-
-    assert.equal(selectedElementText, name);
-  }
-
-  public async rejectSelectedBpmnElementHasName(name): Promise<void> {
-    const selectedElementText = await this.getValueFromElement('[data-test-property-panel-element-name]');
-
-    assert.notEqual(selectedElementText, name);
-  }
-
-  public async showPropertyPanel(): Promise<void> {
-    const propertyPanelIsVisible = await this.webdriverClient.isVisible('[data-test-property-panel]');
-    if (propertyPanelIsVisible) {
-      return;
-    }
-
-    await this.ensureVisible('[data-test-toggle-propertypanel]');
-    await this.clickOn('[data-test-toggle-propertypanel]');
-  }
-
-  public async hidePropertyPanel(): Promise<void> {
-    const propertyPanelIsVisible = await this.webdriverClient.isVisible('[data-test-property-panel]');
-    const propertyPanelIsHidden = !propertyPanelIsVisible;
-    if (propertyPanelIsHidden) {
-      return;
-    }
-
-    await this.ensureVisible('[data-test-toggle-propertypanel]');
-    await this.clickOn('[data-test-toggle-propertypanel]');
-  }
-
-  public async getElement(selector): Promise<any> {
-    return this.webdriverClient.element(selector);
-  }
-
-  public async getElements(selector): Promise<any> {
-    return this.webdriverClient.elements(selector);
-  }
-
-  public async openStartPage(): Promise<void> {
-    return this.openView('');
-  }
-
-  public async assertCanvasModelIsVisible(): Promise<void> {
-    const canvasModelIsVisible = await this.webdriverClient.isVisible('[data-test-canvas-model]');
-    assert.equal(canvasModelIsVisible, true);
-  }
-
-  public async assertXmlViewHasContent(): Promise<void> {
-    const xmlViewContent = await this.getTextFromElement('[data-test-xml-view-content]');
-    assert.notEqual(xmlViewContent, null);
-  }
-
-  public async assertDiffViewHasRenderedAllContainer(): Promise<void> {
-    const leftDiffViewContainerIsVisible = await this.webdriverClient.isVisible('[data-test-left-diff-view]');
-    const rightDiffViewContainerIsVisible = await this.webdriverClient.isVisible('[data-test-right-diff-view]');
-    const lowerDiffViewContainerIsVisible = await this.webdriverClient.isVisible('[data-test-lower-diff-view]');
-
-    assert.equal(leftDiffViewContainerIsVisible, true);
-    assert.equal(rightDiffViewContainerIsVisible, true);
-    assert.equal(lowerDiffViewContainerIsVisible, true);
-  }
-
-  public async openDesignViewForDiagram(diagramName: string, diagramUri: string, solutionUri?: string): Promise<void> {
-    await this.openDesignView('detail', diagramName, diagramUri, solutionUri);
-    await this.ensureVisible('[data-test-diagram-detail]');
-  }
-
-  public async openXmlViewForDiagram(diagramName: string, diagramUri: string, solutionUri?: string): Promise<void> {
-    await this.openDesignView('xml', diagramName, diagramUri, solutionUri);
-    await this.ensureVisible('[data-test-bpmn-xml-view]');
-  }
-
-  public async openDiffViewForDiagram(diagramName: string, diagramUri: string, solutionUri?: string): Promise<void> {
-    await this.openDesignView('diff', diagramName, diagramUri, solutionUri);
-    await this.ensureVisible('[data-test-bpmn-diff-view]');
-  }
-
-  public async openThinkView(diagramName?: string, diagramUri?: string, solutionUri?: string): Promise<void> {
-    if (diagramName && diagramUri) {
-      const encodedName = encodeURIComponent(diagramName);
-      const encodedUri = encodeURIComponent(diagramUri);
-      const encodedSolutionUri = solutionUri ? encodeURIComponent(solutionUri) : '';
-      const uriFragment = `#/think/diagram-list/diagram/${encodedName}?diagramUri=${encodedUri}&solutionUri=${encodedSolutionUri}`;
-
-      await this.openView(uriFragment);
-    } else {
-      await this.openView('#/think/diagram-list/diagram');
-    }
-
-    await this.ensureVisible('diagram-list');
-  }
-
-  public async openThinkViewFromNavbar(): Promise<void> {
-    await this.ensureVisible('[data-test-navbar="Think"]');
-    await this.clickOn('[data-test-navbar="Think"]');
-    await this.ensureVisible('diagram-list');
-  }
-
-  public async getAttributeFromElement(selector, attribute): Promise<string> {
-    return this.webdriverClient.getAttribute(selector, attribute);
-  }
-
-  public async getTextFromElement(selector): Promise<string> {
-    return this.webdriverClient.getText(selector);
-  }
-
-  public async getValueFromElement(selector): Promise<string> {
-    return this.webdriverClient.getValue(selector);
-  }
-
-  public async elementHasText(selector, text): Promise<void> {
-    return this.webdriverClient.waitUntilTextExists(selector, text);
-  }
-
-  public async ensureVisible(selector: string, timeout?: number): Promise<boolean> {
-    return this.webdriverClient.waitForVisible(selector, timeout);
-  }
-
-  public async ensureNotVisible(selector: string): Promise<boolean> {
-    const collection = await this.webdriverClient.elements(selector);
-
-    return collection.value.length === 0;
-  }
-
-  public async clickOn(selector: string): Promise<any> {
-    return this.webdriverClient.$(selector).leftClick();
-  }
-
-  public async pause(timeInMilliseconds: number): Promise<void> {
-    await new Promise((c: Function): any => setTimeout(c, timeInMilliseconds));
-  }
-
-  public async startSpectronApp(): Promise<Application> {
-    return this.app.start();
-  }
-
   public async isSpectronAppRunning(): Promise<boolean> {
     return this.app.isRunning();
   }
@@ -337,35 +95,8 @@ export class TestClient {
     return this.app.stop();
   }
 
-  private getDefaultIdentity(): IIdentity {
-    const identity = {
-      token: 'ZHVtbXlfdG9rZW4=',
-      userId: '',
-    };
-
-    return identity;
-  }
-
-  private get webdriverClient(): any {
+  public get webdriverClient(): any {
     return this.app.client;
-  }
-
-  private async openView(uriPath: string): Promise<void> {
-    return this.app.browserWindow.loadURL(`${APP_BASE_URL}${uriPath}`);
-  }
-
-  private async openDesignView(
-    subPath: string,
-    diagramName: string,
-    diagramUri: string,
-    solutionUri?: string,
-  ): Promise<void> {
-    const encodedName = encodeURIComponent(diagramName);
-    const encodedUri = encodeURIComponent(diagramUri);
-    const encodedSolutionUri = solutionUri ? encodeURIComponent(solutionUri) : '';
-    const uriFragment = `#/design/${subPath}/diagram/${encodedName}?diagramUri=${encodedUri}&solutionUri=${encodedSolutionUri}`;
-
-    return this.openView(uriFragment);
   }
 
   private async execCommand(command: string): Promise<any> {
@@ -377,17 +108,5 @@ export class TestClient {
         return resolve(stdin);
       });
     });
-  }
-
-  private getUriForSelector(pathToSolution: string, diagramName: string): string {
-    const isWindows = process.platform === 'win32';
-    if (isWindows) {
-      const searchString: string = `${pathToSolution}\\${diagramName}`;
-      const replacedSearchString = searchString.replace(/[\\]/gm, '\\\\');
-
-      return replacedSearchString;
-    }
-
-    return `${pathToSolution}/${diagramName}`;
   }
 }
