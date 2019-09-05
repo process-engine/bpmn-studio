@@ -199,9 +199,7 @@ export class SaveDiagramService {
       solutionUri: solutionToSaveTo.uri,
     });
 
-    this.eventAggregator.subscribeOnce('router:navigation:success', () => {
-      this.eventAggregator.publish(environment.events.diagramWasSaved, diagramToSave.uri);
-    });
+    this.eventAggregator.publish(environment.events.diagramWasSaved, diagramToSave.uri);
 
     setTimeout(() => {
       this.isSaving = false;
