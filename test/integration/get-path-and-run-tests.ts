@@ -1,14 +1,13 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
-const exec = require('child_process').exec;
+import {ExecException, exec} from 'child_process';
 
-function getNpmTestScriptName() {
+function getNpmTestScriptName(): string {
   const isWindows = process.platform === 'win32';
   const platform = isWindows ? 'windows' : 'macos';
 
   return `test-electron-${platform}`;
 }
 
-async function getBuiltStudioPath() {
+async function getBuiltStudioPath(): Promise<string> {
   const isWindows = process.platform === 'win32';
   if (isWindows) {
     const result = await execCommand('find ./dist/electron/win-unpacked/**.exe');
@@ -25,9 +24,9 @@ async function getBuiltStudioPath() {
     .slice(0, -1);
 }
 
-async function execCommand(command) {
-  return new Promise((resolve, reject) => {
-    exec(command, (err, stdin, stderr) => {
+async function execCommand(command): Promise<ExecException & string> {
+  return new Promise((resolve: Function, reject: Function): void => {
+    exec(command, (err: ExecException, stdin: string, stderr: string) => {
       if (err || stderr) {
         reject(err, stderr);
       }
@@ -36,16 +35,19 @@ async function execCommand(command) {
   });
 }
 
-async function runTests() {
+async function runTests(): Promise<void> {
   const pathToStudio = await getBuiltStudioPath();
 
-  exec(`cross-env SPECTRON_APP_PATH=${pathToStudio} npm run ${getNpmTestScriptName()}`, (err, stdout, stderr) => {
-    if (err || stderr) {
-      console.error(err, stderr);
-    }
+  exec(
+    `cross-env SPECTRON_APP_PATH=${pathToStudio} npm run ${getNpmTestScriptName()}`,
+    (err: ExecException, stdout: string, stderr: string) => {
+      if (err || stderr) {
+        console.error(err, stderr);
+      }
 
-    console.log(stdout);
-  });
+      console.log(stdout);
+    },
+  );
 }
 
 runTests();

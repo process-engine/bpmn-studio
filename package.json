@@ -36,7 +36,7 @@
     "test": "npm run test-electron",
     "test-electron-macos": "tsc -p test/ && mocha -r choma dist/test/**/*.spec.js",
     "test-electron-windows": "tsc -p test/ && mocha -r choma dist/test/**/*.spec.js",
-    "test-electron": "node test/integration/get-path-and-run-tests.js"
+    "test-electron": "node dist/test/get-path-and-run-tests.js"
   },
   "files": [
     "dist/web",
