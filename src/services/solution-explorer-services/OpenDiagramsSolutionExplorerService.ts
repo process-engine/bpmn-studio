@@ -193,7 +193,7 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
 
               const diagramWasChangedByStudio: boolean =
                 (change !== undefined && (change.change === 'save' && change.xml === xml)) ||
-                change.change === 'create';
+                (change !== undefined && change.change === 'create');
 
               if (diagramWasChangedByStudio) {
                 isSaving = false;
