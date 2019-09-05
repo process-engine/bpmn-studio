@@ -731,7 +731,9 @@ function getAboutWindowInfo(): AboutWindowInfo {
   const copyrightYear: number = new Date().getFullYear();
 
   return {
-    icon_path: path.join(__dirname, '../../../build/icon.png'),
+    icon_path: releaseChannel.isDev()
+      ? path.join(__dirname, '../../../build/icon.png')
+      : path.join(__dirname, '../../../../../build/icon.png'),
     product_name: getProductName(),
     bug_report_url: 'https://github.com/process-engine/bpmn-studio/issues/new',
     homepage: 'www.process-engine.io',
