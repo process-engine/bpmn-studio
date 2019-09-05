@@ -163,14 +163,6 @@ export class DeployDiagramService {
     });
   }
 
-  private shouldSaveDiagram(): Promise<boolean> {
-    return new Promise((resolve: Function): void => {
-      this.eventAggregator.publish(environment.events.deployModals.showSaveBeforeDeployModal, (shouldSave: boolean) => {
-        resolve(shouldSave);
-      });
-    });
-  }
-
   private getRemoteSolutionToDeployTo(): Promise<ISolutionEntry> {
     return new Promise((resolve: Function): void => {
       if (this.multipleRemoteSolutionsExist) {

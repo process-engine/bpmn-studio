@@ -1,15 +1,6 @@
 <template>
   <require from='./deploy-modals.css'></require>
 
-  <modal if.bind="showSaveBeforeDeployModal"
-         header-text="Save Diagram Before Deploying"
-         body-text="In order to deploy your diagram, you have to save your recent changes to disk.">
-    <template replace-part="modal-footer">
-      <button type="button" class="btn btn-default" data-dismiss="modal" click.delegate="cancelSaveBeforeDeployModal()">Cancel</button>
-      <button type="button" class="btn btn-primary" data-dismiss="modal" click.delegate="saveDiagramAndDeploy()">Save and deploy</button>
-    </template>
-  </modal>
-
   <modal if.bind="showRemoteSolutionOnDeployModal"
          header-text="Multiple Connected ProcessEngines Found">
     <template replace-part="modal-body">
