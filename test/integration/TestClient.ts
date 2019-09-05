@@ -66,24 +66,9 @@ export class TestClient {
   }
 
   public async openDirectoryAsSolution(dir: string, diagramName?: string): Promise<void> {
-
-    const result = await this.webdriverClient.executeAsync(
-      async (solutionPath, solutionIdentity, done) => {
-        console.log('reingegangen');
-        // eslint-disable-next-line no-underscore-dangle
-        // await (window as any).__dangerouslyInvoke.openSolution(solutionPath, false, solutionIdentity);
-        const result2 = await callExposedFunction('openSolution', [solutionPath, false, solutionIdentity]);
-        console.log(result2);
-
-        done(result2);
-      },
-      pathToSolution,
-      this.getDefaultIdentity(),
-    );
-
-    console.log(result);
     const pathToSolution: string = path.join(__dirname, '..', '..', '..', '..', dir);
 
+    await callExposedFunction(this.webdriverClient, 'openSolution', pathToSolution, false, this.getDefaultIdentity());
     await this.ensureVisible(`[data-test-solution-entry-name=${dir}]`);
 
     if (diagramName) {

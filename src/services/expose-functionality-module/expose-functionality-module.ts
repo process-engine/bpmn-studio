@@ -9,10 +9,23 @@ export function exposeFunctionForTesting(functionName: string, functionCallback:
   (window as any).__dangerouslyInvoke[functionName] = functionCallback;
 }
 
-export async function callExposedFunction(functionName: string, ...args: Array<any>): Promise<any> {
-  console.log(...args);
-  // await (window as any).__dangerouslyInvoke[functionName]('solutionPath', false, 'solutionIdentity');
+export async function callExposedFunction(
+  webdriverClient: any,
+  functionName: string,
+  ...args: Array<any>
+): Promise<any> {
+  const result = await webdriverClient.executeAsync(
+    async (exposedFunctionName, ...params) => {
+      const exposedFunctionResult = await (window as any).__dangerouslyInvoke[exposedFunctionName](...params);
 
-  return args;
-  // done();
+      const doneFunctionIndex = params.length - 1;
+      const done = params[doneFunctionIndex];
+
+      done(exposedFunctionResult);
+    },
+    functionName,
+    ...args,
+  );
+
+  return result;
 }
