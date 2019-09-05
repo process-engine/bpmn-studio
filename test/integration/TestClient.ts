@@ -22,7 +22,7 @@ function getUserConfigFolder(): string {
   }
 }
 
-const APP_BASE_URL = `file://${__dirname}/../../index.html`;
+const APP_BASE_URL = `file://${__dirname}/../../../../index.html`;
 const DATABASE_PATH = path.join(getUserConfigFolder(), 'bpmn-studio-tests', 'process_engine_databases');
 const SAVE_DIAGRAM_DIR = path.join(getUserConfigFolder(), 'bpmn-studio-tests', 'saved_diagrams');
 
@@ -66,7 +66,6 @@ export class TestClient {
   }
 
   public async openDirectoryAsSolution(dir: string, diagramName?: string): Promise<void> {
-    const pathToSolution: string = path.join(__dirname, '..', '..', dir);
 
     const result = await this.webdriverClient.executeAsync(
       async (solutionPath, solutionIdentity, done) => {
@@ -83,6 +82,7 @@ export class TestClient {
     );
 
     console.log(result);
+    const pathToSolution: string = path.join(__dirname, '..', '..', '..', '..', dir);
 
     await this.ensureVisible(`[data-test-solution-entry-name=${dir}]`);
 
