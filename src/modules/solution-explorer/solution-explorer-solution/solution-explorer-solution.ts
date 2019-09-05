@@ -95,6 +95,8 @@ export class SolutionExplorerSolution {
     isCreateDiagramInputShown: false,
   };
 
+  private diagramStateList: Array<IDiagramStateListEntry>;
+
   private diagramRenamingState: IDiagramNameInputState = {
     currentDiagramInputValue: undefined,
   };
@@ -112,6 +114,7 @@ export class SolutionExplorerSolution {
   private ipcRenderer: any;
 
   private sortedDiagramsOfSolutions: Array<IDiagram> = [];
+  private diagramStatesChangedCallbackId: string;
 
   constructor(
     router: Router,
@@ -133,6 +136,11 @@ export class SolutionExplorerSolution {
     this.openDiagramStateService = openDiagramStateService;
     this.deployDiagramService = deployDiagramService;
     this.saveDiagramService = saveDiagramService;
+
+    this.diagramStateList = this.openDiagramStateService.loadDiagramStateForAllDiagrams();
+    this.diagramStatesChangedCallbackId = this.openDiagramStateService.onDiagramStatesChanged(() => {
+      this.diagramStateList = this.openDiagramStateService.loadDiagramStateForAllDiagrams();
+    });
   }
 
   public async attached(): Promise<void> {
@@ -230,6 +238,8 @@ export class SolutionExplorerSolution {
       this.ipcRenderer.removeListener('menubar__start_close_all_diagrams', this.closeAllDiagramsEventFunction);
       this.ipcRenderer.removeListener('menubar__start_save_all_diagrams', this.saveAllDiagramsEventFunction);
     }
+
+    this.openDiagramStateService.removeOnDiaagramStatesChangedListener(this.diagramStatesChangedCallbackId);
   }
 
   public async showDeleteDiagramModal(diagram: IDiagram, event: Event): Promise<void> {
@@ -501,6 +511,20 @@ export class SolutionExplorerSolution {
       this.openedSolution &&
       !this.isUriFromRemoteSolution(this.openedSolution.uri)
     );
+  }
+
+  @computedFrom('diagramStateList')
+  public get diagramChangedStateMap(): Map<string, boolean> {
+    const isChangedMap: Map<string, boolean> = new Map<string, boolean>();
+
+    this.diagramStateList.forEach((diagramStateListEntry: IDiagramStateListEntry): void => {
+      const isChanged: boolean =
+        diagramStateListEntry !== null && diagramStateListEntry.diagramState.metadata.isChanged;
+
+      isChangedMap.set(diagramStateListEntry.uri, isChanged);
+    });
+
+    return isChangedMap;
   }
 
   public canDeleteDiagram(): boolean {
