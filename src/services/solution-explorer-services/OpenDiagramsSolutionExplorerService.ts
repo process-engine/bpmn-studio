@@ -234,6 +234,11 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
   public closeDiagram(diagram: IDiagram): Promise<void> {
     const index: number = this.findIndexOfDiagramWithURI(diagram.uri);
 
+    const diagramWasNotOpened: boolean = index === -1;
+    if (diagramWasNotOpened) {
+      return undefined;
+    }
+
     this.openedDiagrams.splice(index, 1);
     this.openDiagramStateService.deleteDiagramState(diagram.uri);
     this.unwatchFile(diagram.uri);
