@@ -14,31 +14,22 @@ import {
 import {DataModels, IManagementApi} from '@process-engine/management_api_contracts';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 
-import {
-  DiagramStateChange,
-  IDiagramState,
-  IElementRegistry,
-  ISolutionEntry,
-  ISolutionService,
-  IUserInputValidationRule,
-  NotificationType,
-} from '../../../contracts/index';
+import {IElementRegistry, ISolutionEntry, IUserInputValidationRule, NotificationType} from '../../../contracts/index';
 
 import environment from '../../../environment';
 import {NotificationService} from '../../../services/notification-service/notification.service';
-import {OpenDiagramsSolutionExplorerService} from '../../../services/solution-explorer-services/OpenDiagramsSolutionExplorerService';
 import {BpmnIo} from '../bpmn-io/bpmn-io';
-import {OpenDiagramStateService} from '../../../services/solution-explorer-services/OpenDiagramStateService';
+import {DeployDiagramService} from '../../../services/deploy-diagram-service/deploy-diagram.service';
+import {SaveDiagramService} from '../../../services/save-diagram-service/save-diagram.service';
 
 @inject(
   'ManagementApiClientService',
   'NotificationService',
-  'SolutionService',
   EventAggregator,
   Router,
   ValidationController,
-  'OpenDiagramService',
-  'OpenDiagramStateService',
+  DeployDiagramService,
+  SaveDiagramService,
 )
 export class DiagramDetail {
   @bindable() public activeDiagram: IDiagram;
@@ -68,7 +59,6 @@ export class DiagramDetail {
   private router: Router;
   private validationController: ValidationController;
   private ipcRenderer: any;
-  private solutionService: ISolutionService;
   private managementApiClient: IManagementApi;
   private correlationIdValidationRegExpList: IUserInputValidationRule = {
     alphanumeric: /^[a-z0-9]/i,
@@ -77,28 +67,25 @@ export class DiagramDetail {
   };
 
   private clickedOnCustomStart: boolean = false;
-  private openDiagramService: OpenDiagramsSolutionExplorerService;
-  private openDiagramStateService: OpenDiagramStateService;
-  private isSaving: boolean;
+  private deployDiagramService: DeployDiagramService;
+  private saveDiagramService: SaveDiagramService;
 
   constructor(
     managementApiClient: IManagementApi,
     notificationService: NotificationService,
-    solutionService: ISolutionService,
     eventAggregator: EventAggregator,
     router: Router,
     validationController: ValidationController,
-    openDiagramService: OpenDiagramsSolutionExplorerService,
-    openDiagramStateService: OpenDiagramStateService,
+    deployDiagramService: DeployDiagramService,
+    saveDiagramService: SaveDiagramService,
   ) {
     this.notificationService = notificationService;
-    this.solutionService = solutionService;
     this.eventAggregator = eventAggregator;
     this.router = router;
     this.validationController = validationController;
     this.managementApiClient = managementApiClient;
-    this.openDiagramService = openDiagramService;
-    this.openDiagramStateService = openDiagramStateService;
+    this.deployDiagramService = deployDiagramService;
+    this.saveDiagramService = saveDiagramService;
 
     // eslint-disable-next-line no-underscore-dangle
     (window as any).__dangerouslyInvoke['saveDiagramAs'] = (path: string): void => {
@@ -132,11 +119,13 @@ export class DiagramDetail {
       this.validationController.subscribe((event: ValidateEvent) => {
         this.handleFormValidateEvents(event);
       }),
-      this.eventAggregator.subscribe(environment.events.diagramDetail.saveDiagram, () => {
-        this.saveDiagram();
+      this.eventAggregator.subscribe(environment.events.diagramDetail.saveDiagram, async () => {
+        await this.saveDiagram();
+
+        this.eventAggregator.publish(environment.events.diagramDetail.saveDiagramDone);
       }),
       this.eventAggregator.subscribe(environment.events.diagramDetail.uploadProcess, () => {
-        this.checkIfDiagramIsSavedBeforeDeploy();
+        this.deployDiagram();
       }),
       this.eventAggregator.subscribe(environment.events.differsFromOriginal, (savingNeeded: boolean) => {
         this.diagramHasChanged = savingNeeded;
@@ -223,114 +212,6 @@ export class DiagramDetail {
     return this.activeDiagram.uri;
   }
 
-  /**
-   * Saves the current diagram to disk and deploys it to the
-   * process engine.
-   */
-  public async saveDiagramAndDeploy(): Promise<void> {
-    this.showSaveBeforeDeployModal = false;
-    await this.saveDiagram();
-
-    this.checkForMultipleRemoteSolutions();
-  }
-
-  /**
-   * Dismisses the saveBeforeDeploy modal.
-   */
-  public cancelSaveBeforeDeployModal(): void {
-    this.showSaveBeforeDeployModal = false;
-  }
-
-  /**
-   * Uploads the current diagram to the connected ProcessEngine.
-   */
-  public async uploadProcess(solutionToDeployTo: ISolutionEntry): Promise<void> {
-    this.cancelDialog();
-    // eslint-disable-next-line no-underscore-dangle
-    const rootElements: Array<IModdleElement> = this.bpmnio.modeler._definitions.rootElements;
-
-    const processModel: IModdleElement = rootElements.find((definition: IModdleElement) => {
-      return definition.$type === 'bpmn:Process';
-    });
-    const processModelId: string = processModel.id;
-
-    try {
-      await solutionToDeployTo.service.loadDiagram(processModelId);
-
-      this.showDiagramExistingModal = true;
-
-      const modalResultPromise: Promise<boolean> = new Promise((resolve: Function, reject: Function):
-        | boolean
-        | void => {
-        const cancelModal: EventListenerOrEventListenerObject = (): void => {
-          this.showDiagramExistingModal = false;
-          resolve(false);
-
-          document.getElementById('cancelDiagramDeploy').removeEventListener('click', cancelModal);
-          document.getElementById('overrideDiagramOnSolution').removeEventListener('click', proceedUpload);
-        };
-
-        const proceedUpload: EventListenerOrEventListenerObject = (): void => {
-          this.showDiagramExistingModal = false;
-          resolve(true);
-
-          document.getElementById('cancelDiagramDeploy').removeEventListener('click', cancelModal);
-          document.getElementById('overrideDiagramOnSolution').removeEventListener('click', proceedUpload);
-        };
-
-        setTimeout(() => {
-          document.getElementById('cancelDiagramDeploy').addEventListener('click', cancelModal, {once: true});
-          document.getElementById('overrideDiagramOnSolution').addEventListener('click', proceedUpload, {once: true});
-        }, 0);
-      });
-
-      const modalResult: boolean = await modalResultPromise;
-      if (!modalResult) {
-        return;
-      }
-    } catch {
-      //
-    }
-
-    try {
-      this.activeDiagram.id = processModelId;
-
-      const bpmnFileSuffix: string = '.bpmn';
-      const removeBPMNSuffix: (filename: string) => string = (filename: string): string => {
-        if (filename.endsWith(bpmnFileSuffix)) {
-          return filename.slice(0, bpmnFileSuffix.length);
-        }
-
-        return filename;
-      };
-
-      const copyOfDiagram: IDiagram = {
-        id: this.activeDiagram.id,
-        name: this.activeDiagram.name,
-        uri: removeBPMNSuffix(this.activeDiagram.uri),
-        xml: this.activeDiagram.xml,
-      };
-
-      await solutionToDeployTo.service.saveDiagram(copyOfDiagram, solutionToDeployTo.uri);
-
-      this.activeDiagram = await solutionToDeployTo.service.loadDiagram(processModelId);
-
-      this.router.navigateToRoute('design', {
-        diagramName: this.activeDiagram.name,
-        solutionUri: solutionToDeployTo.uri,
-      });
-
-      this.notificationService.showNotification(
-        NotificationType.SUCCESS,
-        'Diagram was successfully uploaded to the connected ProcessEngine.',
-      );
-
-      this.eventAggregator.publish(environment.events.diagramDetail.onDiagramDeployed, processModelId);
-    } catch (error) {
-      this.notificationService.showNotification(NotificationType.ERROR, `Unable to update diagram: ${error}.`);
-    }
-  }
-
   public async setOptionsAndStart(): Promise<void> {
     if (this.hasValidationError) {
       return;
@@ -392,150 +273,38 @@ export class DiagramDetail {
     await this.showSelectStartEventDialog();
   }
 
-  /**
-   * Saves the current diagram.
-   */
   public async saveDiagram(): Promise<void> {
-    if (this.isSaving) {
-      return;
-    }
-    this.isSaving = true;
-
-    const savingTargetIsRemoteSolution: boolean = this.activeSolutionEntry.uri.startsWith('http');
-    if (this.diagramIsInvalid || savingTargetIsRemoteSolution) {
-      setTimeout(() => {
-        this.isSaving = false;
-      }, 500);
-
-      return;
-    }
-
-    const diagramIsUnsavedDiagram: boolean = this.activeDiagramUri.startsWith('about:open-diagrams');
-    if (diagramIsUnsavedDiagram) {
-      await this.electronOnSaveDiagramAs();
-
-      return;
-    }
-
-    try {
-      const xml: string = await this.bpmnio.getXML();
-      this.activeDiagram.xml = xml;
-
-      await this.bpmnio.saveDiagramState(this.activeDiagramUri);
-
-      this.openDiagramStateService.setDiagramChange(this.activeDiagramUri, {
-        change: 'save',
-        xml: xml,
-      });
-
-      await this.activeSolutionEntry.service.saveDiagram(this.activeDiagram);
-
-      this.diagramHasChanged = false;
-
-      this.bpmnio.saveCurrentXML();
-
-      this.eventAggregator.publish(environment.events.navBar.diagramChangesResolved);
-    } catch (error) {
-      this.notificationService.showNotification(NotificationType.ERROR, `Unable to save the file: ${error}.`);
-
-      setTimeout(() => {
-        this.isSaving = false;
-      }, 500);
-
-      throw error;
-    }
-
-    setTimeout(() => {
-      this.isSaving = false;
-    }, 500);
-  }
-
-  public async saveDiagramAs(path: string): Promise<void> {
     if (this.diagramIsInvalid) {
       return;
     }
 
-    let xml: string = await this.getXMLOrDisplayError();
+    const xml: string = await this.bpmnio.getXML();
+
+    await this.bpmnio.saveDiagramState(this.activeDiagramUri);
+
+    this.saveDiagramService.saveDiagram(this.activeSolutionEntry, this.activeDiagram, xml);
+
+    this.bpmnio.saveCurrentXML();
+    this.diagramHasChanged = false;
+  }
+
+  public async saveDiagramAs(path?: string): Promise<void> {
+    if (this.diagramIsInvalid) {
+      return;
+    }
+
+    const xml: string = await this.getXMLOrDisplayError();
 
     if (!xml) {
       return;
     }
 
-    const diagramIsUnsaved: boolean = this.activeDiagramUri.startsWith('about:open-diagrams');
-    if (diagramIsUnsaved) {
-      const lastIndexOfSlash: number = path.lastIndexOf('/');
-      const lastIndexOfBackSlash: number = path.lastIndexOf('\\');
-      const indexBeforeFilename: number = Math.max(lastIndexOfSlash, lastIndexOfBackSlash) + 1;
+    await this.saveDiagramService.saveDiagramAs(this.activeSolutionEntry, this.activeDiagram, xml, path);
 
-      const filename: string = path.slice(indexBeforeFilename, path.length).replace('.bpmn', '');
-
-      const temporaryDiagramName: string = this.activeDiagramUri
-        .replace('about:open-diagrams/', '')
-        .replace('.bpmn', '');
-
-      xml = xml.replace(new RegExp(temporaryDiagramName, 'g'), filename);
-    }
-
-    const diagram: IDiagram = {
-      name: this.activeDiagram.name,
-      id: this.activeDiagram.id,
-      uri: this.activeDiagram.uri,
-      xml: xml,
-    };
-
-    try {
-      await this.activeSolutionEntry.service.saveDiagram(diagram, path);
-
-      const diagramChange: DiagramStateChange = {change: 'save', xml: diagram.xml};
-      const previousDiagramsState: IDiagramState | null = this.openDiagramStateService.loadDiagramState(diagram.uri);
-
-      const previousDiagramHasState: boolean = previousDiagramsState !== null;
-      if (previousDiagramHasState) {
-        previousDiagramsState.metadata.change = diagramChange;
-
-        this.openDiagramStateService.updateDiagramState(path, previousDiagramsState);
-      } else {
-        this.openDiagramStateService.saveDiagramState(path, diagram.xml, undefined, undefined, false);
-      }
-
-      this.eventAggregator.publish(environment.events.navBar.diagramChangesResolved);
-    } catch (error) {
-      this.notificationService.showNotification(NotificationType.ERROR, `Unable to save the file: ${error}.`);
-
-      throw error;
-    }
-
-    await this.openDiagramService.closeDiagram(this.activeDiagram);
-    this.solutionService.removeOpenDiagramByUri(this.activeDiagram.uri);
     this.bpmnio.saveStateForNewUri = true;
-
-    try {
-      this.activeDiagram = await this.openDiagramService.openDiagram(path, this.activeSolutionEntry.identity);
-      this.solutionService.addOpenDiagram(this.activeDiagram);
-    } catch {
-      const alreadyOpenedDiagram: IDiagram = await this.openDiagramService.getOpenedDiagramByURI(path);
-
-      await this.openDiagramService.closeDiagram(alreadyOpenedDiagram);
-
-      this.activeDiagram = await this.openDiagramService.openDiagram(path, this.activeSolutionEntry.identity);
-    }
-
-    this.xml = this.activeDiagram.xml;
-    this.activeSolutionEntry = this.solutionService.getSolutionEntryForUri('about:open-diagrams');
-
     this.bpmnio.saveCurrentXML();
 
     this.diagramHasChanged = false;
-
-    await this.router.navigateToRoute('design', {
-      diagramName: this.activeDiagram.name,
-      diagramUri: this.activeDiagram.uri,
-      solutionUri: this.activeSolutionEntry.uri,
-    });
-
-    this.eventAggregator.subscribeOnce('router:navigation:success', () => {
-      this.eventAggregator.publish(environment.events.navBar.diagramChangesResolved);
-    });
   }
 
   /**
@@ -683,28 +452,10 @@ export class DiagramDetail {
     this.processesStartEvents = startEventResponse.events;
   }
 
-  /**
-   * Checks, if the diagram is saved before it can be deployed.
-   *
-   * If not, the user will be ask to save the diagram.
-   */
-  private async checkIfDiagramIsSavedBeforeDeploy(): Promise<void> {
-    if (this.diagramHasChanged) {
-      this.showSaveBeforeDeployModal = true;
-    } else {
-      await this.checkForMultipleRemoteSolutions();
-    }
-  }
+  private async deployDiagram(): Promise<void> {
+    const xml: string | undefined = this.diagramHasChanged ? await this.bpmnio.getXML() : undefined;
 
-  private async checkForMultipleRemoteSolutions(): Promise<void> {
-    this.remoteSolutions = this.solutionService.getRemoteSolutionEntries();
-
-    const multipleRemoteSolutionsConnected: boolean = this.remoteSolutions.length > 1;
-    if (multipleRemoteSolutionsConnected) {
-      this.showRemoteSolutionOnDeployModal = true;
-    } else {
-      await this.uploadProcess(this.remoteSolutions[0]);
-    }
+    this.deployDiagramService.deployDiagram(this.activeSolutionEntry, this.activeDiagram, xml);
   }
 
   /**
@@ -723,27 +474,7 @@ export class DiagramDetail {
   }
 
   private electronOnSaveDiagramAs = async (_?: Event): Promise<void> => {
-    const isRemoteSolution: boolean = this.activeDiagramUri.startsWith('http');
-    if (isRemoteSolution) {
-      return;
-    }
-
-    this.isSaving = true;
-
-    this.ipcRenderer.send('open_save-diagram-as_dialog');
-
-    this.ipcRenderer.once('save_diagram_as', async (event: Event, savePath: string) => {
-      const noFileSelected: boolean = savePath === null;
-      if (noFileSelected) {
-        return;
-      }
-
-      await this.saveDiagramAs(savePath);
-
-      setTimeout(() => {
-        this.isSaving = false;
-      }, 500);
-    });
+    await this.saveDiagramAs();
   };
 
   private electronOnSaveDiagram = async (_?: Event): Promise<void> => {

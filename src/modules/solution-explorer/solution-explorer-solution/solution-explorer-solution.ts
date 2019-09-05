@@ -15,6 +15,7 @@ import {
   IDiagramCreationService,
   IDiagramState,
   IDiagramStateList,
+  IDiagramStateListEntry,
   ISolutionEntry,
   ISolutionService,
   NotificationType,
@@ -24,6 +25,8 @@ import {NotificationService} from '../../../services/notification-service/notifi
 import {OpenDiagramsSolutionExplorerService} from '../../../services/solution-explorer-services/OpenDiagramsSolutionExplorerService';
 import {OpenDiagramStateService} from '../../../services/solution-explorer-services/OpenDiagramStateService';
 import {DeleteDiagramModal} from './delete-diagram-modal/delete-diagram-modal';
+import {DeployDiagramService} from '../../../services/deploy-diagram-service/deploy-diagram.service';
+import {SaveDiagramService} from '../../../services/save-diagram-service/save-diagram.service';
 
 const ENTER_KEY: string = 'Enter';
 const ESCAPE_KEY: string = 'Escape';
@@ -53,6 +56,8 @@ interface IDiagramCreationState extends IDiagramNameInputState {
   'SolutionService',
   'OpenDiagramStateService',
   BindingSignaler,
+  DeployDiagramService,
+  SaveDiagramService,
 )
 export class SolutionExplorerSolution {
   public activeDiagram: IDiagram;
@@ -70,12 +75,17 @@ export class SolutionExplorerSolution {
   public deleteDiagramModal: DeleteDiagramModal;
   public processEngineRunning: boolean = false;
 
+  public isSavingDiagrams: boolean = false;
+  public currentlySavingDiagramName: string = '';
+
   private router: Router;
   private eventAggregator: EventAggregator;
   private validationController: ValidationController;
   private diagramCreationService: IDiagramCreationService;
   private notificationService: NotificationService;
   private openDiagramStateService: OpenDiagramStateService;
+  private deployDiagramService: DeployDiagramService;
+  private saveDiagramService: SaveDiagramService;
 
   private diagramRoute: string = 'design';
   private inspectView: string;
@@ -117,6 +127,8 @@ export class SolutionExplorerSolution {
     solutionService: ISolutionService,
     openDiagramStateService: OpenDiagramStateService,
     bindingSignaler: BindingSignaler,
+    deployDiagramService: DeployDiagramService,
+    saveDiagramService: SaveDiagramService,
   ) {
     this.router = router;
     this.eventAggregator = eventAggregator;
@@ -126,6 +138,8 @@ export class SolutionExplorerSolution {
     this.globalSolutionService = solutionService;
     this.openDiagramStateService = openDiagramStateService;
     this.bindingSignaler = bindingSignaler;
+    this.deployDiagramService = deployDiagramService;
+    this.saveDiagramService = saveDiagramService;
   }
 
   public async attached(): Promise<void> {
@@ -149,7 +163,7 @@ export class SolutionExplorerSolution {
         }
       }),
 
-      this.eventAggregator.subscribe(environment.events.navBar.diagramChangesResolved, () => {
+      this.eventAggregator.subscribe(environment.events.diagramWasSaved, () => {
         this.isActiveDiagramChanged = false;
         this.bindingSignaler.signal('diagramChanges');
       }),
@@ -427,6 +441,22 @@ export class SolutionExplorerSolution {
     await this.updateSolution();
   }
 
+  public async deployDiagram(): Promise<void> {
+    const noDiagramInContextMenu: boolean = this.diagramInContextMenu === undefined;
+    if (noDiagramInContextMenu) {
+      return;
+    }
+
+    const diagramState: IDiagramState | null = this.openDiagramStateService.loadDiagramState(
+      this.diagramInContextMenu.uri,
+    );
+    const diagramHasState: boolean = diagramState !== null;
+
+    const xml: string | undefined = diagramHasState ? diagramState.data.xml : undefined;
+
+    await this.deployDiagramService.deployDiagram(this.displayedSolutionEntry, this.diagramInContextMenu, xml);
+  }
+
   /*
    * Called by the parent component to start the creation dialog of a new
    * diagram.
@@ -483,7 +513,8 @@ export class SolutionExplorerSolution {
     return false;
   }
 
-  public canRenameDiagram(): boolean {
+  @computedFrom('displayedSolutionEntry.isOpenDiagramService', 'openedSolution')
+  public get canRenameDiagram(): boolean {
     return (
       !this.displayedSolutionEntry.isOpenDiagramService &&
       this.openedSolution &&
@@ -496,6 +527,7 @@ export class SolutionExplorerSolution {
 
     const updateDiagramState: Function = () => {
       diagramState.metadata.isChanged = this.isActiveDiagramChanged;
+
       this.openDiagramStateService.updateDiagramState(diagramUri, diagramState);
     };
 
@@ -565,16 +597,6 @@ export class SolutionExplorerSolution {
       return undefined;
     }
 
-    /**
-     * We have to check if THIS solution is the "Open Diagrams"-Solution
-     * because it is our special case here and if the ACTIVE solution is the
-     * "Open Diagrams"-Solution we need to return the uri anyway.
-     */
-    const openDiagramSolutionIsActive: boolean = solutionUri === 'about:open-diagrams';
-    if (this.displayedSolutionEntry.isOpenDiagramService && openDiagramSolutionIsActive) {
-      return this.activeDiagram.uri;
-    }
-
     return this.activeDiagram.uri;
   }
 
@@ -635,20 +657,12 @@ export class SolutionExplorerSolution {
 
       const diagramState: IDiagramState = this.openDiagramStateService.loadDiagramState(currentDiagram.uri);
       const diagramHasUnsavedChanges: boolean = diagramState !== null && diagramState.metadata.isChanged;
-
-      let saveDiagram: boolean = false;
       let closeDiagram: boolean = true;
 
       if (diagramHasUnsavedChanges) {
         const closeModalResult: CloseModalResult = await this.showCloseDiagramModal(currentDiagram, false);
 
         closeDiagram = closeModalResult !== CloseModalResult.Cancel;
-        saveDiagram = closeModalResult === CloseModalResult.Save;
-      }
-
-      const diagramIsNewDiagram: boolean = currentDiagram.uri.startsWith('about:open-diagrams');
-      if (saveDiagram && diagramIsNewDiagram) {
-        await this.waitForNavigation();
       }
 
       if (isLastDiagram) {
@@ -665,14 +679,6 @@ export class SolutionExplorerSolution {
 
   private get isCurrentlyRenamingDiagram(): boolean {
     return this.currentlyRenamingDiagram !== null;
-  }
-
-  private waitForNavigation(): Promise<void> {
-    return new Promise((resolve: Function): void => {
-      this.eventAggregator.subscribeOnce('router:navigation:success', () => {
-        resolve();
-      });
-    });
   }
 
   private navigateToStartPage(): Promise<void> {
@@ -789,13 +795,25 @@ export class SolutionExplorerSolution {
   }
 
   private async saveAllUnsavedDiagrams(): Promise<void> {
-    const diagramStateList: IDiagramStateList = this.openDiagramStateService.loadDiagramStateForAllDiagrams();
+    if (this.isSavingDiagrams) {
+      return;
+    }
+
+    this.isSavingDiagrams = true;
+
+    const diagramStateList: IDiagramStateList = this.openDiagramStateService
+      .loadDiagramStateForAllDiagrams()
+      .filter((diagramStateListEntry: IDiagramStateListEntry) => {
+        return diagramStateListEntry.diagramState.metadata.isChanged;
+      });
 
     for (const diagramStateListEntry of diagramStateList) {
       const isActiveDiagram: boolean =
         this.activeDiagram !== undefined && this.activeDiagram.uri === diagramStateListEntry.uri;
       if (isActiveDiagram) {
-        this.eventAggregator.publish(environment.events.diagramDetail.saveDiagram);
+        this.currentlySavingDiagramName = this.activeDiagram.name;
+        await this.saveActiveDiagram();
+        await this.waitForSaving();
 
         continue;
       }
@@ -804,15 +822,46 @@ export class SolutionExplorerSolution {
         return diagram.uri === diagramStateListEntry.uri;
       });
 
+      const diagramNotFound: boolean = diagramToSave === undefined;
+      if (diagramNotFound) {
+        continue;
+      }
+
+      this.currentlySavingDiagramName = diagramToSave.name;
+
       diagramToSave.xml = diagramStateListEntry.diagramState.data.xml;
 
-      await this.openDiagramService.saveDiagram(diagramToSave);
-      const diagramState: IDiagramState = diagramStateListEntry.diagramState;
+      await this.saveDiagramService.saveDiagram(this.displayedSolutionEntry, diagramToSave, diagramToSave.xml);
+
+      const diagramState: IDiagramState = this.openDiagramStateService.loadDiagramState(diagramToSave.uri);
 
       diagramState.metadata.isChanged = false;
 
       this.openDiagramStateService.updateDiagramState(diagramStateListEntry.uri, diagramState);
+
+      await this.waitForSaving();
     }
+
+    this.isSavingDiagrams = false;
+    this.currentlySavingDiagramName = '';
+  }
+
+  private saveActiveDiagram(): Promise<void> {
+    return new Promise((resolve: Function): void => {
+      this.eventAggregator.subscribeOnce(environment.events.diagramDetail.saveDiagramDone, () => {
+        resolve();
+      });
+
+      this.eventAggregator.publish(environment.events.diagramDetail.saveDiagram);
+    });
+  }
+
+  private waitForSaving(): Promise<void> {
+    return new Promise((resolve: Function): void => {
+      setTimeout(() => {
+        resolve();
+      }, 550);
+    });
   }
 
   private refreshDisplayedDiagrams(): void {
@@ -855,7 +904,7 @@ export class SolutionExplorerSolution {
       };
 
       const saveFunction: EventListenerOrEventListenerObject = async (): Promise<void> => {
-        this.eventAggregator.subscribeOnce(environment.events.navBar.diagramChangesResolved, async () => {
+        this.eventAggregator.subscribeOnce(environment.events.diagramWasSaved, async () => {
           if (shouldNavigate) {
             await this.navigateBack();
           }

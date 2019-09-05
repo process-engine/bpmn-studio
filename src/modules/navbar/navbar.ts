@@ -88,7 +88,13 @@ export class NavBar {
         this.diagramContainsUnsavedChanges = isDiagramChanged;
       }),
 
-      this.eventAggregator.subscribe(environment.events.navBar.diagramChangesResolved, () => {
+      this.eventAggregator.subscribe(environment.events.diagramWasSaved, (diagramUri: string) => {
+        const activeDiagramWasSaved: boolean = diagramUri === this.activeDiagram.uri;
+
+        if (!activeDiagramWasSaved) {
+          return;
+        }
+
         this.diagramContainsUnsavedChanges = false;
       }),
 
