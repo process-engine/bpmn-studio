@@ -1,3 +1,5 @@
+import uuid from 'node-uuid';
+
 import {IShape} from '@process-engine/bpmn-elements_contracts';
 
 import {DiagramStateChange, IDiagramState, IDiagramStateList, IDiagramStateListEntry} from '../../contracts';
@@ -81,12 +83,7 @@ export class OpenDiagramStateService {
   }
 
   public onDiagramStatesChanged(callback): string {
-    // eslint-disable-next-line
-    let callbackId: string = new Date().getTime().toString(36);
-    while (this.diagramStatesChangedCallbacks.has(callbackId)) {
-      // eslint-disable-next-line
-      callbackId = new Date().getTime().toString(36);
-    }
+    const callbackId: string = uuid.v4();
 
     this.diagramStatesChangedCallbacks.set(callbackId, callback);
 
