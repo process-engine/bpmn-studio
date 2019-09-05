@@ -137,9 +137,9 @@ export class SolutionExplorerSolution {
     this.deployDiagramService = deployDiagramService;
     this.saveDiagramService = saveDiagramService;
 
-    this.diagramStateList = this.openDiagramStateService.loadDiagramStateForAllDiagrams();
+    this.updateDiagramStateList();
     this.diagramStatesChangedCallbackId = this.openDiagramStateService.onDiagramStatesChanged(() => {
-      this.diagramStateList = this.openDiagramStateService.loadDiagramStateForAllDiagrams();
+      this.updateDiagramStateList();
     });
   }
 
@@ -599,6 +599,10 @@ export class SolutionExplorerSolution {
     }
 
     this.navigateToDetailView(diagram);
+  }
+
+  private updateDiagramStateList(): void {
+    this.diagramStateList = this.openDiagramStateService.loadDiagramStateForAllDiagrams();
   }
 
   private closeDiagramEventFunction: Function = (): void => {
