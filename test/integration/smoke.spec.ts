@@ -76,22 +76,22 @@ describe('Application launch', function foo() {
   });
 
   it('should start the application', async () => {
-    await testClient.globalMehtods.elementHasText('h3', 'Welcome');
+    await testClient.globalMethods.elementHasText('h3', 'Welcome');
 
-    await testClient.globalMehtods.assertWindowTitleIs('Start Page | BPMN Studio');
+    await testClient.globalMethods.assertWindowTitleIs('Start Page | BPMN Studio');
   });
 
   it('should create and open a new diagram by clicking on new diagram link', async () => {
     await createAndOpenDiagram();
 
     await testClient.navbar.assertTitleIs('Untitled-1');
-    await testClient.globalMehtods.assertWindowTitleIs('Design | BPMN Studio');
+    await testClient.globalMethods.assertWindowTitleIs('Design | BPMN Studio');
   });
 
   it('should render a diagram correctly', async () => {
     await createAndOpenDiagram();
 
-    await testClient.globalMehtods.ensureVisible('[data-element-id="Collaboration_1cidyxu"]');
+    await testClient.globalMethods.ensureVisible('[data-element-id="Collaboration_1cidyxu"]');
   });
 
   it('should select StartEvent after opening a diagram', async () => {
@@ -116,7 +116,7 @@ describe('Application launch', function foo() {
     await createAndOpenDiagram();
 
     await testClient.navbar.assertTitleIs('Untitled-1');
-    await testClient.globalMehtods.assertWindowTitleIs('Design | BPMN Studio');
+    await testClient.globalMethods.assertWindowTitleIs('Design | BPMN Studio');
 
     creatingFirstDiagram = false;
     await createAndOpenDiagram();
@@ -168,7 +168,7 @@ describe('Application launch', function foo() {
     await createAndOpenDiagram();
 
     await testClient.navbar.assertTitleIs('Untitled-1');
-    await testClient.globalMehtods.assertWindowTitleIs('Design | BPMN Studio');
+    await testClient.globalMethods.assertWindowTitleIs('Design | BPMN Studio');
   });
 
   it('should open a solution', async () => {
@@ -210,14 +210,14 @@ describe('Application launch', function foo() {
     await createAndOpenDiagram();
 
     await testClient.thinkView.open('Untitled-1', 'about:open-diagrams/Untitled-1.bpmn', 'about:open-diagrams');
-    await testClient.globalMehtods.assertWindowTitleIs('Think | BPMN Studio');
+    await testClient.globalMethods.assertWindowTitleIs('Think | BPMN Studio');
   });
 
   it('should open the Think view from navbar', async () => {
     await createAndOpenDiagram();
 
     await testClient.navbar.openThinkView();
-    await testClient.globalMehtods.assertWindowTitleIs('Think | BPMN Studio');
+    await testClient.globalMethods.assertWindowTitleIs('Think | BPMN Studio');
   });
 
   it('should save a diagram', async () => {
@@ -238,7 +238,7 @@ describe('Application launch', function foo() {
     await testClient.navbar.assertDiagramIsOnFileSystem();
 
     if (isWindows) {
-      await testClient.globalMehtods.pause(800);
+      await testClient.globalMethods.pause(800);
     }
 
     // Act

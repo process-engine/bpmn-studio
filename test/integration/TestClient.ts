@@ -48,7 +48,7 @@ export class TestClient {
   public thinkView: ThinkView;
   public xmlView: XmlView;
 
-  public globalMehtods: GlobalMethods;
+  public globalMethods: GlobalMethods;
   private app: Application;
 
   constructor(applicationArgs: AppConstructorOptions) {
@@ -57,7 +57,7 @@ export class TestClient {
 
   public async startSpectronApp(): Promise<any> {
     await this.app.start();
-    this.globalMehtods = new GlobalMethods(this.app);
+    this.globalMethods = new GlobalMethods(this.app);
     this.solutionExplorer = new SolutionExplorer(this.app);
     this.designView = new Design(this.app, SAVE_DIAGRAM_DIR);
     this.propertyPanel = new PropertyPanel(this.app);
@@ -76,7 +76,7 @@ export class TestClient {
   }
 
   public async startPageLoaded(): Promise<void> {
-    await this.globalMehtods.ensureVisible('[data-test-start-page]');
+    await this.globalMethods.ensureVisible('[data-test-start-page]');
   }
 
   public async clearDatabase(): Promise<void> {
