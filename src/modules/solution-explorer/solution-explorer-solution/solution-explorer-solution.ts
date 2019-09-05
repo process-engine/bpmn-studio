@@ -840,7 +840,7 @@ export class SolutionExplorerSolution {
 
       const diagramNotFound: boolean = diagramToSave === undefined;
       if (diagramNotFound) {
-        return;
+        continue;
       }
 
       this.currentlySavingDiagramName = diagramToSave.name;
