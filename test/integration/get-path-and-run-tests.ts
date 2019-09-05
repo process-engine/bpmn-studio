@@ -24,7 +24,7 @@ async function getBuiltStudioPath(): Promise<string> {
     .slice(0, -1);
 }
 
-async function execCommand(command): Promise<ExecException & string> {
+async function execCommand(command): Promise<string> {
   return new Promise((resolve: Function, reject: Function): void => {
     exec(command, (err: ExecException, stdin: string, stderr: string) => {
       if (err || stderr) {
