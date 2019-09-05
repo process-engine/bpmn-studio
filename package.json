@@ -88,7 +88,7 @@
     "semver": "^6.3.0",
     "socket.io-client": "2.2.0",
     "spectrum-colorpicker": "1.8.0",
-    "sqlite3": "4.0.9"
+    "sqlite3": "4.1.0"
   },
   "peerDependencies": {},
   "devDependencies": {
@@ -122,9 +122,9 @@
     "debounce": "^1.2.0",
     "debug": "^4.1.1",
     "downloadjs": "1.4.7",
-    "electron": "5.0.9",
+    "electron": "6.0.7",
     "electron-builder": "21.2.0",
-    "electron-rebuild": "^1.8.5",
+    "electron-rebuild": "^1.8.6",
     "eslint": "^5.9.0",
     "event-stream": "4.0.1",
     "eventemitter2": "^5.0.1",
