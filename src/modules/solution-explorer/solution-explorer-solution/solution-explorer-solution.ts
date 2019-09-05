@@ -657,20 +657,12 @@ export class SolutionExplorerSolution {
 
       const diagramState: IDiagramState = this.openDiagramStateService.loadDiagramState(currentDiagram.uri);
       const diagramHasUnsavedChanges: boolean = diagramState !== null && diagramState.metadata.isChanged;
-
-      let saveDiagram: boolean = false;
       let closeDiagram: boolean = true;
 
       if (diagramHasUnsavedChanges) {
         const closeModalResult: CloseModalResult = await this.showCloseDiagramModal(currentDiagram, false);
 
         closeDiagram = closeModalResult !== CloseModalResult.Cancel;
-        saveDiagram = closeModalResult === CloseModalResult.Save;
-      }
-
-      const diagramIsNewDiagram: boolean = currentDiagram.uri.startsWith('about:open-diagrams');
-      if (saveDiagram && diagramIsNewDiagram) {
-        await this.waitForNavigation();
       }
 
       if (isLastDiagram) {
@@ -687,14 +679,6 @@ export class SolutionExplorerSolution {
 
   private get isCurrentlyRenamingDiagram(): boolean {
     return this.currentlyRenamingDiagram !== null;
-  }
-
-  private waitForNavigation(): Promise<void> {
-    return new Promise((resolve: Function): void => {
-      this.eventAggregator.subscribeOnce('router:navigation:success', () => {
-        resolve();
-      });
-    });
   }
 
   private navigateToStartPage(): Promise<void> {
