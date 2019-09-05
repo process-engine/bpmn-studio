@@ -3,12 +3,9 @@ _VERSION="0.0.1"
 
 ############
 # This script reinstalls the current developement setup by:
-#   * Resetting your configuration by calling the npm reset script
-#     that:
-#       * Deletes the node_modules directory
-#       * Deletes the package-lock file (if it exists)
-#       * Clears the NPM - Cache
-#   * Reinstalling all required node modules
+#   * Deletes the node_modules directory
+#   * Clears the NPM - Cache
+#   * Reinstalling all required node modules (the package-lock file is accounted for and must exist)
 #   * Rebuilding
 #
 # Note: Please DO NOT ADD THIS SCRIPT TO THE Jenkinsfile!
@@ -23,8 +20,11 @@ _VERSION="0.0.1"
 ############
 
 # Reset the current setup
-echo "Cleaning setup..."
-npm run reset
+echo "Removing Node Modules..."
+rm -rf node_modules/
+
+echo "Clearing npm cache..."
+npm cache clean --force
 
 # Reinstalling your node modules
 echo "Installing node modules..."
@@ -37,7 +37,9 @@ if [[ ! -z $OLD_PATH ]]; then
   PATH=$OLD_PATH
 fi
 
-npm install
+# npm ci takes the package-lock file into account.
+# npm i recreates it after each install.
+npm ci
 
 # If npm install fails, its likely that also the build process would fail,
 # so we can exit here.
@@ -49,3 +51,4 @@ fi
 # Build all modules
 echo "Building..."
 npm run build
+npm run electron-rebuild
