@@ -1,8 +1,8 @@
 /* eslint-disable no-underscore-dangle */
 export function exposeFunctionForTesting(functionName: string, functionCallback: Function): void {
-  const danngerouslyInvokeObjectIsUndefined = (window as any).__dangerouslyInvoke === undefined;
+  const dangerouslyInvokeObjectIsUndefined = (window as any).__dangerouslyInvoke === undefined;
 
-  if (danngerouslyInvokeObjectIsUndefined) {
+  if (dangerouslyInvokeObjectIsUndefined) {
     (window as any).__dangerouslyInvoke = {};
   }
 
