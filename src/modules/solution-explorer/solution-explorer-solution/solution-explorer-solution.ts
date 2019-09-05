@@ -239,7 +239,7 @@ export class SolutionExplorerSolution {
       this.ipcRenderer.removeListener('menubar__start_save_all_diagrams', this.saveAllDiagramsEventFunction);
     }
 
-    this.openDiagramStateService.removeOnDiaagramStatesChangedListener(this.diagramStatesChangedCallbackId);
+    this.openDiagramStateService.removeOnDiagramStatesChangedListener(this.diagramStatesChangedCallbackId);
   }
 
   public async showDeleteDiagramModal(diagram: IDiagram, event: Event): Promise<void> {

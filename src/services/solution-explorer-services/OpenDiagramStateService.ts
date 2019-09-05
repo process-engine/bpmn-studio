@@ -93,7 +93,7 @@ export class OpenDiagramStateService {
     return callbackId;
   }
 
-  public removeOnDiaagramStatesChangedListener(callbackId: string): void {
+  public removeOnDiagramStatesChangedListener(callbackId: string): void {
     this.diagramStatesChangedCallbacks.delete(callbackId);
   }
 
