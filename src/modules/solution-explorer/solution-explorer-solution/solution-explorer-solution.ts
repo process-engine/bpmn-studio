@@ -4,10 +4,11 @@ import {NewInstance, bindable, computedFrom, inject} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 import {ControllerValidateResult, ValidateResult, ValidationController, ValidationRules} from 'aurelia-validation';
 
+import {join} from 'path';
+
 import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
 import {IDiagram, ISolution} from '@process-engine/solutionexplorer.contracts';
 import {ISolutionExplorerService} from '@process-engine/solutionexplorer.service.contracts';
-import {join} from 'path';
 
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {
