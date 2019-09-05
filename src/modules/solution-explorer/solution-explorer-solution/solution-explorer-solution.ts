@@ -3,7 +3,6 @@ import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {NewInstance, bindable, computedFrom, inject} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 import {ControllerValidateResult, ValidateResult, ValidationController, ValidationRules} from 'aurelia-validation';
-import {BindingSignaler} from 'aurelia-templating-resources';
 
 import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
 import {IDiagram, ISolution} from '@process-engine/solutionexplorer.contracts';
@@ -55,7 +54,6 @@ interface IDiagramCreationState extends IDiagramNameInputState {
   'NotificationService',
   'SolutionService',
   'OpenDiagramStateService',
-  BindingSignaler,
   DeployDiagramService,
   SaveDiagramService,
 )
@@ -115,9 +113,6 @@ export class SolutionExplorerSolution {
 
   private sortedDiagramsOfSolutions: Array<IDiagram> = [];
 
-  private bindingSignaler: BindingSignaler;
-  private isActiveDiagramChanged: boolean = false;
-
   constructor(
     router: Router,
     eventAggregator: EventAggregator,
@@ -126,7 +121,6 @@ export class SolutionExplorerSolution {
     notificationService: NotificationService,
     solutionService: ISolutionService,
     openDiagramStateService: OpenDiagramStateService,
-    bindingSignaler: BindingSignaler,
     deployDiagramService: DeployDiagramService,
     saveDiagramService: SaveDiagramService,
   ) {
@@ -137,7 +131,6 @@ export class SolutionExplorerSolution {
     this.notificationService = notificationService;
     this.globalSolutionService = solutionService;
     this.openDiagramStateService = openDiagramStateService;
-    this.bindingSignaler = bindingSignaler;
     this.deployDiagramService = deployDiagramService;
     this.saveDiagramService = saveDiagramService;
   }
@@ -154,18 +147,6 @@ export class SolutionExplorerSolution {
     this.subscriptions = [
       this.eventAggregator.subscribe('router:navigation:success', () => {
         this.updateSolutionExplorer();
-      }),
-
-      this.eventAggregator.subscribe(environment.events.differsFromOriginal, (isDiagramChanged: boolean) => {
-        this.isActiveDiagramChanged = isDiagramChanged;
-        if (this.displayedSolutionEntry.isOpenDiagramService) {
-          this.bindingSignaler.signal('diagramChanges');
-        }
-      }),
-
-      this.eventAggregator.subscribe(environment.events.diagramWasSaved, () => {
-        this.isActiveDiagramChanged = false;
-        this.bindingSignaler.signal('diagramChanges');
       }),
     ];
 
@@ -520,28 +501,6 @@ export class SolutionExplorerSolution {
       this.openedSolution &&
       !this.isUriFromRemoteSolution(this.openedSolution.uri)
     );
-  }
-
-  public isDiagramChanged(diagramUri: string): boolean {
-    const diagramState: IDiagramState = this.openDiagramStateService.loadDiagramState(diagramUri);
-
-    const updateDiagramState: Function = () => {
-      diagramState.metadata.isChanged = this.isActiveDiagramChanged;
-
-      this.openDiagramStateService.updateDiagramState(diagramUri, diagramState);
-    };
-
-    const diagramIsOpenedDiagram: boolean = diagramUri === this.activeDiagramUri;
-    if (diagramIsOpenedDiagram) {
-      if (!diagramState.metadata.isChanged && this.isActiveDiagramChanged) {
-        updateDiagramState();
-        this.isActiveDiagramChanged = false;
-      } else if (diagramState.metadata.isChanged && !this.isActiveDiagramChanged) {
-        updateDiagramState();
-      }
-    }
-
-    return diagramState !== null && diagramState.metadata.isChanged;
   }
 
   public canDeleteDiagram(): boolean {
