@@ -1343,7 +1343,14 @@ export class SolutionExplorerSolution {
       try {
         const activeSolution: ISolution = await this.solutionService.loadSolution();
         this.activeDiagram = activeSolution.diagrams.find((diagram: IDiagram) => {
-          return diagram.name === diagramName && (diagram.uri === diagramUri || diagramUri === undefined);
+          const currentDiagramIsGivenDiagram: boolean = diagram.uri === diagramUri;
+
+          const solutionIsRemoteSolution: boolean = solutionUri.startsWith('http');
+          const diagramIsInGivenSolution: boolean = solutionIsRemoteSolution
+            ? diagram.uri.includes(solutionUri)
+            : diagram.uri.includes(`${solutionUri}/${diagram.name}.bpmn`);
+
+          return diagram.name === diagramName && (currentDiagramIsGivenDiagram || diagramIsInGivenSolution);
         });
       } catch {
         // Do nothing
