@@ -1,22 +1,19 @@
-/* eslint-disable @typescript-eslint/no-useless-constructor */
-/* eslint-disable no-useless-constructor */
-import {Application} from 'spectron';
+import {TestClient} from '../TestClient';
 
 export class StartPage {
   private testClient: TestClient;
 
-export class StartPage extends GlobalMethods {
-  constructor(app: Application) {
-    super(app);
+  constructor(testClient: TestClient) {
+    this.testClient = testClient;
   }
 
   public async open(): Promise<void> {
-    return this.openView('');
+    return this.testClient.openView('');
   }
 
   public async createAndOpenNewDiagram(): Promise<void> {
-    await this.ensureVisible('[data-test-create-new-diagram]');
-    await this.clickOn('[data-test-create-new-diagram]');
-    await this.ensureVisible('[data-test-navbar-title]');
+    await this.testClient.ensureVisible('[data-test-create-new-diagram]');
+    await this.testClient.clickOn('[data-test-create-new-diagram]');
+    await this.testClient.ensureVisible('[data-test-navbar-title]');
   }
 }

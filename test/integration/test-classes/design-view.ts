@@ -1,27 +1,25 @@
-/* eslint-disable @typescript-eslint/no-useless-constructor */
-/* eslint-disable no-useless-constructor */
-import {Application} from 'spectron';
 import path from 'path';
 import fs from 'fs';
 import assert from 'assert';
+import {TestClient} from '../TestClient';
 
 export class Design {
   private testClient: TestClient;
   private saveDiagramDir: string;
 
-  constructor(app: Application, saveDiagramDir: string) {
-    super(app);
+  constructor(testClient: TestClient, saveDiagramDir: string) {
+    this.testClient = testClient;
     this.saveDiagramDir = saveDiagramDir;
   }
 
   public async open(diagramName: string, diagramUri: string, solutionUri?: string): Promise<void> {
-    await this.openDesignView('detail', diagramName, diagramUri, solutionUri);
-    await this.ensureVisible('[data-test-diagram-detail]');
+    await this.testClient.openDesignView('detail', diagramName, diagramUri, solutionUri);
+    await this.testClient.ensureVisible('[data-test-diagram-detail]');
   }
 
   public async clickOnBpmnElementWithName(name): Promise<void> {
-    await this.ensureVisible(`.djs-label=${name}`);
-    await this.clickOn(`.djs-label=${name}`);
+    await this.testClient.ensureVisible(`.djs-label=${name}`);
+    await this.testClient.clickOn(`.djs-label=${name}`);
   }
 
   public async saveDiagramAs(fileName: string): Promise<void> {
@@ -32,7 +30,7 @@ export class Design {
       fs.mkdirSync(this.saveDiagramDir);
     }
 
-    await this.webdriverClient.executeAsync(async (pathToSave, done) => {
+    await this.testClient.webdriverClient.executeAsync(async (pathToSave, done) => {
       // eslint-disable-next-line no-underscore-dangle
       await (window as any).__dangerouslyInvoke.saveDiagramAs(pathToSave);
 
@@ -41,7 +39,7 @@ export class Design {
   }
 
   public async assertCanvasModelIsVisible(): Promise<void> {
-    const canvasModelIsVisible = await this.webdriverClient.isVisible('[data-test-canvas-model]');
+    const canvasModelIsVisible = await this.testClient.webdriverClient.isVisible('[data-test-canvas-model]');
     assert.equal(canvasModelIsVisible, true);
   }
 }

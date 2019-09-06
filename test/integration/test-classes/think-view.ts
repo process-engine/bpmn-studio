@@ -1,13 +1,10 @@
-/* eslint-disable @typescript-eslint/no-useless-constructor */
-/* eslint-disable no-useless-constructor */
-import {Application} from 'spectron';
+import {TestClient} from '../TestClient';
 
 export class ThinkView {
   private testClient: TestClient;
 
-export class ThinkView extends GlobalMethods {
-  constructor(app: Application) {
-    super(app);
+  constructor(testClient: TestClient) {
+    this.testClient = testClient;
   }
 
   public async open(diagramName?: string, diagramUri?: string, solutionUri?: string): Promise<void> {
@@ -17,11 +14,11 @@ export class ThinkView extends GlobalMethods {
       const encodedSolutionUri = solutionUri ? encodeURIComponent(solutionUri) : '';
       const uriFragment = `#/think/diagram-list/diagram/${encodedName}?diagramUri=${encodedUri}&solutionUri=${encodedSolutionUri}`;
 
-      await this.openView(uriFragment);
+      await this.testClient.openView(uriFragment);
     } else {
-      await this.openView('#/think/diagram-list/diagram');
+      await this.testClient.openView('#/think/diagram-list/diagram');
     }
 
-    await this.ensureVisible('diagram-list');
+    await this.testClient.ensureVisible('diagram-list');
   }
 }

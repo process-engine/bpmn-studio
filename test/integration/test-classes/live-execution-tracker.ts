@@ -1,18 +1,15 @@
-/* eslint-disable @typescript-eslint/no-useless-constructor */
-/* eslint-disable no-useless-constructor */
-import {Application} from 'spectron';
+import {TestClient} from '../TestClient';
 
 export class LiveExecutionTracker {
   private testClient: TestClient;
 
-export class LiveExecutionTracker extends GlobalMethods {
-  constructor(app: Application) {
-    super(app);
+  constructor(testClient: TestClient) {
+    this.testClient = testClient;
   }
 
   public async stopProcess(): Promise<void> {
-    await this.ensureVisible('[data-test-stop-process-button]');
-    await this.clickOn('[data-test-stop-process-button]');
-    await this.ensureNotVisible('[data-test-stop-process-button]');
+    await this.testClient.ensureVisible('[data-test-stop-process-button]');
+    await this.testClient.clickOn('[data-test-stop-process-button]');
+    await this.testClient.ensureNotVisible('[data-test-stop-process-button]');
   }
 }

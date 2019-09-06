@@ -1,46 +1,48 @@
-/* eslint-disable @typescript-eslint/no-useless-constructor */
-/* eslint-disable no-useless-constructor */
 import path from 'path';
+import {TestClient} from '../TestClient';
 
 export class SolutionExplorer {
   private testClient: TestClient;
 
-export class SolutionExplorer extends GlobalMethods {
-  constructor(app: Application) {
-    super(app);
+  constructor(testClient: TestClient) {
+    this.testClient = testClient;
   }
 
   public async show(): Promise<void> {
-    const solutionExplorerIsVisible = await this.webdriverClient.isVisible('[data-test-solution-explorer-panel]');
+    const solutionExplorerIsVisible = await this.testClient.webdriverClient.isVisible(
+      '[data-test-solution-explorer-panel]',
+    );
     if (solutionExplorerIsVisible) {
       return;
     }
 
-    await this.ensureVisible('[data-test-toggle-solution-explorer]');
-    await this.clickOn('[data-test-toggle-solution-explorer]');
-    await this.ensureVisible('[data-test-solution-explorer-panel]');
+    await this.testClient.ensureVisible('[data-test-toggle-solution-explorer]');
+    await this.testClient.clickOn('[data-test-toggle-solution-explorer]');
+    await this.testClient.ensureVisible('[data-test-solution-explorer-panel]');
   }
 
   public async hide(): Promise<void> {
-    const solutionExplorerIsVisible = await this.webdriverClient.isVisible('[data-test-solution-explorer-panel]');
+    const solutionExplorerIsVisible = await this.testClient.webdriverClient.isVisible(
+      '[data-test-solution-explorer-panel]',
+    );
     const solutionExplorerIsHidden = !solutionExplorerIsVisible;
     if (solutionExplorerIsHidden) {
       return;
     }
 
-    await this.ensureVisible('[data-test-toggle-solution-explorer]');
-    await this.clickOn('[data-test-toggle-solution-explorer]');
-    await this.ensureNotVisible('[data-test-solution-explorer-panel]');
+    await this.testClient.ensureVisible('[data-test-toggle-solution-explorer]');
+    await this.testClient.clickOn('[data-test-toggle-solution-explorer]');
+    await this.testClient.ensureNotVisible('[data-test-solution-explorer-panel]');
   }
 
   public async assertInternalProcessEngineIsOpenedAsSolution(): Promise<void> {
-    await this.ensureVisible('[data-test-solution-is-internal=true]');
+    await this.testClient.ensureVisible('[data-test-solution-is-internal=true]');
   }
 
   public async openDirectoryAsSolution(dir: string, diagramName?: string): Promise<void> {
     const pathToSolution: string = path.join(__dirname, '..', '..', '..', dir);
 
-    await this.webdriverClient.executeAsync(
+    await this.testClient.webdriverClient.executeAsync(
       async (solutionPath, solutionIdentity, done) => {
         // eslint-disable-next-line no-underscore-dangle
         await (window as any).__dangerouslyInvoke.openSolution(solutionPath, false, solutionIdentity);
@@ -48,15 +50,15 @@ export class SolutionExplorer extends GlobalMethods {
         done();
       },
       pathToSolution,
-      this.getDefaultIdentity(),
+      this.testClient.getDefaultIdentity(),
     );
 
-    await this.ensureVisible(`[data-test-solution-entry-name=${dir}]`);
+    await this.testClient.ensureVisible(`[data-test-solution-entry-name=${dir}]`);
 
     if (diagramName) {
       const diagramUri = this.getUriForSelector(pathToSolution, diagramName);
-      await this.ensureVisible(`[data-test-open-diagram-with-uri*="${diagramUri}"]`);
-      await this.clickOn(`[data-test-open-diagram-with-uri*="${diagramUri}"]`);
+      await this.testClient.ensureVisible(`[data-test-open-diagram-with-uri*="${diagramUri}"]`);
+      await this.testClient.clickOn(`[data-test-open-diagram-with-uri*="${diagramUri}"]`);
     }
   }
 
