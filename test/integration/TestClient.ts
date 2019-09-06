@@ -76,7 +76,11 @@ export class TestClient {
   }
 
   public async startPageLoaded(): Promise<void> {
-    await this.globalMethods.ensureVisible('[data-test-start-page]');
+    await this.ensureVisible('[data-test-start-page]');
+  }
+
+  public async ensureVisible(selector: string, timeout?: number): Promise<boolean> {
+    return this.webdriverClient.waitForVisible(selector, timeout);
   }
 
   public async clearDatabase(): Promise<void> {
@@ -97,6 +101,77 @@ export class TestClient {
 
   public get webdriverClient(): any {
     return this.app.client;
+  }
+
+  public async clickOn(selector: string): Promise<any> {
+    return this.webdriverClient.$(selector).leftClick();
+  }
+
+  public async openDesignView(
+    subPath: string,
+    diagramName: string,
+    diagramUri: string,
+    solutionUri?: string,
+  ): Promise<void> {
+    const encodedName = encodeURIComponent(diagramName);
+    const encodedUri = encodeURIComponent(diagramUri);
+    const encodedSolutionUri = solutionUri ? encodeURIComponent(solutionUri) : '';
+    const uriFragment = `#/design/${subPath}/diagram/${encodedName}?diagramUri=${encodedUri}&solutionUri=${encodedSolutionUri}`;
+
+    return this.openView(uriFragment);
+  }
+
+  public async elementHasText(selector, text): Promise<void> {
+    return this.webdriverClient.waitUntilTextExists(selector, text);
+  }
+
+  public async assertWindowTitleIs(name): Promise<void> {
+    const windowTitle = await this.webdriverClient.getTitle();
+
+    assert.equal(windowTitle, name);
+  }
+
+  public async pause(timeInMilliseconds: number): Promise<void> {
+    await new Promise((c: Function): any => setTimeout(c, timeInMilliseconds));
+  }
+
+  public async getElement(selector): Promise<any> {
+    return this.webdriverClient.element(selector);
+  }
+
+  public async getElements(selector): Promise<any> {
+    return this.webdriverClient.elements(selector);
+  }
+
+  public async getAttributeFromElement(selector, attribute): Promise<string> {
+    return this.webdriverClient.getAttribute(selector, attribute);
+  }
+
+  public async getTextFromElement(selector): Promise<string> {
+    return this.webdriverClient.getText(selector);
+  }
+
+  public async getValueFromElement(selector): Promise<string> {
+    return this.webdriverClient.getValue(selector);
+  }
+
+  public async ensureNotVisible(selector: string): Promise<boolean> {
+    const collection = await this.webdriverClient.elements(selector);
+
+    return collection.value.length === 0;
+  }
+
+  public getDefaultIdentity(): IIdentity {
+    const identity = {
+      token: 'ZHVtbXlfdG9rZW4=',
+      userId: '',
+    };
+
+    return identity;
+  }
+
+  public async openView(uriPath: string): Promise<void> {
+    return this.app.browserWindow.loadURL(`${APP_BASE_URL}${uriPath}`);
   }
 
   private async execCommand(command: string): Promise<any> {
