@@ -21,6 +21,7 @@ import {NotificationService} from '../../../services/notification-service/notifi
 import {BpmnIo} from '../bpmn-io/bpmn-io';
 import {DeployDiagramService} from '../../../services/deploy-diagram-service/deploy-diagram.service';
 import {SaveDiagramService} from '../../../services/save-diagram-service/save-diagram.service';
+import {exposeFunctionForTesting} from '../../../services/expose-functionality-module/expose-functionality-module';
 
 @inject(
   'ManagementApiClientService',
@@ -87,10 +88,9 @@ export class DiagramDetail {
     this.deployDiagramService = deployDiagramService;
     this.saveDiagramService = saveDiagramService;
 
-    // eslint-disable-next-line no-underscore-dangle
-    (window as any).__dangerouslyInvoke['saveDiagramAs'] = (path: string): void => {
+    exposeFunctionForTesting('saveDiagramAs', (path: string): void => {
       this.saveDiagramAs(path);
-    };
+    });
   }
 
   public determineActivationStrategy(): string {

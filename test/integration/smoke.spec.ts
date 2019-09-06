@@ -23,8 +23,18 @@ function getApplicationArgs(givenPath: string | null): AppConstructorOptions {
   }
 
   const electronExecutable = isWindows ? 'electron.cmd' : 'electron';
-  const electronPath = path.join(__dirname, '..', '..', 'node_modules', '.bin', electronExecutable);
-  const electronBundlePath = path.join(__dirname, '..', '..', 'dist', 'electron_app', 'electron_app', 'electron.js');
+  const electronPath = path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', electronExecutable);
+  const electronBundlePath = path.join(
+    __dirname,
+    '..',
+    '..',
+    '..',
+    '..',
+    'dist',
+    'electron_app',
+    'electron_app',
+    'electron.js',
+  );
 
   return {...commonArgs, path: electronPath, args: [electronBundlePath]};
 }

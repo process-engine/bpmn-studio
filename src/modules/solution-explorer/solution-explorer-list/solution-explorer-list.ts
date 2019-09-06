@@ -18,6 +18,7 @@ import {
 import {OpenDiagramsSolutionExplorerService} from '../../../services/solution-explorer-services/OpenDiagramsSolutionExplorerService';
 import {SolutionExplorerServiceFactory} from '../../../services/solution-explorer-services/SolutionExplorerServiceFactory';
 import {SolutionExplorerSolution} from '../solution-explorer-solution/solution-explorer-solution';
+import {exposeFunctionForTesting} from '../../../services/expose-functionality-module/expose-functionality-module';
 
 interface IUriToViewModelMap {
   [key: string]: SolutionExplorerSolution;
@@ -81,14 +82,9 @@ export class SolutionExplorerList {
       this.createOpenDiagramServiceEntry();
     }
 
-    // eslint-disable-next-line no-underscore-dangle
-    (window as any).__dangerouslyInvoke['openSolution'] = (
-      uri: string,
-      insertAtBeginning?: boolean,
-      identity?: IIdentity,
-    ): void => {
+    exposeFunctionForTesting('openSolution', (uri: string, insertAtBeginning?: boolean, identity?: IIdentity): void => {
       this.openSolution(uri, insertAtBeginning, identity);
-    };
+    });
 
     this.internalSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
   }
