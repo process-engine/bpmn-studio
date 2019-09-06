@@ -1,5 +1,5 @@
 import {TestClient} from './TestClient';
-import {applicationArgs} from './get-application-args';
+import {applicationArgs} from './modules/get-application-args';
 
 let testClient: TestClient;
 
@@ -37,7 +37,7 @@ describe('SolutionExplorer', function foo() {
 
     const diagramName = 'call_activity_subprocess_error';
     await testClient.solutionExplorer.openDirectoryAsSolution('fixtures', diagramName);
-    await testClient.assertTitleIs(diagramName);
+    await testClient.assertNavbarTitleIs(diagramName);
   });
 
   it('should open the internal ProcessEngine as solution', async () => {
