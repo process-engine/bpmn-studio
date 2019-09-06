@@ -1,50 +1,12 @@
-import path from 'path';
-
-import {AppConstructorOptions} from 'spectron';
 import {TestClient} from './TestClient';
-
-const isWindows = process.platform === 'win32';
-const applicationArgs = getApplicationArgs(process.env.SPECTRON_APP_PATH);
-
-function getApplicationArgs(givenPath: string | null): AppConstructorOptions {
-  const commonArgs = {
-    requireName: 'nodeRequire',
-    env: {
-      SPECTRON_TESTS: true,
-    },
-    webdriverOptions: {
-      deprecationWarnings: false,
-    },
-  };
-
-  if (givenPath != null) {
-    console.log(`Using path: ${givenPath}`);
-    return {...commonArgs, path: givenPath};
-  }
-
-  const electronExecutable = isWindows ? 'electron.cmd' : 'electron';
-  const electronPath = path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', electronExecutable);
-  const electronBundlePath = path.join(
-    __dirname,
-    '..',
-    '..',
-    '..',
-    '..',
-    'dist',
-    'electron_app',
-    'electron_app',
-    'electron.js',
-  );
-
-  return {...commonArgs, path: electronPath, args: [electronBundlePath]};
-}
+import {applicationArgs} from './get-application-args';
 
 async function createAndOpenDiagram(): Promise<void> {
   if (!creatingFirstDiagram) {
-    await testClient.startPage.open();
+    await testClient.openStartPage();
   }
 
-  await testClient.startPage.createAndOpenNewDiagram();
+  await testClient.createAndOpenNewDiagram();
 }
 
 let testClient: TestClient;
@@ -84,191 +46,93 @@ describe('Application launch', function foo() {
   it('should create and open a new diagram by clicking on new diagram link', async () => {
     await createAndOpenDiagram();
 
-    await testClient.navbar.assertTitleIs('Untitled-1');
+    await testClient.assertTitleIs('Untitled-1');
     await testClient.assertWindowTitleIs('Design | BPMN Studio');
-  });
-
-  it('should render a diagram correctly', async () => {
-    await createAndOpenDiagram();
-
-    await testClient.ensureVisible('[data-element-id="Collaboration_1cidyxu"]');
-  });
-
-  it('should select StartEvent after opening a diagram', async () => {
-    await createAndOpenDiagram();
-    await testClient.propertyPanel.show();
-
-    await testClient.propertyPanel.assertSelectedBpmnElementHasName('Start Event');
-  });
-
-  it('should select element on click', async () => {
-    await createAndOpenDiagram();
-    await testClient.propertyPanel.show();
-
-    const elementName = 'End Event';
-
-    await testClient.propertyPanel.rejectSelectedBpmnElementHasName(elementName);
-    await testClient.designView.clickOnBpmnElementWithName(elementName);
-    await testClient.propertyPanel.assertSelectedBpmnElementHasName(elementName);
   });
 
   it('should create and open a second diagram', async () => {
     await createAndOpenDiagram();
 
-    await testClient.navbar.assertTitleIs('Untitled-1');
+    await testClient.assertTitleIs('Untitled-1');
     await testClient.assertWindowTitleIs('Design | BPMN Studio');
 
     creatingFirstDiagram = false;
     await createAndOpenDiagram();
 
-    await testClient.navbar.assertTitleIs('Untitled-2');
+    await testClient.assertTitleIs('Untitled-2');
   });
 
   it('should open detail view', async () => {
     await createAndOpenDiagram();
-    await testClient.startPage.open();
+    await testClient.openStartPage();
 
-    await testClient.designView.open('Untitled-1', 'about:open-diagrams/Untitled-1.bpmn', 'about:open-diagrams');
+    await testClient.designView.openDetailView(
+      'Untitled-1',
+      'about:open-diagrams/Untitled-1.bpmn',
+      'about:open-diagrams',
+    );
 
-    await testClient.designView.assertCanvasModelIsVisible();
+    await testClient.assertCanvasModelIsVisible();
   });
 
   it('should open XML view', async () => {
     await createAndOpenDiagram();
 
-    await testClient.xmlView.open('Untitled-1', 'about:open-diagrams/Untitled-1.bpmn', 'about:open-diagrams');
+    await testClient.designView.openXmlView('Untitled-1', 'about:open-diagrams/Untitled-1.bpmn', 'about:open-diagrams');
 
-    await testClient.xmlView.hasContent();
+    await testClient.assertXmlViewHasContent();
   });
 
   it('should open diff view', async () => {
     await createAndOpenDiagram();
 
-    await testClient.diffView.open('Untitled-1', 'about:open-diagrams/Untitled-1.bpmn', 'about:open-diagrams');
+    await testClient.designView.openDiffView(
+      'Untitled-1',
+      'about:open-diagrams/Untitled-1.bpmn',
+      'about:open-diagrams',
+    );
 
-    await testClient.diffView.assertHasRenderedAllContainer();
+    await testClient.assertDiffViewHasRenderedAllContainer();
   });
 
   it('should open the xml view from the status bar', async () => {
     await createAndOpenDiagram();
-    await testClient.statusbar.openXmlView();
-    await testClient.xmlView.assertContainsText('id="Untitled-1"');
+    await testClient.designView.openXmlViewFromStatusbar();
+    await testClient.assertXmlViewContainsText('id="Untitled-1"');
   });
 
   it('should open design view from the status bar', async () => {
     // Arrange
     await createAndOpenDiagram();
-    await testClient.statusbar.openXmlView();
+    await testClient.designView.openXmlViewFromStatusbar();
 
     // Act and Assert
-    await testClient.statusbar.openDesignView();
-  });
-
-  it('should create and open a new diagam by clicking on new diagram link', async () => {
-    await createAndOpenDiagram();
-
-    await testClient.navbar.assertTitleIs('Untitled-1');
-    await testClient.assertWindowTitleIs('Design | BPMN Studio');
-  });
-
-  it('should open a solution', async () => {
-    await testClient.startPageLoaded();
-
-    await testClient.solutionExplorer.openDirectoryAsSolution('fixtures');
-  });
-
-  it('should open a diagram from solution', async () => {
-    await testClient.startPageLoaded();
-
-    const diagramName = 'call_activity_subprocess_error';
-    await testClient.solutionExplorer.openDirectoryAsSolution('fixtures', diagramName);
-    await testClient.navbar.assertTitleIs(diagramName);
-  });
-
-  it('should open the internal ProcessEngine as solution', async () => {
-    await testClient.startPageLoaded();
-
-    await testClient.solutionExplorer.assertInternalProcessEngineIsOpenedAsSolution();
-  });
-
-  it('should show the SolutionExplorer', async () => {
-    // Arrange
-    await testClient.startPageLoaded();
-    await testClient.solutionExplorer.hide();
-
-    // Act and Assert
-    await testClient.solutionExplorer.show();
-  });
-
-  it('should hide the SolutionExplorer', async () => {
-    await testClient.startPageLoaded();
-
-    await testClient.solutionExplorer.hide();
+    await testClient.designView.openDetailViewFromStatusbar();
   });
 
   it('should open the Think view', async () => {
     await createAndOpenDiagram();
 
-    await testClient.thinkView.open('Untitled-1', 'about:open-diagrams/Untitled-1.bpmn', 'about:open-diagrams');
+    await testClient.openThinkView('Untitled-1', 'about:open-diagrams/Untitled-1.bpmn', 'about:open-diagrams');
     await testClient.assertWindowTitleIs('Think | BPMN Studio');
   });
 
   it('should open the Think view from navbar', async () => {
     await createAndOpenDiagram();
 
-    await testClient.navbar.openThinkView();
+    await testClient.openThinkView();
     await testClient.assertWindowTitleIs('Think | BPMN Studio');
-  });
-
-  it('should save a diagram', async () => {
-    // Arrange
-    await createAndOpenDiagram();
-    await testClient.navbar.assertDiagramIsUnsaved();
-
-    // Act and Assert
-    await testClient.designView.saveDiagramAs('test1.bpmn');
-    await testClient.navbar.assertDiagramIsSaved();
-  });
-
-  it('should deploy a diagram', async () => {
-    // Arrange
-    const diagramName = 'receive_task_wait_test';
-    await testClient.startPageLoaded();
-    await testClient.solutionExplorer.openDirectoryAsSolution('fixtures', diagramName);
-    await testClient.navbar.assertDiagramIsOnFileSystem();
-
-    if (isWindows) {
-      await testClient.pause(800);
-    }
-
-    // Act
-    await testClient.navbar.deployDiagram();
-    // Assert
-    await testClient.navbar.assertTitleIs(diagramName);
-    await testClient.navbar.assertDiagramIsOnProcessEngine();
-  });
-
-  it('should start a process', async () => {
-    const diagramName = 'receive_task_wait_test';
-    await testClient.startPageLoaded();
-    await testClient.solutionExplorer.openDirectoryAsSolution('fixtures', diagramName);
-    await testClient.navbar.assertDiagramIsOnFileSystem();
-    await testClient.navbar.deployDiagram();
-    await testClient.navbar.assertTitleIs(diagramName);
-    await testClient.navbar.assertDiagramIsOnProcessEngine();
-
-    await testClient.navbar.startProcess();
   });
 
   it('should stop a process on LiveExecutionTracker', async () => {
     const diagramName = 'receive_task_wait_test';
     await testClient.startPageLoaded();
     await testClient.solutionExplorer.openDirectoryAsSolution('fixtures', diagramName);
-    await testClient.navbar.assertDiagramIsOnFileSystem();
-    await testClient.navbar.deployDiagram();
-    await testClient.navbar.assertTitleIs(diagramName);
-    await testClient.navbar.assertDiagramIsOnProcessEngine();
-    await testClient.navbar.startProcess();
+    await testClient.assertDiagramIsOnFileSystem();
+    await testClient.designView.deployDiagram();
+    await testClient.assertTitleIs(diagramName);
+    await testClient.assertDiagramIsOnProcessEngine();
+    await testClient.designView.startProcess();
 
     await testClient.liveExecutionTracker.stopProcess();
   });
