@@ -1,6 +1,5 @@
 import path from 'path';
 import fs from 'fs';
-import assert from 'assert';
 import {TestClient} from '../TestClient';
 
 export class Design {
@@ -12,14 +11,19 @@ export class Design {
     this.saveDiagramDir = saveDiagramDir;
   }
 
-  public async open(diagramName: string, diagramUri: string, solutionUri?: string): Promise<void> {
+  public async openDetailView(diagramName: string, diagramUri: string, solutionUri?: string): Promise<void> {
     await this.testClient.openDesignView('detail', diagramName, diagramUri, solutionUri);
     await this.testClient.ensureVisible('[data-test-diagram-detail]');
   }
 
-  public async clickOnBpmnElementWithName(name): Promise<void> {
-    await this.testClient.ensureVisible(`.djs-label=${name}`);
-    await this.testClient.clickOn(`.djs-label=${name}`);
+  public async openXmlView(diagramName: string, diagramUri: string, solutionUri?: string): Promise<void> {
+    await this.testClient.openDesignView('xml', diagramName, diagramUri, solutionUri);
+    await this.testClient.ensureVisible('[data-test-bpmn-xml-view]');
+  }
+
+  public async openDiffView(diagramName: string, diagramUri: string, solutionUri?: string): Promise<void> {
+    await this.testClient.openDesignView('diff', diagramName, diagramUri, solutionUri);
+    await this.testClient.ensureVisible('[data-test-bpmn-diff-view]');
   }
 
   public async saveDiagramAs(fileName: string): Promise<void> {
@@ -38,8 +42,28 @@ export class Design {
     }, fileUri);
   }
 
-  public async assertCanvasModelIsVisible(): Promise<void> {
-    const canvasModelIsVisible = await this.testClient.webdriverClient.isVisible('[data-test-canvas-model]');
-    assert.equal(canvasModelIsVisible, true);
+  public async startProcess(): Promise<void> {
+    await this.testClient.ensureVisible('[data-test-start-diagram-button]');
+    await this.testClient.clickOn('[data-test-start-diagram-button]');
+    await this.testClient.ensureVisible('[data-test-live-execution-tracker]');
+  }
+
+  public async deployDiagram(): Promise<void> {
+    await this.testClient.ensureVisible('[data-test-deploy-diagram-button]');
+    await this.testClient.clickOn('[data-test-deploy-diagram-button]');
+  }
+
+  // openXMLViewForCurrentDiagram?
+  public async openXmlViewFromStatusbar(): Promise<void> {
+    await this.testClient.ensureVisible('[data-test-status-bar-xml-view-button]');
+    await this.testClient.clickOn('[data-test-status-bar-xml-view-button]');
+    await this.testClient.ensureVisible('[data-test-bpmn-xml-view]');
+  }
+
+  // openDesignViewForCurrentDiagram?
+  public async openDetailViewFromStatusbar(): Promise<void> {
+    await this.testClient.ensureVisible('[data-test-status-bar-disable-xml-view-button]');
+    await this.testClient.clickOn('[data-test-status-bar-disable-xml-view-button]');
+    await this.testClient.ensureVisible('[data-test-diagram-detail]');
   }
 }
