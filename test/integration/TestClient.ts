@@ -7,7 +7,7 @@ import {exec} from 'child_process';
 import {AppConstructorOptions, Application} from 'spectron';
 import assert from 'assert';
 import {IIdentity} from '@essential-projects/iam_contracts';
-import {callExposedFunction} from '../../src/services/expose-functionality-module/expose-functionality-module';
+
 import {SolutionExplorer} from './test-classes/solution-explorer';
 import {PropertyPanel} from './test-classes/property-panel';
 import {Design} from './test-classes/design-view';

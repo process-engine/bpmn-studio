@@ -1,5 +1,6 @@
 import path from 'path';
 import {TestClient} from '../TestClient';
+import {callExposedFunction} from '../../../src/services/expose-functionality-module/expose-functionality-module';
 
 export class SolutionExplorer {
   private testClient: TestClient;
@@ -40,16 +41,13 @@ export class SolutionExplorer {
   }
 
   public async openDirectoryAsSolution(dir: string, diagramName?: string): Promise<void> {
-    const pathToSolution: string = path.join(__dirname, '..', '..', '..', dir);
+    const pathToSolution: string = path.join(__dirname, '..', '..', '..', '..', '..', dir);
 
-    await this.testClient.webdriverClient.executeAsync(
-      async (solutionPath, solutionIdentity, done) => {
-        // eslint-disable-next-line no-underscore-dangle
-        await (window as any).__dangerouslyInvoke.openSolution(solutionPath, false, solutionIdentity);
-
-        done();
-      },
+    await callExposedFunction(
+      this.testClient.webdriverClient,
+      'openSolution',
       pathToSolution,
+      false,
       this.testClient.getDefaultIdentity(),
     );
 
