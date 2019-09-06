@@ -18,7 +18,6 @@ import {StartPage} from './test-classes/startpage';
 import {Statusbar} from './test-classes/status-bar';
 import {ThinkView} from './test-classes/think-view';
 import {XmlView} from './test-classes/xml-view';
-import {GlobalMethods} from './test-classes/global-methods';
 
 function getUserConfigFolder(): string {
   const userHomeDir = os.homedir();
@@ -37,18 +36,17 @@ const DATABASE_PATH = path.join(getUserConfigFolder(), 'bpmn-studio-tests', 'pro
 const SAVE_DIAGRAM_DIR = path.join(getUserConfigFolder(), 'bpmn-studio-tests', 'saved_diagrams');
 
 export class TestClient {
-  public solutionExplorer: SolutionExplorer;
-  public designView: Design;
-  public propertyPanel: PropertyPanel;
-  public diffView: DiffView;
-  public liveExecutionTracker: LiveExecutionTracker;
-  public navbar: Navbar;
-  public startPage: StartPage;
-  public statusbar: Statusbar;
-  public thinkView: ThinkView;
-  public xmlView: XmlView;
+  public solutionExplorer: SolutionExplorer = new SolutionExplorer(this);
+  public designView: Design = new Design(this, SAVE_DIAGRAM_DIR);
+  public propertyPanel: PropertyPanel = new PropertyPanel(this);
+  public diffView: DiffView = new DiffView(this);
+  public liveExecutionTracker: LiveExecutionTracker = new LiveExecutionTracker(this);
+  public navbar: Navbar = new Navbar(this);
+  public startPage: StartPage = new StartPage(this);
+  public statusbar: Statusbar = new Statusbar(this);
+  public thinkView: ThinkView = new ThinkView(this);
+  public xmlView: XmlView = new XmlView(this);
 
-  public globalMethods: GlobalMethods;
   private app: Application;
 
   constructor(applicationArgs: AppConstructorOptions) {
@@ -57,17 +55,6 @@ export class TestClient {
 
   public async startSpectronApp(): Promise<any> {
     await this.app.start();
-    this.globalMethods = new GlobalMethods(this.app);
-    this.solutionExplorer = new SolutionExplorer(this.app);
-    this.designView = new Design(this.app, SAVE_DIAGRAM_DIR);
-    this.propertyPanel = new PropertyPanel(this.app);
-    this.diffView = new DiffView(this.app);
-    this.liveExecutionTracker = new LiveExecutionTracker(this.app);
-    this.navbar = new Navbar(this.app);
-    this.startPage = new StartPage(this.app);
-    this.statusbar = new Statusbar(this.app);
-    this.thinkView = new ThinkView(this.app);
-    this.xmlView = new XmlView(this.app);
   }
 
   public async awaitReadyness(): Promise<void> {
