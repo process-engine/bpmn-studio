@@ -14,7 +14,8 @@
     "start_dev": "au run --watch",
     "build-electron-app": "tsc -p electron_app/tsconfig.json",
     "build-bin": "tsc -p bin/tsconfig.json",
-    "build": "npm run build-bin && npm run build-electron-app && au build",
+    "build-tests": "tsc -p test/",
+    "build": "npm run build-bin && npm run build-electron-app && au build && npm run build-tests",
     "reset": "bash dev_tooling/scripts/reset_setup.bash",
     "reinstall": "OLD_PATH=$PATH bash dev_tooling/scripts/reinstall_setup.bash && unset OLD_PATH",
     "reinstall-clean": "OLD_PATH=$PATH bash dev_tooling/scripts/reinstall_clean_setup.bash && unset OLD_PATH",
@@ -34,9 +35,9 @@
     "jenkins-run-end-to-end-tests": "au e2eDocker",
     "jenkins-start-process-engine": "process-engine",
     "test": "npm run test-electron",
-    "test-electron-macos": "tsc -p test/ && mocha -r choma dist/test/**/*.spec.js",
-    "test-electron-windows": "tsc -p test/ && mocha -r choma dist/test/**/*.spec.js",
-    "test-electron": "node dist/test/get-path-and-run-tests.js"
+    "test-electron-macos": "mocha -r choma dist/test/**/*.spec.js",
+    "test-electron-windows": "mocha -r choma dist/test/**/*.spec.js",
+    "test-electron": "npm run build-tests && node dist/test/test/integration/get-path-and-run-tests.js"
   },
   "files": [
     "dist/web",
