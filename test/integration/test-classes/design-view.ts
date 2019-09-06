@@ -18,7 +18,6 @@ export class Design {
 
   public async openXmlView(diagramName: string, diagramUri: string, solutionUri?: string): Promise<void> {
     await this.testClient.openDesignView('xml', diagramName, diagramUri, solutionUri);
-    await this.testClient.ensureVisible('[data-test-bpmn-xml-view]');
   }
 
   public async openDiffView(diagramName: string, diagramUri: string, solutionUri?: string): Promise<void> {
@@ -57,7 +56,6 @@ export class Design {
   public async openXmlViewFromStatusbar(): Promise<void> {
     await this.testClient.ensureVisible('[data-test-status-bar-xml-view-button]');
     await this.testClient.clickOn('[data-test-status-bar-xml-view-button]');
-    await this.testClient.ensureVisible('[data-test-bpmn-xml-view]');
   }
 
   // openDesignViewForCurrentDiagram?
@@ -65,5 +63,30 @@ export class Design {
     await this.testClient.ensureVisible('[data-test-status-bar-disable-xml-view-button]');
     await this.testClient.clickOn('[data-test-status-bar-disable-xml-view-button]');
     await this.testClient.ensureVisible('[data-test-diagram-detail]');
+  }
+
+  public async assertXmlViewIsVisible(): Promise<void> {
+    await this.testClient.ensureVisible('[data-test-bpmn-xml-view]');
+  }
+
+  public async showPropertyPanel(): Promise<void> {
+    const propertyPanelIsVisible = await this.testClient.webdriverClient.isVisible('[data-test-property-panel]');
+    if (propertyPanelIsVisible) {
+      return;
+    }
+
+    await this.testClient.ensureVisible('[data-test-toggle-propertypanel]');
+    await this.testClient.clickOn('[data-test-toggle-propertypanel]');
+  }
+
+  public async hidePropertyPanel(): Promise<void> {
+    const propertyPanelIsVisible = await this.testClient.webdriverClient.isVisible('[data-test-property-panel]');
+    const propertyPanelIsHidden = !propertyPanelIsVisible;
+    if (propertyPanelIsHidden) {
+      return;
+    }
+
+    await this.testClient.ensureVisible('[data-test-toggle-propertypanel]');
+    await this.testClient.clickOn('[data-test-toggle-propertypanel]');
   }
 }
