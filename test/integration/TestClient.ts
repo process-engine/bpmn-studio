@@ -9,19 +9,13 @@ import assert from 'assert';
 import {IIdentity} from '@essential-projects/iam_contracts';
 
 import {SolutionExplorer} from './test-classes/solution-explorer';
-import {PropertyPanel} from './test-classes/property-panel';
 import {Design} from './test-classes/design-view';
-import {DiffView} from './test-classes/diff-view';
 import {LiveExecutionTracker} from './test-classes/live-execution-tracker';
-import {Navbar} from './test-classes/navbar';
-import {StartPage} from './test-classes/startpage';
-import {Statusbar} from './test-classes/status-bar';
-import {ThinkView} from './test-classes/think-view';
-import {XmlView} from './test-classes/xml-view';
 
 function getUserConfigFolder(): string {
   const userHomeDir = os.homedir();
   switch (process.platform) {
+
     case 'darwin':
       return path.join(userHomeDir, 'Library', 'Application Support');
     case 'win32':
@@ -38,14 +32,7 @@ const SAVE_DIAGRAM_DIR = path.join(getUserConfigFolder(), 'bpmn-studio-tests', '
 export class TestClient {
   public solutionExplorer: SolutionExplorer = new SolutionExplorer(this);
   public designView: Design = new Design(this, SAVE_DIAGRAM_DIR);
-  public propertyPanel: PropertyPanel = new PropertyPanel(this);
-  public diffView: DiffView = new DiffView(this);
   public liveExecutionTracker: LiveExecutionTracker = new LiveExecutionTracker(this);
-  public navbar: Navbar = new Navbar(this);
-  public startPage: StartPage = new StartPage(this);
-  public statusbar: Statusbar = new Statusbar(this);
-  public thinkView: ThinkView = new ThinkView(this);
-  public xmlView: XmlView = new XmlView(this);
 
   private app: Application;
 
@@ -64,6 +51,57 @@ export class TestClient {
 
   public async startPageLoaded(): Promise<void> {
     await this.ensureVisible('[data-test-start-page]');
+  }
+
+  public async clickOnBpmnElementWithName(name): Promise<void> {
+    await this.ensureVisible(`.djs-label=${name}`);
+    await this.clickOn(`.djs-label=${name}`);
+  }
+
+  public async assertXmlViewHasContent(): Promise<void> {
+    const xmlViewContent = await this.getTextFromElement('[data-test-xml-view-content]');
+    assert.notEqual(xmlViewContent, null);
+  }
+
+  public async assertXmlViewContainsText(text: string): Promise<void> {
+    const xmlViewContent = await this.getTextFromElement('[data-test-xml-view-content]');
+    const xmlViewContentContainsText: boolean = xmlViewContent.includes(text);
+
+    assert.equal(xmlViewContentContainsText, true);
+  }
+
+  public async assertCanvasModelIsVisible(): Promise<void> {
+    const canvasModelIsVisible = await this.webdriverClient.isVisible('[data-test-canvas-model]');
+    assert.equal(canvasModelIsVisible, true);
+  }
+
+  public async assertDiagramIsOnFileSystem(): Promise<void> {
+    await this.ensureVisible('[data-test-navbar-icon]');
+    const classAttribute = await this.getAttributeFromElement('[data-test-navbar-icon]', 'data-test-navbar-icon');
+
+    assert.equal(classAttribute, 'false');
+  }
+
+  public async assertDiagramIsOnProcessEngine(): Promise<void> {
+    await this.ensureVisible('[data-test-navbar-icon]');
+    const classAttribute = await this.getAttributeFromElement('[data-test-navbar-icon]', 'data-test-navbar-icon');
+
+    assert.equal(classAttribute, 'true');
+  }
+
+  public async assertTitleIs(name): Promise<void> {
+    await this.ensureVisible('[data-test-navbar-title]');
+    const navbarTitle = await this.getTextFromElement('[data-test-navbar-title]');
+
+    assert.equal(navbarTitle, name);
+  }
+
+  public async assertDiagramIsSaved(): Promise<void> {
+    await this.ensureNotVisible('[data-test-edited-label]');
+  }
+
+  public async assertDiagramIsUnsaved(): Promise<void> {
+    await this.ensureVisible('[data-test-edited-label]');
   }
 
   public async ensureVisible(selector: string, timeout?: number): Promise<boolean> {
@@ -106,6 +144,80 @@ export class TestClient {
     const uriFragment = `#/design/${subPath}/diagram/${encodedName}?diagramUri=${encodedUri}&solutionUri=${encodedSolutionUri}`;
 
     return this.openView(uriFragment);
+  }
+
+  public async openThinkView(diagramName?: string, diagramUri?: string, solutionUri?: string): Promise<void> {
+    if (diagramName && diagramUri) {
+      const encodedName = encodeURIComponent(diagramName);
+      const encodedUri = encodeURIComponent(diagramUri);
+      const encodedSolutionUri = solutionUri ? encodeURIComponent(solutionUri) : '';
+      const uriFragment = `#/think/diagram-list/diagram/${encodedName}?diagramUri=${encodedUri}&solutionUri=${encodedSolutionUri}`;
+
+      await this.openView(uriFragment);
+    } else {
+      await this.openView('#/think/diagram-list/diagram');
+    }
+
+    await this.ensureVisible('diagram-list');
+  }
+
+  public async openThinkViewFromNavbar(): Promise<void> {
+    await this.ensureVisible('[data-test-navbar="Think"]');
+    await this.clickOn('[data-test-navbar="Think"]');
+    await this.ensureVisible('diagram-list');
+  }
+
+  public async openStartPage(): Promise<void> {
+    return this.openView('');
+  }
+
+  public async createAndOpenNewDiagram(): Promise<void> {
+    await this.ensureVisible('[data-test-create-new-diagram]');
+    await this.clickOn('[data-test-create-new-diagram]');
+    await this.ensureVisible('[data-test-navbar-title]');
+  }
+
+  public async assertSelectedBpmnElementHasName(name): Promise<void> {
+    const selectedElementText = await this.getValueFromElement('[data-test-property-panel-element-name]');
+
+    assert.equal(selectedElementText, name);
+  }
+
+  public async rejectSelectedBpmnElementHasName(name): Promise<void> {
+    const selectedElementText = await this.getValueFromElement('[data-test-property-panel-element-name]');
+
+    assert.notEqual(selectedElementText, name);
+  }
+
+  public async assertDiffViewHasRenderedAllContainer(): Promise<void> {
+    const leftDiffViewContainerIsVisible = await this.webdriverClient.isVisible('[data-test-left-diff-view]');
+    const rightDiffViewContainerIsVisible = await this.webdriverClient.isVisible('[data-test-right-diff-view]');
+    const lowerDiffViewContainerIsVisible = await this.webdriverClient.isVisible('[data-test-lower-diff-view]');
+
+    assert.equal(leftDiffViewContainerIsVisible, true);
+    assert.equal(rightDiffViewContainerIsVisible, true);
+    assert.equal(lowerDiffViewContainerIsVisible, true);
+  }
+
+  public async showPropertyPanel(): Promise<void> {
+    const propertyPanelIsVisible = await this.webdriverClient.isVisible('[data-test-property-panel]');
+    if (propertyPanelIsVisible) {
+      return;
+    }
+
+    await this.ensureVisible('[data-test-toggle-propertypanel]');
+    await this.clickOn('[data-test-toggle-propertypanel]');
+  }
+
+  public async hidePropertyPanel(): Promise<void> {
+    const propertyPanelIsVisible = await this.webdriverClient.isVisible('[data-test-property-panel]');
+    const propertyPanelIsHidden = !propertyPanelIsVisible;
+    if (propertyPanelIsHidden) {
+      return;
+    }
+
+    await this.ensureVisible('[data-test-toggle-propertypanel]');
+    await this.clickOn('[data-test-toggle-propertypanel]');
   }
 
   public async elementHasText(selector, text): Promise<void> {
