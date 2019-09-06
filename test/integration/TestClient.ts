@@ -15,7 +15,6 @@ import {LiveExecutionTracker} from './test-classes/live-execution-tracker';
 function getUserConfigFolder(): string {
   const userHomeDir = os.homedir();
   switch (process.platform) {
-
     case 'darwin':
       return path.join(userHomeDir, 'Library', 'Application Support');
     case 'win32':
@@ -33,6 +32,7 @@ export class TestClient {
   public solutionExplorer: SolutionExplorer = new SolutionExplorer(this);
   public designView: Design = new Design(this, SAVE_DIAGRAM_DIR);
   public liveExecutionTracker: LiveExecutionTracker = new LiveExecutionTracker(this);
+  public creatingFirstDiagram: boolean = true;
 
   private app: Application;
 
@@ -58,18 +58,6 @@ export class TestClient {
     await this.clickOn(`.djs-label=${name}`);
   }
 
-  public async assertXmlViewHasContent(): Promise<void> {
-    const xmlViewContent = await this.getTextFromElement('[data-test-xml-view-content]');
-    assert.notEqual(xmlViewContent, null);
-  }
-
-  public async assertXmlViewContainsText(text: string): Promise<void> {
-    const xmlViewContent = await this.getTextFromElement('[data-test-xml-view-content]');
-    const xmlViewContentContainsText: boolean = xmlViewContent.includes(text);
-
-    assert.equal(xmlViewContentContainsText, true);
-  }
-
   public async assertCanvasModelIsVisible(): Promise<void> {
     const canvasModelIsVisible = await this.webdriverClient.isVisible('[data-test-canvas-model]');
     assert.equal(canvasModelIsVisible, true);
@@ -89,7 +77,7 @@ export class TestClient {
     assert.equal(classAttribute, 'true');
   }
 
-  public async assertTitleIs(name): Promise<void> {
+  public async assertNavbarTitleIs(name): Promise<void> {
     await this.ensureVisible('[data-test-navbar-title]');
     const navbarTitle = await this.getTextFromElement('[data-test-navbar-title]');
 
@@ -172,6 +160,10 @@ export class TestClient {
   }
 
   public async createAndOpenNewDiagram(): Promise<void> {
+    if (!this.creatingFirstDiagram) {
+      await this.openStartPage();
+    }
+
     await this.ensureVisible('[data-test-create-new-diagram]');
     await this.clickOn('[data-test-create-new-diagram]');
     await this.ensureVisible('[data-test-navbar-title]');
@@ -197,27 +189,6 @@ export class TestClient {
     assert.equal(leftDiffViewContainerIsVisible, true);
     assert.equal(rightDiffViewContainerIsVisible, true);
     assert.equal(lowerDiffViewContainerIsVisible, true);
-  }
-
-  public async showPropertyPanel(): Promise<void> {
-    const propertyPanelIsVisible = await this.webdriverClient.isVisible('[data-test-property-panel]');
-    if (propertyPanelIsVisible) {
-      return;
-    }
-
-    await this.ensureVisible('[data-test-toggle-propertypanel]');
-    await this.clickOn('[data-test-toggle-propertypanel]');
-  }
-
-  public async hidePropertyPanel(): Promise<void> {
-    const propertyPanelIsVisible = await this.webdriverClient.isVisible('[data-test-property-panel]');
-    const propertyPanelIsHidden = !propertyPanelIsVisible;
-    if (propertyPanelIsHidden) {
-      return;
-    }
-
-    await this.ensureVisible('[data-test-toggle-propertypanel]');
-    await this.clickOn('[data-test-toggle-propertypanel]');
   }
 
   public async elementHasText(selector, text): Promise<void> {
