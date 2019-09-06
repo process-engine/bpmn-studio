@@ -33,6 +33,7 @@ export default {
     diagramChangedOutsideTheStudio: 'diagramChangedOutsideTheStudio',
     xmlChanged: 'xmlChanged',
     diagramWasSaved: 'diagramWasSaved',
+    updatingNavbarDone: 'updatingNavbarDone',
     deployModals: {
       showRemoteSolutionSelectionModal: 'deployModals:remoteSolutionSelectionModal:show',
       showOverwriteDiagramModal: 'deployModals:overwriteDiagramModal:show',
@@ -106,6 +107,11 @@ export default {
     },
     solutionExplorer: {
       updateOpenDiagrams: 'solutioneExplorer:openDiagrams:update',
+    },
+    tutorial: {
+      diagramOpened: 'tutorial:diagram:opened',
+      diagramDeployed: 'tutorial:diagram:deployed',
+      diagramStarted: 'tutorial:diagram:started',
     },
   },
   baseRoute: processEngineRoute,

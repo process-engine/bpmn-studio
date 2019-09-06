@@ -1,0 +1,163 @@
+import {inject} from 'aurelia-framework';
+import {EventAggregator} from 'aurelia-event-aggregator';
+
+import Driver from 'driver.js';
+import 'driver.js/dist/driver.min.css';
+
+import {NotificationService} from '../notification-service/notification.service';
+import environment from '../../environment';
+import {NotificationType} from '../../contracts/index';
+
+@inject(EventAggregator, 'NotificationService')
+export class TutorialService {
+  private driver: Driver;
+  private eventAggregator: EventAggregator;
+  private notificationService: NotificationService;
+
+  constructor(eventAggregator: EventAggregator, notificationService: NotificationService) {
+    this.notificationService = notificationService;
+    this.eventAggregator = eventAggregator;
+    // # 1 & 2
+    // this.driver = new Driver();
+
+    // # 3
+    this.driver = new Driver({
+      allowClose: false,
+      animate: false,
+      showButtons: false,
+      // onDeselected: async (element: Driver.Element): Promise<void> => {
+      //   await this.waitUntillOverlayIsGone();
+
+      //   const elementId: string = (element as any).options.element;
+      //   const title: string = element.getPopover().getTitleNode().textContent;
+      //   const description: string = element.getPopover().getDescriptionNode().textContent;
+      //   const position: string = (element as any).options.popover.position;
+      //   this.driver.highlight({
+      //     element: elementId,
+      //     popover: {
+      //       title: title,
+      //       description: description,
+      //       position: position,
+      //     },
+      //   });
+
+      //   this.notificationService.showNotification(NotificationType.ERROR, 'You are not done yet!');
+      // },
+    });
+  }
+
+  public async startTutorial(): Promise<void> {
+    const openDiagramElementId: string = '#open-a-diagram-button';
+    const deployDiagramElementId: string = '#deploy-diagram-button';
+    const startDiagramElementId: string = '#start-diagram-button';
+
+    // # 1
+
+    // this.driver.highlight(openDiagramElementId);
+    // console.log('now');
+    // this.notificationService.showNonDisappearingNotification(
+    //   NotificationType.INFO,
+    //   'At first open a new diagram via this button.',
+    // );
+
+    // setTimeout(() => {
+    //   console.log('reset');
+    //   this.driver.reset();
+    // }, 2000);
+
+    // # 2
+
+    // this.driver.defineSteps([
+    //   {
+    //     element: openDiagramElementId,
+    //     popover: {
+    //       title: 'Open a diagram',
+    //       description: 'At first you need to open a new diagram via this button.',
+    //     },
+    //   },
+    //   {
+    //     element: deployDiagramElementId,
+    //     popover: {
+    //       title: 'Deploy the diagram',
+    //       description: 'Then deploy this diagram button.',
+    //       position: 'left',
+    //     },
+    //   },
+    // ]);
+    // this.driver.start();
+
+    // # 3
+
+    // TODO Disable Click outside highlighted area
+
+    this.driver.highlight({
+      element: openDiagramElementId,
+      popover: {
+        title: 'Open a diagram',
+        description: 'At first you need to open a new diagram via this button.',
+      },
+    });
+
+    await this.waitUntillDiagramIsOpen();
+    this.driver.reset();
+    await this.waitUntillOverlayIsGone();
+
+    this.driver.highlight({
+      element: deployDiagramElementId,
+      popover: {
+        title: 'Deploy the diagram',
+        description: 'Then deploy this diagram button to a remote solution.',
+        position: 'left',
+      },
+    });
+
+    await this.waitUntillDiagramIsDeployed();
+    this.driver.reset();
+    await this.waitUntillOverlayIsGone();
+
+    this.driver.highlight({
+      element: startDiagramElementId,
+      popover: {
+        title: 'Start the diagram',
+        description: 'As soon as the diagram is deployed on a remote solution it can be started.',
+        position: 'left',
+      },
+    });
+
+    await this.waitUntillDiagramIsStarted();
+    this.driver.reset();
+    await this.waitUntillOverlayIsGone();
+  }
+
+  private waitUntillDiagramIsOpen(): Promise<void> {
+    return new Promise((resolve: Function): void => {
+      this.eventAggregator.subscribeOnce(environment.events.tutorial.diagramOpened, () => {
+        resolve();
+      });
+    });
+  }
+
+  private waitUntillDiagramIsDeployed(): Promise<void> {
+    return new Promise((resolve: Function): void => {
+      this.eventAggregator.subscribeOnce(environment.events.tutorial.diagramDeployed, () => {
+        resolve();
+      });
+    });
+  }
+
+  private waitUntillDiagramIsStarted(): Promise<void> {
+    return new Promise((resolve: Function): void => {
+      this.eventAggregator.subscribeOnce(environment.events.tutorial.diagramStarted, () => {
+        resolve();
+      });
+    });
+  }
+
+  private waitUntillOverlayIsGone(): Promise<void> {
+    return new Promise((resolve: Function): void => {
+      setTimeout(() => {
+        resolve();
+      }, 0);
+    });
+  }
+}

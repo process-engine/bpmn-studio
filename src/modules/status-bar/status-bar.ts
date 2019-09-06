@@ -9,6 +9,7 @@ import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 import {DiffMode, ISolutionEntry, ISolutionService, NotificationType} from '../../contracts/index';
 import environment from '../../environment';
 import {NotificationService} from '../../services/notification-service/notification.service';
+import {TutorialService} from '../../services/tutorial-service/tutorial.service';
 
 type UpdateProgressData = {
   bytesPerSecond: number;
@@ -18,7 +19,7 @@ type UpdateProgressData = {
   transferred: number;
 };
 
-@inject(EventAggregator, Router, 'SolutionService', 'NotificationService')
+@inject(EventAggregator, Router, 'SolutionService', 'NotificationService', TutorialService)
 export class StatusBar {
   public showDiagramViewButtons: boolean = false;
   public diffIsShown: boolean = false;
@@ -48,17 +49,20 @@ export class StatusBar {
   private designView: string;
   private ipcRenderer: any;
   private notificationService: NotificationService;
+  private tutorialService: TutorialService;
 
   constructor(
     eventAggregator: EventAggregator,
     router: Router,
     solutionService: ISolutionService,
     notificationService: NotificationService,
+    tutorialService: TutorialService,
   ) {
     this.eventAggregator = eventAggregator;
     this.router = router;
     this.solutionService = solutionService;
     this.notificationService = notificationService;
+    this.tutorialService = tutorialService;
 
     const applicationRunsInElectron: boolean = (window as any).nodeRequire !== undefined;
     if (applicationRunsInElectron) {
@@ -154,6 +158,12 @@ export class StatusBar {
     });
 
     this.xmlIsShown = !this.xmlIsShown;
+  }
+
+  public startTutorial(event): void {
+    event.stopPropagation();
+
+    this.tutorialService.startTutorial();
   }
 
   public changeDiffMode(mode: DiffMode): void {

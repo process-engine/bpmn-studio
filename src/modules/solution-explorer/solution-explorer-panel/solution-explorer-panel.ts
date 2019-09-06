@@ -316,6 +316,8 @@ export class SolutionExplorerPanel {
       const filePath: string = openedFile[0];
 
       await this.openDiagramOrDisplayError(filePath);
+
+      this.eventAggregator.publish(environment.events.tutorial.diagramOpened);
     });
   }
 

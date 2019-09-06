@@ -66,8 +66,9 @@ export class NavBar {
     this.updateNavbar();
 
     this.subscriptions = [
-      this.eventAggregator.subscribe('router:navigation:success', () => {
-        this.updateNavbar();
+      this.eventAggregator.subscribe('router:navigation:success', async () => {
+        await this.updateNavbar();
+        this.eventAggregator.publish(environment.events.updatingNavbarDone);
       }),
 
       this.eventAggregator.subscribe(environment.events.navBar.showTools, () => {
