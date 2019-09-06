@@ -3,7 +3,8 @@
 import {Application} from 'spectron';
 import assert from 'assert';
 
-import {GlobalMethods} from './global-methods';
+export class DiffView {
+  private testClient: TestClient;
 
 export class DiffView extends GlobalMethods {
   constructor(app: Application) {

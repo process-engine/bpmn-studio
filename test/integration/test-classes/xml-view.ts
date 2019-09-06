@@ -3,7 +3,8 @@
 import {Application} from 'spectron';
 import assert from 'assert';
 
-import {GlobalMethods} from './global-methods';
+export class XmlView {
+  private testClient: TestClient;
 
 export class XmlView extends GlobalMethods {
   constructor(app: Application) {

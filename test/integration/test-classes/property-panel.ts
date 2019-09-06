@@ -2,11 +2,13 @@
 /* eslint-disable no-useless-constructor */
 import {Application} from 'spectron';
 import assert from 'assert';
-import {GlobalMethods} from './global-methods';
+import {TestClient} from '../TestClient';
 
-export class PropertyPanel extends GlobalMethods {
-  constructor(app: Application) {
-    super(app);
+export class PropertyPanel {
+  private testClient: TestClient;
+
+  constructor(testClient: TestClient) {
+    this.testClient = testClient;
   }
 
   public async show(): Promise<void> {

@@ -5,9 +5,8 @@ import path from 'path';
 import fs from 'fs';
 import assert from 'assert';
 
-import {GlobalMethods} from './global-methods';
-
-export class Design extends GlobalMethods {
+export class Design {
+  private testClient: TestClient;
   private saveDiagramDir: string;
 
   constructor(app: Application, saveDiagramDir: string) {

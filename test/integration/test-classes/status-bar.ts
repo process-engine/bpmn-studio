@@ -2,7 +2,8 @@
 /* eslint-disable no-useless-constructor */
 import {Application} from 'spectron';
 
-import {GlobalMethods} from './global-methods';
+export class Statusbar {
+  private testClient: TestClient;
 
 export class Statusbar extends GlobalMethods {
   constructor(app: Application) {

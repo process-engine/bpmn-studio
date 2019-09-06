@@ -2,8 +2,8 @@
 /* eslint-disable no-useless-constructor */
 import path from 'path';
 
-import {Application} from 'spectron';
-import {GlobalMethods} from './global-methods';
+export class SolutionExplorer {
+  private testClient: TestClient;
 
 export class SolutionExplorer extends GlobalMethods {
   constructor(app: Application) {

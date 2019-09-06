@@ -2,7 +2,8 @@
 /* eslint-disable no-useless-constructor */
 import {Application} from 'spectron';
 
-import {GlobalMethods} from './global-methods';
+export class StartPage {
+  private testClient: TestClient;
 
 export class StartPage extends GlobalMethods {
   constructor(app: Application) {
