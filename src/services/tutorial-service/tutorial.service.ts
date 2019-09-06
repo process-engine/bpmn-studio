@@ -17,10 +17,7 @@ export class TutorialService {
   constructor(eventAggregator: EventAggregator, notificationService: NotificationService) {
     this.notificationService = notificationService;
     this.eventAggregator = eventAggregator;
-    // # 1 & 2
-    // this.driver = new Driver();
 
-    // # 3
     this.driver = new Driver({
       allowClose: false,
       animate: false,
@@ -50,43 +47,6 @@ export class TutorialService {
     const openDiagramElementId: string = '#open-a-diagram-button';
     const deployDiagramElementId: string = '#deploy-diagram-button';
     const startDiagramElementId: string = '#start-diagram-button';
-
-    // # 1
-
-    // this.driver.highlight(openDiagramElementId);
-    // console.log('now');
-    // this.notificationService.showNonDisappearingNotification(
-    //   NotificationType.INFO,
-    //   'At first open a new diagram via this button.',
-    // );
-
-    // setTimeout(() => {
-    //   console.log('reset');
-    //   this.driver.reset();
-    // }, 2000);
-
-    // # 2
-
-    // this.driver.defineSteps([
-    //   {
-    //     element: openDiagramElementId,
-    //     popover: {
-    //       title: 'Open a diagram',
-    //       description: 'At first you need to open a new diagram via this button.',
-    //     },
-    //   },
-    //   {
-    //     element: deployDiagramElementId,
-    //     popover: {
-    //       title: 'Deploy the diagram',
-    //       description: 'Then deploy this diagram button.',
-    //       position: 'left',
-    //     },
-    //   },
-    // ]);
-    // this.driver.start();
-
-    // # 3
 
     // TODO Disable Click outside highlighted area
 
