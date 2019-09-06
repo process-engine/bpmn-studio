@@ -54,9 +54,9 @@ export class SolutionExplorer extends GlobalMethods {
     await this.ensureVisible(`[data-test-solution-entry-name=${dir}]`);
 
     if (diagramName) {
-      const searchString = this.getUriForSelector(pathToSolution, diagramName);
-      await this.ensureVisible(`[data-test-open-diagram-with-uri*="${searchString}"]`);
-      await this.clickOn(`[data-test-open-diagram-with-uri*="${searchString}"]`);
+      const diagramUri = this.getUriForSelector(pathToSolution, diagramName);
+      await this.ensureVisible(`[data-test-open-diagram-with-uri*="${diagramUri}"]`);
+      await this.clickOn(`[data-test-open-diagram-with-uri*="${diagramUri}"]`);
     }
   }
 
