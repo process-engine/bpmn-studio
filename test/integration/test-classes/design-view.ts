@@ -1,6 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import {TestClient} from '../TestClient';
+import {callExposedFunction} from '../../../src/services/expose-functionality-module/expose-functionality-module';
 
 export class Design {
   private testClient: TestClient;
@@ -33,12 +34,7 @@ export class Design {
       fs.mkdirSync(this.saveDiagramDir);
     }
 
-    await this.testClient.webdriverClient.executeAsync(async (pathToSave, done) => {
-      // eslint-disable-next-line no-underscore-dangle
-      await (window as any).__dangerouslyInvoke.saveDiagramAs(pathToSave);
-
-      done();
-    }, fileUri);
+    await callExposedFunction(this.testClient.webdriverClient, 'saveDiagramAs', fileUri);
   }
 
   public async startProcess(): Promise<void> {
