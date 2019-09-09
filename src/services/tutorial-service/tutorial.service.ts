@@ -58,22 +58,22 @@ export class TutorialService {
       },
     });
 
-    await this.waitUntillDiagramIsOpen();
+    await this.waitUntilDiagramIsOpen();
     this.driver.reset();
-    await this.waitUntillOverlayIsGone();
+    await this.waitUntilOverlayIsGone();
 
     this.driver.highlight({
       element: deployDiagramElementId,
       popover: {
         title: 'Deploy the diagram',
-        description: 'Then deploy this diagram button to a remote solution.',
+        description: 'Then deploy the diagram to a remote solution, by pressing this button.',
         position: 'left',
       },
     });
 
-    await this.waitUntillDiagramIsDeployed();
+    await this.waitUntilDiagramIsDeployed();
     this.driver.reset();
-    await this.waitUntillOverlayIsGone();
+    await this.waitUntilOverlayIsGone();
 
     this.driver.highlight({
       element: startDiagramElementId,
@@ -84,12 +84,12 @@ export class TutorialService {
       },
     });
 
-    await this.waitUntillDiagramIsStarted();
+    await this.waitUntilDiagramIsStarted();
     this.driver.reset();
-    await this.waitUntillOverlayIsGone();
+    await this.waitUntilOverlayIsGone();
   }
 
-  private waitUntillDiagramIsOpen(): Promise<void> {
+  private waitUntilDiagramIsOpen(): Promise<void> {
     return new Promise((resolve: Function): void => {
       this.eventAggregator.subscribeOnce(environment.events.tutorial.diagramOpened, () => {
         resolve();
@@ -97,7 +97,7 @@ export class TutorialService {
     });
   }
 
-  private waitUntillDiagramIsDeployed(): Promise<void> {
+  private waitUntilDiagramIsDeployed(): Promise<void> {
     return new Promise((resolve: Function): void => {
       this.eventAggregator.subscribeOnce(environment.events.tutorial.diagramDeployed, () => {
         resolve();
@@ -105,7 +105,7 @@ export class TutorialService {
     });
   }
 
-  private waitUntillDiagramIsStarted(): Promise<void> {
+  private waitUntilDiagramIsStarted(): Promise<void> {
     return new Promise((resolve: Function): void => {
       this.eventAggregator.subscribeOnce(environment.events.tutorial.diagramStarted, () => {
         resolve();
@@ -113,7 +113,7 @@ export class TutorialService {
     });
   }
 
-  private waitUntillOverlayIsGone(): Promise<void> {
+  private waitUntilOverlayIsGone(): Promise<void> {
     return new Promise((resolve: Function): void => {
       setTimeout(() => {
         resolve();
