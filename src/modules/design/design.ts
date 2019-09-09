@@ -170,14 +170,12 @@ export class Design {
       this.eventAggregator.publish(environment.events.bpmnio.unbindKeyboard);
 
       const diagramState: IDiagramState | null = this.openDiagramStateService.loadDiagramState(this.activeDiagram.uri);
-      const diagramHasNoState: boolean = diagramState === null;
-      if (diagramHasNoState) {
+      const diagramHasState: boolean = diagramState !== null;
+      if (diagramHasState) {
+        this.xmlForDiff = diagramState.data.xml;
+      } else {
         this.xmlForDiff = this.activeDiagram.xml;
-
-        return;
       }
-
-      this.xmlForDiff = diagramState.data.xml;
 
       this.showDiffView();
     }
