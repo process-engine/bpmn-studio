@@ -42,7 +42,6 @@ export class DiagramDetail {
   @bindable public isDisplayed: boolean;
   public bpmnio: BpmnIo;
   public showSaveForStartModal: boolean = false;
-  public showSaveBeforeDeployModal: boolean = false;
   public showStartEventModal: boolean = false;
   public showStartWithOptionsModal: boolean = false;
   public processesStartEvents: Array<DataModels.Events.Event> = [];

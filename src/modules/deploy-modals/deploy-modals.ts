@@ -7,12 +7,10 @@ import {SolutionService} from '../../services/solution-service/SolutionService';
 
 @inject(EventAggregator, 'SolutionService')
 export class DeployModals {
-  public showSaveBeforeDeployModal: boolean = false;
   public showRemoteSolutionOnDeployModal: boolean = false;
   public showOverwriteDiagramModal: boolean = false;
   public remoteSolutions: Array<ISolutionEntry>;
 
-  public cancelSaveBeforeDeployModal: Function;
   public saveDiagramAndDeploy: Function;
 
   public cancelMultipleRemoteSolutionModal: Function;
@@ -34,13 +32,6 @@ export class DeployModals {
   public attached(): void {
     this.subscriptions = [
       this.eventAggregator.subscribe(
-        environment.events.deployModals.showSaveBeforeDeployModal,
-        (callback: Function) => {
-          this.handleSaveBeforeDeploy(callback);
-        },
-      ),
-
-      this.eventAggregator.subscribe(
         environment.events.deployModals.showRemoteSolutionSelectionModal,
         (callback: Function) => {
           this.handleRemoteSolutionSelection(callback);
@@ -60,22 +51,6 @@ export class DeployModals {
     this.subscriptions.forEach((subscription: Subscription) => {
       subscription.dispose();
     });
-  }
-
-  public handleSaveBeforeDeploy(callback: Function): void {
-    this.showSaveBeforeDeployModal = true;
-
-    this.cancelSaveBeforeDeployModal = (): void => {
-      this.showSaveBeforeDeployModal = false;
-
-      callback(false);
-    };
-
-    this.saveDiagramAndDeploy = (): void => {
-      this.showSaveBeforeDeployModal = false;
-
-      callback(true);
-    };
   }
 
   public handleRemoteSolutionSelection(callback: Function): void {

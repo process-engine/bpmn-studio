@@ -329,10 +329,6 @@ export class Design {
     return remoteSolutionsWithoutActive;
   }
 
-  public get showSaveBeforeDeployModal(): boolean {
-    return this.diagramDetail.showSaveBeforeDeployModal;
-  }
-
   public get showRemoteSolutionOnDeployModal(): boolean {
     return this.diagramDetail.showRemoteSolutionOnDeployModal;
   }
