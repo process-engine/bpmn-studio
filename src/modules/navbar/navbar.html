@@ -11,14 +11,14 @@
         <a class="menu-tabbed-link" click.delegate="navigate(nav)" data-test-navbar="${nav.title}">${nav.title}</a>
       </div>
     </div>
-    <div class="menu-bar__menu--center" id="navBarCenter">
+    <div class="menu-bar__menu--center" ref="navbarCenter">
       <div class="menu__element menu__element--title btn-group" if.bind="showProcessName" ref="diagramInfo">
         <span class="fas menu__origin-icon" class.bind="getClassNameForNavbarIcon" data-test-navbar-icon="${savingTargetIsRemoteSolution}"></span>
         <span class="process-details-title" title.bind="navbarTitle" data-test-navbar-title>${navbarTitle}</span>
         <span if.bind="diagramContainsUnsavedChanges" class="edited-label" data-test-edited-label>- edited</span>
       </div>
     </div>
-    <div class="menu-bar__menu--right" id="navBarRight">
+    <div class="menu-bar__menu--right" ref="navbarRight">
       <template if.bind="showTools">
         <button class="button menu-bar__menu-center--action-button menu-bar__menu-center--back-button back-button" click.delegate="navigateBack()" title="Navigate back">
           <i class="fas fa-arrow-circle-left"></i>
