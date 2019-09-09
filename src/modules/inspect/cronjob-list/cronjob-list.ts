@@ -15,6 +15,7 @@ export class CronjobList {
   public currentPage: number = 1;
   public pageSize: number = 10;
   public paginationSize: number = 10;
+  public showError: boolean;
 
   private managementApiService: ManagementApiClientService;
 
@@ -77,7 +78,9 @@ export class CronjobList {
       if (errorIsForbiddenError || errorIsUnauthorizedError) {
         this.requestSuccessful = true;
       } else {
-        this.requestSuccessful = false;
+        this.cronjobs = [];
+        this.requestSuccessful = true;
+        this.showError = true;
       }
     }
   }

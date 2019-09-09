@@ -25,6 +25,7 @@ export class ProcessList {
   public paginationSize: number = 10;
   public requestSuccessful: boolean = false;
   public processInstancesToDisplay: Array<ProcessInstanceWithCorrelation> = [];
+  public showError: boolean;
 
   private managementApiService: IManagementApi;
   private eventAggregator: EventAggregator;
@@ -164,7 +165,11 @@ export class ProcessList {
       if (errorIsForbiddenError || errorIsUnauthorizedError) {
         this.requestSuccessful = true;
       } else {
-        this.requestSuccessful = false;
+        this.processInstancesToDisplay = [];
+        this.processInstancesWithCorrelation = [];
+        this.correlations = [];
+        this.showError = true;
+        this.requestSuccessful = true;
       }
     }
 

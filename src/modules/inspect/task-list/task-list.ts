@@ -44,6 +44,7 @@ export class TaskList {
   public paginationSize: number = 10;
 
   public requestSuccessful: boolean = false;
+  public showError: boolean = false;
 
   private activeSolutionUri: string;
   private eventAggregator: EventAggregator;
@@ -371,7 +372,8 @@ export class TaskList {
       if (errorIsForbiddenError || errorIsUnauthorizedError) {
         this.requestSuccessful = true;
       } else {
-        this.requestSuccessful = false;
+        this.showError = true;
+        this.requestSuccessful = true;
       }
     }
 

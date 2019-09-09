@@ -37,7 +37,8 @@
       </div>
     </template>
     <template if.bind="requestSuccessful && (!tasks || tasks.length === 0)">
-      <span class="task-list__no-tasks-span">No tasks found for this user</span>
+      <span if.bind="showError" class="cronjob-list__no-tasks-span">There was an error while receiving the tasks.</span>
+      <span else class="task-list__no-tasks-span">No tasks found for this user.</span>
     </template>
     <div if.bind="!requestSuccessful" class="container">
       <img src="src/resources/images/gears.svg" class="loading-spinner">

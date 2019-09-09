@@ -33,7 +33,8 @@
       </div>
     </div>
     <template if.bind="requestSuccessful && !showCronjobList">
-      <span class="cronjob-list__no-crpnjobs-span">No active cronjobs found for this user</span>
+      <span if.bind="showError" class="cronjob-list__no-cronjobs-span">There was an error while receiving the cronjobs.</span>
+      <span else class="cronjob-list__no-cronjobs-span">No active cronjobs found for this user.</span>
     </template>
     <div if.bind="!requestSuccessful" class="container">
       <img src="src/resources/images/gears.svg" class="loading-spinner">
