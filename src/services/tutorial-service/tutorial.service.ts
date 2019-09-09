@@ -61,6 +61,11 @@ export class TutorialService {
           'In this chapter you will learn how to open a diagram, deploy it on a remote solution and how to start it.',
         start: this.startChapterOne,
       },
+      {
+        name: 'Chapter Two: WIP',
+        description: 'This chapter is not yet implemented.',
+        start: this.startChapterTwo,
+      },
     ];
   }
 
@@ -109,6 +114,10 @@ export class TutorialService {
     await this.waitUntilDiagramIsStarted();
     this.driver.reset();
     await this.waitUntilOverlayIsGone();
+  };
+
+  private startChapterTwo: Function = (): void => {
+    this.notificationService.showNotification(NotificationType.INFO, 'This chapter is not yet implemented.');
   };
 
   private waitUntilDiagramIsOpen(): Promise<void> {
