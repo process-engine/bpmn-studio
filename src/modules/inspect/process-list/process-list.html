@@ -2,8 +2,8 @@
   <require from="./process-list.css"></require>
   <div class="process-list">
     <div class="process-list-container" id="processListContainer">
+      <h4 class="process-list-header">Processes</h4><br>
       <template if.bind="processInstancesToDisplay && processInstancesToDisplay.length > 0 && requestSuccessful">
-        <h4 class="process-list-header">Processes running</h4>
         <h6 class="process-list-total-count">Total: ${totalItems}</h6>
         <table class="table table-striped table-bordered">
           <tr>
@@ -26,14 +26,14 @@
           </tr>
         </table>
       </template>
+      <template if.bind="requestSuccessful && processInstancesToDisplay.length == 0">
+        <span class="process-list__no-processes-span">No process instances found for this user</span>
+      </template>
       <div class="col-md-12 col-xs-12 pagination" show.bind="processInstancesToDisplay && processInstancesToDisplay.length > 0">
         <aubs-pagination page-size.bind="pageSize" total-items.bind="totalItems" current-page.bind="currentPage" boundary-links.bind="true" pagination-size.bind="paginationSize">
         </aubs-pagination>
       </div>
-      <template if.bind="requestSuccessful && (!processInstancesToDisplay || processInstancesToDisplay.length === 0)">
-        <h3>No process instances found</h3>
-      </template>
-      <div show.bind="!requestSuccessful" class="container">
+      <div if.bind="!requestSuccessful" class="container">
         <img src="src/resources/images/gears.svg" class="loading-spinner">
       </div>
     </div>
