@@ -32,8 +32,12 @@
   margin-top: 7px;
 }
 
-.cronjob-list__no-cronjobs-span {
+.cronjob-list__no-cronjobs-text {
   display: block;
   margin-top: 14px;
   margin-bottom: 14px;
+}
+
+.cronjob-list__no-cronjobs-text--error {
+  color: darkred;
 }

@@ -41,8 +41,12 @@
   margin-top: 7px;
 }
 
-.process-list__no-processes-span {
+.process-list__no-processes-text {
   display: block;
   margin-top: 14px;
   margin-bottom: 14px;
+}
+
+.process-list__no-processes-text--error {
+  color: darkred;
 }

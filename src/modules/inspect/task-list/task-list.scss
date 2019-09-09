@@ -32,8 +32,12 @@
   margin-top: 7px;
 }
 
-.task-list__no-tasks-span {
+.task-list__no-tasks-text {
   display: block;
   margin-top: 14px;
   margin-bottom: 14px;
+}
+
+.task-list__no-tasks-text--error {
+  color: darkred;
 }
