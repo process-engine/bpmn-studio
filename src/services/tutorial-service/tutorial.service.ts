@@ -1,5 +1,6 @@
 import {inject} from 'aurelia-framework';
 import {EventAggregator} from 'aurelia-event-aggregator';
+import {Router} from 'aurelia-router';
 
 import Driver from 'driver.js';
 import 'driver.js/dist/driver.min.css';
@@ -8,15 +9,17 @@ import {NotificationService} from '../notification-service/notification.service'
 import environment from '../../environment';
 import {NotificationType} from '../../contracts/index';
 
-@inject(EventAggregator, 'NotificationService')
+@inject(EventAggregator, 'NotificationService', Router)
 export class TutorialService {
   private driver: Driver;
   private eventAggregator: EventAggregator;
+  private router: Router;
   private notificationService: NotificationService;
 
-  constructor(eventAggregator: EventAggregator, notificationService: NotificationService) {
+  constructor(eventAggregator: EventAggregator, notificationService: NotificationService, router: Router) {
     this.notificationService = notificationService;
     this.eventAggregator = eventAggregator;
+    this.router = router;
 
     this.driver = new Driver({
       allowClose: false,
@@ -44,6 +47,7 @@ export class TutorialService {
   }
 
   public async startTutorial(): Promise<void> {
+    await this.navigateToStartView();
     const openDiagramElementId: string = '#open-a-diagram-button';
     const deployDiagramElementId: string = '#deploy-diagram-button';
     const startDiagramElementId: string = '#start-diagram-button';
@@ -87,7 +91,7 @@ export class TutorialService {
     await this.waitUntilDiagramIsStarted();
     this.driver.reset();
     await this.waitUntilOverlayIsGone();
-  }
+  };
 
   private waitUntilDiagramIsOpen(): Promise<void> {
     return new Promise((resolve: Function): void => {
@@ -118,6 +122,20 @@ export class TutorialService {
       setTimeout(() => {
         resolve();
       }, 0);
+    });
+  }
+
+  private async navigateToStartView(): Promise<void> {
+    this.router.navigateToRoute('start-page');
+
+    await this.waitForNavigation();
+  }
+
+  private waitForNavigation(): Promise<void> {
+    return new Promise((resolve: Function): void => {
+      this.eventAggregator.subscribeOnce('router:navigation:success', () => {
+        resolve();
+      });
     });
   }
 }
