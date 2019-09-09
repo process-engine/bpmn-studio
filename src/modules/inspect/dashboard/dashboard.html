@@ -5,8 +5,8 @@
   <require from="../cronjob-list/cronjob-list"></require>
 
   <div class="dashboard-container" id="dashboardContainer">
-    <process-list active-solution-entry.bind="activeSolutionEntry" if.bind="showProcessList"></process-list>
-    <task-list active-solution-entry.bind="activeSolutionEntry" if.bind="showTaskList"></task-list>
+    <process-list active-solution-entry.bind="activeSolutionEntry"></process-list>
+    <task-list active-solution-entry.bind="activeSolutionEntry"></task-list>
     <cronjob-list active-solution-entry.to-view="activeSolutionEntry" if.bind="showCronjobList"></cronjob-list>
   </div>
 
