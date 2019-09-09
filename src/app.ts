@@ -26,6 +26,7 @@ export class App {
   private preventDefaultBehaviour: EventListener;
   private ipcRenderer: any | null = null;
   private router: Router;
+  private showChapterSelection: boolean = false;
 
   constructor(
     openIdConnect: OpenIdConnect,
@@ -81,6 +82,17 @@ export class App {
           }
         },
       ),
+      this.eventAggregator.subscribe(environment.events.processSolutionPanel.toggleProcessSolutionExplorer, () => {
+        this.showSolutionExplorer = !this.showSolutionExplorer;
+        if (this.showSolutionExplorer) {
+          window.localStorage.setItem('SolutionExplorerVisibility', 'true');
+        } else {
+          window.localStorage.setItem('SolutionExplorerVisibility', 'false');
+        }
+      }),
+      this.eventAggregator.subscribe(environment.events.tutorial.toggleChapterSelection, () => {
+        this.showChapterSelection = !this.showChapterSelection;
+      }),
     ];
 
     /*

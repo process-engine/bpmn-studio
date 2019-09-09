@@ -160,10 +160,10 @@ export class StatusBar {
     this.xmlIsShown = !this.xmlIsShown;
   }
 
-  public startTutorial(event): void {
+  public toggleChapterSelection(event): void {
     event.stopPropagation();
 
-    this.tutorialService.startTutorial();
+    this.eventAggregator.publish(environment.events.tutorial.toggleChapterSelection);
   }
 
   public changeDiffMode(mode: DiffMode): void {

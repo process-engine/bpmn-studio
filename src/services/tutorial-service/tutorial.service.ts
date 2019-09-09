@@ -7,7 +7,7 @@ import 'driver.js/dist/driver.min.css';
 
 import {NotificationService} from '../notification-service/notification.service';
 import environment from '../../environment';
-import {NotificationType} from '../../contracts/index';
+import {Chapter, NotificationType} from '../../contracts/index';
 
 @inject(EventAggregator, 'NotificationService', Router)
 export class TutorialService {
@@ -15,6 +15,7 @@ export class TutorialService {
   private eventAggregator: EventAggregator;
   private router: Router;
   private notificationService: NotificationService;
+  private chapters: Array<Chapter> = [];
 
   constructor(eventAggregator: EventAggregator, notificationService: NotificationService, router: Router) {
     this.notificationService = notificationService;
@@ -44,9 +45,26 @@ export class TutorialService {
       //   this.notificationService.showNotification(NotificationType.ERROR, 'You are not done yet!');
       // },
     });
+
+    this.initializeChapters();
   }
 
-  public async startTutorial(): Promise<void> {
+  public getAllChapters(): Array<Chapter> {
+    return this.chapters;
+  }
+
+  private initializeChapters(): void {
+    this.chapters = [
+      {
+        name: 'Chapter One: Load, Deploy & Start',
+        description:
+          'In this chapter you will learn how to open a diagram, deploy it on a remote solution and how to start it.',
+        start: this.startChapterOne,
+      },
+    ];
+  }
+
+  private startChapterOne: Function = async (): Promise<void> => {
     await this.navigateToStartView();
     const openDiagramElementId: string = '#open-a-diagram-button';
     const deployDiagramElementId: string = '#deploy-diagram-button';

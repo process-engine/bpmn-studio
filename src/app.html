@@ -7,6 +7,7 @@
   <require from="./modules/solution-explorer/solution-explorer-panel/solution-explorer-panel"></require>
   <require from="./modules/status-bar/status-bar"></require>
   <require from="./modules/deploy-modals/deploy-modals"></require>
+  <require from="./modules/tutorial-chapter-selection/tutorial-chapter-selection"></require>
 
   <div class="bpmn-studio-layout">
     <nav-bar></nav-bar>
@@ -14,6 +15,7 @@
     <deploy-modals></deploy-modals>
 
     <div class="bpmn-studio-layout__content">
+      <tutorial-chapter-selection if.bind="showChapterSelection" show-chapter-selection.two-way="showChapterSelection"></tutorial-chapter-selection>
       <solution-explorer-panel show.bind="showSolutionExplorer" data-test-solution-explorer-panel></solution-explorer-panel>
       <router-view></router-view>
     </div>
