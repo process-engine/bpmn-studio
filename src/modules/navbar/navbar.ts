@@ -12,8 +12,7 @@ import {NotificationService} from '../../services/notification-service/notificat
 export class NavBar {
   public activeSolutionEntry: ISolutionEntry;
   public activeDiagram: IDiagram;
-  public navbarCenter: HTMLDivElement;
-  public navbarRight: HTMLDivElement;
+  public navbarContainer: HTMLDivElement;
 
   public diagramInfo: HTMLElement;
   public dropdown: HTMLElement;
@@ -124,9 +123,7 @@ export class NavBar {
       }),
     ];
 
-    this.navbarCenter.addEventListener('dblclick', this.maximizeWindow);
-
-    this.navbarRight.addEventListener('dblclick', this.maximizeWindow);
+    this.navbarContainer.addEventListener('dblclick', this.maximizeWindow);
   }
 
   public maximizeWindow = (): void => {
