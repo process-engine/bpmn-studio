@@ -23,7 +23,7 @@ jobs:
     - uses: actions/upload-artifact@master
       with:
         name: package_json
-        path: package.json
+        path: package*.json
 
   lint_linux:
     name: "Lint sources"
