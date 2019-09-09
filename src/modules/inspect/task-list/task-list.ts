@@ -2,11 +2,10 @@ import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {bindable, inject} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 
-import {NotFoundError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
+import {ForbiddenError, NotFoundError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
 import {DataModels, IManagementApi} from '@process-engine/management_api_contracts';
 
-import {AuthenticationStateEvent, ISolutionEntry, ISolutionService, NotificationType} from '../../../contracts/index';
-import {NotificationService} from '../../../services/notification-service/notification.service';
+import {AuthenticationStateEvent, ISolutionEntry, ISolutionService} from '../../../contracts/index';
 
 interface ITaskListRouteParameters {
   processInstanceId?: string;
@@ -35,7 +34,7 @@ type TaskListEntry = {
   taskType: TaskType;
 };
 
-@inject(EventAggregator, 'ManagementApiClientService', Router, 'NotificationService', 'SolutionService')
+@inject(EventAggregator, 'ManagementApiClientService', Router, 'SolutionService')
 export class TaskList {
   @bindable() public activeSolutionEntry: ISolutionEntry;
 
@@ -50,7 +49,6 @@ export class TaskList {
   private eventAggregator: EventAggregator;
   private managementApiService: IManagementApi;
   private router: Router;
-  private notificationService: NotificationService;
   private solutionService: ISolutionService;
 
   private subscriptions: Array<Subscription>;
@@ -62,13 +60,11 @@ export class TaskList {
     eventAggregator: EventAggregator,
     managementApiService: IManagementApi,
     router: Router,
-    notificationService: NotificationService,
     solutionService: ISolutionService,
   ) {
     this.eventAggregator = eventAggregator;
     this.managementApiService = managementApiService;
     this.router = router;
-    this.notificationService = notificationService;
     this.solutionService = solutionService;
   }
 
@@ -368,20 +364,14 @@ export class TaskList {
       this.tasks = await this.getTasks();
       this.requestSuccessful = true;
     } catch (error) {
-      this.requestSuccessful = false;
+      this.tasks = [];
+      const errorIsForbiddenError: boolean = isError(error, ForbiddenError);
+      const errorIsUnauthorizedError: boolean = isError(error, UnauthorizedError);
 
-      if (isError(error, UnauthorizedError)) {
-        this.notificationService.showNotification(
-          NotificationType.ERROR,
-          "You don't have permission to view the task list.",
-        );
-        this.router.navigateToRoute('start-page');
+      if (errorIsForbiddenError || errorIsUnauthorizedError) {
+        this.requestSuccessful = true;
       } else {
-        this.notificationService.showNotification(
-          NotificationType.ERROR,
-          `Error receiving task list: ${error.message}`,
-        );
-        this.tasks = [];
+        this.requestSuccessful = false;
       }
     }
 
