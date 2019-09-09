@@ -15,7 +15,7 @@ jobs:
     - name: Install NPM dependencies
       run: |
         npm ci
-        node ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+        # node ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
     - name: Prepare version
       run: |
         # does prepare the version, but not commit it
@@ -23,7 +23,7 @@ jobs:
     - uses: actions/upload-artifact@master
       with:
         name: package_json
-        path: package*.json
+        path: package.json
 
   lint_linux:
     name: "Lint sources"
