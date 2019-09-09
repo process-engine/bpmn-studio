@@ -3,10 +3,10 @@ import {bindable, computedFrom, inject} from 'aurelia-framework';
 import {ManagementApiClientService} from '@process-engine/management_api_client';
 import {DataModels} from '@process-engine/management_api_contracts';
 
-import {ISolutionEntry, NotificationType} from '../../../contracts/index';
+import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
+import {ISolutionEntry} from '../../../contracts/index';
 import environment from '../../../environment';
 import {getBeautifiedDate} from '../../../services/date-service/date.service';
-import {NotificationService} from '../../../services/notification-service/notification.service';
 
 @inject('ManagementApiClientService', 'NotificationService')
 export class CronjobList {
@@ -21,11 +21,9 @@ export class CronjobList {
   private cronjobs: Array<DataModels.Cronjobs.CronjobConfiguration> = [];
   private pollingTimeout: NodeJS.Timeout;
   private isAttached: boolean;
-  private notificationService: NotificationService;
 
-  constructor(managementApiService: ManagementApiClientService, notificationService: NotificationService) {
+  constructor(managementApiService: ManagementApiClientService) {
     this.managementApiService = managementApiService;
-    this.notificationService = notificationService;
   }
 
   public async attached(): Promise<void> {
@@ -73,11 +71,14 @@ export class CronjobList {
 
       this.requestSuccessful = true;
     } catch (error) {
-      this.notificationService.showNotification(
-        NotificationType.ERROR,
-        `Error receiving process list: ${error.message}`,
-      );
-      this.requestSuccessful = false;
+      const errorIsForbiddenError: boolean = isError(error, ForbiddenError);
+      const errorIsUnauthorizedError: boolean = isError(error, UnauthorizedError);
+
+      if (errorIsForbiddenError || errorIsUnauthorizedError) {
+        this.requestSuccessful = true;
+      } else {
+        this.requestSuccessful = false;
+      }
     }
   }
 
