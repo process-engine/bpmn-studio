@@ -37,6 +37,7 @@ jobs:
         path: "."
     - name: Install NPM dependencies
       run: |
+        cat package.json
         npm ci
         node ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
     - run: npm run lint
@@ -76,6 +77,7 @@ jobs:
         path: "."
     - name: Install NPM dependencies
       run: |
+        cat package.json
         npm ci
         node ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
 
