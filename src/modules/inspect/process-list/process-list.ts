@@ -23,7 +23,7 @@ export class ProcessList {
   public pageSize: number = 10;
   public totalItems: number;
   public paginationSize: number = 10;
-  public requestSuccessful: boolean = false;
+  public initialLoadingFinished: boolean = false;
   public processInstancesToDisplay: Array<ProcessInstanceWithCorrelation> = [];
   public showError: boolean;
 
@@ -62,7 +62,7 @@ export class ProcessList {
     this.processInstancesWithCorrelation = [];
     this.processInstancesToDisplay = [];
     this.stoppedProcessInstancesWithCorrelation = [];
-    this.requestSuccessful = false;
+    this.initialLoadingFinished = false;
 
     this.eventAggregator.publish(environment.events.configPanel.solutionEntryChanged, newValue);
     await this.updateCorrelationList();
@@ -157,9 +157,9 @@ export class ProcessList {
         this.updateCorrelationsToDisplay();
       }
 
-      this.requestSuccessful = true;
+      this.initialLoadingFinished = true;
     } catch (error) {
-      this.requestSuccessful = true;
+      this.initialLoadingFinished = true;
 
       const errorIsForbiddenError: boolean = isError(error, ForbiddenError);
       const errorIsUnauthorizedError: boolean = isError(error, UnauthorizedError);

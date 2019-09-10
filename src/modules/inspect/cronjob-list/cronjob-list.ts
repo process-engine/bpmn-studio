@@ -12,7 +12,7 @@ import {getBeautifiedDate} from '../../../services/date-service/date.service';
 @inject('ManagementApiClientService', EventAggregator)
 export class CronjobList {
   @bindable public activeSolutionEntry: ISolutionEntry;
-  public requestSuccessful: boolean = false;
+  public initialLoadingFinished: boolean = false;
   public currentPage: number = 1;
   public pageSize: number = 10;
   public paginationSize: number = 10;
@@ -84,9 +84,9 @@ export class CronjobList {
     try {
       this.cronjobs = await this.managementApiService.getAllActiveCronjobs(this.activeSolutionEntry.identity);
 
-      this.requestSuccessful = true;
+      this.initialLoadingFinished = true;
     } catch (error) {
-      this.requestSuccessful = true;
+      this.initialLoadingFinished = true;
 
       const errorIsForbiddenError: boolean = isError(error, ForbiddenError);
       const errorIsUnauthorizedError: boolean = isError(error, UnauthorizedError);

@@ -44,7 +44,7 @@ export class TaskList {
   public totalItems: number;
   public paginationSize: number = 10;
 
-  public requestSuccessful: boolean = false;
+  public initialLoadingFinished: boolean = false;
   public showError: boolean = false;
 
   private activeSolutionUri: string;
@@ -369,10 +369,10 @@ export class TaskList {
   private async updateTasks(): Promise<void> {
     try {
       this.tasks = await this.getTasks();
-      this.requestSuccessful = true;
+      this.initialLoadingFinished = true;
     } catch (error) {
       this.tasks = [];
-      this.requestSuccessful = true;
+      this.initialLoadingFinished = true;
 
       const errorIsForbiddenError: boolean = isError(error, ForbiddenError);
       const errorIsUnauthorizedError: boolean = isError(error, UnauthorizedError);
