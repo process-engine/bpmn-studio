@@ -6,6 +6,7 @@ import {ForbiddenError, NotFoundError, UnauthorizedError, isError} from '@essent
 import {DataModels, IManagementApi} from '@process-engine/management_api_contracts';
 
 import {AuthenticationStateEvent, ISolutionEntry, ISolutionService} from '../../../contracts/index';
+import environment from '../../../environment';
 
 interface ITaskListRouteParameters {
   processInstanceId?: string;
@@ -99,8 +100,13 @@ export class TaskList {
     }
   }
 
-  public async activeSolutionEntryChanged(): Promise<void> {
+  public async activeSolutionEntryChanged(newValue): Promise<void> {
     if (this.isAttached) {
+      this.tasks = [];
+      this.initialLoadingFinished = false;
+      this.showError = false;
+      this.eventAggregator.publish(environment.events.configPanel.solutionEntryChanged, newValue);
+
       await this.updateTasks();
     }
   }
