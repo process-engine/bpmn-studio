@@ -72,14 +72,14 @@ export class CronjobList {
 
       this.requestSuccessful = true;
     } catch (error) {
+      this.requestSuccessful = true;
+
       const errorIsForbiddenError: boolean = isError(error, ForbiddenError);
       const errorIsUnauthorizedError: boolean = isError(error, UnauthorizedError);
+      const errorIsAuthenticationRelated: boolean = errorIsForbiddenError || errorIsUnauthorizedError;
 
-      if (errorIsForbiddenError || errorIsUnauthorizedError) {
-        this.requestSuccessful = true;
-      } else {
+      if (!errorIsAuthenticationRelated) {
         this.cronjobs = [];
-        this.requestSuccessful = true;
         this.showError = true;
       }
     }

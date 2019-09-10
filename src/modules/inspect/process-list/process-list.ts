@@ -159,17 +159,17 @@ export class ProcessList {
 
       this.requestSuccessful = true;
     } catch (error) {
+      this.requestSuccessful = true;
+
       const errorIsForbiddenError: boolean = isError(error, ForbiddenError);
       const errorIsUnauthorizedError: boolean = isError(error, UnauthorizedError);
+      const errorIsAuthenticationRelated: boolean = errorIsForbiddenError || errorIsUnauthorizedError;
 
-      if (errorIsForbiddenError || errorIsUnauthorizedError) {
-        this.requestSuccessful = true;
-      } else {
+      if (!errorIsAuthenticationRelated) {
         this.processInstancesToDisplay = [];
         this.processInstancesWithCorrelation = [];
         this.correlations = [];
         this.showError = true;
-        this.requestSuccessful = true;
       }
     }
 
