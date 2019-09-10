@@ -57,7 +57,7 @@
     "@fortawesome/fontawesome-free": "^5.9.0",
     "@process-engine/bpmn-js-custom-bundle": "~2.7.0",
     "@process-engine/bpmn-lint_rules": "^1.6.2",
-    "@process-engine/ci_tools": "2.0.0-alpha.51",
+    "@process-engine/ci_tools": "2.0.0",
     "@process-engine/dynamic_ui_core": "^1.5.0",
     "@process-engine/electron-updater": "1.0.0",
     "@process-engine/management_api_client": "^5.4.0",
