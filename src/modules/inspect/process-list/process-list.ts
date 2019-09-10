@@ -5,6 +5,7 @@ import {Router} from 'aurelia-router';
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {DataModels, IManagementApi} from '@process-engine/management_api_contracts';
 
+import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
 import {AuthenticationStateEvent, ISolutionEntry, ISolutionService, NotificationType} from '../../../contracts/index';
 import {getBeautifiedDate} from '../../../services/date-service/date.service';
 import {NotificationService} from '../../../services/notification-service/notification.service';
@@ -22,8 +23,9 @@ export class ProcessList {
   public pageSize: number = 10;
   public totalItems: number;
   public paginationSize: number = 10;
-  public requestSuccessful: boolean = false;
+  public initialLoadingFinished: boolean = false;
   public processInstancesToDisplay: Array<ProcessInstanceWithCorrelation> = [];
+  public showError: boolean;
 
   private managementApiService: IManagementApi;
   private eventAggregator: EventAggregator;
@@ -60,7 +62,7 @@ export class ProcessList {
     this.processInstancesWithCorrelation = [];
     this.processInstancesToDisplay = [];
     this.stoppedProcessInstancesWithCorrelation = [];
-    this.requestSuccessful = false;
+    this.initialLoadingFinished = false;
 
     this.eventAggregator.publish(environment.events.configPanel.solutionEntryChanged, newValue);
     await this.updateCorrelationList();
@@ -93,11 +95,11 @@ export class ProcessList {
     await this.updateCorrelationList();
 
     this.subscriptions = [
-      this.eventAggregator.subscribe(AuthenticationStateEvent.LOGIN, () => {
-        this.updateCorrelationList();
+      this.eventAggregator.subscribe(AuthenticationStateEvent.LOGIN, async () => {
+        await this.updateCorrelationList();
       }),
-      this.eventAggregator.subscribe(AuthenticationStateEvent.LOGOUT, () => {
-        this.updateCorrelationList();
+      this.eventAggregator.subscribe(AuthenticationStateEvent.LOGOUT, async () => {
+        await this.updateCorrelationList();
       }),
     ];
 
@@ -119,8 +121,10 @@ export class ProcessList {
   }
 
   public detached(): void {
-    for (const subscription of this.subscriptions) {
-      subscription.dispose();
+    if (this.subscriptions !== undefined) {
+      for (const subscription of this.subscriptions) {
+        subscription.dispose();
+      }
     }
   }
 
@@ -153,13 +157,20 @@ export class ProcessList {
         this.updateCorrelationsToDisplay();
       }
 
-      this.requestSuccessful = true;
+      this.initialLoadingFinished = true;
     } catch (error) {
-      this.notificationService.showNotification(
-        NotificationType.ERROR,
-        `Error receiving process list: ${error.message}`,
-      );
-      this.requestSuccessful = false;
+      this.initialLoadingFinished = true;
+
+      const errorIsForbiddenError: boolean = isError(error, ForbiddenError);
+      const errorIsUnauthorizedError: boolean = isError(error, UnauthorizedError);
+      const errorIsAuthenticationRelated: boolean = errorIsForbiddenError || errorIsUnauthorizedError;
+
+      if (!errorIsAuthenticationRelated) {
+        this.processInstancesToDisplay = [];
+        this.processInstancesWithCorrelation = [];
+        this.correlations = [];
+        this.showError = true;
+      }
     }
 
     const correlationsAreNotSet: boolean = this.correlations === undefined || this.correlations === null;

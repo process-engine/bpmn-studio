@@ -24,10 +24,14 @@
 }
 
 .cronjob-list-header {
-  float: left;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .cronjob-list-total-count {
   float: right;
-  margin-top: 7px;
+}
+
+.cronjob-list__no-cronjobs-text--error {
+  color: darkred;
 }
