@@ -24,18 +24,12 @@
 }
 
 .task-list-header {
-  float: left;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .task-list-total-count {
   float: right;
-  margin-top: 7px;
-}
-
-.task-list__no-tasks-text {
-  display: block;
-  margin-top: 14px;
-  margin-bottom: 14px;
 }
 
 .task-list__no-tasks-text--error {

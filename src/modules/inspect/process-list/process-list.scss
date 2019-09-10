@@ -33,18 +33,12 @@
 }
 
 .process-list-header {
-  float: left;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .process-list-total-count {
   float: right;
-  margin-top: 7px;
-}
-
-.process-list__no-processes-text {
-  display: block;
-  margin-top: 14px;
-  margin-bottom: 14px;
 }
 
 .process-list__no-processes-text--error {
