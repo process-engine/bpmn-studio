@@ -1,7 +1,8 @@
 <template>
   <require from="./cronjob-list.css"></require>
   <div class="cronhob-list-container" id="cronhobListContainer">
-    <h4 class="cronjob-list-header">Cronjobs</h4><br>
+    <h4 class="cronjob-list-header">Cronjobs</h4>
+    <br>
     <div if.bind="showCronjobList && initialLoadingFinished">
       <h6 class="cronjob-list-total-count">Total: ${totalItems}</h6>
       <table class="table table-striped table-bordered">
