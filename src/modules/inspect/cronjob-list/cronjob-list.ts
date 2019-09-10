@@ -54,6 +54,26 @@ export class CronjobList {
 
     await this.updateCronjobs();
     this.startPolling();
+
+    this.managementApiService.onCronjobCreated(this.activeSolutionEntry.identity, async (message: any) => {
+      console.log('CREATED', message);
+      // await this.updateCorrelationList();
+    });
+
+    this.managementApiService.onCronjobExecuted(this.activeSolutionEntry.identity, async (message: any) => {
+      console.log('executed', message);
+      // await this.updateCorrelationList();
+    });
+
+    this.managementApiService.onCronjobStopped(this.activeSolutionEntry.identity, async (message: any) => {
+      console.log('stopped', message);
+      // await this.updateCorrelationList();
+    });
+
+    this.managementApiService.onCronjobUpdated(this.activeSolutionEntry.identity, async (message: any) => {
+      console.log('updated', message);
+      // await this.updateCorrelationList();
+    });
   }
 
   public detached(): void {
