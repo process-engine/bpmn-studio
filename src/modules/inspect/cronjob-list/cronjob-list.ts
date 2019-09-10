@@ -4,11 +4,12 @@ import {ManagementApiClientService} from '@process-engine/management_api_client'
 import {DataModels} from '@process-engine/management_api_contracts';
 
 import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
+import {EventAggregator} from 'aurelia-event-aggregator';
 import {ISolutionEntry} from '../../../contracts/index';
 import environment from '../../../environment';
 import {getBeautifiedDate} from '../../../services/date-service/date.service';
 
-@inject('ManagementApiClientService', 'NotificationService')
+@inject('ManagementApiClientService', EventAggregator)
 export class CronjobList {
   @bindable public activeSolutionEntry: ISolutionEntry;
   public requestSuccessful: boolean = false;
@@ -22,9 +23,22 @@ export class CronjobList {
   private cronjobs: Array<DataModels.Cronjobs.CronjobConfiguration> = [];
   private pollingTimeout: NodeJS.Timeout;
   private isAttached: boolean;
+  private eventAggregator: EventAggregator;
 
-  constructor(managementApiService: ManagementApiClientService) {
+  constructor(managementApiService: ManagementApiClientService, eventAggregator: EventAggregator) {
     this.managementApiService = managementApiService;
+    this.eventAggregator = eventAggregator;
+  }
+
+  public async activeSolutionEntryChanged(newValue): Promise<void> {
+    if (this.isAttached) {
+      this.cronjobs = [];
+      this.initialLoadingFinished = false;
+      this.showError = false;
+      this.eventAggregator.publish(environment.events.configPanel.solutionEntryChanged, newValue);
+
+      await this.updateCronjobs();
+    }
   }
 
   public async attached(): Promise<void> {
