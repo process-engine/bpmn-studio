@@ -229,7 +229,7 @@ export class TaskDynamicUi {
     }
   }
 
-  private async setDynamicUIWrapperUserTask(): Promise<void> {
+  private setDynamicUIWrapperUserTask(): void {
     const dynamicUiWrapperNotExisting: boolean = this.dynamicUiWrapper === undefined || this.dynamicUiWrapper === null;
 
     if (dynamicUiWrapperNotExisting) {
@@ -239,7 +239,7 @@ export class TaskDynamicUi {
     this.dynamicUiWrapper.currentUserTask = this.userTask;
   }
 
-  private async setDynamicUIWrapperManualTask(): Promise<void> {
+  private setDynamicUIWrapperManualTask(): void {
     const dynamicUiWrapperNotExisting: boolean = this.dynamicUiWrapper === undefined || this.dynamicUiWrapper === null;
 
     if (dynamicUiWrapperNotExisting) {
