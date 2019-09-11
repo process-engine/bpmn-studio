@@ -265,9 +265,14 @@ export class BpmnIo {
     this.hideOrShowPpForSpaceReasons();
 
     this.subscriptions = [
-      this.eventAggregator.subscribe(environment.events.solutionExplorerPanel.toggleSolutionExplorer, () => {
-        this.hideOrShowPpForSpaceReasons();
-      }),
+      this.eventAggregator.subscribe(
+        environment.events.solutionExplorerPanel.toggleSolutionExplorer,
+        (showSolutionExplorer: boolean) => {
+          this.setDjsPaletteLeftStyle(showSolutionExplorer);
+
+          this.hideOrShowPpForSpaceReasons();
+        },
+      ),
 
       this.eventAggregator.subscribe(`${environment.events.diagramDetail.exportDiagramAs}:BPMN`, async () => {
         try {
@@ -426,6 +431,9 @@ export class BpmnIo {
     }
 
     bpmnIoPaletteContainer.className += ' djs-palette-override';
+
+    const showSolutionExplorer: boolean = localStorage.getItem('SolutionExplorerVisibility') !== 'false';
+    this.setDjsPaletteLeftStyle(showSolutionExplorer);
   }
 
   public async saveCurrentXML(): Promise<void> {
@@ -899,6 +907,15 @@ export class BpmnIo {
     } else if (this.propertyPanelHiddenForSpaceReasons) {
       this.showPropertyPanelForSpaceReasons();
     }
+  }
+
+  private setDjsPaletteLeftStyle(solutionExplorerIsActive: boolean): void {
+    const bpmnIoPaletteContainer: HTMLElement = this.canvasModel.getElementsByClassName(
+      'djs-palette',
+    )[0] as HTMLElement;
+    const djsPaletteLeft: number = solutionExplorerIsActive ? 250 : 0;
+
+    bpmnIoPaletteContainer.style.left = `${djsPaletteLeft}px`;
   }
 
   /**
