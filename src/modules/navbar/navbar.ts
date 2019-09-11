@@ -222,7 +222,11 @@ export class NavBar {
 
   public toggleSolutionExplorer(): void {
     this.solutionExplorerIsActive = !this.solutionExplorerIsActive;
-    this.eventAggregator.publish(environment.events.processSolutionPanel.toggleProcessSolutionExplorer);
+
+    this.eventAggregator.publish(
+      environment.events.solutionExplorerPanel.toggleSolutionExplorer,
+      this.solutionExplorerIsActive,
+    );
   }
 
   public saveDiagram(): void {
