@@ -60,6 +60,10 @@
                         loading-finished-callback.bind="dynamicUiLoadingFinished">
       </task-dynamic-ui>
     </template>
+    <template replace-part="modal-footer">
+      <div class="dynamic-ui-modal__button-container" id="dynamic-ui-modal-button-container">
+      </div>
+    </template>
   </modal>
 
   <modal show.bind="showDiagramPreviewViewer"

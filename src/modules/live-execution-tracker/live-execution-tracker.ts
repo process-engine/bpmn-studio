@@ -322,6 +322,36 @@ export class LiveExecutionTracker {
     const dynamicUiTitle: HTMLElement = document.getElementsByClassName('card-title')[0] as HTMLElement;
 
     dynamicUiTitle.style.display = 'none';
+
+    const dynamicUiButtonContainer: HTMLElement = document.getElementById('dynamic-ui-wrapper-cancel-button')
+      .parentNode as HTMLElement;
+
+    const dynamicUiButtons: Array<Element> = Array.from(dynamicUiButtonContainer.children).filter(
+      (element: Element): boolean => {
+        return element.nodeName === 'BUTTON';
+      },
+    );
+
+    const dynamicUiModalButtonContainer: Element = document.getElementById('dynamic-ui-modal-button-container');
+    while (dynamicUiModalButtonContainer.firstChild) {
+      dynamicUiModalButtonContainer.removeChild(dynamicUiModalButtonContainer.firstChild);
+    }
+
+    dynamicUiButtons.forEach((dynamicUiButton: HTMLElement) => {
+      let newDynamicUiButton: HTMLElement = dynamicUiButton;
+
+      if (dynamicUiButton.getAttribute('type') === 'submit') {
+        newDynamicUiButton = dynamicUiButton.cloneNode(true) as HTMLElement;
+
+        newDynamicUiButton.onclick = (): void => {
+          dynamicUiButton.click();
+        };
+      }
+
+      dynamicUiModalButtonContainer.appendChild(newDynamicUiButton);
+    });
+
+    dynamicUiButtonContainer.style.display = 'none';
   };
 
   private checkIfProcessEngineSupportsEvents(): boolean {
