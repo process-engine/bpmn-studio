@@ -91,8 +91,8 @@ export default {
       setDiffDestination: 'diffview:diffDestination:set',
     },
     diagramChange: 'diagram:change',
-    processSolutionPanel: {
-      toggleProcessSolutionExplorer: 'processSolutionPanel:processsolutionexplorer:toggle',
+    solutionExplorerPanel: {
+      toggleSolutionExplorer: 'solutionExplorerPanel:solutionExplorer:toggle',
     },
     inspect: {
       shouldDisableTokenViewerButton: 'inspect:tokenViewerButton:disable',
