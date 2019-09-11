@@ -53,32 +53,30 @@ export class CronjobList {
     this.isAttached = true;
 
     await this.updateCronjobs();
-    this.startPolling();
 
     this.managementApiService.onCronjobCreated(this.activeSolutionEntry.identity, async (message: any) => {
-      console.log('CREATED', message);
-      // await this.updateCorrelationList();
+      await this.updateCronjobs();
     });
 
     this.managementApiService.onCronjobExecuted(this.activeSolutionEntry.identity, async (message: any) => {
-      console.log('executed', message);
-      // await this.updateCorrelationList();
+      await this.updateCronjobs();
     });
 
     this.managementApiService.onCronjobStopped(this.activeSolutionEntry.identity, async (message: any) => {
-      console.log('stopped', message);
-      // await this.updateCorrelationList();
+      await this.updateCronjobs();
     });
 
     this.managementApiService.onCronjobUpdated(this.activeSolutionEntry.identity, async (message: any) => {
-      console.log('updated', message);
-      // await this.updateCorrelationList();
+      await this.updateCronjobs();
+    });
+
+    this.managementApiService.onCronjobRemoved(this.activeSolutionEntry.identity, async (message: any) => {
+      await this.updateCronjobs();
     });
   }
 
   public detached(): void {
     this.isAttached = false;
-    this.stopPolling();
   }
 
   public currentPageChanged(): void {
