@@ -19,9 +19,8 @@ export class CorrelationList {
   @bindable public selectedProcessInstance: DataModels.Correlations.CorrelationProcessInstance;
   @bindable public selectedCorrelation: DataModels.Correlations.Correlation;
   @bindable public correlations: Array<DataModels.Correlations.Correlation>;
-  @bindable public processInstances: Array<DataModels.Correlations.CorrelationProcessInstance>;
   @bindable public activeDiagram: IDiagram;
-  public sortedTableData: Array<ICorrelationTableEntry>;
+  @bindable public sortedTableData: Array<ICorrelationTableEntry>;
   public correlationListSortProperty: typeof CorrelationListSortProperty = CorrelationListSortProperty;
   public sortSettings: ICorrelationSortSettings = {
     ascending: false,
