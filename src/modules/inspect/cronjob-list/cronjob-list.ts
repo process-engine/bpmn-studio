@@ -54,23 +54,23 @@ export class CronjobList {
 
     await this.updateCronjobs();
 
-    this.managementApiService.onCronjobCreated(this.activeSolutionEntry.identity, async (message: any) => {
+    this.managementApiService.onCronjobCreated(this.activeSolutionEntry.identity, async () => {
       await this.updateCronjobs();
     });
 
-    this.managementApiService.onCronjobExecuted(this.activeSolutionEntry.identity, async (message: any) => {
+    this.managementApiService.onCronjobExecuted(this.activeSolutionEntry.identity, async () => {
       await this.updateCronjobs();
     });
 
-    this.managementApiService.onCronjobStopped(this.activeSolutionEntry.identity, async (message: any) => {
+    this.managementApiService.onCronjobStopped(this.activeSolutionEntry.identity, async () => {
       await this.updateCronjobs();
     });
 
-    this.managementApiService.onCronjobUpdated(this.activeSolutionEntry.identity, async (message: any) => {
+    this.managementApiService.onCronjobUpdated(this.activeSolutionEntry.identity, async () => {
       await this.updateCronjobs();
     });
 
-    this.managementApiService.onCronjobRemoved(this.activeSolutionEntry.identity, async (message: any) => {
+    this.managementApiService.onCronjobRemoved(this.activeSolutionEntry.identity, async () => {
       await this.updateCronjobs();
     });
   }
