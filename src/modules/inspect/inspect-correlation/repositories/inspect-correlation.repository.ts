@@ -17,27 +17,7 @@ export class InspectCorrelationRepository implements IInspectCorrelationReposito
     processModelId: string,
     identity: IIdentity,
   ): Promise<Array<DataModels.Correlations.Correlation>> {
-    const allCorrelations: Array<
-      DataModels.Correlations.Correlation
-    > = await this.managementApiService.getAllCorrelations(identity);
-
-    const correlationsForProcessModelId: Array<DataModels.Correlations.Correlation> = allCorrelations.filter(
-      (correlation: DataModels.Correlations.Correlation) => {
-        const processModelWithSameId: DataModels.Correlations.CorrelationProcessInstance = correlation.processInstances.find(
-          (processModel: DataModels.Correlations.CorrelationProcessInstance) => {
-            const isSearchedProcessModel: boolean = processModel.processModelId === processModelId;
-
-            return isSearchedProcessModel;
-          },
-        );
-
-        const processModelFound: boolean = processModelWithSameId !== undefined;
-
-        return processModelFound;
-      },
-    );
-
-    return correlationsForProcessModelId;
+    return this.managementApiService.getCorrelationsByProcessModelId(identity, processModelId);
   }
 
   public async getLogsForCorrelation(
