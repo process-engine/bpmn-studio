@@ -333,17 +333,14 @@ export class NavBar {
       const inspectViewIsDashboard: boolean = inspectView === 'dashboard';
       const inspectViewIsHeatmap: boolean = inspectView === 'heatmap';
       const inspectViewIsInspectCorrelation: boolean = inspectView === 'inspect-correlation';
-      if (activeSolutionIsRemoteSolution) {
-        this.showInspectTools = true;
 
-        this.disableDashboardButton = inspectViewIsDashboard;
-        this.disableHeatmapButton = inspectViewIsHeatmap;
-        this.disableInspectCorrelationButton = inspectViewIsInspectCorrelation;
+      this.showInspectTools = true;
 
-        this.showExportOnInspectCorrelation = inspectViewIsInspectCorrelation || false;
-      } else {
-        this.showInspectTools = false;
-      }
+      this.disableDashboardButton = inspectViewIsDashboard;
+      this.disableHeatmapButton = inspectViewIsHeatmap;
+      this.disableInspectCorrelationButton = inspectViewIsInspectCorrelation;
+
+      this.showExportOnInspectCorrelation = inspectViewIsInspectCorrelation || false;
 
       this.showTools = false;
     } else if (activeRouteIsLET) {
