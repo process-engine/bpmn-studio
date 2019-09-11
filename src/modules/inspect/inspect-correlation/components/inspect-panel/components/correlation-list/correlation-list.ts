@@ -47,7 +47,10 @@ export class CorrelationList {
   }
 
   public correlationsChanged(): void {
-    const processInstancesWithCorrelation = this.getProcessInstancesWithCorrelations(this.correlations);
+    const processInstancesWithCorrelation = this.getProcessInstancesWithCorrelations(
+      this.correlations,
+      this.activeDiagram.id,
+    );
 
     this.tableData = this.convertCorrelationsIntoTableData(processInstancesWithCorrelation);
 
@@ -190,12 +193,13 @@ export class CorrelationList {
 
   private getProcessInstancesWithCorrelations(
     correlations: Array<DataModels.Correlations.Correlation>,
+    processModelId: string,
   ): Array<IProcessInstanceWithCorrelation> {
     const processInstancesWithCorrelation: Array<IProcessInstanceWithCorrelation> = [];
 
     correlations.forEach((correlation: DataModels.Correlations.Correlation) => {
       correlation.processInstances.forEach((processInstance: DataModels.Correlations.CorrelationProcessInstance) => {
-        const isNotSelectedProcessModel: boolean = processInstance.processModelId !== this.activeDiagram.id;
+        const isNotSelectedProcessModel: boolean = processInstance.processModelId !== processModelId;
 
         if (isNotSelectedProcessModel) {
           return;
