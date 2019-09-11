@@ -65,14 +65,18 @@ export class App {
     window.localStorage.setItem('SolutionExplorerVisibility', showSolutionExplorer);
 
     this.subscriptions = [
-      this.eventAggregator.subscribe(environment.events.solutionExplorerPanel.toggleSolutionExplorer, () => {
-        this.showSolutionExplorer = !this.showSolutionExplorer;
-        if (this.showSolutionExplorer) {
-          window.localStorage.setItem('SolutionExplorerVisibility', 'true');
-        } else {
-          window.localStorage.setItem('SolutionExplorerVisibility', 'false');
-        }
-      }),
+      this.eventAggregator.subscribe(
+        environment.events.solutionExplorerPanel.toggleSolutionExplorer,
+        (show: boolean) => {
+          this.showSolutionExplorer = show;
+
+          if (this.showSolutionExplorer) {
+            window.localStorage.setItem('SolutionExplorerVisibility', 'true');
+          } else {
+            window.localStorage.setItem('SolutionExplorerVisibility', 'false');
+          }
+        },
+      ),
     ];
 
     /*
