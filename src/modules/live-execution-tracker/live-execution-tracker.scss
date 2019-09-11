@@ -80,7 +80,8 @@
 }
 
 .let__close-dynamic-ui-modal-button {
-  top: 5px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .let__token-viewer {
@@ -120,4 +121,11 @@
 
 .let__tool--active {
   opacity: 1;
+}
+
+.dynamic-ui-modal__headline {
+  position: absolute;
+  top: 50%;
+  left: 25px;
+  transform: translateY(-50%);
 }

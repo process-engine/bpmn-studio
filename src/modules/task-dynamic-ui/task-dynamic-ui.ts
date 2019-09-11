@@ -36,6 +36,7 @@ export class TaskDynamicUi {
   @bindable() public activeSolutionEntry: ISolutionEntry;
   @bindable public userTask: DataModels.UserTasks.UserTask;
   @bindable public manualTask: DataModels.ManualTasks.ManualTask;
+  @bindable public loadingFinishedCallback: Function;
 
   private activeDiagramName: string;
   private activeSolutionUri: string;
@@ -96,9 +97,29 @@ export class TaskDynamicUi {
       this.finishTask();
     };
 
+    this.dynamicUiWrapper.activeSolutionEntry = this.activeSolutionEntry;
     this.setDynamicUIWrapperUserTask();
     this.setDynamicUIWrapperManualTask();
-    this.dynamicUiWrapper.activeSolutionEntry = this.activeSolutionEntry;
+  }
+
+  public taskFound(dynamicUiTitle: string): void {
+    if (!this.loadingFinishedCallback) {
+      return;
+    }
+
+    const dynamicUiFinishedLoadingInterval: NodeJS.Timeout = setInterval(() => {
+      const cardTitles: Array<Element> = Array.from(document.getElementsByClassName('card-title'));
+
+      const dynamicUiFinishedLoading: boolean = cardTitles.some((cardTitle: Element) => {
+        return cardTitle.innerHTML === dynamicUiTitle;
+      });
+
+      if (dynamicUiFinishedLoading) {
+        clearInterval(dynamicUiFinishedLoadingInterval);
+
+        this.loadingFinishedCallback();
+      }
+    }, 100);
   }
 
   public activeSolutionEntryChanged(newValue: ISolutionEntry): void {
@@ -120,10 +141,22 @@ export class TaskDynamicUi {
 
   public userTaskChanged(): void {
     this.setDynamicUIWrapperUserTask();
+
+    if (!this.userTask) {
+      return;
+    }
+
+    this.taskFound(this.userTask.name);
   }
 
   public manualTaskChanged(): void {
     this.setDynamicUIWrapperManualTask();
+
+    if (!this.manualTask) {
+      return;
+    }
+
+    this.taskFound(this.userTask.name);
   }
 
   @computedFrom('userTask', 'manualTask')

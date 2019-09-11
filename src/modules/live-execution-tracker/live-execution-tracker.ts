@@ -314,6 +314,16 @@ export class LiveExecutionTracker {
     this.startPolling();
   }
 
+  public dynamicUiLoadingFinished: Function = () => {
+    if (!this.showDynamicUiModal) {
+      return;
+    }
+
+    const dynamicUiTitle: HTMLElement = document.getElementsByClassName('card-title')[0] as HTMLElement;
+
+    dynamicUiTitle.style.display = 'none';
+  };
+
   private checkIfProcessEngineSupportsEvents(): boolean {
     const processEngineVersion: string = this.activeSolutionEntry.processEngineVersion;
 
