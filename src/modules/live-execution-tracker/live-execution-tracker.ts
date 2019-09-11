@@ -340,7 +340,8 @@ export class LiveExecutionTracker {
     dynamicUiButtons.forEach((dynamicUiButton: HTMLElement) => {
       let newDynamicUiButton: HTMLElement = dynamicUiButton;
 
-      if (dynamicUiButton.getAttribute('type') === 'submit') {
+      const buttonIsSubmitButton: boolean = dynamicUiButton.getAttribute('type') === 'submit';
+      if (buttonIsSubmitButton) {
         newDynamicUiButton = dynamicUiButton.cloneNode(true) as HTMLElement;
 
         newDynamicUiButton.onclick = (): void => {
