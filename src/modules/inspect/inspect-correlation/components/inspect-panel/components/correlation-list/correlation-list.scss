@@ -60,13 +60,8 @@
   text-overflow: ellipsis;
 }
 
-.correlation-table__table-entry--number {
-  width: 10%;
-  padding: 8px;
-  overflow: hidden;
-  border-top: none !important;
-  border-bottom: 1px solid #ccc;
-  text-overflow: ellipsis;
+.correlation-table__table-entry--state {
+  text-transform: uppercase;
 }
 
 .correlation-table__selected-entry {
