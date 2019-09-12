@@ -20,12 +20,9 @@ Engine verbunden werden, um diese Diagramme auszuführen.
 
 ## Downloads für Windows, macOS und Docker
 
-Die Releases des BPMN Studios lassen sich
-[hier](https://github.com/process-engine/bpmn-studio/releases/latest)
-für Windows und macOS herunterladen.
+Es stehen [Releases von BPMN Studio für Windows und macOS](https://github.com/process-engine/bpmn-studio/releases/latest) zum Download bereit.
 
-Ein Docker-Image des kompletten Bundles (BPMN Studio & ProcessEngine Runtime) gibt 
-es [hier](https://hub.docker.com/r/5minds/bpmn-studio-bundle).
+Ein [Docker-Image des kompletten Bundles](https://hub.docker.com/r/5minds/bpmn-studio-bundle) (BPMN Studio & ProcessEngine Runtime) wird auf Docker Hub bereitgestellt.
 
 ## Wie kann ich das Projekt aufsetzen?
 
