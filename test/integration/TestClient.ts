@@ -44,7 +44,7 @@ export class TestClient {
     await this.app.start();
   }
 
-  public async awaitReadyness(): Promise<void> {
+  public async awaitReadiness(): Promise<void> {
     await this.app.client.waitUntilWindowLoaded();
     await this.app.browserWindow.isVisible();
   }
