@@ -69,10 +69,10 @@ export class TestClient {
   }
 
   public async assertDiagramIsOnProcessEngine(): Promise<void> {
-    await this.ensureVisible('[data-test-navbar-icon]');
-    const classAttribute = await this.getAttributeFromElement('[data-test-navbar-icon]', 'data-test-navbar-icon');
+    const url: string = await this.app.webContents.getURL();
+    const urlIsRemoteSolution: boolean = url.includes('solutionUri=http');
 
-    assert.equal(classAttribute, 'true');
+    assert.equal(urlIsRemoteSolution, true);
   }
 
   public async assertNavbarTitleIs(name): Promise<void> {
