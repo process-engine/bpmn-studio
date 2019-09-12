@@ -1,5 +1,5 @@
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
-import {computedFrom, inject} from 'aurelia-framework';
+import {inject} from 'aurelia-framework';
 import {NavModel, Router} from 'aurelia-router';
 
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
@@ -143,17 +143,6 @@ export class NavBar {
 
   public detached(): void {
     this.disposeAllSubscriptions();
-  }
-
-  @computedFrom('savingTargetIsRemoteSolution')
-  public get getClassNameForNavbarIcon(): string {
-    const iconClassName: string = ((): string => {
-      if (this.savingTargetIsRemoteSolution) {
-        return 'fa-database';
-      }
-      return 'fa-folder';
-    })();
-    return iconClassName;
   }
 
   private disposeAllSubscriptions(): void {
