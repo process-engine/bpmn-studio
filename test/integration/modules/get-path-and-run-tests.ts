@@ -2,9 +2,18 @@ import {ExecException, exec} from 'child_process';
 
 function getNpmTestScriptName(): string {
   const isWindows = process.platform === 'win32';
-  const platform = isWindows ? 'windows' : 'macos';
+  const isLinux = process.platform === 'linux';
+  const isMacOS = process.platform === 'darwin';
 
-  return `test-electron-${platform}`;
+  if (isWindows) {
+    return 'test-electron-windows';
+  } else if (isLinux) {
+    return 'test-electron-linux';
+  } else if (isMacOS) {
+    return 'test-electron-macos';
+  }
+
+  throw new Error(`Could not determine npm test script name based on platform: ${process.platform}`);
 }
 
 function getRawAndEscapedPathForMacOS(result: string): string {
@@ -18,14 +27,24 @@ function getRawAndEscapedPathForMacOS(result: string): string {
 
 async function getBuiltStudioPath(): Promise<string> {
   const isWindows = process.platform === 'win32';
+  const isLinux = process.platform === 'linux';
+
   if (isWindows) {
     try {
-      const result = await execCommand('find ./dist/electron/win-unpacked/**.exe');
-      return `"${result.substr(2).trim()}"`;
+      const currentDir = await execCommand('CD');
+      const result = await execCommand(`where /r ${currentDir.trim()} BPMN?Studio*.exe`);
+      const files = result.split('\n');
+      const correctPath = files.find((path) => {
+        return path.includes('win-unpacked');
+      });
+
+      return `"${correctPath.trim()}"`;
     } catch (error) {
       console.error(error);
       return process.exit(1);
     }
+  } else if (isLinux) {
+    return '';
   }
 
   try {
