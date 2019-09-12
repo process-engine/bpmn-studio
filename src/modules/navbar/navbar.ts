@@ -1,5 +1,5 @@
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
-import {computedFrom, inject} from 'aurelia-framework';
+import {inject} from 'aurelia-framework';
 import {NavModel, Router} from 'aurelia-router';
 
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';

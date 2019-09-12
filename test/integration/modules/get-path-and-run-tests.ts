@@ -7,9 +7,11 @@ function getNpmTestScriptName(): string {
 
   if (isWindows) {
     return 'test-electron-windows';
-  } else if (isLinux) {
+  }
+  if (isLinux) {
     return 'test-electron-linux';
-  } else if (isMacOS) {
+  }
+  if (isMacOS) {
     return 'test-electron-macos';
   }
 
