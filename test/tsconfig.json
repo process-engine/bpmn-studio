@@ -9,6 +9,6 @@
     "lib": ["esnext", "dom"]
   },
   "filesGlob": [
-    "./**/*.ts",
+    "./**/*.ts"
   ]
 }
