@@ -12,7 +12,7 @@ describe('Design View', function foo() {
 
     testClient.creatingFirstDiagram = true;
     await testClient.startSpectronApp();
-    await testClient.awaitReadyness();
+    await testClient.awaitReadiness();
   });
 
   afterEach(async () => {
@@ -73,14 +73,14 @@ describe('Design View', function foo() {
     await testClient.ensureVisible('[data-element-id="Collaboration_1cidyxu"]');
   });
 
-  it('should select StartEvent after opening a diagram', async () => {
+  it('should select a StartEvent after opening a diagram', async () => {
     await testClient.createAndOpenNewDiagram();
     await testClient.designView.showPropertyPanel();
 
     await testClient.assertSelectedBpmnElementHasName('Start Event');
   });
 
-  it('should select element on click', async () => {
+  it('should select a element the user clicks on', async () => {
     await testClient.createAndOpenNewDiagram();
     await testClient.designView.showPropertyPanel();
 

@@ -28,7 +28,7 @@ describe('XML View', function foo() {
 
     testClient.creatingFirstDiagram = true;
     await testClient.startSpectronApp();
-    await testClient.awaitReadyness();
+    await testClient.awaitReadiness();
   });
 
   afterEach(async () => {

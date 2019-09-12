@@ -11,7 +11,7 @@ describe('SolutionExplorer', function foo() {
     testClient = new TestClient(applicationArgs);
 
     await testClient.startSpectronApp();
-    await testClient.awaitReadyness();
+    await testClient.awaitReadiness();
   });
 
   afterEach(async () => {
@@ -32,7 +32,7 @@ describe('SolutionExplorer', function foo() {
     await testClient.solutionExplorer.openDirectoryAsSolution('fixtures');
   });
 
-  it('should open a diagram from solution', async () => {
+  it('should open a diagram from the opened solution', async () => {
     await testClient.startPageLoaded();
 
     const diagramName = 'call_activity_subprocess_error';
@@ -40,7 +40,7 @@ describe('SolutionExplorer', function foo() {
     await testClient.assertNavbarTitleIs(diagramName);
   });
 
-  it('should open the internal ProcessEngine as solution', async () => {
+  it('should open the internal ProcessEngine as a solution', async () => {
     await testClient.startPageLoaded();
 
     await testClient.solutionExplorer.assertInternalProcessEngineIsOpenedAsSolution();

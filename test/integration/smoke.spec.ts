@@ -12,7 +12,7 @@ describe('Application launch', function foo() {
 
     testClient.creatingFirstDiagram = true;
     await testClient.startSpectronApp();
-    await testClient.awaitReadyness();
+    await testClient.awaitReadiness();
   });
 
   afterEach(async () => {
@@ -33,7 +33,7 @@ describe('Application launch', function foo() {
     await testClient.assertWindowTitleIs('Start Page | BPMN Studio');
   });
 
-  it('should create and open a new diagram by clicking on new diagram link', async () => {
+  it('should create and open a new diagram by clicking on the "new diagram" link', async () => {
     await testClient.createAndOpenNewDiagram();
 
     await testClient.assertNavbarTitleIs('Untitled-1');
@@ -52,7 +52,7 @@ describe('Application launch', function foo() {
     await testClient.assertNavbarTitleIs('Untitled-2');
   });
 
-  it('should open detail view', async () => {
+  it('should open the detail view', async () => {
     await testClient.createAndOpenNewDiagram();
     await testClient.openStartPage();
 
@@ -65,13 +65,13 @@ describe('Application launch', function foo() {
     await testClient.assertCanvasModelIsVisible();
   });
 
-  it('should open XML view', async () => {
+  it('should open the XML view', async () => {
     await testClient.createAndOpenNewDiagram();
     await testClient.designView.openXmlView('Untitled-1', 'about:open-diagrams/Untitled-1.bpmn', 'about:open-diagrams');
     await testClient.designView.assertXmlViewIsVisible();
   });
 
-  it('should open diff view', async () => {
+  it('should open the diff view', async () => {
     await testClient.createAndOpenNewDiagram();
 
     await testClient.designView.openDiffView(
@@ -97,7 +97,7 @@ describe('Application launch', function foo() {
     await testClient.assertWindowTitleIs('Think | BPMN Studio');
   });
 
-  it('should stop a process on LiveExecutionTracker', async () => {
+  it('should stop a process from the LiveExecutionTracker', async () => {
     const diagramName = 'receive_task_wait_test';
     await testClient.startPageLoaded();
     await testClient.solutionExplorer.openDirectoryAsSolution('fixtures', diagramName);
