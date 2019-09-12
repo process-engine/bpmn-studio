@@ -38,16 +38,16 @@ async function execCommand(command): Promise<string> {
 async function runTests(): Promise<void> {
   const pathToStudio = await getBuiltStudioPath();
 
-  exec(
-    `cross-env SPECTRON_APP_PATH=${pathToStudio} npm run ${getNpmTestScriptName()}`,
-    (err: ExecException, stdout: string, stderr: string) => {
-      if (err || stderr) {
-        console.error(err, stderr);
-      }
+  const childProcess = exec(`cross-env SPECTRON_APP_PATH=${pathToStudio} npm run ${getNpmTestScriptName()}`);
 
-      console.log(stdout);
-    },
-  );
+  childProcess.stdout.on('data', (data) => {
+    console.log(data);
+  });
+
+  childProcess.stderr.on('data', (data) => {
+    console.error(data);
+    process.exit(1);
+  });
 }
 
 runTests();
