@@ -90,7 +90,7 @@ jobs:
       run: |
         npm run electron-build-macos
 
-        npm run test-electron-macos
+        npm run test-electron
 
     - uses: actions/upload-artifact@master
       with:
@@ -120,7 +120,7 @@ jobs:
       run: |
         npm run electron-build-windows
 
-        npm run test-electron-windows
+        npm run test-electron
 
     - uses: actions/upload-artifact@master
       with:
