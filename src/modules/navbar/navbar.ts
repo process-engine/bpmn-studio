@@ -145,17 +145,6 @@ export class NavBar {
     this.disposeAllSubscriptions();
   }
 
-  @computedFrom('savingTargetIsRemoteSolution')
-  public get getClassNameForNavbarIcon(): string {
-    const iconClassName: string = ((): string => {
-      if (this.savingTargetIsRemoteSolution) {
-        return 'fa-database';
-      }
-      return 'fa-folder';
-    })();
-    return iconClassName;
-  }
-
   private disposeAllSubscriptions(): void {
     this.subscriptions.forEach((subscription: Subscription) => {
       subscription.dispose();

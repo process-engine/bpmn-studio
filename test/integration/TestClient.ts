@@ -62,17 +62,11 @@ export class TestClient {
   }
 
   public async assertDiagramIsOnFileSystem(): Promise<void> {
-    await this.ensureVisible('[data-test-navbar-icon]');
-    const classAttribute = await this.getAttributeFromElement('[data-test-navbar-icon]', 'data-test-navbar-icon');
-
-    assert.equal(classAttribute, 'false');
+    await this.ensureVisible('[data-test-navbar-icon-local-solution]');
   }
 
   public async assertDiagramIsOnProcessEngine(): Promise<void> {
-    const url: string = await this.app.webContents.getURL();
-    const urlIsRemoteSolution: boolean = url.includes('solutionUri=http');
-
-    assert.equal(urlIsRemoteSolution, true);
+    await this.ensureVisible('[data-test-navbar-icon-remote-solution]');
   }
 
   public async assertNavbarTitleIs(name): Promise<void> {
