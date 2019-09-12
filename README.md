@@ -18,7 +18,7 @@ Engine verbunden werden, um diese Diagramme auszuführen.
 
 [Changelog und Release](https://github.com/process-engine/bpmn-studio/releases/latest)
 
-## Downloads
+## Downloads für Windows, macOS und Docker
 
 Die Releases des BPMN Studios lassen sich
 [hier](https://github.com/process-engine/bpmn-studio/releases/latest)
@@ -198,7 +198,7 @@ Die folgenden Skripte, werden in unserem Tooling verwendet:
 
 * `build`
 
-   Baut ALLES, was zum Ausführen der Webversion, der Electron-Dev App und der Tests notwendig ist.
+   Baut alles, was zum Ausführen der Webversion, der Electron-Dev App und der Tests notwendig ist.
 
 * `reinstall`
 
@@ -263,7 +263,5 @@ Die Konfiguration liegt unter `aurelia_project/environments/dev.ts`.
 
 [Alexander Kasten](mailto:alexander.kasten@5minds.de)
 [Christian Werner](mailto:christian.werner@5minds.de)
-[Christoph Gnip](mailto:christoph.gnip@5minds.de)
-[Paul Heidenreich](mailto:paul.heidenreich@5minds.de)
 [René Föhring](mailto:rene.foehring@5minds.de)
 [Steffen Knaup](mailto:steffen.knaup@5minds.de)
