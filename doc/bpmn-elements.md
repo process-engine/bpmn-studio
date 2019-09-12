@@ -217,6 +217,8 @@ Wie ErrorEndEvent, forciert jedoch das sofortige Beenden aller parallel laufende
 
 Stellt eine Aufgabe dar, die von Benutzern abgearbeitet werden kann. Der Benutzer kann Eingaben machen.
 
+Wie ein UserTask konfiguriert werden kann, wird in der [DynamicUi](https://github.com/process-engine/dynamic_ui_core/blob/develop/README.md) erklärt.
+
 ### ManualTask
 
 <img src="./bpmn-elements-svg/manualtask.svg">
