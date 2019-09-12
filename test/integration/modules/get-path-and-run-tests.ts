@@ -10,18 +10,28 @@ function getNpmTestScriptName(): string {
 async function getBuiltStudioPath(): Promise<string> {
   const isWindows = process.platform === 'win32';
   if (isWindows) {
-    const result = await execCommand('find ./dist/electron/win-unpacked/**.exe');
-    return `"${result.substr(2).trim()}"`;
+    try {
+      const result = await execCommand('find ./dist/electron/win-unpacked/**.exe');
+      return `"${result.substr(2).trim()}"`;
+    } catch (error) {
+      console.error(error);
+      process.exit(1);
+    }
   }
 
-  const result = await execCommand('find ./dist/electron/mac/**.app/Contents/MacOS/BPMN**');
-  return result
-    .substr(2)
-    .replace(/\s/g, '\\ ')
-    .replace(/\(/g, '\\(')
-    .replace(/\)/g, '\\)')
-    .trim()
-    .slice(0, -1);
+  try {
+    const result = await execCommand('find ./dist/electron/mac/**.app/Contents/MacOS/BPMN**');
+    return result
+      .substr(2)
+      .replace(/\s/g, '\\ ')
+      .replace(/\(/g, '\\(')
+      .replace(/\)/g, '\\)')
+      .trim()
+      .slice(0, -1);
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  }
 }
 
 async function execCommand(command): Promise<string> {
