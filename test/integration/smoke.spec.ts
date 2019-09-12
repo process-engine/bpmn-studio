@@ -4,9 +4,9 @@ import {applicationArgs} from './modules/get-application-args';
 let testClient: TestClient;
 
 async function stopProcess(): Promise<void> {
-  await this.testClient.ensureVisible('[data-test-stop-process-button]');
-  await this.testClient.clickOn('[data-test-stop-process-button]');
-  await this.testClient.ensureNotVisible('[data-test-stop-process-button]');
+  await testClient.ensureVisible('[data-test-stop-process-button]');
+  await testClient.clickOn('[data-test-stop-process-button]');
+  await testClient.ensureNotVisible('[data-test-stop-process-button]');
 }
 
 describe('Application launch', function foo() {
