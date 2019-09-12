@@ -63,11 +63,6 @@ export class Inspect {
         window.localStorage.getItem('InternalProcessEngineRoute'),
       );
 
-      this.notificationService.showNotification(
-        NotificationType.INFO,
-        'There is currently no runtime information about this process available.',
-      );
-
       return true;
     }
 

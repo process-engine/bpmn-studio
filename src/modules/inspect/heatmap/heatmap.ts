@@ -18,6 +18,7 @@ import {IFlowNodeAssociation, IHeatmapService} from './contracts';
 @inject('HeatmapService')
 export class Heatmap {
   public viewerContainer: HTMLDivElement;
+  public noRuntimeInformation: boolean = false;
   @bindable() public activeDiagram: IDiagram;
   @bindable() public activeSolutionEntry: ISolutionEntry;
 
@@ -34,6 +35,7 @@ export class Heatmap {
   }
 
   public activeDiagramChanged(): void {
+    this.noRuntimeInformation = false;
     const attachedViewer: Element = document.getElementsByClassName('bjs-container')[0];
 
     const viewerContainerIsAttached: boolean =
@@ -64,6 +66,7 @@ export class Heatmap {
 
     const diagramIsNoRemoteDiagram: boolean = !this.activeDiagram.uri.startsWith('http');
     if (diagramIsNoRemoteDiagram) {
+      this.noRuntimeInformation = true;
       return;
     }
 
