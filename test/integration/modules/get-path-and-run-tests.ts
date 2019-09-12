@@ -7,6 +7,15 @@ function getNpmTestScriptName(): string {
   return `test-electron-${platform}`;
 }
 
+function getRawAndEscapedPathForMacOS(result: string): string {
+  return result
+    .trim()
+    .replace(/^\.\//g, '')
+    .replace(/\s/g, '\\ ')
+    .replace(/\(/g, '\\(')
+    .replace(/\)/g, '\\)');
+}
+
 async function getBuiltStudioPath(): Promise<string> {
   const isWindows = process.platform === 'win32';
   if (isWindows) {
@@ -15,22 +24,18 @@ async function getBuiltStudioPath(): Promise<string> {
       return `"${result.substr(2).trim()}"`;
     } catch (error) {
       console.error(error);
-      process.exit(1);
+      return process.exit(1);
     }
   }
 
   try {
     const result = await execCommand('find ./dist/electron/mac/**.app/Contents/MacOS/BPMN**');
-    return result
-      .substr(2)
-      .replace(/\s/g, '\\ ')
-      .replace(/\(/g, '\\(')
-      .replace(/\)/g, '\\)')
-      .trim()
-      .slice(0, -1);
+    const rawPath = getRawAndEscapedPathForMacOS(result);
+
+    return rawPath;
   } catch (error) {
     console.error(error);
-    process.exit(1);
+    return process.exit(1);
   }
 }
 
