@@ -3,6 +3,7 @@ import {computedFrom, inject} from 'aurelia-framework';
 import {NavModel, Router} from 'aurelia-router';
 
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
+import {BrowserWindow} from 'electron';
 import {ISolutionEntry, ISolutionService, NotificationType} from '../../contracts/index';
 import environment from '../../environment';
 import {NotificationService} from '../../services/notification-service/notification.service';
@@ -11,6 +12,7 @@ import {NotificationService} from '../../services/notification-service/notificat
 export class NavBar {
   public activeSolutionEntry: ISolutionEntry;
   public activeDiagram: IDiagram;
+  public navbarContainer: HTMLDivElement;
 
   public diagramInfo: HTMLElement;
   public dropdown: HTMLElement;
@@ -120,7 +122,24 @@ export class NavBar {
         this.disableInspectCorrelationButton = true;
       }),
     ];
+
+    this.navbarContainer.addEventListener('dblclick', this.maximizeWindow);
   }
+
+  public maximizeWindow = (): void => {
+    if (!(window as any).nodeRequire) {
+      return undefined;
+    }
+
+    const browserWindow: BrowserWindow = (window as any).nodeRequire('electron').remote.getCurrentWindow();
+
+    const browserWindowIsMaximized: boolean = browserWindow.isMaximized();
+    if (browserWindowIsMaximized) {
+      return browserWindow.unmaximize();
+    }
+
+    return browserWindow.maximize();
+  };
 
   public detached(): void {
     this.disposeAllSubscriptions();
