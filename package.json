@@ -22,7 +22,6 @@
     "lint": "eslint \"test/**/*.ts\" \"src/**/*.ts\" \"electron_app/**/*.ts\" \"bin/**/*.ts\" \"aurelia_project/**/*.js\" \"aurelia_project/**/*.ts\"",
     "lint-fix": "eslint --fix \"test/**/*.ts\" \"src/**/*.ts\" \"electron_app/**/*.ts\" \"bin/**/*.ts\" \"aurelia_project/**/*.js\" \"aurelia_project/**/*.ts\"",
     "postinstall": "npm rebuild",
-    "reset": "bash dev_tooling/scripts/reset_setup.bash",
     "reinstall": "OLD_PATH=$PATH bash dev_tooling/scripts/reinstall_setup.bash && unset OLD_PATH",
     "start": "node ./dist/bin/bpmn-studio.js",
     "start_dev": "au run --watch",
