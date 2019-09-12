@@ -3,7 +3,7 @@ import fs from 'fs';
 import {TestClient} from '../TestClient';
 import {callExposedFunction} from '../../../src/services/expose-functionality-module/expose-functionality-module';
 
-export class Design {
+export class DesignViewClient {
   private testClient: TestClient;
   private saveDiagramDir: string;
 
@@ -19,6 +19,7 @@ export class Design {
 
   public async openXmlView(diagramName: string, diagramUri: string, solutionUri?: string): Promise<void> {
     await this.testClient.openDesignView('xml', diagramName, diagramUri, solutionUri);
+    await this.testClient.ensureVisible('[data-test-bpmn-xml-view]');
   }
 
   public async openDiffView(diagramName: string, diagramUri: string, solutionUri?: string): Promise<void> {

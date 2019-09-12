@@ -31,19 +31,20 @@ describe('XML View', function foo() {
     await testClient.awaitReadiness();
   });
 
-  afterEach(async () => {
-    if (await testClient.isSpectronAppRunning()) {
-      await testClient.stopSpectronApp();
-      return testClient.clearDatabase();
-    }
-    return null;
-  });
+  afterEach(
+    async (): Promise<void> => {
+      if (await testClient.isSpectronAppRunning()) {
+        await testClient.stopSpectronApp();
+        await testClient.clearDatabase();
+      }
+    },
+  );
 
   this.afterAll(async () => {
     await testClient.clearSavedDiagrams();
   });
 
-  it('should has content', async () => {
+  it('should have content', async () => {
     await testClient.createAndOpenNewDiagram();
     await testClient.designView.openXmlView('Untitled-1', 'about:open-diagrams/Untitled-1.bpmn', 'about:open-diagrams');
     await assertXmlViewHasContent();

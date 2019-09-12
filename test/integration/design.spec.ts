@@ -15,13 +15,14 @@ describe('Design View', function foo() {
     await testClient.awaitReadiness();
   });
 
-  afterEach(async () => {
-    if (await testClient.isSpectronAppRunning()) {
-      await testClient.stopSpectronApp();
-      return testClient.clearDatabase();
-    }
-    return null;
-  });
+  afterEach(
+    async (): Promise<void> => {
+      if (await testClient.isSpectronAppRunning()) {
+        await testClient.stopSpectronApp();
+        await testClient.clearDatabase();
+      }
+    },
+  );
 
   this.afterAll(async () => {
     await testClient.clearSavedDiagrams();
@@ -43,10 +44,6 @@ describe('Design View', function foo() {
     await testClient.startPageLoaded();
     await testClient.solutionExplorer.openDirectoryAsSolution('fixtures', diagramName);
     await testClient.assertDiagramIsOnFileSystem();
-
-    // if (isWindows) {
-    //   await testClient.pause(800);
-    // }
 
     // Act
     await testClient.designView.deployDiagram();

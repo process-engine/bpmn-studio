@@ -9,8 +9,7 @@ import assert from 'assert';
 import {IIdentity} from '@essential-projects/iam_contracts';
 
 import {SolutionExplorer} from './test-classes/solution-explorer';
-import {Design} from './test-classes/design-view';
-import {LiveExecutionTracker} from './test-classes/live-execution-tracker';
+import {DesignViewClient} from './test-classes/design-view';
 
 function getUserConfigFolder(): string {
   const userHomeDir = os.homedir();
@@ -30,8 +29,7 @@ const SAVE_DIAGRAM_DIR = path.join(getUserConfigFolder(), 'bpmn-studio-tests', '
 
 export class TestClient {
   public solutionExplorer: SolutionExplorer = new SolutionExplorer(this);
-  public designView: Design = new Design(this, SAVE_DIAGRAM_DIR);
-  public liveExecutionTracker: LiveExecutionTracker = new LiveExecutionTracker(this);
+  public designView: DesignViewClient = new DesignViewClient(this, SAVE_DIAGRAM_DIR);
   public creatingFirstDiagram: boolean = true;
 
   private app: Application;

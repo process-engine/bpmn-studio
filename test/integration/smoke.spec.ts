@@ -3,6 +3,12 @@ import {applicationArgs} from './modules/get-application-args';
 
 let testClient: TestClient;
 
+async function stopProcess(): Promise<void> {
+  await this.testClient.ensureVisible('[data-test-stop-process-button]');
+  await this.testClient.clickOn('[data-test-stop-process-button]');
+  await this.testClient.ensureNotVisible('[data-test-stop-process-button]');
+}
+
 describe('Application launch', function foo() {
   this.slow(10000);
   this.timeout(15000);
@@ -15,13 +21,14 @@ describe('Application launch', function foo() {
     await testClient.awaitReadiness();
   });
 
-  afterEach(async () => {
-    if (await testClient.isSpectronAppRunning()) {
-      await testClient.stopSpectronApp();
-      return testClient.clearDatabase();
-    }
-    return null;
-  });
+  afterEach(
+    async (): Promise<void> => {
+      if (await testClient.isSpectronAppRunning()) {
+        await testClient.stopSpectronApp();
+        await testClient.clearDatabase();
+      }
+    },
+  );
 
   this.afterAll(async () => {
     await testClient.clearSavedDiagrams();
@@ -107,6 +114,6 @@ describe('Application launch', function foo() {
     await testClient.assertDiagramIsOnProcessEngine();
     await testClient.designView.startProcess();
 
-    await testClient.liveExecutionTracker.stopProcess();
+    await stopProcess();
   });
 });
