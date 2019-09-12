@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "../dist/test",
+    "outDir": "../dist/test-integration",
     "sourceMap": false,
     "target": "esnext",
     "module": "commonjs",
