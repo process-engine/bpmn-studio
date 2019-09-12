@@ -71,8 +71,8 @@ stages:
     - script: npm run electron-build-windows
       displayName: 'npm run electron-build-windows'
 
-    - script: npm run test-electron-windows
-      displayName: 'npm test-electron-windows'
+    - script: npm run test-electron
+      displayName: 'npm test-electron'
 
   - job: macOS
     pool:
@@ -89,8 +89,8 @@ stages:
     - script: npm run electron-build-macos
       displayName: 'npm run electron-build-macos'
 
-    - script: npm run test-electron-macos
-      displayName: 'npm test-electron-macos'
+    - script: npm run test-electron
+      displayName: 'npm test-electron'
 
 - stage: Publish
   jobs:
