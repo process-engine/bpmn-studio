@@ -12,9 +12,20 @@ Engine verbunden werden, um diese Diagramme auszuführen.
 
 ## Relevante URLs
 
-[ProcessEngine](https://github.com/process-engine/process_engine)
-[Dokumentation](https://github.com/process-engine/documentation)
-[Minimales Skeleton](https://github.com/process-engine/skeleton)
+[ProcessEngine.io](https://www.process-engine.io/)
+
+[ProcessEngine Runtime](https://github.com/process-engine/process_engine_runtime)
+
+[Changelog und Release](https://github.com/process-engine/bpmn-studio/releases/latest)
+
+## Downloads
+
+Die Releases des BPMN Studios lassen sich
+[hier](https://github.com/process-engine/bpmn-studio/releases/latest)
+für Windows und macOS herunterladen.
+
+Ein Docker-Image des kompletten Bundles (BPMN Studio & ProcessEngine Runtime) gibt 
+es [hier](https://hub.docker.com/r/5minds/bpmn-studio-bundle).
 
 ## Wie kann ich das Projekt aufsetzen?
 
@@ -29,7 +40,6 @@ Engine verbunden werden, um diese Diagramme auszuführen.
 
 1. `npm install`
 1. `npm run build`
-1. `npm run electron-build-<OS>`
 1. `npm start` / `npm run start_dev`
 
 **Notizen:**
@@ -48,8 +58,8 @@ Engine verbunden werden, um diese Diagramme auszuführen.
 **TL;DR Tests**
 
 1. `npm start`
-1. `npm run test-init`
-1. `npm run test`
+1. `npm run electron-build-<OS>`
+1. `npm test`
 
 ## Wie kann ich das Projekt benutzen?
 
@@ -122,7 +132,7 @@ automatisch neu geladen.
 npm run electron-build-macos
 ```
 
-Nach dem Bauen kann man in dem `dist/mac` Ordner die fertige Applikation finden
+Nach dem Bauen kann man in dem `dist/electron/mac` Ordner die fertige Applikation finden
 und ausführen.
 
 **Windows:**
@@ -139,19 +149,13 @@ Danach kann gebuildet werden:
 npm run electron-build-windows
 ```
 
-Nach dem Bauen, kann man in dem `dist/` Ordner die Datei `bpmn-studio Setup
+Nach dem Bauen, kann man in dem `dist/electron/` Ordner die Datei `bpmn-studio-setup-
 <VERSION>.exe` ausführen, um die Applikation zu installieren; `<VERSION>` wird
 durch die entsprechende Version ersetzt.
 
 Beispiel:
 
-`dist/bpmn-studio Setup 1.2.1.exe`
-
-**Alternative:**
-
-Die Releases des BPMN Studios lassen sich alternativ auch
-[hier](https://github.com/process-engine/bpmn-studio/releases)
-herunterladen.
+`dist/electron/bpmn-studio-setup-5.7.0.exe`
 
 ### Docker Image
 
@@ -185,110 +189,6 @@ docker run -p 9000:9000 bpmn-studio:latest
 Anschließend lässt sich das BPMN Studio unter URL `http://localhost:17290`
 aufrufen.
 
-## End-to-End-Tests
-
-Die End-to-End-Tests werden mit Hilfe des
-[Protractor Frameworks](https://www.protractortest.org/#/)
-durchgeführt.
-
-Unser Ziel ist es, die Testabdeckung ausreichend auszubauen, um das Vertrauen
-in einen Release zu verbessern. Es wird keine 100% Abdeckung angestrebt, aber
-generelle Tests für alle unterstützten Plattformen sind gewünscht.
-
-**Hinweis:**
-
-Alle Befehle müssen im geklonten Repository ausgeführt werden.
-
-**Hinweis:**
-
-Aufgrund eines
-[Fehlers](https://github.com/process-engine/process_engine_runtime/issues/9)
-bei der verwendeten Version der ProcessEngine-Runtime, schlagen aktuell einige
-Tests fehl.
-
-### Voraussetzungen
-
-Es werden folgende Pakete benötigt:
-
-1. Allgemein:
-
-   * [Java Development Kit](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
-   * [Chrome](https://www.google.com/intl/de_ALL/chrome/)
-
-1. Nur bei lokalen Tests mit Docker:
-
-   * Docker
-
-1. Nur bei CrossBrowserTesting:
-
-   * VM oder vergleichbares mit öffentlicher IP
-   * Docker
-   * CrossBrowserTesting Account
-
-### Lokale Tests ohne Docker ausführen
-
-1. Initial müssen folgende Befehle in einem Terminal ausgeführt werden:
-
-   ```shell
-   npm install
-   ```
-
-1. Anschließend folgenden Befehl eingeben, um den Selenium Server und die ProcessEngine zu starten:
-
-   ```shell
-   npm run test-init
-   ```
-
-1. Die End-to-End Tests können in einem weiteren Terminal mit folgendem Befehl
-   gestartet werden:
-
-   ```shell
-   npm run test
-   ```
-
-### Lokale Tests mit Docker ausführen
-
-1. Ein Terminal öffnen und folgenden Befehl eingeben, um den Selenium
-   Server zu starten:
-
-   ```shell
-   npm run test-init
-   ```
-
-1. Die End-to-End Tests können in einem weiteren Terminal mit folgendem Befehl
-   gestartet werden:
-
-   ```shell
-   npm run test-docker
-   ```
-
-### Crossbrowser Tests mit Docker ausführen
-
-[<img src="https://crossbrowsertesting.com/design/images/brand/cbt-sb-logo.svg" width="250px">](https://crossbrowsertesting.com)
-
-1. Initial müssen folgende Umgebungsvariablen gesetzt werden:
-
-   ```shell
-   export CB_USER=""           # CrossBrowserTesting E-Mail Adresse
-   export CB_KEY=""            # CrossBrowserTesting API Key
-   export aureliaUrl=""        # URL oder IP der VM + Port des BPMN Studios, z.B. http://1.1.1.1:9000
-   export processEngineUrl=""  # URL oder IP der VM + Port der ProcessEngine, z.B. http://1.1.1.1:8000
-   ```
-
-1. Ein Terminal öffnen und das BPMN Studio auf der VM mit folgendem Befehl
-   starten:
-
-   ```shell
-   docker run -p 8000:8000 -p 9000:9000 5minds/bpmn-studio-bundle:latest
-   ```
-
-1. Ein Terminal auf dem lokalen Computer öffnen und mit folgenden Befehl die
-   CrossBrowserTesting Tests starten:
-
-   ```shell
-   npm run test-crossbrowser
-   ```
-
 ## Shortcut Skripte
 
 Es sind Skripte in der `package.json` vordefiniert, welche
@@ -298,11 +198,11 @@ Die folgenden Skripte, werden in unserem Tooling verwendet:
 
 * `build`
 
-   Baut das Aurelia Bundle.
+   Baut ALLES, was zum Ausführen der Webversion, der Electron-Dev App und der Tests notwendig ist.
 
 * `reinstall`
 
-  Entfernt die aktuell installierten Abhängigkeiten und installiert diese neu.
+  Entfernt die aktuell installierten Abhängigkeiten, installiert diese neu und baut die komplette Anwendung.
 
 * `reset`
 
@@ -322,10 +222,6 @@ Die folgenden Skripte, werden in unserem Tooling verwendet:
 
   Baut das Aurelia Bundle und startet die Electron Anwendung.
 
-* `reset`
-
-  Entfernt alle node_modules, die `package-lock.json` Datei und bereinigt den NPM-Cache.
-
 * `lint`
 
   Startet `eslint` für das gesamte Projekt.
@@ -342,20 +238,22 @@ Die folgenden Skripte, werden in unserem Tooling verwendet:
 
   Baut alle nativen Abhängigkeiten.
 
-* `test-init`
-
-  Startet die installierte ProcessEngine und den Webdriver, welcher für
-  die End-to-End Tests benötigt wird.
-
 * `test`
 
-  Führt die End-to-End Tests für das BPMN Studio Frontend aus.
+  Führt die Spectron Tests für das BPMN Studio in Electron aus.
 
-* `test-docker`
+* `test-electron`
 
-  Startet die BPMN Studio Webanwendung als Docker Container und führt
-  die End-to-End Tests gegen der im Container laufenden Instanz der
-  BPMN Studio Webanwendung aus.
+  Baut die Tests und führt diese mit der gebauten BPMN Studio App aus.
+
+* `test-electron-macos`
+
+  Führt die Tests in der Electron Dev Variante auf macOS aus.
+
+  * `test-electron-windows`
+
+  Führt die Tests in der Electron Dev Variante auf Windows aus.
+
 
 ## Was muss ich sonst noch wissen?
 
@@ -363,6 +261,9 @@ Die Konfiguration liegt unter `aurelia_project/environments/dev.ts`.
 
 # Wen kann ich auf das Projekt ansprechen?
 
-[Christoph Gnip](mailto:christoph.gnip@5minds.de)
 [Alexander Kasten](mailto:alexander.kasten@5minds.de)
+[Christian Werner](mailto:christian.werner@5minds.de)
+[Christoph Gnip](mailto:christoph.gnip@5minds.de)
 [Paul Heidenreich](mailto:paul.heidenreich@5minds.de)
+[René Föhring](mailto:rene.foehring@5minds.de)
+[Steffen Knaup](mailto:steffen.knaup@5minds.de)
