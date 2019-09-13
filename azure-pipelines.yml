@@ -9,7 +9,8 @@ trigger:
 
 stages:
 
-- stage: Prepare version
+- stage: Prepare_version
+  displayName: Prepare version
   jobs:
   - job: Linux
     pool:
@@ -28,11 +29,9 @@ stages:
       artifact: package_json
 
 
-- stage: BuildAndTest
-  displayName: Build and Test
-
+- stage: Build_and_test
+  displayName: Build and test
   jobs:
-
   - job: Linux
     pool:
       vmImage: 'ubuntu-16.04'
@@ -112,7 +111,8 @@ stages:
     - script: npm test
       displayName: 'npm test'
 
-- stage: "Commit & tag version"
+- stage: Commit_and_tag_version
+  displayName: "Commit & tag version"
   jobs:
   - job: Linux
     pool:
