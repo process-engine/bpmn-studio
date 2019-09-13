@@ -1,6 +1,7 @@
 import {DataModels} from '@process-engine/management_api_contracts';
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {DashboardRepository} from './dashboard-repository';
+import {TaskListEntry} from '../contracts';
 
 export class DashboardPaginationRepository extends DashboardRepository {
   public getAllActiveCronjobs(identity: IIdentity): Promise<DataModels.Cronjobs.CronjobList> {
@@ -76,5 +77,16 @@ export class DashboardPaginationRepository extends DashboardRepository {
     correlationId: string,
   ): Promise<DataModels.UserTasks.UserTaskList> {
     return this.managementApiService.getUserTasksForProcessInstance(identity, correlationId);
+  }
+
+  public async getAllSuspendedTasks(identity: IIdentity): Promise<Array<TaskListEntry>> {
+    const taskList: DataModels.Tasks.TaskList = await this.managementApiService.getAllSuspendedTasks(identity);
+    const allTasks: Array<TaskListEntry> = [].concat(
+      taskList.emptyActivities,
+      taskList.manualTasks,
+      taskList.userTasks,
+    );
+
+    return allTasks;
   }
 }

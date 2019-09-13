@@ -2,6 +2,7 @@ import {DataModels, IManagementApiClient, Messages} from '@process-engine/manage
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {Subscription} from '@essential-projects/event_aggregator_contracts';
 import {IDashboardRepository} from './IDashboardRepository';
+import {TaskListEntry, TaskSource, TaskType} from '../contracts/index';
 
 export class DashboardRepository implements IDashboardRepository {
   protected managementApiService: IManagementApiClient;
@@ -221,5 +222,77 @@ export class DashboardRepository implements IDashboardRepository {
 
   public removeSubscription(identity: IIdentity, subscription: Subscription): Promise<void> {
     return this.managementApiService.removeSubscription(identity, subscription);
+  }
+
+  public async getAllSuspendedTasks(identity: IIdentity): Promise<Array<TaskListEntry>> {
+    const allProcessModels: DataModels.ProcessModels.ProcessModelList = await this.getProcessModels(identity);
+
+    // TODO (ph): This will create 1 + n http reqeusts, where n is the number of process models in the processengine.
+    const promisesForAllUserTasks: Array<Promise<Array<TaskListEntry>>> = allProcessModels.processModels.map(
+      async (processModel: DataModels.ProcessModels.ProcessModel): Promise<Array<TaskListEntry>> => {
+        const userTaskList: DataModels.UserTasks.UserTaskList = await this.getUserTasksForProcessModel(
+          identity,
+          processModel.id,
+        );
+
+        return this.mapToTaskListEntry(userTaskList.userTasks, TaskType.UserTask);
+      },
+    );
+
+    const promisesForAllManualTasks: Array<Promise<Array<TaskListEntry>>> = allProcessModels.processModels.map(
+      async (processModel: DataModels.ProcessModels.ProcessModel): Promise<Array<TaskListEntry>> => {
+        const manualTaskList: DataModels.ManualTasks.ManualTaskList = await this.getManualTasksForProcessModel(
+          identity,
+          processModel.id,
+        );
+
+        return this.mapToTaskListEntry(manualTaskList.manualTasks, TaskType.ManualTask);
+      },
+    );
+
+    const promisesForAllEmptyActivities: Array<Promise<Array<TaskListEntry>>> = allProcessModels.processModels.map(
+      async (processModel: DataModels.ProcessModels.ProcessModel): Promise<Array<TaskListEntry>> => {
+        const emptyActivityList: DataModels.EmptyActivities.EmptyActivityList = await this.getEmptyActivitiesForProcessModel(
+          identity,
+          processModel.id,
+        );
+
+        return this.mapToTaskListEntry(emptyActivityList.emptyActivities, TaskType.EmptyActivity);
+      },
+    );
+    // Concatenate the Promises for requesting UserTasks and requesting ManualTasks.
+    const promisesForAllTasksForAllProcessModels: Array<TaskListEntry> = [].concat(
+      promisesForAllUserTasks,
+      promisesForAllManualTasks,
+      promisesForAllEmptyActivities,
+    );
+
+    // Await all promises.
+    const allTasksForAllProcessModels: Array<TaskListEntry> = await Promise.all(promisesForAllTasksForAllProcessModels);
+
+    // Flatten all results.
+    const allTasks: Array<TaskListEntry> = [].concat(...allTasksForAllProcessModels);
+
+    return allTasks;
+  }
+
+  private mapToTaskListEntry(tasks: Array<TaskSource>, targetType: TaskType): Array<TaskListEntry> {
+    const mappedTasks: Array<TaskListEntry> = tasks.map(
+      (task: TaskSource): TaskListEntry => {
+        return {
+          correlationId: task.correlationId,
+          id: task.id,
+          flowNodeInstanceId: task.flowNodeInstanceId,
+          processInstanceId: task.processInstanceId,
+          processModelId: task.processModelId,
+          name: task.name,
+          // NOTE: Can't use instanceof or typeof, because the tasks were received as a plain JSON that does not have any type infos.
+          // TODO: Add type mapping to the Management API Client.
+          taskType: targetType,
+        };
+      },
+    );
+
+    return mappedTasks;
   }
 }
