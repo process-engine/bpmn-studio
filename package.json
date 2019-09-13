@@ -55,7 +55,7 @@
     "@process-engine/management_api_client": "6.1.0-beta.4",
     "@process-engine/process_engine_runtime": "9.0.0-beta.7",
     "@process-engine/solutionexplorer.repository.filesystem": "^4.2.0",
-    "@process-engine/solutionexplorer.repository.management_api": "3.1.0-9ffd8f25-b10",
+    "@process-engine/solutionexplorer.repository.management_api": "feature~update_management-api",
     "@process-engine/solutionexplorer.service": "^4.2.0",
     "@types/bluebird": "^3.5.27",
     "@types/mocha": "^5.2.7",
