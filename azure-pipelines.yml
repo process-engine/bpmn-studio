@@ -64,8 +64,8 @@ stages:
     - download: current
       artifact: package_json
 
-    - script: cat ./package.json
-      displayName: 'cat ./package.json'
+    - script: ls -al
+      displayName: 'ls -al'
 
     - script: npm install
       displayName: 'npm install'
