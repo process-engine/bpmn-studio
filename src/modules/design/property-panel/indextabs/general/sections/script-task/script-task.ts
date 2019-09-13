@@ -12,6 +12,8 @@ export class ScriptTaskSection implements ISection {
   public canHandleElement: boolean = false;
   public businessObjInPanel: IScriptTaskElement;
 
+  public showModal: boolean = false;
+
   public scriptInput: HTMLElement;
 
   private eventAggregator: EventAggregator;
