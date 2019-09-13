@@ -38,6 +38,10 @@ export class App {
 
     if (this.isRunningInElectron) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
+
+      this.ipcRenderer.on('database-export-error', (event: Event, errorMessage: string) => {
+        this.notificationService.showNotification(NotificationType.ERROR, errorMessage);
+      });
     }
   }
 

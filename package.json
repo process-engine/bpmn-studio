@@ -70,6 +70,7 @@
     "get-port": "^5.0.0",
     "highlight.js": "9.15.8",
     "highlightjs-line-numbers.js": "^2.7.0",
+    "jszip": "3.2.2",
     "minimist": "^1.2.0",
     "moment": "2.24.0",
     "node-fetch": "2.6.0",
