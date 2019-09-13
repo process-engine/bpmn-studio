@@ -78,14 +78,8 @@ stages:
     - script: xvfb-run --auto-servernum npm test
       displayName: 'npm test'
 
-    - publish: '@fortawesome'
-      artifact: NpmPackage-Fortawesome
-
-    - publish: 'bootstrap'
-      artifact: NpmPackage-Bootstrap
-
-    - publish: 'scripts'
-      artifact: NpmPackage-Scripts
+    - publish: 'dist/web'
+      artifact: NpmPackage-DistWeb
 
     - publish: 'config'
       artifact: NpmPackage-config
