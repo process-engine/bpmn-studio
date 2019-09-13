@@ -22,6 +22,10 @@ stages:
       displayName: 'Install Node.js'
 
     - script: |
+        npm ci
+      displayName: 'npm ci'
+
+    - script: |
         node ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir
       displayName: 'Prepare version'
 
