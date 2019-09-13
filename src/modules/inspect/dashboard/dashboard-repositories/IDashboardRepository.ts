@@ -1,8 +1,10 @@
 import {DataModels} from '@process-engine/management_api_contracts';
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {Subscription} from '@essential-projects/event_aggregator_contracts';
+import {TaskListEntry} from '../contracts/index';
 
 export interface IDashboardRepository {
+  getAllSuspendedTasks(identity: IIdentity): Promise<Array<TaskListEntry>>;
   getAllActiveCronjobs(identity: IIdentity, offset?: number, limit?: number): Promise<DataModels.Cronjobs.CronjobList>;
   getActiveCorrelations(
     identity: IIdentity,

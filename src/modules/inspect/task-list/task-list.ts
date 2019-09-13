@@ -8,33 +8,13 @@ import {DataModels} from '@process-engine/management_api_contracts';
 import {AuthenticationStateEvent, ISolutionEntry, ISolutionService} from '../../../contracts/index';
 import environment from '../../../environment';
 import {DashboardService} from '../dashboard/dashboard-service/dashboard-service';
+import {TaskListEntry, TaskSource, TaskType} from '../dashboard/contracts/index';
 
 interface ITaskListRouteParameters {
   processInstanceId?: string;
   diagramName?: string;
   correlationId?: string;
 }
-
-type TaskSource =
-  | DataModels.EmptyActivities.EmptyActivity
-  | DataModels.ManualTasks.ManualTask
-  | DataModels.UserTasks.UserTask;
-
-enum TaskType {
-  UserTask = 'UserTask',
-  ManualTask = 'ManualTask',
-  EmptyActivity = 'EmptyActivity',
-}
-
-type TaskListEntry = {
-  id: string;
-  flowNodeInstanceId?: string;
-  name: string;
-  correlationId: string;
-  processModelId: string;
-  processInstanceId: string;
-  taskType: TaskType;
-};
 
 @inject('DashboardService', Router, 'SolutionService')
 export class TaskList {
@@ -189,57 +169,11 @@ export class TaskList {
   }
 
   private async getAllTasks(): Promise<Array<TaskListEntry>> {
-    const allProcessModels: DataModels.ProcessModels.ProcessModelList = await this.dashboardService.getProcessModels(
+    const allSuspendedTasks: Array<TaskListEntry> = await this.dashboardService.getAllSuspendedTasks(
       this.activeSolutionEntry.identity,
     );
 
-    // TODO (ph): This will create 1 + n http reqeusts, where n is the number of process models in the processengine.
-    const promisesForAllUserTasks: Array<Promise<Array<TaskListEntry>>> = allProcessModels.processModels.map(
-      async (processModel: DataModels.ProcessModels.ProcessModel): Promise<Array<TaskListEntry>> => {
-        const userTaskList: DataModels.UserTasks.UserTaskList = await this.dashboardService.getUserTasksForProcessModel(
-          this.activeSolutionEntry.identity,
-          processModel.id,
-        );
-
-        return this.mapToTaskListEntry(userTaskList.userTasks, TaskType.UserTask);
-      },
-    );
-
-    const promisesForAllManualTasks: Array<Promise<Array<TaskListEntry>>> = allProcessModels.processModels.map(
-      async (processModel: DataModels.ProcessModels.ProcessModel): Promise<Array<TaskListEntry>> => {
-        const manualTaskList: DataModels.ManualTasks.ManualTaskList = await this.dashboardService.getManualTasksForProcessModel(
-          this.activeSolutionEntry.identity,
-          processModel.id,
-        );
-
-        return this.mapToTaskListEntry(manualTaskList.manualTasks, TaskType.ManualTask);
-      },
-    );
-
-    const promisesForAllEmptyActivities: Array<Promise<Array<TaskListEntry>>> = allProcessModels.processModels.map(
-      async (processModel: DataModels.ProcessModels.ProcessModel): Promise<Array<TaskListEntry>> => {
-        const emptyActivityList: DataModels.EmptyActivities.EmptyActivityList = await this.dashboardService.getEmptyActivitiesForProcessModel(
-          this.activeSolutionEntry.identity,
-          processModel.id,
-        );
-
-        return this.mapToTaskListEntry(emptyActivityList.emptyActivities, TaskType.EmptyActivity);
-      },
-    );
-    // Concatenate the Promises for requesting UserTasks and requesting ManualTasks.
-    const promisesForAllTasksForAllProcessModels: Array<TaskListEntry> = [].concat(
-      promisesForAllUserTasks,
-      promisesForAllManualTasks,
-      promisesForAllEmptyActivities,
-    );
-
-    // Await all promises.
-    const allTasksForAllProcessModels: Array<TaskListEntry> = await Promise.all(promisesForAllTasksForAllProcessModels);
-
-    // Flatten all results.
-    const allTasks: Array<TaskListEntry> = [].concat(...allTasksForAllProcessModels);
-
-    return allTasks;
+    return allSuspendedTasks;
   }
 
   private async getTasksForProcessModel(processModelId: string): Promise<Array<TaskListEntry>> {

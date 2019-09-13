@@ -11,6 +11,7 @@ import {processEngineSupportsPagination} from '../../../../services/process-engi
 import {DashboardPaginationRepository} from '../dashboard-repositories/dashboard-pagination-repository';
 import {DashboardRepository} from '../dashboard-repositories/dashboard-repository';
 import {IDashboardRepository} from '../dashboard-repositories/IDashboardRepository';
+import {TaskListEntry} from '../contracts/index';
 
 @inject(EventAggregator, 'ManagementApiClientService')
 export class DashboardService {
@@ -33,6 +34,10 @@ export class DashboardService {
         }
       },
     );
+  }
+
+  public getAllSuspendedTasks(identity: IIdentity): Promise<Array<TaskListEntry>> {
+    return this.dashboardRepository.getAllSuspendedTasks(identity);
   }
 
   public getAllActiveCronjobs(identity: IIdentity): Promise<DataModels.Cronjobs.CronjobList> {
