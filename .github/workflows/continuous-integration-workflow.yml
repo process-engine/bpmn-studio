@@ -115,6 +115,8 @@ jobs:
       run: |
         npm ci
         node ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+        npm --vs2015 install --global windows-build-tools
+      shell: powershell
 
     - name: npm build and test
       run: |
