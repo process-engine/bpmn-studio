@@ -153,9 +153,11 @@ export class TutorialService {
   }
 
   private async navigateToStartView(): Promise<void> {
+    const waitingForNavigationPromise = this.waitForNavigation();
+
     this.router.navigateToRoute('start-page');
 
-    await this.waitForNavigation();
+    await waitingForNavigationPromise;
   }
 
   private waitForNavigation(): Promise<void> {
