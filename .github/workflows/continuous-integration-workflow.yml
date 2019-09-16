@@ -56,14 +56,21 @@ jobs:
       run: |
         npm ci
         node ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
-    - name: npm build and test
+    - name: Build the web app 
       run: |
         head package.json
         ls -al
         npm run build
-        npm test
 
-        # TODO: save artifacts for webapp
+    - name: Run the tests
+      run: npm test
+
+    - uses: actions/upload-artifact@master
+      with:
+        name: dist_web
+        path: dist/web
+
+        # TODO: Include index.html with correct paths to zip
 
   build_and_test_macos:
     name: "Build & Test (macOS)"
