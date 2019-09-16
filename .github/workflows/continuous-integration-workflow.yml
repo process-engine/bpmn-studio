@@ -120,10 +120,11 @@ jobs:
       run: npm --vs2015 install --global windows-build-tools
       shell: powershell
 
-    - name: npm build and test
-      run: |
-        npm run electron-build-windows
-        npm test
+    - name: npm build
+      run: npm run electron-build-windows
+
+    - name: npm test
+      run: npm test
 
     - uses: actions/upload-artifact@master
       with:
