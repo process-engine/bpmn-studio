@@ -117,7 +117,7 @@ jobs:
         node ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
 
     - name: Install Windows build tools
-      run: npm install --global windows-build-tools
+      run: npm --vs2015 install --global windows-build-tools
       shell: powershell
 
     - name: npm build and test
