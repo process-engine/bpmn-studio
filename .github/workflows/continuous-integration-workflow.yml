@@ -123,7 +123,6 @@ jobs:
     - name: npm build and test
       run: |
         npm run electron-build-windows
-
         npm test
 
     - uses: actions/upload-artifact@master
