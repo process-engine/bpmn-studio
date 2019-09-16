@@ -2,6 +2,7 @@ import {inject} from 'aurelia-framework';
 import {EventAggregator} from 'aurelia-event-aggregator';
 import {Router} from 'aurelia-router';
 
+import uuid from 'node-uuid';
 import Driver from 'driver.js';
 import 'driver.js/dist/driver.min.css';
 
@@ -17,33 +18,20 @@ export class TutorialService {
   private notificationService: NotificationService;
   private chapters: Array<Chapter> = [];
 
+  private activeTutorial: string = '';
+
   constructor(eventAggregator: EventAggregator, notificationService: NotificationService, router: Router) {
     this.notificationService = notificationService;
     this.eventAggregator = eventAggregator;
     this.router = router;
 
     this.driver = new Driver({
-      allowClose: false,
+      allowClose: true,
       animate: false,
       showButtons: false,
-      // onDeselected: async (element: Driver.Element): Promise<void> => {
-      //   await this.waitUntillOverlayIsGone();
-
-      //   const elementId: string = (element as any).options.element;
-      //   const title: string = element.getPopover().getTitleNode().textContent;
-      //   const description: string = element.getPopover().getDescriptionNode().textContent;
-      //   const position: string = (element as any).options.popover.position;
-      //   this.driver.highlight({
-      //     element: elementId,
-      //     popover: {
-      //       title: title,
-      //       description: description,
-      //       position: position,
-      //     },
-      //   });
-
-      //   this.notificationService.showNotification(NotificationType.ERROR, 'You are not done yet!');
-      // },
+      onDeselected: async (): Promise<void> => {
+        this.activeTutorial = '';
+      },
     });
 
     this.initializeChapters();
@@ -70,6 +58,9 @@ export class TutorialService {
   }
 
   private startChapterOne: Function = async (): Promise<void> => {
+    const tutorialId: string = uuid.v4();
+    this.activeTutorial = tutorialId;
+
     await this.navigateToStartView();
     const openDiagramElementId: string = '#open-a-diagram-button';
     const deployDiagramElementId: string = '#deploy-diagram-button';
@@ -86,6 +77,11 @@ export class TutorialService {
     });
 
     await this.waitUntilDiagramIsOpen();
+
+    if (tutorialId !== this.activeTutorial) {
+      return;
+    }
+
     this.driver.reset();
     await this.waitUntilOverlayIsGone();
 
@@ -99,6 +95,11 @@ export class TutorialService {
     });
 
     await this.waitUntilDiagramIsDeployed();
+
+    if (tutorialId !== this.activeTutorial) {
+      return;
+    }
+
     this.driver.reset();
     await this.waitUntilOverlayIsGone();
 
@@ -114,10 +115,17 @@ export class TutorialService {
     await this.waitUntilDiagramIsStarted();
     this.driver.reset();
     await this.waitUntilOverlayIsGone();
+
+    this.activeTutorial = '';
   };
 
   private startChapterTwo: Function = (): void => {
+    const tutorialId: string = uuid.v4();
+    this.activeTutorial = tutorialId;
+
     this.notificationService.showNotification(NotificationType.INFO, 'This chapter is not yet implemented.');
+
+    this.activeTutorial = '';
   };
 
   private waitUntilDiagramIsOpen(): Promise<void> {
