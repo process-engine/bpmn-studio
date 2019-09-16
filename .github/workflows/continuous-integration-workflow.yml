@@ -90,7 +90,7 @@ jobs:
       run: |
         npm run electron-build-macos
 
-        npm run test-electron
+        npm test
 
     - uses: actions/upload-artifact@master
       with:
@@ -116,15 +116,11 @@ jobs:
         npm ci
         node ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
 
-    - name: Install Windows build tools
-      run: npm --vs2015 install --global windows-build-tools
-      shell: powershell
-
     - name: npm build and test
       run: |
         npm run electron-build-windows
 
-        npm run test-electron
+        npm test
 
     - uses: actions/upload-artifact@master
       with:

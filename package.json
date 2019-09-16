@@ -16,7 +16,7 @@
     "electron-build-windows": "npm run electron-prepare && electron-builder --config build/electron-builder.yml --publish never --windows && npm run electron-cleanup",
     "electron-build-macos": "npm run electron-prepare && electron-builder --config build/electron-builder.yml --publish never --macos && npm run electron-cleanup",
     "electron-cleanup": "node electron-builder/reset-name-in-package-json.js",
-    "electron-prepare": "electron-builder install-app-deps && node electron-builder/set-name-in-package-json.js && npm run build && node electron-builder/prepare-electron-build.js",
+    "electron-prepare": "node electron-builder/set-name-in-package-json.js && npm run build && node electron-builder/prepare-electron-build.js",
     "electron-rebuild": "electron-rebuild",
     "electron-rebuild-sqlite-forced": "electron-rebuild -f -w sqlite3",
     "electron-start-dev": "npm run build && electron dist/electron_app/electron_app/electron.js",
