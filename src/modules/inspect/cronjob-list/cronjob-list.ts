@@ -57,7 +57,7 @@ export class CronjobList {
 
     await this.updateCronjobs();
 
-    if (this.processEngineSupportsCronjobEvents) {
+    if (this.processEngineSupportsCronjobEvents()) {
       this.subscribeToEvents();
     } else {
       this.startPolling();
@@ -197,7 +197,7 @@ export class CronjobList {
     });
   }
 
-  private get processEngineSupportsCronjobEvents(): boolean {
+  private processEngineSupportsCronjobEvents(): boolean {
     const processEngineVersion: string = this.activeSolutionEntry.processEngineVersion;
 
     const solutionEntryPEVersion = new SemVer(processEngineVersion);
