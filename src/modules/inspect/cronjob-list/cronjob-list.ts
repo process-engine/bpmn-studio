@@ -2,9 +2,12 @@ import {bindable, computedFrom, inject, observable} from 'aurelia-framework';
 
 import * as Bluebird from 'bluebird';
 
-import {DataModels} from '@process-engine/management_api_contracts';
+import {DataModels,DataModels, IManagementApiClient} from '@process-engine/management_api_contracts';
+
 
 import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
+import {SemVer} from 'semver';
+
 import {ISolutionEntry} from '../../../contracts/index';
 import environment from '../../../environment';
 import {getBeautifiedDate} from '../../../services/date-service/date.service';
@@ -54,29 +57,16 @@ export class CronjobList {
 
     await this.updateCronjobs();
 
-    this.managementApiService.onCronjobCreated(this.activeSolutionEntry.identity, async () => {
-      await this.updateCronjobs();
-    });
-
-    this.managementApiService.onCronjobExecuted(this.activeSolutionEntry.identity, async () => {
-      await this.updateCronjobs();
-    });
-
-    this.managementApiService.onCronjobStopped(this.activeSolutionEntry.identity, async () => {
-      await this.updateCronjobs();
-    });
-
-    this.managementApiService.onCronjobUpdated(this.activeSolutionEntry.identity, async () => {
-      await this.updateCronjobs();
-    });
-
-    this.managementApiService.onCronjobRemoved(this.activeSolutionEntry.identity, async () => {
-      await this.updateCronjobs();
-    });
+    if (this.processEngineSupportsCronjobEvents) {
+      this.subscribeToEvents();
+    } else {
+      this.startPolling();
+    }
   }
 
   public detached(): void {
     this.isAttached = false;
+    clearTimeout(this.pollingTimeout);
   }
 
   public currentPageChanged(): void {
@@ -164,5 +154,68 @@ export class CronjobList {
     secondCronjob: DataModels.Cronjobs.CronjobConfiguration,
   ): number {
     return firstCronjob.nextExecution.getTime() - secondCronjob.nextExecution.getTime();
+  }
+
+  private startPolling(): void {
+    this.pollingTimeout = setTimeout(async () => {
+      await this.updateCronjobs();
+
+      if (this.isAttached) {
+        this.startPolling();
+      }
+    }, environment.processengine.dashboardPollingIntervalInMs);
+  }
+
+  private subscribeToEvents(): void {
+    this.managementApiService.onCronjobCreated(this.activeSolutionEntry.identity, async (message) => {
+      console.log(message);
+      await this.updateCronjobs();
+    });
+
+    this.managementApiService.onCronjobExecuted(this.activeSolutionEntry.identity, async (message) => {
+      console.log(message);
+
+      await this.updateCronjobs();
+    });
+
+    this.managementApiService.onCronjobStopped(this.activeSolutionEntry.identity, async (message) => {
+      console.log(message);
+
+      await this.updateCronjobs();
+    });
+
+    this.managementApiService.onCronjobUpdated(this.activeSolutionEntry.identity, async (message) => {
+      console.log(message);
+
+      await this.updateCronjobs();
+    });
+
+    this.managementApiService.onCronjobRemoved(this.activeSolutionEntry.identity, async (message) => {
+      console.log(message);
+
+      await this.updateCronjobs();
+    });
+  }
+
+  private get processEngineSupportsCronjobEvents(): boolean {
+    const processEngineVersion: string = this.activeSolutionEntry.processEngineVersion;
+
+    const solutionEntryPEVersion = new SemVer(processEngineVersion);
+
+    const alphaVersionWithEvents = new SemVer('8.6.0-alpha.18');
+    const betaVersionWithEvents = new SemVer('8.6.0-beta.2');
+    const stableVersionWithEvents = new SemVer('8.6.0');
+
+    const solutionEntryIsAlpha: boolean = solutionEntryPEVersion.prerelease[0] === 'alpha';
+    const solutionEntryIsBeta: boolean = solutionEntryPEVersion.prerelease[0] === 'beta';
+
+    if (solutionEntryIsAlpha) {
+      return solutionEntryPEVersion.compare(alphaVersionWithEvents) >= 0;
+    }
+    if (solutionEntryIsBeta) {
+      return solutionEntryPEVersion.compare(betaVersionWithEvents) >= 0;
+    }
+
+    return solutionEntryPEVersion.compare(stableVersionWithEvents) >= 0;
   }
 }
