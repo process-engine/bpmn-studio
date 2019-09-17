@@ -719,6 +719,9 @@ function getHelpMenu(): MenuItem {
       },
     },
     {
+      type: 'separator',
+    },
+    {
       label: 'Export Databases',
       click: async (): Promise<void> => {
         try {
@@ -987,8 +990,11 @@ async function exportDatabases(): Promise<void> {
     img.file(filename, fs.readFileSync(filePath), {base64: true});
   });
 
+  // eslint-disable-next-line newline-per-chained-call
+  const now = new Date().toISOString().replace(/:/g, '-');
+
   const savePath: string = dialog.showSaveDialogSync({
-    defaultPath: `database-backup-${new Date().toISOString()}.zip`,
+    defaultPath: `database-backup-${now}.zip`,
     filters: [
       {
         name: 'zip',
