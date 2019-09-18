@@ -235,7 +235,7 @@ export class DashboardRepository implements IDashboardRepository {
           processModel.id,
         );
 
-        return this.mapToTaskListEntry(userTaskList.userTasks, TaskType.UserTask);
+        return this.mapTasksToTaskListEntry(userTaskList.userTasks, TaskType.UserTask);
       },
     );
 
@@ -246,7 +246,7 @@ export class DashboardRepository implements IDashboardRepository {
           processModel.id,
         );
 
-        return this.mapToTaskListEntry(manualTaskList.manualTasks, TaskType.ManualTask);
+        return this.mapTasksToTaskListEntry(manualTaskList.manualTasks, TaskType.ManualTask);
       },
     );
 
@@ -257,7 +257,7 @@ export class DashboardRepository implements IDashboardRepository {
           processModel.id,
         );
 
-        return this.mapToTaskListEntry(emptyActivityList.emptyActivities, TaskType.EmptyActivity);
+        return this.mapTasksToTaskListEntry(emptyActivityList.emptyActivities, TaskType.EmptyActivity);
       },
     );
     // Concatenate the Promises for requesting UserTasks and requesting ManualTasks.
@@ -276,7 +276,7 @@ export class DashboardRepository implements IDashboardRepository {
     return allTasks;
   }
 
-  private mapToTaskListEntry(tasks: Array<TaskSource>, targetType: TaskType): Array<TaskListEntry> {
+  private mapTasksToTaskListEntry(tasks: Array<TaskSource>, targetType: TaskType): Array<TaskListEntry> {
     const mappedTasks: Array<TaskListEntry> = tasks.map(
       (task: TaskSource): TaskListEntry => {
         return {

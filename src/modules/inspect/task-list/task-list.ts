@@ -192,9 +192,12 @@ export class TaskList {
       processModelId,
     );
 
-    const userTasks: Array<TaskListEntry> = this.mapToTaskListEntry(userTaskList.userTasks, TaskType.UserTask);
-    const manualTasks: Array<TaskListEntry> = this.mapToTaskListEntry(manualTaskList.manualTasks, TaskType.ManualTask);
-    const emptyActivities: Array<TaskListEntry> = this.mapToTaskListEntry(
+    const userTasks: Array<TaskListEntry> = this.mapTasksToTaskListEntry(userTaskList.userTasks, TaskType.UserTask);
+    const manualTasks: Array<TaskListEntry> = this.mapTasksToTaskListEntry(
+      manualTaskList.manualTasks,
+      TaskType.ManualTask,
+    );
+    const emptyActivities: Array<TaskListEntry> = this.mapTasksToTaskListEntry(
       emptyActivityList.emptyActivities,
       TaskType.EmptyActivity,
     );
@@ -233,11 +236,14 @@ export class TaskList {
       correlationId,
     );
 
-    const userTasks: Array<TaskListEntry> = this.mapToTaskListEntry(userTaskList.userTasks, TaskType.UserTask);
+    const userTasks: Array<TaskListEntry> = this.mapTasksToTaskListEntry(userTaskList.userTasks, TaskType.UserTask);
 
-    const manualTasks: Array<TaskListEntry> = this.mapToTaskListEntry(manualTaskList.manualTasks, TaskType.ManualTask);
+    const manualTasks: Array<TaskListEntry> = this.mapTasksToTaskListEntry(
+      manualTaskList.manualTasks,
+      TaskType.ManualTask,
+    );
 
-    const emptyActivities: Array<TaskListEntry> = this.mapToTaskListEntry(
+    const emptyActivities: Array<TaskListEntry> = this.mapTasksToTaskListEntry(
       emptyActivityList.emptyActivities,
       TaskType.EmptyActivity,
     );
@@ -261,12 +267,15 @@ export class TaskList {
       processInstanceId,
     );
 
-    const userTasksAndProcessModels: Array<TaskListEntry> = this.mapToTaskListEntry(
+    const userTasksAndProcessModels: Array<TaskListEntry> = this.mapTasksToTaskListEntry(
       userTaskList.userTasks,
       TaskType.UserTask,
     );
-    const manualTasks: Array<TaskListEntry> = this.mapToTaskListEntry(manualTaskList.manualTasks, TaskType.ManualTask);
-    const emptyActivities: Array<TaskListEntry> = this.mapToTaskListEntry(
+    const manualTasks: Array<TaskListEntry> = this.mapTasksToTaskListEntry(
+      manualTaskList.manualTasks,
+      TaskType.ManualTask,
+    );
+    const emptyActivities: Array<TaskListEntry> = this.mapTasksToTaskListEntry(
       emptyActivityList.emptyActivities,
       TaskType.EmptyActivity,
     );
@@ -274,7 +283,7 @@ export class TaskList {
     return [].concat(userTasksAndProcessModels, manualTasks, emptyActivities);
   }
 
-  private mapToTaskListEntry(tasks: Array<TaskSource>, targetType: TaskType): Array<TaskListEntry> {
+  private mapTasksToTaskListEntry(tasks: Array<TaskSource>, targetType: TaskType): Array<TaskListEntry> {
     const mappedTasks: Array<TaskListEntry> = tasks.map(
       (task: TaskSource): TaskListEntry => {
         return {
