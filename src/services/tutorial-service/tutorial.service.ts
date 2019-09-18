@@ -29,6 +29,7 @@ export class TutorialService {
       allowClose: true,
       animate: false,
       showButtons: false,
+      padding: 2,
       onDeselected: async (): Promise<void> => {
         this.activeTutorial = '';
       },
