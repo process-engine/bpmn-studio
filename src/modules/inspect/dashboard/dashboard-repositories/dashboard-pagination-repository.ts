@@ -1,7 +1,7 @@
 import {DataModels} from '@process-engine/management_api_contracts';
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {DashboardRepository} from './dashboard-repository';
-import {TaskListEntry} from '../contracts';
+import {TaskListEntry, TaskType} from '../contracts/index';
 
 export class DashboardPaginationRepository extends DashboardRepository {
   public getAllActiveCronjobs(identity: IIdentity): Promise<DataModels.Cronjobs.CronjobList> {
@@ -80,13 +80,44 @@ export class DashboardPaginationRepository extends DashboardRepository {
   }
 
   public async getAllSuspendedTasks(identity: IIdentity): Promise<Array<TaskListEntry>> {
-    const taskList: DataModels.Tasks.TaskList = await this.managementApiService.getAllSuspendedTasks(identity);
-    const allTasks: Array<TaskListEntry> = [].concat(
-      taskList.emptyActivities,
-      taskList.manualTasks,
-      taskList.userTasks,
+    const taskList: DataModels.FlowNodeInstances.TaskList = await this.managementApiService.getAllSuspendedTasks(
+      identity,
     );
 
-    return allTasks;
+    return this.mapTaskListToTaskListEntry(taskList);
+  }
+
+  private mapTaskListToTaskListEntry(taskList: DataModels.FlowNodeInstances.TaskList): Array<TaskListEntry> {
+    const taskListEntries: Array<TaskListEntry> = taskList.tasks.map((task) => {
+      return {
+        correlationId: task.correlationId,
+        id: task.id,
+        flowNodeInstanceId: task.flowNodeInstanceId,
+        processInstanceId: task.processInstanceId,
+        processModelId: task.processModelId,
+        name: task.name,
+        taskType: this.getTaskTypeByFlowNodeType(task.flowNodeType),
+      };
+    });
+
+    return taskListEntries;
+  }
+
+  private getTaskTypeByFlowNodeType(flowNodeType: string): TaskType {
+    const isUserTask: boolean = flowNodeType === 'bpmn:UserTask';
+    const isManualTask: boolean = flowNodeType === 'bpmn:ManualTask';
+    const isEmptyActivity: boolean = flowNodeType === 'bpmn:Task';
+
+    if (isUserTask) {
+      return TaskType.UserTask;
+    }
+    if (isManualTask) {
+      return TaskType.ManualTask;
+    }
+    if (isEmptyActivity) {
+      return TaskType.EmptyActivity;
+    }
+
+    return undefined;
   }
 }
