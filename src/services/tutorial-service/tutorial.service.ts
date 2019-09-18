@@ -165,6 +165,11 @@ export class TutorialService {
   }
 
   private async navigateToStartView(): Promise<void> {
+    const isAlreadyOnStartPage: boolean = this.router.currentInstruction.config.name === 'start-page';
+    if (isAlreadyOnStartPage) {
+      return;
+    }
+
     const waitingForNavigationPromise = this.waitForNavigation();
 
     this.router.navigateToRoute('start-page');
