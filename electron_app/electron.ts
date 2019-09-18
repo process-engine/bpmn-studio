@@ -1,6 +1,9 @@
+/* eslint-disable max-lines */
 import fs from 'fs';
 import path from 'path';
 import {homedir} from 'os';
+
+import JSZip from 'jszip';
 
 import {
   App,
@@ -715,6 +718,19 @@ function getHelpMenu(): MenuItem {
         electron.shell.openExternal(currentReleaseNotesUrl);
       },
     },
+    {
+      type: 'separator',
+    },
+    {
+      label: 'Export Databases',
+      click: async (): Promise<void> => {
+        try {
+          await exportDatabases();
+        } catch (error) {
+          browserWindow.webContents.send('database-export-error', error.message);
+        }
+      },
+    },
   ];
 
   const submenu: Menu = electron.Menu.buildFromTemplate(submenuOptions);
@@ -769,7 +785,7 @@ async function startInternalProcessEngine(): Promise<any> {
 
   process.env.http__http_extension__server__port = `${port}`;
 
-  const processEngineDatabaseFolderName = 'process_engine_databases';
+  const processEngineDatabaseFolderName = getProcessEngineDatabaseFolderName();
 
   process.env.process_engine__process_model_repository__storage = path.join(
     userDataFolderPath,
@@ -841,7 +857,7 @@ async function startInternalProcessEngine(): Promise<any> {
   // TODO: Check if the ProcessEngine instance is now run on the UI thread.
   // See issue https://github.com/process-engine/bpmn-studio/issues/312
   try {
-    const sqlitePath = path.join(getConfigFolder(), processEngineDatabaseFolderName);
+    const sqlitePath = getDatabaseFolder();
 
     // eslint-disable-next-line global-require
     pe.startRuntime(sqlitePath);
@@ -865,6 +881,14 @@ async function startInternalProcessEngine(): Promise<any> {
       internalProcessEngineStartupError,
     );
   }
+}
+
+function getDatabaseFolder(): string {
+  return path.join(getConfigFolder(), getProcessEngineDatabaseFolderName());
+}
+
+function getProcessEngineDatabaseFolderName(): string {
+  return 'process_engine_databases';
 }
 
 function sendInternalProcessEngineStatus(
@@ -949,6 +973,61 @@ function bringExistingInstanceToForeground(): void {
 
     browserWindow.focus();
   }
+}
+
+async function exportDatabases(): Promise<void> {
+  const zip = new JSZip();
+
+  const img = zip.folder('databases');
+
+  const foldername: string = getDatabaseFolder();
+
+  const files: Array<string> = await getFilenamesOfFilesInFolder(foldername);
+
+  files.forEach((filename: string) => {
+    const filePath: string = `${foldername}/${filename}`;
+
+    img.file(filename, fs.readFileSync(filePath), {base64: true});
+  });
+
+  // eslint-disable-next-line newline-per-chained-call
+  const now = new Date().toISOString().replace(/:/g, '-');
+
+  const savePath: string = dialog.showSaveDialogSync({
+    defaultPath: `database-backup-${now}.zip`,
+    filters: [
+      {
+        name: 'zip',
+        extensions: ['zip'],
+      },
+      {
+        name: 'All Files',
+        extensions: ['*'],
+      },
+    ],
+  });
+
+  if (!savePath) {
+    return;
+  }
+
+  zip.generateAsync({type: 'nodebuffer'}).then((content) => {
+    fs.writeFileSync(savePath, content);
+  });
+}
+
+function getFilenamesOfFilesInFolder(foldername): Promise<Array<string>> {
+  return new Promise((resolve: Function, reject: Function): void => {
+    fs.readdir(foldername, (error: Error, fileNames: Array<string>): void => {
+      if (error) {
+        reject(new Error(`Unable to scan directory: ${error}`));
+
+        return;
+      }
+
+      resolve(fileNames);
+    });
+  });
 }
 
 execute();
