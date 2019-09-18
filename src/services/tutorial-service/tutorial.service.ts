@@ -41,6 +41,10 @@ export class TutorialService {
     return this.chapters;
   }
 
+  public getChapter(index): Chapter {
+    return this.chapters[index];
+  }
+
   private initializeChapters(): void {
     this.chapters = [
       {

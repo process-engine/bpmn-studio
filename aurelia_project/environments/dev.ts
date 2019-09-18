@@ -112,7 +112,6 @@ export default {
       diagramOpened: 'tutorial:diagram:opened',
       diagramDeployed: 'tutorial:diagram:deployed',
       diagramStarted: 'tutorial:diagram:started',
-      toggleChapterSelection: 'tutorial:chapterSelection:toggle',
     },
   },
   baseRoute: processEngineRoute,

@@ -14,7 +14,8 @@ import environment from './environment';
 import {NotificationService} from './services/notification-service/notification.service';
 
 import {oidcConfig} from './open-id-connect-configuration';
-@inject(OpenIdConnect, 'NotificationService', EventAggregator)
+import {TutorialService} from './services/tutorial-service/tutorial.service';
+@inject(OpenIdConnect, 'NotificationService', EventAggregator, TutorialService)
 export class App {
   public showSolutionExplorer: boolean = false;
 
@@ -26,16 +27,19 @@ export class App {
   private preventDefaultBehaviour: EventListener;
   private ipcRenderer: any | null = null;
   private router: Router;
-  private showChapterSelection: boolean = false;
+
+  private tutorialService: TutorialService;
 
   constructor(
     openIdConnect: OpenIdConnect,
     notificationService: NotificationService,
     eventAggregator: EventAggregator,
+    tutorialService: TutorialService,
   ) {
     this.openIdConnect = openIdConnect;
     this.notificationService = notificationService;
     this.eventAggregator = eventAggregator;
+    this.tutorialService = tutorialService;
 
     if (this.isRunningInElectron) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
@@ -82,17 +86,6 @@ export class App {
           }
         },
       ),
-      this.eventAggregator.subscribe(environment.events.processSolutionPanel.toggleProcessSolutionExplorer, () => {
-        this.showSolutionExplorer = !this.showSolutionExplorer;
-        if (this.showSolutionExplorer) {
-          window.localStorage.setItem('SolutionExplorerVisibility', 'true');
-        } else {
-          window.localStorage.setItem('SolutionExplorerVisibility', 'false');
-        }
-      }),
-      this.eventAggregator.subscribe(environment.events.tutorial.toggleChapterSelection, () => {
-        this.showChapterSelection = !this.showChapterSelection;
-      }),
     ];
 
     /*
@@ -123,6 +116,12 @@ export class App {
 
     if (this.isRunningInElectron) {
       this.ipcRenderer.on('menubar__open_preferences', this.openPreferences);
+
+      this.ipcRenderer.on('menubar__start_tutorial', (event: Event, chapterIndex: number) => {
+        const selectedChapter = this.tutorialService.getChapter(chapterIndex);
+
+        selectedChapter.start();
+      });
     }
   }
 

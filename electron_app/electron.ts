@@ -708,6 +708,13 @@ function getHelpMenu(): MenuItem {
       },
     },
     {
+      label: 'Tutorial',
+      submenu: getTutorialMenu(),
+    },
+    {
+      type: 'separator',
+    },
+    {
       label: 'Release Notes',
       click: (): void => {
         const currentVersion = app.getVersion();
@@ -755,6 +762,26 @@ function getHelpMenu(): MenuItem {
   };
 
   return new MenuItem(menuOptions);
+}
+
+function getTutorialMenu(): Menu {
+  const submenuOptions: Array<MenuItemConstructorOptions> = [
+    {
+      label: 'Tutorial 1',
+      click: (): void => {
+        browserWindow.webContents.send('menubar__start_tutorial', 0);
+      },
+    },
+    {
+      label: 'Tutorial 2',
+      click: (): void => {
+        browserWindow.webContents.send('menubar__start_tutorial', 1);
+      },
+    },
+  ];
+  const submenu: Menu = electron.Menu.buildFromTemplate(submenuOptions);
+
+  return submenu;
 }
 
 function getAboutWindowInfo(): AboutWindowInfo {

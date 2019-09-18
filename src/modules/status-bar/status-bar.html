@@ -8,7 +8,6 @@
       <a if.bind="updateAvailable" class="update-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <img class="update-button-icon" src="src/resources/images/icon.png" title.bind="isDownloading ? updateProgressData.percent.toString() + '%' : 'Update available.'">
       </a>
-      <a class="tutorial-button" title="Toggle chapter selection" click.delegate="toggleChapterSelection($event)"><i class="fas fa-graduation-cap"></i></a>
       <div class="dropdown-menu update-dropdown" ref="updateDropdown">
         <template if.bind="!isDownloading && !updateDownloadFinished">
           <div class="update-dropdown-title-container">
