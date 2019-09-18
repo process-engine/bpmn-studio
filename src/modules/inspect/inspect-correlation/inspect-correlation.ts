@@ -52,7 +52,11 @@ export class InspectCorrelation {
         this.activeSolutionEntry.identity,
       );
 
+      console.log(correlationList);
+
       this.correlations = correlationList.correlations;
+
+      console.log(this.correlations);
     } catch (error) {
       this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
       this.correlations = [];
@@ -145,7 +149,9 @@ export class InspectCorrelation {
           this.activeSolutionEntry.identity,
         );
 
+        console.log(correlationList);
         this.correlations = correlationList.correlations;
+        console.log(this.correlations);
       } catch (error) {
         this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
         this.correlations = [];

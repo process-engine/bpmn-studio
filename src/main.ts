@@ -42,6 +42,7 @@ export function configure(aurelia: Aurelia): void {
     .feature('services/user-config-service')
     .feature('services/diagram-validation-service')
     .feature('modules/management-api_client')
+    .feature('services/process-engine-version-service')
     .feature('services/authentication-service')
     /*
      * The services/solution-explorer-services has a hard dependency on
