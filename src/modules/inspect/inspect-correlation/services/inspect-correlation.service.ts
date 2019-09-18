@@ -16,14 +16,14 @@ export class InspectCorrelationService implements IInspectCorrelationService {
   public getAllCorrelationsForProcessModelId(
     processModelId: string,
     identity: IIdentity,
-  ): Promise<Array<DataModels.Correlations.Correlation>> {
+  ): Promise<DataModels.Correlations.CorrelationList> {
     return this.inspectCorrelationRepository.getAllCorrelationsForProcessModelId(processModelId, identity);
   }
 
   public getLogsForCorrelation(
     correlation: DataModels.Correlations.Correlation,
     identity: IIdentity,
-  ): Promise<Array<DataModels.Logging.LogEntry>> {
+  ): Promise<Array<DataModels.Logging.LogEntryList>> {
     return this.inspectCorrelationRepository.getLogsForCorrelation(correlation, identity);
   }
 
@@ -31,7 +31,7 @@ export class InspectCorrelationService implements IInspectCorrelationService {
     processModelId: string,
     processInstanceId: string,
     identity: IIdentity,
-  ): Promise<Array<DataModels.Logging.LogEntry>> {
+  ): Promise<DataModels.Logging.LogEntryList> {
     return this.inspectCorrelationRepository.getLogsForProcessInstance(processModelId, processInstanceId, identity);
   }
 
@@ -43,9 +43,7 @@ export class InspectCorrelationService implements IInspectCorrelationService {
   ): Promise<DataModels.TokenHistory.TokenHistoryGroup | undefined> {
     try {
       const tokenHistory: DataModels.TokenHistory.TokenHistoryGroup = {};
-      const tokenForFlowNodeInstance: Array<
-        DataModels.TokenHistory.TokenHistoryEntry
-      > = await this.inspectCorrelationRepository.getTokenForFlowNodeInstance(
+      const tokenForFlowNodeInstance: DataModels.TokenHistory.TokenHistoryEntryList = await this.inspectCorrelationRepository.getTokenForFlowNodeInstance(
         processModelId,
         correlationId,
         flowNodeId,

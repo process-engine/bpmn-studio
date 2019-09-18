@@ -2,14 +2,14 @@
 import {inject} from 'aurelia-framework';
 
 import {IIdentity} from '@essential-projects/iam_contracts';
-import {ManagementApiClientService} from '@process-engine/management_api_client';
+import {ManagementApiClient} from '@process-engine/management_api_client';
 import {DataModels} from '@process-engine/management_api_contracts';
 
 import {IHeatmapRepository} from '../contracts/IHeatmap.Repository';
 
 @inject('ManagementApiClientService')
 export class HeatmapMockRepository implements IHeatmapRepository {
-  private managementApiClient: ManagementApiClientService;
+  private managementApiClient: ManagementApiClient;
   private identity: IIdentity;
 
   private mockDataForHeatmapSampleProcess: Array<DataModels.Kpi.FlowNodeRuntimeInformation> = [
@@ -1779,7 +1779,7 @@ export class HeatmapMockRepository implements IHeatmapRepository {
     },
   ];
 
-  constructor(manegementApiClient: ManagementApiClientService) {
+  constructor(manegementApiClient: ManagementApiClient) {
     this.managementApiClient = manegementApiClient;
   }
 
@@ -1789,13 +1789,13 @@ export class HeatmapMockRepository implements IHeatmapRepository {
 
   public getRuntimeInformationForProcessModel(
     processModelId: string,
-  ): Promise<Array<DataModels.Kpi.FlowNodeRuntimeInformation>> {
+  ): Promise<DataModels.Kpi.FlowNodeRuntimeInformationList> {
     return new Promise((resolve: Function, reject: Function): void => {
       resolve(this.mockDataForHeatmapSampleProcess);
     });
   }
 
-  public getActiveTokensForFlowNode(flowNodeId: string): Promise<Array<DataModels.Kpi.ActiveToken>> {
+  public getActiveTokensForFlowNode(flowNodeId: string): Promise<DataModels.Kpi.ActiveTokenList> {
     return new Promise((resolve: Function, reject: Function): void => {
       const newArray: Array<DataModels.Kpi.ActiveToken> = this.mockDataForActiveTokens.filter(
         (element: DataModels.Kpi.ActiveToken) => {

@@ -1,22 +1,22 @@
 import {inject} from 'aurelia-framework';
 
 import {IIdentity} from '@essential-projects/iam_contracts';
-import {DataModels, IManagementApi} from '@process-engine/management_api_contracts';
+import {DataModels, IManagementApiClient} from '@process-engine/management_api_contracts';
 
 import {IHeatmapRepository} from '../contracts/IHeatmap.Repository';
 
 @inject('ManagementApiClientService')
 export class HeatmapRepository implements IHeatmapRepository {
-  private managementApiClientService: IManagementApi;
+  private managementApiClientService: IManagementApiClient;
   private identity: IIdentity;
 
-  constructor(managementApiClientService: IManagementApi) {
+  constructor(managementApiClientService: IManagementApiClient) {
     this.managementApiClientService = managementApiClientService;
   }
 
   public getRuntimeInformationForProcessModel(
     processModelId: string,
-  ): Promise<Array<DataModels.Kpi.FlowNodeRuntimeInformation>> {
+  ): Promise<DataModels.Kpi.FlowNodeRuntimeInformationList> {
     return this.managementApiClientService.getRuntimeInformationForProcessModel(this.identity, processModelId);
   }
 
@@ -24,7 +24,7 @@ export class HeatmapRepository implements IHeatmapRepository {
     return this.managementApiClientService.getProcessModelById(this.identity, processModelId);
   }
 
-  public getActiveTokensForFlowNode(flowNodeId: string): Promise<Array<DataModels.Kpi.ActiveToken>> {
+  public getActiveTokensForFlowNode(flowNodeId: string): Promise<DataModels.Kpi.ActiveTokenList> {
     return this.managementApiClientService.getActiveTokensForFlowNode(this.identity, flowNodeId);
   }
 

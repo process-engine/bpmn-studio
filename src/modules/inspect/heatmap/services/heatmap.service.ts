@@ -38,11 +38,11 @@ export class HeatmapService implements IHeatmapService {
 
   public getRuntimeInformationForProcessModel(
     processModelId: string,
-  ): Promise<Array<DataModels.Kpi.FlowNodeRuntimeInformation>> {
+  ): Promise<DataModels.Kpi.FlowNodeRuntimeInformationList> {
     return this.heatmapRepository.getRuntimeInformationForProcessModel(processModelId);
   }
 
-  public getActiveTokensForFlowNode(flowNodeId: string): Promise<Array<DataModels.Kpi.ActiveToken>> {
+  public getActiveTokensForFlowNode(flowNodeId: string): Promise<DataModels.Kpi.ActiveTokenList> {
     return this.heatmapRepository.getActiveTokensForFlowNode(flowNodeId);
   }
 
@@ -79,7 +79,7 @@ export class HeatmapService implements IHeatmapService {
     };
 
     const elementsForOverlays: Array<IShape> = this.getElementsForOverlays(elementRegistry);
-    const activeTokenListArray: Array<Array<DataModels.Kpi.ActiveToken>> = await this.getActiveTokenListArray(
+    const activeTokenListArray: Array<DataModels.Kpi.ActiveTokenList> = await this.getActiveTokenListArray(
       elementsForOverlays,
       processModelId,
     );
@@ -88,7 +88,9 @@ export class HeatmapService implements IHeatmapService {
 
     const elementsWithoutToken: Array<IShape> = this.getElementsWithoutToken(elementsForOverlays, activeTokenListArray);
 
-    activeTokenListArray.forEach((activeTokenArray: Array<DataModels.Kpi.ActiveToken & {type: string}>) => {
+    activeTokenListArray.forEach((activeTokenList: DataModels.Kpi.ActiveTokenList) => {
+      const activeTokenArray = activeTokenList.activeTokens as Array<DataModels.Kpi.ActiveToken & {type: string}>;
+
       const elementIsEvent: boolean = this.elementIsEvent(activeTokenArray[0].type);
       const elementIsGateway: boolean = this.elementIsGateway(activeTokenArray[0].type);
       const elementIsTask: boolean = this.elementIsTask(activeTokenArray[0].type);
@@ -338,64 +340,65 @@ export class HeatmapService implements IHeatmapService {
   private async getActiveTokenListArray(
     elementsForOverlays: Array<IShape>,
     processModelId: string,
-  ): Promise<Array<Array<DataModels.Kpi.ActiveToken>>> {
-    const promisesForElements: Array<Promise<Array<DataModels.Kpi.ActiveToken>>> = elementsForOverlays.map(
+  ): Promise<Array<DataModels.Kpi.ActiveTokenList>> {
+    const promisesForElements: Array<Promise<DataModels.Kpi.ActiveTokenList>> = elementsForOverlays.map(
       async (element: IShape) => {
-        const elementsActiveTokens: Array<DataModels.Kpi.ActiveToken> = await this.getActiveTokensForFlowNode(
-          element.id,
-        );
+        const activeTokenList: DataModels.Kpi.ActiveTokenList = await this.getActiveTokensForFlowNode(element.id);
 
-        const elementActiveTokensForProcessModel: Array<DataModels.Kpi.ActiveToken> = elementsActiveTokens.filter(
-          (token: DataModels.Kpi.ActiveToken) => {
-            const tokenIsInProcessModel: boolean = token.processModelId === processModelId;
+        const elementActiveTokensForProcessModel: Array<
+          DataModels.Kpi.ActiveToken
+        > = activeTokenList.activeTokens.filter((token: DataModels.Kpi.ActiveToken) => {
+          const tokenIsInProcessModel: boolean = token.processModelId === processModelId;
 
-            return tokenIsInProcessModel;
-          },
-        );
+          return tokenIsInProcessModel;
+        });
 
-        return elementActiveTokensForProcessModel;
+        return {
+          activeTokens: elementActiveTokensForProcessModel,
+          totalCount: elementActiveTokensForProcessModel.length,
+        };
       },
     );
 
-    const activeTokenListArrayForAllElements: Array<Array<DataModels.Kpi.ActiveToken>> = await Promise.all(
+    const activeTokenListArrayForAllElements: Array<DataModels.Kpi.ActiveTokenList> = await Promise.all(
       promisesForElements,
     );
 
     const filteredActiveTokenListArray: Array<
-      Array<DataModels.Kpi.ActiveToken>
-    > = activeTokenListArrayForAllElements.filter((element: Array<DataModels.Kpi.ActiveToken>) => {
-      const arrayIsEmpty: boolean = element.length !== 0;
+      DataModels.Kpi.ActiveTokenList
+    > = activeTokenListArrayForAllElements.filter((element: DataModels.Kpi.ActiveTokenList) => {
+      const arrayIsNotEmpty: boolean = element.totalCount !== 0;
 
-      return arrayIsEmpty;
+      return arrayIsNotEmpty;
     });
 
     return filteredActiveTokenListArray;
   }
 
   private addShapeTypeToActiveToken(
-    activeTokenListArray: Array<Array<DataModels.Kpi.ActiveToken>>,
+    activeTokenListArray: Array<DataModels.Kpi.ActiveTokenList>,
     elementsForOverlays: Array<IShape>,
   ): void {
-    activeTokenListArray.forEach((activeTokenArray: Array<DataModels.Kpi.ActiveToken & {type: string}>) => {
+    activeTokenListArray.forEach((activeTokenList: DataModels.Kpi.ActiveTokenList) => {
       const elementOfActiveToken: IShape = elementsForOverlays.find((element: IShape) => {
-        const isCorrectElement: boolean = element.id === activeTokenArray[0].flowNodeId;
+        const isCorrectElement: boolean = element.id === activeTokenList.activeTokens[0].flowNodeId;
 
         return isCorrectElement;
       });
 
       // eslint-disable-next-line no-param-reassign
-      activeTokenArray[0].type = elementOfActiveToken.type;
+      (activeTokenList.activeTokens[0] as any).type = elementOfActiveToken.type;
     });
   }
 
   private getElementsWithoutToken(
     elementsForOverlays: Array<IShape>,
-    activeTokenListArray: Array<Array<DataModels.Kpi.ActiveToken>>,
+    activeTokenListArray: Array<DataModels.Kpi.ActiveTokenList>,
   ): Array<IShape> {
     const elementsWithoutToken: Array<IShape> = elementsForOverlays.filter((element: IShape) => {
-      const activeTokenForElement: Array<DataModels.Kpi.ActiveToken> = activeTokenListArray.find(
-        (activeTokenArray: Array<DataModels.Kpi.ActiveToken>) => {
-          return activeTokenArray[0].flowNodeId === element.id;
+      const activeTokenForElement: DataModels.Kpi.ActiveTokenList = activeTokenListArray.find(
+        (activeTokenList: DataModels.Kpi.ActiveTokenList) => {
+          return activeTokenList.activeTokens[0].flowNodeId === element.id;
         },
       );
 

@@ -5,16 +5,16 @@ export interface IInspectCorrelationService {
   getAllCorrelationsForProcessModelId(
     processModelId: string,
     identity: IIdentity,
-  ): Promise<Array<DataModels.Correlations.Correlation>>;
+  ): Promise<DataModels.Correlations.CorrelationList>;
   getLogsForCorrelation(
     correlation: DataModels.Correlations.Correlation,
     identity: IIdentity,
-  ): Promise<Array<DataModels.Logging.LogEntry>>;
+  ): Promise<Array<DataModels.Logging.LogEntryList>>;
   getLogsForProcessInstance(
     processModelId: string,
     processInstance: string,
     identity: IIdentity,
-  ): Promise<Array<DataModels.Logging.LogEntry>>;
+  ): Promise<DataModels.Logging.LogEntryList>;
   getTokenForFlowNodeInstance(
     processModelId: string,
     correlationId: string,

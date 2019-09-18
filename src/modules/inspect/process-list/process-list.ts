@@ -3,7 +3,7 @@ import {bindable, inject, observable} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 
 import {IIdentity} from '@essential-projects/iam_contracts';
-import {DataModels, IManagementApi} from '@process-engine/management_api_contracts';
+import {DataModels, IManagementApiClient} from '@process-engine/management_api_contracts';
 
 import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
 import {AuthenticationStateEvent, ISolutionEntry, ISolutionService, NotificationType} from '../../../contracts/index';
@@ -27,7 +27,7 @@ export class ProcessList {
   public processInstancesToDisplay: Array<ProcessInstanceWithCorrelation> = [];
   public showError: boolean;
 
-  private managementApiService: IManagementApi;
+  private managementApiService: IManagementApiClient;
   private eventAggregator: EventAggregator;
   private notificationService: NotificationService;
   private solutionService: ISolutionService;
@@ -40,7 +40,7 @@ export class ProcessList {
   private stoppedProcessInstancesWithCorrelation: Array<ProcessInstanceWithCorrelation> = [];
 
   constructor(
-    managementApiService: IManagementApi,
+    managementApiService: IManagementApiClient,
     eventAggregator: EventAggregator,
     notificationService: NotificationService,
     solutionService: ISolutionService,
@@ -130,12 +130,12 @@ export class ProcessList {
 
   public async updateCorrelationList(): Promise<void> {
     try {
-      const correlations: Array<DataModels.Correlations.Correlation> = await this.getAllActiveCorrelations();
+      const correlationList: DataModels.Correlations.CorrelationList = await this.getAllActiveCorrelations();
       const correlationListWasUpdated: boolean =
-        JSON.stringify(correlations.sort(this.sortCorrelations)) !== JSON.stringify(this.correlations);
+        JSON.stringify(correlationList.correlations.sort(this.sortCorrelations)) !== JSON.stringify(this.correlations);
 
       if (correlationListWasUpdated) {
-        this.correlations = correlations;
+        this.correlations = correlationList.correlations;
         this.correlations.sort(this.sortCorrelations);
 
         this.processInstancesWithCorrelation = [];
@@ -213,7 +213,7 @@ export class ProcessList {
     return getBeautifiedDate(date);
   }
 
-  private async getAllActiveCorrelations(): Promise<Array<DataModels.Correlations.Correlation>> {
+  private async getAllActiveCorrelations(): Promise<DataModels.Correlations.CorrelationList> {
     const identity: IIdentity = this.activeSolutionEntry.identity;
 
     return this.managementApiService.getActiveCorrelations(identity);

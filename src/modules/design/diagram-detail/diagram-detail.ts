@@ -11,7 +11,7 @@ import {
   IShape,
 } from '@process-engine/bpmn-elements_contracts';
 
-import {DataModels, IManagementApi} from '@process-engine/management_api_contracts';
+import {DataModels, IManagementApiClient} from '@process-engine/management_api_contracts';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 
 import {IElementRegistry, ISolutionEntry, IUserInputValidationRule, NotificationType} from '../../../contracts/index';
@@ -59,7 +59,7 @@ export class DiagramDetail {
   private router: Router;
   private validationController: ValidationController;
   private ipcRenderer: any;
-  private managementApiClient: IManagementApi;
+  private managementApiClient: IManagementApiClient;
   private correlationIdValidationRegExpList: IUserInputValidationRule = {
     alphanumeric: /^[a-z0-9]/i,
     specialCharacters: /^[._ -]/i,
@@ -71,7 +71,7 @@ export class DiagramDetail {
   private saveDiagramService: SaveDiagramService;
 
   constructor(
-    managementApiClient: IManagementApi,
+    managementApiClient: IManagementApiClient,
     notificationService: NotificationService,
     eventAggregator: EventAggregator,
     router: Router,

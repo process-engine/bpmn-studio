@@ -3,7 +3,7 @@ import {bindable, inject} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 
 import {ForbiddenError, NotFoundError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
-import {DataModels, IManagementApi} from '@process-engine/management_api_contracts';
+import {DataModels, IManagementApiClient} from '@process-engine/management_api_contracts';
 
 import {AuthenticationStateEvent, ISolutionEntry, ISolutionService} from '../../../contracts/index';
 import environment from '../../../environment';
@@ -49,7 +49,7 @@ export class TaskList {
 
   private activeSolutionUri: string;
   private eventAggregator: EventAggregator;
-  private managementApiService: IManagementApi;
+  private managementApiService: IManagementApiClient;
   private router: Router;
   private solutionService: ISolutionService;
 
@@ -60,7 +60,7 @@ export class TaskList {
 
   constructor(
     eventAggregator: EventAggregator,
-    managementApiService: IManagementApi,
+    managementApiService: IManagementApiClient,
     router: Router,
     solutionService: ISolutionService,
   ) {
@@ -275,11 +275,11 @@ export class TaskList {
   }
 
   private async getTasksForCorrelation(correlationId: string): Promise<Array<TaskListEntry>> {
-    const runningCorrelations: Array<
-      DataModels.Correlations.Correlation
-    > = await this.managementApiService.getActiveCorrelations(this.activeSolutionEntry.identity);
+    const runningCorrelations: DataModels.Correlations.CorrelationList = await this.managementApiService.getActiveCorrelations(
+      this.activeSolutionEntry.identity,
+    );
 
-    const correlation: DataModels.Correlations.Correlation = runningCorrelations.find(
+    const correlation: DataModels.Correlations.Correlation = runningCorrelations.correlations.find(
       (otherCorrelation: DataModels.Correlations.Correlation) => {
         return otherCorrelation.id === correlationId;
       },

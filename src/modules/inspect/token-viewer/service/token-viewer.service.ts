@@ -21,16 +21,14 @@ export class TokenViewerService implements ITokenViewerService {
   ): Promise<DataModels.TokenHistory.TokenHistoryGroup | undefined> {
     try {
       const tokenHistory: DataModels.TokenHistory.TokenHistoryGroup = {};
-      const tokenForFlowNodeInstance: Array<
-        DataModels.TokenHistory.TokenHistoryEntry
-      > = await this.tokenViewerRepository.getTokenForFlowNodeInstance(
+      const tokenForFlowNodeInstance: DataModels.TokenHistory.TokenHistoryEntryList = await this.tokenViewerRepository.getTokenForFlowNodeInstance(
         processModelId,
         correlationId,
         flowNodeId,
         identity,
       );
 
-      tokenHistory[tokenForFlowNodeInstance[0].flowNodeId] = tokenForFlowNodeInstance;
+      tokenHistory[tokenForFlowNodeInstance.tokenHistoryEntries[0].flowNodeId] = tokenForFlowNodeInstance;
       return tokenHistory;
     } catch (error) {
       return undefined;

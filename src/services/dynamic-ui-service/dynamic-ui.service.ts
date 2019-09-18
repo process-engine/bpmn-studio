@@ -1,16 +1,16 @@
 import {inject} from 'aurelia-framework';
 
 import {IIdentity} from '@essential-projects/iam_contracts';
-import {ManagementApiClientService} from '@process-engine/management_api_client';
+import {ManagementApiClient} from '@process-engine/management_api_client';
 import {DataModels} from '@process-engine/management_api_contracts';
 
 import {IDynamicUiService} from '../../contracts';
 
 @inject('ManagementApiClientService')
 export class DynamicUiService implements IDynamicUiService {
-  private managementApiClient: ManagementApiClientService;
+  private managementApiClient: ManagementApiClient;
 
-  constructor(managmentApiClient: ManagementApiClientService) {
+  constructor(managmentApiClient: ManagementApiClient) {
     this.managementApiClient = managmentApiClient;
   }
 

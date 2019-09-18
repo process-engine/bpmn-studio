@@ -92,11 +92,15 @@ export class Heatmap {
       elementRegistry,
     );
 
-    const flowNodeRuntimeInformation: Array<
-      DataModels.Kpi.FlowNodeRuntimeInformation
-    > = await this.heatmapService.getRuntimeInformationForProcessModel(this.activeDiagram.id);
+    const flowNodeRuntimeInformationList: DataModels.Kpi.FlowNodeRuntimeInformationList = await this.heatmapService.getRuntimeInformationForProcessModel(
+      this.activeDiagram.id,
+    );
 
-    const xml: string = await this.heatmapService.getColoredXML(associations, flowNodeRuntimeInformation, this.modeler);
+    const xml: string = await this.heatmapService.getColoredXML(
+      associations,
+      flowNodeRuntimeInformationList.flowNodeRuntimeInformation,
+      this.modeler,
+    );
 
     // eslint-disable-next-line 6river/new-cap
     this.viewer = new bundle.viewer({

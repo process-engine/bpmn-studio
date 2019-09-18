@@ -1,6 +1,6 @@
 import {bindable, computedFrom, inject} from 'aurelia-framework';
 
-import {ManagementApiClientService} from '@process-engine/management_api_client';
+import {ManagementApiClient} from '@process-engine/management_api_client';
 import {DataModels} from '@process-engine/management_api_contracts';
 
 import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
@@ -18,14 +18,14 @@ export class CronjobList {
   public paginationSize: number = 10;
   public showError: boolean;
 
-  private managementApiService: ManagementApiClientService;
+  private managementApiService: ManagementApiClient;
 
   private cronjobs: Array<DataModels.Cronjobs.CronjobConfiguration> = [];
   private pollingTimeout: NodeJS.Timeout;
   private isAttached: boolean;
   private eventAggregator: EventAggregator;
 
-  constructor(managementApiService: ManagementApiClientService, eventAggregator: EventAggregator) {
+  constructor(managementApiService: ManagementApiClient, eventAggregator: EventAggregator) {
     this.managementApiService = managementApiService;
     this.eventAggregator = eventAggregator;
   }
@@ -82,8 +82,8 @@ export class CronjobList {
 
   public async updateCronjobs(): Promise<void> {
     try {
-      this.cronjobs = await this.managementApiService.getAllActiveCronjobs(this.activeSolutionEntry.identity);
-
+      const cronjobList = await this.managementApiService.getAllActiveCronjobs(this.activeSolutionEntry.identity);
+      this.cronjobs = cronjobList.cronjobs;
       this.initialLoadingFinished = true;
     } catch (error) {
       this.initialLoadingFinished = true;

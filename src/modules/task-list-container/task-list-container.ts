@@ -2,7 +2,7 @@ import {inject} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 
 import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
-import {IManagementApi} from '@process-engine/management_api_contracts';
+import {IManagementApiClient} from '@process-engine/management_api_contracts';
 
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {ISolutionEntry, ISolutionService, NotificationType} from '../../contracts/index';
@@ -23,13 +23,13 @@ export class TaskListContainer {
   private routeParameters: ITaskListRouteParameters;
   private notificationService: NotificationService;
   private router: Router;
-  private managementApiService: IManagementApi;
+  private managementApiService: IManagementApiClient;
   private solutionService: ISolutionService;
 
   constructor(
     notificationService: NotificationService,
     router: Router,
-    managementApiService: IManagementApi,
+    managementApiService: IManagementApiClient,
     solutionService: ISolutionService,
   ) {
     this.notificationService = notificationService;

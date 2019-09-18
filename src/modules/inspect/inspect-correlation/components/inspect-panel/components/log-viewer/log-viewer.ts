@@ -45,11 +45,13 @@ export class LogViewer {
     }
 
     setTimeout(async () => {
-      this.log = await this.inspectCorrelationService.getLogsForProcessInstance(
+      const logList = await this.inspectCorrelationService.getLogsForProcessInstance(
         this.processInstance.processModelId,
         this.processInstance.processInstanceId,
         this.activeSolutionEntry.identity,
       );
+
+      this.log = logList.logEntries;
 
       this.sortSettings = {
         ascending: false,
