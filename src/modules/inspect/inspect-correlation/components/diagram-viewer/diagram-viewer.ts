@@ -27,7 +27,7 @@ export class DiagramViewer {
   @bindable public activeDiagram: IDiagram;
   @bindable public selectedFlowNode: IShape;
   @bindable public activeSolutionEntry: ISolutionEntry;
-  public noCorrelationsFound: boolean = true;
+  public noCorrelationsFound: boolean;
   public xmlIsNotSelected: boolean = true;
   public canvasModel: HTMLElement;
 
@@ -54,6 +54,9 @@ export class DiagramViewer {
   }
 
   public attached(): void {
+    if (!this.activeDiagram) {
+      this.noCorrelationsFound = true;
+    }
     // eslint-disable-next-line 6river/new-cap
     this.diagramViewer = new bundle.viewer({
       additionalModules: [bundle.ZoomScrollModule, bundle.MoveCanvasModule],
@@ -233,6 +236,10 @@ export class DiagramViewer {
 
     if (diagramViewerIsNotSet) {
       return;
+    }
+
+    if (!this.activeDiagram) {
+      this.noCorrelationsFound = true;
     }
 
     this.diagramViewer.clear();
