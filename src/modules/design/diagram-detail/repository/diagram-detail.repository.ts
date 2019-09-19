@@ -16,14 +16,15 @@ export class DiagramDetailRepository implements IDiagramDetailRepository {
     identity: IIdentity,
     processModelId: string,
   ): Promise<DataModels.Events.EventList> {
-    const startEvents: Array<DataModels.Events.Event> = (await this.managementApiClient.getStartEventsForProcessModel(
-      identity,
-      processModelId,
-    )) as any;
+    const startEvents: {
+      events: Array<DataModels.Events.Event>;
+    } = (await this.managementApiClient.getStartEventsForProcessModel(identity, processModelId)) as any;
+
+    console.log(startEvents);
 
     const eventList: DataModels.Events.EventList = {
-      events: startEvents,
-      totalCount: startEvents.length,
+      events: startEvents.events,
+      totalCount: startEvents.events.length,
     };
 
     return eventList;
