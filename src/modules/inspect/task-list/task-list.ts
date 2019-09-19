@@ -1,9 +1,9 @@
-import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
+import {Subscription} from 'aurelia-event-aggregator';
 import {bindable, inject} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 
 import {ForbiddenError, NotFoundError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
-import {DataModels, IManagementApiClient} from '@process-engine/management_api_contracts';
+import {DataModels} from '@process-engine/management_api_contracts';
 
 import {AuthenticationStateEvent, ISolutionEntry, ISolutionService} from '../../../contracts/index';
 import environment from '../../../environment';
