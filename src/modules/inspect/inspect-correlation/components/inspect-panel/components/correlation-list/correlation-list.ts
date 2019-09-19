@@ -47,6 +47,10 @@ export class CorrelationList {
   }
 
   public correlationsChanged(): void {
+    if (!this.activeDiagram) {
+      return;
+    }
+
     const processInstancesWithCorrelation = this.getProcessInstancesWithCorrelations(
       this.correlations,
       this.activeDiagram.id,
