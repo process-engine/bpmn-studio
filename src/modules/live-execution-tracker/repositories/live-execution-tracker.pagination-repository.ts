@@ -1,12 +1,9 @@
-import {inject} from 'aurelia-framework';
-
 import {IIdentity} from '@essential-projects/iam_contracts';
 
 import {DataModels} from '@process-engine/management_api_contracts';
 import {LiveExecutionTrackerRepository} from './live-execution-tracker.repository';
 import {ILiveExecutionTrackerRepository, RequestError} from '../contracts/index';
 
-@inject('ManagementApiClientService')
 export class LiveExecutionTrackerPaginationRepository extends LiveExecutionTrackerRepository
   implements ILiveExecutionTrackerRepository {
   public async getFlowNodeInstancesForProcessInstance(

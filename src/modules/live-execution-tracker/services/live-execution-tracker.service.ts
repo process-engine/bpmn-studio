@@ -21,7 +21,6 @@ import {ILiveExecutionTrackerRepository, ILiveExecutionTrackerService} from '../
 import {createRepository} from '../repositories/live-execution-tracker-repository-factory';
 import environment from '../../../environment';
 
-@inject(EventAggregator, 'ManagementApiClientService')
 export class LiveExecutionTrackerService implements ILiveExecutionTrackerService {
   private liveExecutionTrackerRepository: ILiveExecutionTrackerRepository;
 
