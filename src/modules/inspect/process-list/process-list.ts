@@ -6,6 +6,7 @@ import {IIdentity} from '@essential-projects/iam_contracts';
 import {DataModels} from '@process-engine/management_api_contracts';
 
 import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
+import * as Bluebird from 'bluebird';
 import {AuthenticationStateEvent, ISolutionEntry, ISolutionService, NotificationType} from '../../../contracts/index';
 import {getBeautifiedDate} from '../../../services/date-service/date.service';
 import {NotificationService} from '../../../services/notification-service/notification.service';
@@ -39,6 +40,8 @@ export class ProcessList {
   private processInstancesWithCorrelation: Array<ProcessInstanceWithCorrelation> = [];
   private stoppedProcessInstancesWithCorrelation: Array<ProcessInstanceWithCorrelation> = [];
 
+  private handlerPromise: any;
+
   constructor(
     dashboardService: DashboardService,
     notificationService: NotificationService,
@@ -51,9 +54,13 @@ export class ProcessList {
     this.router = router;
   }
 
-  public async activeSolutionEntryChanged(newValue: ISolutionEntry): Promise<void> {
+  public async activeSolutionEntryChanged(newValue: ISolutionEntry, oldValue: ISolutionEntry): Promise<void> {
     if (!newValue.uri.includes('http')) {
       return;
+    }
+
+    if (this.handlerPromise) {
+      this.handlerPromise.cancel();
     }
 
     this.correlations = [];
@@ -63,6 +70,7 @@ export class ProcessList {
     this.initialLoadingFinished = false;
 
     this.dashboardService.eventAggregator.publish(environment.events.configPanel.solutionEntryChanged, newValue);
+
     await this.updateCorrelationList();
   }
 
@@ -214,7 +222,19 @@ export class ProcessList {
   private async getAllActiveCorrelations(): Promise<DataModels.Correlations.CorrelationList> {
     const identity: IIdentity = this.activeSolutionEntry.identity;
 
-    return this.dashboardService.getActiveCorrelations(identity);
+    Bluebird.Promise.config({cancellation: true});
+    this.handlerPromise = new Bluebird.Promise(
+      async (resolve: Function, reject: Function): Promise<any> => {
+        try {
+          const activeCorreations = await this.dashboardService.getActiveCorrelations(identity);
+          resolve(activeCorreations);
+        } catch (error) {
+          reject(error);
+        }
+      },
+    );
+
+    return this.handlerPromise;
   }
 
   private sortCorrelations(
