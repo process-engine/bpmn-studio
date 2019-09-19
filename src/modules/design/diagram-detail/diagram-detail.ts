@@ -11,7 +11,7 @@ import {
   IShape,
 } from '@process-engine/bpmn-elements_contracts';
 
-import {DataModels, IManagementApiClient} from '@process-engine/management_api_contracts';
+import {DataModels} from '@process-engine/management_api_contracts';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 
 import {IElementRegistry, ISolutionEntry, IUserInputValidationRule, NotificationType} from '../../../contracts/index';
@@ -22,9 +22,10 @@ import {BpmnIo} from '../bpmn-io/bpmn-io';
 import {DeployDiagramService} from '../../../services/deploy-diagram-service/deploy-diagram.service';
 import {SaveDiagramService} from '../../../services/save-diagram-service/save-diagram.service';
 import {exposeFunctionForTesting} from '../../../services/expose-functionality-module/expose-functionality-module';
+import {DiagramDetailService} from './service/diagram-detail.service';
 
 @inject(
-  'ManagementApiClientService',
+  'DiagramDetailService',
   'NotificationService',
   EventAggregator,
   Router,
@@ -53,13 +54,13 @@ export class DiagramDetail {
   @observable public selectedRemoteSolution: ISolutionEntry;
   public showDiagramExistingModal: boolean = false;
 
+  private diagramDetailService: DiagramDetailService;
   private notificationService: NotificationService;
   private eventAggregator: EventAggregator;
   private subscriptions: Array<Subscription>;
   private router: Router;
   private validationController: ValidationController;
   private ipcRenderer: any;
-  private managementApiClient: IManagementApiClient;
   private correlationIdValidationRegExpList: IUserInputValidationRule = {
     alphanumeric: /^[a-z0-9]/i,
     specialCharacters: /^[._ -]/i,
@@ -71,7 +72,7 @@ export class DiagramDetail {
   private saveDiagramService: SaveDiagramService;
 
   constructor(
-    managementApiClient: IManagementApiClient,
+    diagramDetailService: DiagramDetailService,
     notificationService: NotificationService,
     eventAggregator: EventAggregator,
     router: Router,
@@ -79,11 +80,11 @@ export class DiagramDetail {
     deployDiagramService: DeployDiagramService,
     saveDiagramService: SaveDiagramService,
   ) {
+    this.diagramDetailService = diagramDetailService;
     this.notificationService = notificationService;
     this.eventAggregator = eventAggregator;
     this.router = router;
     this.validationController = validationController;
-    this.managementApiClient = managementApiClient;
     this.deployDiagramService = deployDiagramService;
     this.saveDiagramService = saveDiagramService;
 
@@ -239,15 +240,13 @@ export class DiagramDetail {
 
     try {
       const useDefaultStartCallbackType: undefined = undefined;
-      const doNotAwaitEndEvent: undefined = undefined;
 
-      const response: DataModels.ProcessModels.ProcessStartResponsePayload = await this.managementApiClient.startProcessInstance(
+      const response: DataModels.ProcessModels.ProcessStartResponsePayload = await this.diagramDetailService.startProcessInstance(
         this.activeSolutionEntry.identity,
         this.activeDiagram.id,
         startRequestPayload,
         useDefaultStartCallbackType,
         this.selectedStartEventId,
-        doNotAwaitEndEvent,
       );
 
       const {correlationId, processInstanceId} = response;
@@ -443,7 +442,7 @@ export class DiagramDetail {
   }
 
   private async updateProcessStartEvents(): Promise<void> {
-    const startEventResponse: DataModels.Events.EventList = await this.managementApiClient.getStartEventsForProcessModel(
+    const startEventResponse: DataModels.Events.EventList = await this.diagramDetailService.getStartEventsForProcessModel(
       this.activeSolutionEntry.identity,
       this.activeDiagram.id,
     );

@@ -51,6 +51,7 @@ export function configure(aurelia: Aurelia): void {
     .feature('modules/inspect/token-viewer')
     .feature('modules/inspect/inspect-correlation')
     .feature('modules/inspect/dashboard')
+    .feature('modules/design/diagram-detail')
     .feature('services/diagram-creation-service')
     .feature('services/solution-service')
     .feature('modules/inspect/heatmap')
