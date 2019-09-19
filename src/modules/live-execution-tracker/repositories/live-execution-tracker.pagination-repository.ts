@@ -72,4 +72,23 @@ export class LiveExecutionTrackerPaginationRepository extends LiveExecutionTrack
 
     return null;
   }
+
+  public async getEmptyActivitiesForProcessInstance(
+    identity: IIdentity,
+    processInstanceId: string,
+  ): Promise<DataModels.EmptyActivities.EmptyActivityList | null> {
+    for (let retries: number = 0; retries < this.maxRetries; retries++) {
+      try {
+        return await this.managementApiClient.getEmptyActivitiesForProcessInstance(identity, processInstanceId);
+      } catch {
+        await new Promise((resolve: Function): void => {
+          setTimeout(() => {
+            resolve();
+          }, this.retryDelayInMs);
+        });
+      }
+    }
+
+    return null;
+  }
 }
