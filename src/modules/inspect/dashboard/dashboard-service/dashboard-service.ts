@@ -174,4 +174,8 @@ export class DashboardService {
       userTaskResult,
     );
   }
+
+  public removeSubscription(identity: IIdentity, subscription: Subscription): Promise<void> {
+    return this.dashboardRepository.removeSubscription(identity, subscription);
+  }
 }

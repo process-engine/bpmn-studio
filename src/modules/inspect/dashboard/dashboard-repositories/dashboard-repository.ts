@@ -218,4 +218,8 @@ export class DashboardRepository implements IDashboardRepository {
       userTaskResult,
     );
   }
+
+  public removeSubscription(identity: IIdentity, subscription: Subscription): Promise<void> {
+    return this.managementApiService.removeSubscription(identity, subscription);
+  }
 }

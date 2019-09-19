@@ -91,4 +91,5 @@ export interface IDashboardRepository {
   onUserTaskWaiting(identity: IIdentity, callback: Function): Promise<Subscription>;
   onManualTaskFinished(identity: IIdentity, callback: Function): Promise<Subscription>;
   onManualTaskWaiting(identity: IIdentity, callback: Function): Promise<Subscription>;
+  removeSubscription(identity: IIdentity, subscription: Subscription): Promise<void>;
 }
