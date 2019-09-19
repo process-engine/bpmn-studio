@@ -1,9 +1,8 @@
-import {inject} from 'aurelia-framework';
-
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {IConnection, IShape} from '@process-engine/bpmn-elements_contracts';
-import {DataModels} from '@process-engine/management_api_contracts';
+import {DataModels, IManagementApiClient} from '@process-engine/management_api_contracts';
 
+import {EventAggregator} from 'aurelia-event-aggregator';
 import {
   IBpmnModeler,
   IColorPickerColor,
@@ -11,6 +10,7 @@ import {
   IModeling,
   IOverlayManager,
   IOverlayPosition,
+  ISolutionEntry,
   defaultBpmnColors,
 } from '../../../../contracts/index';
 import {
@@ -20,30 +20,44 @@ import {
   ITokenPositionAndCount,
   defaultOverlayPositions,
 } from '../contracts/index';
+import environment from '../../../../environment';
+import {processEngineSupportsPagination} from '../../../../services/process-engine-version-module/process-engine-version-module';
+import {HeatmapPaginationRepository} from '../repositories/heatmap.pagination.repository';
+import {HeatmapRepository} from '../repositories/heatmap.repository';
 
 // maximalTokenCount is used to sanitise the displayed number to "99+"
 const maximalTokenCount: number = 100;
 
-@inject('HeatmapRepository')
 export class HeatmapService implements IHeatmapService {
   private heatmapRepository: IHeatmapRepository;
+  private eventAggregator: EventAggregator;
+  private managementApiService: IManagementApiClient;
 
-  constructor(heatmapRepository: IHeatmapRepository) {
-    this.heatmapRepository = heatmapRepository;
-  }
+  constructor(eventAggregator: EventAggregator, managementApiService: IManagementApiClient) {
+    this.eventAggregator = eventAggregator;
+    this.managementApiService = managementApiService;
 
-  public setIdentity(identity: IIdentity): void {
-    this.heatmapRepository.setIdentity(identity);
+    this.eventAggregator.subscribe(
+      environment.events.configPanel.solutionEntryChanged,
+      (solutionEntry: ISolutionEntry) => {
+        if (processEngineSupportsPagination(solutionEntry.processEngineVersion)) {
+          this.heatmapRepository = new HeatmapPaginationRepository(this.managementApiService);
+        } else {
+          this.heatmapRepository = new HeatmapRepository(this.managementApiService);
+        }
+      },
+    );
   }
 
   public getRuntimeInformationForProcessModel(
+    identity: IIdentity,
     processModelId: string,
   ): Promise<DataModels.Kpi.FlowNodeRuntimeInformationList> {
-    return this.heatmapRepository.getRuntimeInformationForProcessModel(processModelId);
+    return this.heatmapRepository.getRuntimeInformationForProcessModel(identity, processModelId);
   }
 
-  public getActiveTokensForFlowNode(flowNodeId: string): Promise<DataModels.Kpi.ActiveTokenList> {
-    return this.heatmapRepository.getActiveTokensForFlowNode(flowNodeId);
+  public getActiveTokensForFlowNode(identity: IIdentity, flowNodeId: string): Promise<DataModels.Kpi.ActiveTokenList> {
+    return this.heatmapRepository.getActiveTokensForFlowNode(identity, flowNodeId);
   }
 
   /**
@@ -54,6 +68,7 @@ export class HeatmapService implements IHeatmapService {
    * This method adds overlays for the activeTokens to the diagram viewer.
    */
   public async addOverlays(
+    identity: IIdentity,
     overlays: IOverlayManager,
     elementRegistry: IElementRegistry,
     processModelId: string,
@@ -80,6 +95,7 @@ export class HeatmapService implements IHeatmapService {
 
     const elementsForOverlays: Array<IShape> = this.getElementsForOverlays(elementRegistry);
     const activeTokenListArray: Array<DataModels.Kpi.ActiveTokenList> = await this.getActiveTokenListArray(
+      identity,
       elementsForOverlays,
       processModelId,
     );
@@ -127,8 +143,8 @@ export class HeatmapService implements IHeatmapService {
     });
   }
 
-  public getProcess(processModelId: string): Promise<DataModels.ProcessModels.ProcessModel> {
-    return this.heatmapRepository.getProcess(processModelId);
+  public getProcess(identity: IIdentity, processModelId: string): Promise<DataModels.ProcessModels.ProcessModel> {
+    return this.heatmapRepository.getProcess(identity, processModelId);
   }
 
   /**
@@ -338,12 +354,16 @@ export class HeatmapService implements IHeatmapService {
   }
 
   private async getActiveTokenListArray(
+    identity: IIdentity,
     elementsForOverlays: Array<IShape>,
     processModelId: string,
   ): Promise<Array<DataModels.Kpi.ActiveTokenList>> {
     const promisesForElements: Array<Promise<DataModels.Kpi.ActiveTokenList>> = elementsForOverlays.map(
       async (element: IShape) => {
-        const activeTokenList: DataModels.Kpi.ActiveTokenList = await this.getActiveTokensForFlowNode(element.id);
+        const activeTokenList: DataModels.Kpi.ActiveTokenList = await this.getActiveTokensForFlowNode(
+          identity,
+          element.id,
+        );
 
         const elementActiveTokensForProcessModel: Array<
           DataModels.Kpi.ActiveToken

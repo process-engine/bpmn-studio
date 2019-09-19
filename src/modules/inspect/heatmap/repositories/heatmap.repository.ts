@@ -1,34 +1,37 @@
-import {inject} from 'aurelia-framework';
-
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {DataModels, IManagementApiClient} from '@process-engine/management_api_contracts';
 
 import {IHeatmapRepository} from '../contracts/IHeatmap.Repository';
 
-@inject('ManagementApiClientService')
 export class HeatmapRepository implements IHeatmapRepository {
-  private managementApiClientService: IManagementApiClient;
-  private identity: IIdentity;
+  protected managementApiClientService: IManagementApiClient;
 
   constructor(managementApiClientService: IManagementApiClient) {
     this.managementApiClientService = managementApiClientService;
   }
 
-  public getRuntimeInformationForProcessModel(
+  public async getRuntimeInformationForProcessModel(
+    identity: IIdentity,
     processModelId: string,
   ): Promise<DataModels.Kpi.FlowNodeRuntimeInformationList> {
-    return this.managementApiClientService.getRuntimeInformationForProcessModel(this.identity, processModelId);
+    const result = (await this.managementApiClientService.getRuntimeInformationForProcessModel(
+      identity,
+      processModelId,
+    )) as any;
+
+    return {flowNodeRuntimeInformation: result, totalCount: result.length};
   }
 
-  public getProcess(processModelId: string): Promise<DataModels.ProcessModels.ProcessModel> {
-    return this.managementApiClientService.getProcessModelById(this.identity, processModelId);
+  public getProcess(identity: IIdentity, processModelId: string): Promise<DataModels.ProcessModels.ProcessModel> {
+    return this.managementApiClientService.getProcessModelById(identity, processModelId);
   }
 
-  public getActiveTokensForFlowNode(flowNodeId: string): Promise<DataModels.Kpi.ActiveTokenList> {
-    return this.managementApiClientService.getActiveTokensForFlowNode(this.identity, flowNodeId);
-  }
+  public async getActiveTokensForFlowNode(
+    identity: IIdentity,
+    flowNodeId: string,
+  ): Promise<DataModels.Kpi.ActiveTokenList> {
+    const result = (await this.managementApiClientService.getActiveTokensForFlowNode(identity, flowNodeId)) as any;
 
-  public setIdentity(identity: IIdentity): void {
-    this.identity = identity;
+    return {activeTokens: result, totalCount: result.length};
   }
 }

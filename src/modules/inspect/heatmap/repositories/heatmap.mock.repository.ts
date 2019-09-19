@@ -1788,6 +1788,7 @@ export class HeatmapMockRepository implements IHeatmapRepository {
   }
 
   public getRuntimeInformationForProcessModel(
+    identity: IIdentity,
     processModelId: string,
   ): Promise<DataModels.Kpi.FlowNodeRuntimeInformationList> {
     return new Promise((resolve: Function, reject: Function): void => {
@@ -1795,7 +1796,7 @@ export class HeatmapMockRepository implements IHeatmapRepository {
     });
   }
 
-  public getActiveTokensForFlowNode(flowNodeId: string): Promise<DataModels.Kpi.ActiveTokenList> {
+  public getActiveTokensForFlowNode(identity: IIdentity, flowNodeId: string): Promise<DataModels.Kpi.ActiveTokenList> {
     return new Promise((resolve: Function, reject: Function): void => {
       const newArray: Array<DataModels.Kpi.ActiveToken> = this.mockDataForActiveTokens.filter(
         (element: DataModels.Kpi.ActiveToken) => {
@@ -1807,7 +1808,7 @@ export class HeatmapMockRepository implements IHeatmapRepository {
     });
   }
 
-  public getProcess(processModelId: string): Promise<DataModels.ProcessModels.ProcessModel> {
-    return this.managementApiClient.getProcessModelById(this.identity, processModelId);
+  public getProcess(identity: IIdentity, processModelId: string): Promise<DataModels.ProcessModels.ProcessModel> {
+    return this.managementApiClient.getProcessModelById(identity, processModelId);
   }
 }
