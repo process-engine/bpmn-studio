@@ -7,11 +7,14 @@ import {DataModels} from '@process-engine/management_api_contracts';
 
 import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
 import * as Bluebird from 'bluebird';
+
 import {AuthenticationStateEvent, ISolutionEntry, ISolutionService, NotificationType} from '../../../contracts/index';
 import {getBeautifiedDate} from '../../../services/date-service/date.service';
 import {NotificationService} from '../../../services/notification-service/notification.service';
 import environment from '../../../environment';
 import {DashboardService} from '../dashboard/dashboard-service/dashboard-service';
+
+Bluebird.Promise.config({cancellation: true});
 
 type ProcessInstanceWithCorrelation = {
   processInstance: DataModels.Correlations.CorrelationProcessInstance;
@@ -222,7 +225,6 @@ export class ProcessList {
   private async getAllActiveCorrelations(): Promise<DataModels.Correlations.CorrelationList> {
     const identity: IIdentity = this.activeSolutionEntry.identity;
 
-    Bluebird.Promise.config({cancellation: true});
     this.handlerPromise = new Bluebird.Promise(
       async (resolve: Function, reject: Function): Promise<any> => {
         try {
