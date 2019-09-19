@@ -95,7 +95,29 @@ export class LiveExecutionTrackerRepository implements ILiveExecutionTrackerRepo
   ): Promise<DataModels.TokenHistory.TokenHistoryGroup | null> {
     for (let retries: number = 0; retries < this.maxRetries; retries++) {
       try {
-        return await this.managementApiClient.getTokensForProcessInstance(identity, processInstanceId);
+        type OldTokenHistoryGroup = {
+          [name: string]: Array<DataModels.TokenHistory.TokenHistoryEntry>;
+        };
+
+        const oldTokenHistoryGroup: OldTokenHistoryGroup = (await this.managementApiClient.getTokensForProcessInstance(
+          identity,
+          processInstanceId,
+        )) as any;
+
+        const oldTokenHistoryKeys: Array<string> = Object.keys(oldTokenHistoryGroup);
+
+        const tokenHistoryGroup: DataModels.TokenHistory.TokenHistoryGroup = {};
+
+        oldTokenHistoryKeys.forEach((key: string) => {
+          const tokenHistoryEntryList: DataModels.TokenHistory.TokenHistoryEntryList = {
+            tokenHistoryEntries: oldTokenHistoryGroup[key],
+            totalCount: oldTokenHistoryGroup[key].length,
+          };
+
+          tokenHistoryGroup[key] = tokenHistoryEntryList;
+        });
+
+        return tokenHistoryGroup;
       } catch {
         await new Promise((resolve: Function): void => {
           setTimeout(() => {

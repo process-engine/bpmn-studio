@@ -7,10 +7,10 @@ import {ITokenViewerRepository} from '../contracts';
 
 @inject('ManagementApiClientService')
 export class TokenViewerRepository implements ITokenViewerRepository {
-  protected managementApiService: IManagementApiClient;
+  protected managementApiClient: IManagementApiClient;
 
-  constructor(managementApiService: IManagementApiClient) {
-    this.managementApiService = managementApiService;
+  constructor(managementApiClient: IManagementApiClient) {
+    this.managementApiClient = managementApiClient;
   }
 
   public async getTokenForFlowNodeInstance(
@@ -21,7 +21,7 @@ export class TokenViewerRepository implements ITokenViewerRepository {
   ): Promise<DataModels.TokenHistory.TokenHistoryEntryList> {
     const tokenHistoryEntries: Array<
       DataModels.TokenHistory.TokenHistoryEntry
-    > = (await this.managementApiService.getTokensForFlowNode(
+    > = (await this.managementApiClient.getTokensForFlowNode(
       identity,
       correlationId,
       processModelId,
@@ -41,6 +41,28 @@ export class TokenViewerRepository implements ITokenViewerRepository {
     flowNodeId: string,
     identity: IIdentity,
   ): Promise<DataModels.TokenHistory.TokenHistoryGroup> {
-    return this.managementApiService.getTokensForFlowNodeByProcessInstanceId(identity, processInstanceId, flowNodeId);
+    type OldTokenHistoryGroup = {
+      [name: string]: Array<DataModels.TokenHistory.TokenHistoryEntry>;
+    };
+
+    const oldTokenHistoryGroup: OldTokenHistoryGroup = (await this.managementApiClient.getTokensForFlowNodeByProcessInstanceId(
+      identity,
+      processInstanceId,
+      flowNodeId,
+    )) as any;
+    const oldTokenHistoryKeys: Array<string> = Object.keys(oldTokenHistoryGroup);
+
+    const tokenHistoryGroup: DataModels.TokenHistory.TokenHistoryGroup = {};
+
+    oldTokenHistoryKeys.forEach((key: string) => {
+      const tokenHistoryEntryList: DataModels.TokenHistory.TokenHistoryEntryList = {
+        tokenHistoryEntries: oldTokenHistoryGroup[key],
+        totalCount: oldTokenHistoryGroup[key].length,
+      };
+
+      tokenHistoryGroup[key] = tokenHistoryEntryList;
+    });
+
+    return tokenHistoryGroup;
   }
 }

@@ -13,4 +13,12 @@ export class TokenViewerPaginationRepository extends TokenViewerRepository imple
   ): Promise<DataModels.TokenHistory.TokenHistoryEntryList> {
     return this.managementApiService.getTokensForFlowNode(identity, correlationId, processModelId, flowNodeId);
   }
+
+  public async getTokenForFlowNodeByProcessInstanceId(
+    processInstanceId: string,
+    flowNodeId: string,
+    identity: IIdentity,
+  ): Promise<DataModels.TokenHistory.TokenHistoryGroup> {
+    return this.managementApiService.getTokensForFlowNodeByProcessInstanceId(identity, processInstanceId, flowNodeId);
+  }
 }

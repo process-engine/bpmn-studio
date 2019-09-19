@@ -51,6 +51,27 @@ export class LiveExecutionTrackerPaginationRepository extends LiveExecutionTrack
     return correlationIsActive;
   }
 
+  public async getTokenHistoryGroupForProcessInstance(
+    identity: IIdentity,
+    processInstanceId: string,
+  ): Promise<DataModels.TokenHistory.TokenHistoryGroup | null> {
+    for (let retries: number = 0; retries < this.maxRetries; retries++) {
+      try {
+        const a = await this.managementApiClient.getTokensForProcessInstance(identity, processInstanceId);
+
+        return a;
+      } catch {
+        await new Promise((resolve: Function): void => {
+          setTimeout(() => {
+            resolve();
+          }, this.retryDelayInMs);
+        });
+      }
+    }
+
+    return null;
+  }
+
   public async getActiveTokensForProcessInstance(
     identity: IIdentity,
     processInstanceId: string,
