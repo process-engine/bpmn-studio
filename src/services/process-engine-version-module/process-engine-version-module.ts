@@ -1,6 +1,10 @@
 import {SemVer} from 'semver';
 
 export function processEngineSupportsPagination(processEngineVersion: string): boolean {
+  if (!processEngineVersion) {
+    return undefined;
+  }
+
   const solutionEntryPEVersion = new SemVer(processEngineVersion);
 
   const alphaVersionWithEvents = new SemVer('8.6.0-alpha.24');
