@@ -10,6 +10,10 @@ export class Dashboard {
     this.showCronjobList = this.processEngineSupportsCronjob();
   }
 
+  public activeSolutionEntryChanged(): void {
+    this.showCronjobList = this.processEngineSupportsCronjob();
+  }
+
   private processEngineSupportsCronjob(): boolean {
     const processEngineVersion: string = this.activeSolutionEntry.processEngineVersion;
 
