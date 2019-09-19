@@ -5,24 +5,30 @@ import {Subscription} from '@essential-projects/event_aggregator_contracts';
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {IModdleElement, IShape} from '@process-engine/bpmn-elements_contracts';
 import * as bundle from '@process-engine/bpmn-js-custom-bundle';
-import {DataModels} from '@process-engine/management_api_contracts';
+import {DataModels, IManagementApiClient} from '@process-engine/management_api_contracts';
 
+import {EventAggregator} from 'aurelia-event-aggregator';
 import {
   IBpmnModeler,
   IBpmnXmlSaveOptions,
   IColorPickerColor,
   IElementRegistry,
   IModeling,
+  ISolutionEntry,
   defaultBpmnColors,
 } from '../../../contracts/index';
 import {ILiveExecutionTrackerRepository, ILiveExecutionTrackerService} from '../contracts/index';
+import {createRepository} from '../repositories/live-execution-tracker-repository-factory';
+import environment from '../../../environment';
 
-@inject('LiveExecutionTrackerRepository')
+@inject(EventAggregator, 'ManagementApiClientService')
 export class LiveExecutionTrackerService implements ILiveExecutionTrackerService {
   private liveExecutionTrackerRepository: ILiveExecutionTrackerRepository;
 
-  constructor(liveExecutionTrackerRepository: ILiveExecutionTrackerRepository) {
-    this.liveExecutionTrackerRepository = liveExecutionTrackerRepository;
+  constructor(eventAggregator: EventAggregator, managementApiClient: IManagementApiClient) {
+    eventAggregator.subscribe(environment.events.configPanel.solutionEntryChanged, (solutionEntry: ISolutionEntry) => {
+      this.liveExecutionTrackerRepository = createRepository(managementApiClient, solutionEntry.processEngineVersion);
+    });
   }
 
   public isProcessInstanceActive(identity: IIdentity, processInstanceId: string): Promise<boolean> {

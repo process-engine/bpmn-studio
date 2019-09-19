@@ -7,12 +7,12 @@ import {ILiveExecutionTrackerRepository, RequestError} from '../contracts/index'
 
 @inject('ManagementApiClientService')
 export class LiveExecutionTrackerRepository implements ILiveExecutionTrackerRepository {
-  private managementApiClient: IManagementApiClient;
+  protected managementApiClient: IManagementApiClient;
 
-  private maxRetries: number = 5;
-  private retryDelayInMs: number = 500;
+  protected maxRetries: number = 5;
+  protected retryDelayInMs: number = 500;
 
-  constructor(managementApiClientService: IManagementApiClient) {
+  constructor(managementApiClientService?: IManagementApiClient) {
     this.managementApiClient = managementApiClientService;
   }
 
@@ -20,7 +20,16 @@ export class LiveExecutionTrackerRepository implements ILiveExecutionTrackerRepo
     identity: IIdentity,
     processInstanceId: string,
   ): Promise<DataModels.FlowNodeInstances.FlowNodeInstanceList> {
-    return this.managementApiClient.getFlowNodeInstancesForProcessInstance(identity, processInstanceId);
+    const flowNodeInstances: Array<
+      DataModels.FlowNodeInstances.FlowNodeInstance
+    > = (await this.managementApiClient.getFlowNodeInstancesForProcessInstance(identity, processInstanceId)) as any;
+
+    const flowNodeInstanceList: DataModels.FlowNodeInstances.FlowNodeInstanceList = {
+      flowNodeInstances: flowNodeInstances,
+      totalCount: flowNodeInstances.length,
+    };
+
+    return flowNodeInstanceList;
   }
 
   public async getCorrelationById(
@@ -44,10 +53,10 @@ export class LiveExecutionTrackerRepository implements ILiveExecutionTrackerRepo
   }
 
   public async isProcessInstanceActive(identity: IIdentity, processInstanceId: string): Promise<boolean> {
-    const getActiveTokens: Function = async (): Promise<DataModels.Kpi.ActiveTokenList | RequestError> => {
+    const getActiveTokens: Function = async (): Promise<Array<DataModels.Kpi.ActiveToken> | RequestError> => {
       for (let retries: number = 0; retries < this.maxRetries; retries++) {
         try {
-          return await this.managementApiClient.getActiveTokensForProcessInstance(identity, processInstanceId);
+          return (await this.managementApiClient.getActiveTokensForProcessInstance(identity, processInstanceId)) as any;
         } catch (error) {
           const errorIsConnectionLost: boolean = error.message === 'Failed to fetch';
 
@@ -60,7 +69,7 @@ export class LiveExecutionTrackerRepository implements ILiveExecutionTrackerRepo
       return RequestError.OtherError;
     };
 
-    const activeTokensOrRequestError: DataModels.Kpi.ActiveTokenList | RequestError = await getActiveTokens();
+    const activeTokensOrRequestError: Array<DataModels.Kpi.ActiveToken> | RequestError = await getActiveTokens();
 
     const couldNotGetActiveTokens: boolean =
       activeTokensOrRequestError === RequestError.ConnectionLost ||
@@ -71,9 +80,11 @@ export class LiveExecutionTrackerRepository implements ILiveExecutionTrackerRepo
       throw requestError;
     }
 
-    const activeTokenList: DataModels.Kpi.ActiveTokenList = activeTokensOrRequestError as DataModels.Kpi.ActiveTokenList;
+    const allActiveTokens: Array<DataModels.Kpi.ActiveToken> = activeTokensOrRequestError as Array<
+      DataModels.Kpi.ActiveToken
+    >;
 
-    const correlationIsActive: boolean = activeTokenList.totalCount > 0;
+    const correlationIsActive: boolean = allActiveTokens.length > 0;
 
     return correlationIsActive;
   }
@@ -103,7 +114,16 @@ export class LiveExecutionTrackerRepository implements ILiveExecutionTrackerRepo
   ): Promise<DataModels.Kpi.ActiveTokenList | null> {
     for (let retries: number = 0; retries < this.maxRetries; retries++) {
       try {
-        return await this.managementApiClient.getActiveTokensForProcessInstance(identity, processInstanceId);
+        const activeTokens: Array<
+          DataModels.Kpi.ActiveToken
+        > = (await this.managementApiClient.getActiveTokensForProcessInstance(identity, processInstanceId)) as any;
+
+        const activeTokenList: DataModels.Kpi.ActiveTokenList = {
+          activeTokens: activeTokens,
+          totalCount: activeTokens.length,
+        };
+
+        return activeTokenList;
       } catch {
         await new Promise((resolve: Function): void => {
           setTimeout(() => {

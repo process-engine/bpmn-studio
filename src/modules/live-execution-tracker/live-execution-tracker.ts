@@ -31,6 +31,7 @@ import environment from '../../environment';
 import {NotificationService} from '../../services/notification-service/notification.service';
 import {TaskDynamicUi} from '../task-dynamic-ui/task-dynamic-ui';
 import {ILiveExecutionTrackerService, RequestError} from './contracts/index';
+import {LiveExecutionTrackerService} from './services/live-execution-tracker.service';
 
 type RouteParameters = {
   diagramName: string;
