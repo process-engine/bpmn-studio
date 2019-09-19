@@ -7,7 +7,7 @@ import {ITokenViewerRepository} from '../contracts';
 
 @inject('ManagementApiClientService')
 export class TokenViewerRepository implements ITokenViewerRepository {
-  private managementApiService: IManagementApiClient;
+  protected managementApiService: IManagementApiClient;
 
   constructor(managementApiService: IManagementApiClient) {
     this.managementApiService = managementApiService;
@@ -19,7 +19,21 @@ export class TokenViewerRepository implements ITokenViewerRepository {
     flowNodeId: string,
     identity: IIdentity,
   ): Promise<DataModels.TokenHistory.TokenHistoryEntryList> {
-    return this.managementApiService.getTokensForFlowNode(identity, correlationId, processModelId, flowNodeId);
+    const tokenHistoryEntries: Array<
+      DataModels.TokenHistory.TokenHistoryEntry
+    > = (await this.managementApiService.getTokensForFlowNode(
+      identity,
+      correlationId,
+      processModelId,
+      flowNodeId,
+    )) as any;
+
+    const tokenHistoryEntryList: DataModels.TokenHistory.TokenHistoryEntryList = {
+      tokenHistoryEntries: tokenHistoryEntries,
+      totalCount: tokenHistoryEntries.length,
+    };
+
+    return tokenHistoryEntryList;
   }
 
   public async getTokenForFlowNodeByProcessInstanceId(

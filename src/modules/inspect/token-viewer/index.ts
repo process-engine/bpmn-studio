@@ -1,9 +1,15 @@
 import {FrameworkConfiguration} from 'aurelia-framework';
+import {EventAggregator} from 'aurelia-event-aggregator';
 
-import {TokenViewerRepository} from './repository/token-viewer.repository';
+import {IManagementApiClient} from '@process-engine/management_api_contracts';
+
 import {TokenViewerService} from './service/token-viewer.service';
 
 export function configure(config: FrameworkConfiguration): void {
-  config.container.registerSingleton('TokenViewerRepository', TokenViewerRepository);
-  config.container.registerSingleton('TokenViewerService', TokenViewerService);
+  const eventAggregator: EventAggregator = config.container.get(EventAggregator);
+  const managementApiClient: IManagementApiClient = config.container.get('ManagementApiClientService');
+
+  const tokenViewerService: TokenViewerService = new TokenViewerService(eventAggregator, managementApiClient);
+
+  config.container.registerInstance('TokenViewerService', tokenViewerService);
 }
