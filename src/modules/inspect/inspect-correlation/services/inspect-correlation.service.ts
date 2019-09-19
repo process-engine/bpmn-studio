@@ -24,7 +24,7 @@ export class InspectCorrelationService implements IInspectCorrelationService {
     this.eventAggregator.subscribe(
       environment.events.configPanel.solutionEntryChanged,
       (solutionEntry: ISolutionEntry) => {
-        if (processEngineSupportsPagination(solutionEntry)) {
+        if (processEngineSupportsPagination(solutionEntry.processEngineVersion)) {
           this.inspectCorrelationRepository = new InspectCorrelationPaginationRepository(this.managementApiService);
         } else {
           this.inspectCorrelationRepository = new InspectCorrelationRepository(this.managementApiService);
