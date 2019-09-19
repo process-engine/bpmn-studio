@@ -47,7 +47,6 @@ export class CorrelationList {
   }
 
   public correlationsChanged(): void {
-    console.log(this.correlations);
     const processInstancesWithCorrelation = this.getProcessInstancesWithCorrelations(
       this.correlations,
       this.activeDiagram.id,
@@ -198,7 +197,6 @@ export class CorrelationList {
   ): Array<IProcessInstanceWithCorrelation> {
     const processInstancesWithCorrelation: Array<IProcessInstanceWithCorrelation> = [];
 
-    console.log(correlations);
     correlations.forEach((correlation: DataModels.Correlations.Correlation) => {
       correlation.processInstances.forEach((processInstance: DataModels.Correlations.CorrelationProcessInstance) => {
         const isNotSelectedProcessModel: boolean = processInstance.processModelId !== processModelId;
