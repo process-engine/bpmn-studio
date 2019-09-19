@@ -1,15 +1,11 @@
 import {IIdentity} from '@essential-projects/iam_contracts';
-import {DataModels, IManagementApiClient} from '@process-engine/management_api_contracts';
+import {DataModels} from '@process-engine/management_api_contracts';
 
 import {IInspectCorrelationRepository} from '../contracts';
+import {InspectCorrelationRepository} from './inspect-correlation.repository';
 
-export class InspectCorrelationPaginationRepository implements IInspectCorrelationRepository {
-  private managementApiService: IManagementApiClient;
-
-  constructor(managementApi: IManagementApiClient) {
-    this.managementApiService = managementApi;
-  }
-
+export class InspectCorrelationPaginationRepository extends InspectCorrelationRepository
+  implements IInspectCorrelationRepository {
   public async getAllCorrelationsForProcessModelId(
     processModelId: string,
     identity: IIdentity,
@@ -80,13 +76,5 @@ export class InspectCorrelationPaginationRepository implements IInspectCorrelati
       offset,
       limit,
     );
-  }
-
-  public async getTokenForFlowNodeByProcessInstanceId(
-    processInstanceId: string,
-    flowNodeId: string,
-    identity: IIdentity,
-  ): Promise<DataModels.TokenHistory.TokenHistoryGroup> {
-    return this.managementApiService.getTokensForFlowNodeByProcessInstanceId(identity, processInstanceId, flowNodeId);
   }
 }

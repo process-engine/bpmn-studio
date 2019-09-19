@@ -1,22 +1,23 @@
-import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
+import {Subscription} from 'aurelia-event-aggregator';
 import {bindable, inject, observable} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 
 import {IIdentity} from '@essential-projects/iam_contracts';
-import {DataModels, IManagementApiClient} from '@process-engine/management_api_contracts';
+import {DataModels} from '@process-engine/management_api_contracts';
 
 import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
 import {AuthenticationStateEvent, ISolutionEntry, ISolutionService, NotificationType} from '../../../contracts/index';
 import {getBeautifiedDate} from '../../../services/date-service/date.service';
 import {NotificationService} from '../../../services/notification-service/notification.service';
 import environment from '../../../environment';
+import {DashboardService} from '../dashboard/dashboard-service/dashboard-service';
 
 type ProcessInstanceWithCorrelation = {
   processInstance: DataModels.Correlations.CorrelationProcessInstance;
   correlation: DataModels.Correlations.Correlation;
 };
 
-@inject('ManagementApiClientService', EventAggregator, 'NotificationService', 'SolutionService', Router)
+@inject('DashboardService', 'NotificationService', 'SolutionService', Router)
 export class ProcessList {
   @observable public currentPage: number = 1;
   @bindable() public activeSolutionEntry: ISolutionEntry;
@@ -27,8 +28,7 @@ export class ProcessList {
   public processInstancesToDisplay: Array<ProcessInstanceWithCorrelation> = [];
   public showError: boolean;
 
-  private managementApiService: IManagementApiClient;
-  private eventAggregator: EventAggregator;
+  private dashboardService: DashboardService;
   private notificationService: NotificationService;
   private solutionService: ISolutionService;
   private activeSolutionUri: string;
@@ -40,14 +40,12 @@ export class ProcessList {
   private stoppedProcessInstancesWithCorrelation: Array<ProcessInstanceWithCorrelation> = [];
 
   constructor(
-    managementApiService: IManagementApiClient,
-    eventAggregator: EventAggregator,
+    dashboardService: DashboardService,
     notificationService: NotificationService,
     solutionService: ISolutionService,
     router: Router,
   ) {
-    this.managementApiService = managementApiService;
-    this.eventAggregator = eventAggregator;
+    this.dashboardService = dashboardService;
     this.notificationService = notificationService;
     this.solutionService = solutionService;
     this.router = router;
@@ -64,7 +62,7 @@ export class ProcessList {
     this.stoppedProcessInstancesWithCorrelation = [];
     this.initialLoadingFinished = false;
 
-    this.eventAggregator.publish(environment.events.configPanel.solutionEntryChanged, newValue);
+    this.dashboardService.eventAggregator.publish(environment.events.configPanel.solutionEntryChanged, newValue);
     await this.updateCorrelationList();
   }
 
@@ -95,19 +93,19 @@ export class ProcessList {
     await this.updateCorrelationList();
 
     this.subscriptions = [
-      this.eventAggregator.subscribe(AuthenticationStateEvent.LOGIN, async () => {
+      this.dashboardService.eventAggregator.subscribe(AuthenticationStateEvent.LOGIN, async () => {
         await this.updateCorrelationList();
       }),
-      this.eventAggregator.subscribe(AuthenticationStateEvent.LOGOUT, async () => {
+      this.dashboardService.eventAggregator.subscribe(AuthenticationStateEvent.LOGOUT, async () => {
         await this.updateCorrelationList();
       }),
     ];
 
-    this.managementApiService.onProcessStarted(this.activeSolutionEntry.identity, async () => {
+    this.dashboardService.onProcessStarted(this.activeSolutionEntry.identity, async () => {
       await this.updateCorrelationList();
     });
 
-    this.managementApiService.onProcessEnded(this.activeSolutionEntry.identity, async () => {
+    this.dashboardService.onProcessEnded(this.activeSolutionEntry.identity, async () => {
       await this.updateCorrelationList();
     });
 
@@ -115,7 +113,7 @@ export class ProcessList {
      * This notification gets also triggered when the processinstance has been terminated.
      * Currently the onProcessTerminated notification does not work.
      */
-    this.managementApiService.onProcessError(this.activeSolutionEntry.identity, async () => {
+    this.dashboardService.onProcessError(this.activeSolutionEntry.identity, async () => {
       await this.updateCorrelationList();
     });
   }
@@ -187,11 +185,11 @@ export class ProcessList {
     correlation: DataModels.Correlations.Correlation,
   ): Promise<void> {
     try {
-      this.managementApiService.onProcessError(this.activeSolutionEntry.identity, () => {
+      this.dashboardService.onProcessError(this.activeSolutionEntry.identity, () => {
         processInstance.state = DataModels.Correlations.CorrelationState.error;
       });
 
-      await this.managementApiService.terminateProcessInstance(
+      await this.dashboardService.terminateProcessInstance(
         this.activeSolutionEntry.identity,
         processInstance.processInstanceId,
       );
@@ -216,7 +214,7 @@ export class ProcessList {
   private async getAllActiveCorrelations(): Promise<DataModels.Correlations.CorrelationList> {
     const identity: IIdentity = this.activeSolutionEntry.identity;
 
-    return this.managementApiService.getActiveCorrelations(identity);
+    return this.dashboardService.getActiveCorrelations(identity);
   }
 
   private sortCorrelations(

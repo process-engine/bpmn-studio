@@ -4,7 +4,7 @@ import {DataModels, IManagementApiClient} from '@process-engine/management_api_c
 import {IInspectCorrelationRepository} from '../contracts';
 
 export class InspectCorrelationRepository implements IInspectCorrelationRepository {
-  private managementApiService: IManagementApiClient;
+  protected managementApiService: IManagementApiClient;
 
   constructor(managementApi: IManagementApiClient) {
     this.managementApiService = managementApi;
