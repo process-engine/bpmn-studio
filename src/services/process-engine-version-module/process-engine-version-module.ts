@@ -1,6 +1,6 @@
 import {SemVer} from 'semver';
 
-export function supportsPaginationAndNewDataModels(solutionEntry): boolean {
+export function processEngineSupportsPagination(solutionEntry): boolean {
   const processEngineVersion: string = solutionEntry.processEngineVersion;
 
   const solutionEntryPEVersion = new SemVer(processEngineVersion);

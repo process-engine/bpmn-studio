@@ -9,7 +9,7 @@ import {InspectCorrelationPaginationRepository} from '../repositories/inspect-co
 import environment from '../../../../environment';
 import {InspectCorrelationRepository} from '../repositories/inspect-correlation.repository';
 import {ISolutionEntry} from '../../../../contracts';
-import {supportsPaginationAndNewDataModels} from '../../../../services/process-engine-version-module/process-engine-version-module';
+import {processEngineSupportsPagination} from '../../../../services/process-engine-version-module/process-engine-version-module';
 
 @inject(EventAggregator, 'ManagementApiClientService')
 export class InspectCorrelationService implements IInspectCorrelationService {
@@ -24,12 +24,11 @@ export class InspectCorrelationService implements IInspectCorrelationService {
     this.eventAggregator.subscribe(
       environment.events.configPanel.solutionEntryChanged,
       (solutionEntry: ISolutionEntry) => {
-        if (supportsPaginationAndNewDataModels(solutionEntry)) {
+        if (processEngineSupportsPagination(solutionEntry)) {
           this.inspectCorrelationRepository = new InspectCorrelationPaginationRepository(this.managementApiService);
         } else {
           this.inspectCorrelationRepository = new InspectCorrelationRepository(this.managementApiService);
         }
-
       },
     );
   }
