@@ -164,13 +164,13 @@ export class LiveExecutionTrackerRepository implements ILiveExecutionTrackerRepo
   ): Promise<DataModels.EmptyActivities.EmptyActivityList | null> {
     for (let retries: number = 0; retries < this.maxRetries; retries++) {
       try {
-        const emptyActivities: Array<
-          DataModels.EmptyActivities.EmptyActivity
-        > = (await this.managementApiClient.getEmptyActivitiesForProcessInstance(identity, processInstanceId)) as any;
+        const emptyActivities: {
+          emptyActivities: Array<DataModels.EmptyActivities.EmptyActivity>;
+        } = (await this.managementApiClient.getEmptyActivitiesForProcessInstance(identity, processInstanceId)) as any;
 
         const emptyActivityList: DataModels.EmptyActivities.EmptyActivityList = {
-          emptyActivities: emptyActivities,
-          totalCount: emptyActivities.length,
+          emptyActivities: emptyActivities.emptyActivities,
+          totalCount: emptyActivities.emptyActivities.length,
         };
 
         return emptyActivityList;
