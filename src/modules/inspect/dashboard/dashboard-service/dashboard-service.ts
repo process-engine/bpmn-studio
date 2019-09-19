@@ -149,4 +149,29 @@ export class DashboardService {
   public onManualTaskWaiting(identity: IIdentity, callback: Function): Promise<Subscription> {
     return this.dashboardRepository.onManualTaskWaiting(identity, callback);
   }
+
+  public finishManualTask(
+    identity: IIdentity,
+    processInstanceId: string,
+    correlationId: string,
+    manualTaskInstanceId: string,
+  ): Promise<void> {
+    return this.dashboardRepository.finishManualTask(identity, processInstanceId, correlationId, manualTaskInstanceId);
+  }
+
+  public finishUserTask(
+    identity: IIdentity,
+    processInstanceId: string,
+    correlationId: string,
+    userTaskInstanceId: string,
+    userTaskResult: DataModels.UserTasks.UserTaskResult,
+  ): Promise<void> {
+    return this.managementApiService.finishUserTask(
+      identity,
+      processInstanceId,
+      correlationId,
+      userTaskInstanceId,
+      userTaskResult,
+    );
+  }
 }

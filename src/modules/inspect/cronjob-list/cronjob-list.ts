@@ -79,11 +79,9 @@ export class CronjobList {
   public async updateCronjobs(): Promise<void> {
     try {
       const cronjobList = await this.dashboardService.getAllActiveCronjobs(this.activeSolutionEntry.identity);
-      console.log(cronjobList);
       this.cronjobs = cronjobList.cronjobs;
       this.initialLoadingFinished = true;
     } catch (error) {
-      console.log(error);
       this.initialLoadingFinished = true;
 
       const errorIsForbiddenError: boolean = isError(error, ForbiddenError);

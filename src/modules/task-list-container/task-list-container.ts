@@ -8,6 +8,7 @@ import {IIdentity} from '@essential-projects/iam_contracts';
 import {ISolutionEntry, ISolutionService, NotificationType} from '../../contracts/index';
 import {NotificationService} from '../../services/notification-service/notification.service';
 import {TaskList} from '../inspect/task-list/task-list';
+import {DashboardService} from '../inspect/dashboard/dashboard-service/dashboard-service';
 
 interface ITaskListRouteParameters {
   processModelId?: string;
@@ -15,7 +16,7 @@ interface ITaskListRouteParameters {
   solutionUri?: string;
 }
 
-@inject('NotificationService', Router, 'ManagementApiClientService', 'SolutionService')
+@inject('NotificationService', Router, 'DashboardService', 'SolutionService')
 export class TaskListContainer {
   public showTaskList: boolean = false;
   public taskList: TaskList;
@@ -23,18 +24,18 @@ export class TaskListContainer {
   private routeParameters: ITaskListRouteParameters;
   private notificationService: NotificationService;
   private router: Router;
-  private managementApiService: IManagementApiClient;
+  private dashboardService: DashboardService;
   private solutionService: ISolutionService;
 
   constructor(
     notificationService: NotificationService,
     router: Router,
-    managementApiService: IManagementApiClient,
+    dashboardService: DashboardService,
     solutionService: ISolutionService,
   ) {
     this.notificationService = notificationService;
     this.router = router;
-    this.managementApiService = managementApiService;
+    this.dashboardService = dashboardService;
     this.solutionService = solutionService;
   }
 
@@ -81,8 +82,8 @@ export class TaskListContainer {
       // TODO: Refactor; this is not how we want to do our claim checks.
       // Talk to Sebastian or Christoph first.
 
-      await this.managementApiService.getProcessModels(identity);
-      await this.managementApiService.getActiveCorrelations(identity);
+      await this.dashboardService.getProcessModels(identity);
+      await this.dashboardService.getActiveCorrelations(identity);
     } catch (error) {
       const errorIsForbiddenError: boolean = isError(error, ForbiddenError);
       const errorIsUnauthorizedError: boolean = isError(error, UnauthorizedError);

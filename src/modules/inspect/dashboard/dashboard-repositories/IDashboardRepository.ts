@@ -69,6 +69,19 @@ export interface IDashboardRepository {
     limit?: number,
   ): Promise<DataModels.UserTasks.UserTaskList>;
   terminateProcessInstance(identity: IIdentity, processInstanceId: string): Promise<void>;
+  finishManualTask(
+    identity: IIdentity,
+    processInstanceId: string,
+    correlationId: string,
+    manualTaskInstanceId: string,
+  ): Promise<void>;
+  finishUserTask(
+    identity: IIdentity,
+    processInstanceId: string,
+    correlationId: string,
+    userTaskInstanceId: string,
+    userTaskResult: DataModels.UserTasks.UserTaskResult,
+  ): Promise<void>;
   onProcessEnded(identity: IIdentity, callback: Function): Promise<Subscription>;
   onProcessStarted(identity: IIdentity, callback: Function): Promise<Subscription>;
   onProcessError(identity: IIdentity, callback: Function): Promise<Subscription>;
