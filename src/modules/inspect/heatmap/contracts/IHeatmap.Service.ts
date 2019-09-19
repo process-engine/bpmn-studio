@@ -5,16 +5,21 @@ import {IBpmnModeler, IElementRegistry, IOverlayManager} from '../../../../contr
 
 export interface IHeatmapService {
   getRuntimeInformationForProcessModel(
+    identity: IIdentity,
     processModelId: string,
-  ): Promise<Array<DataModels.Kpi.FlowNodeRuntimeInformation>>;
-  getProcess(processModelId: string): Promise<DataModels.ProcessModels.ProcessModel>;
+  ): Promise<DataModels.Kpi.FlowNodeRuntimeInformationList>;
+  getProcess(identity: IIdentity, processModelId: string): Promise<DataModels.ProcessModels.ProcessModel>;
   getFlowNodeAssociations(elementRegistry: IElementRegistry): Array<IFlowNodeAssociation>;
   getColoredXML(
     associations: Array<IFlowNodeAssociation>,
     flowNodeRuntimeInformation: Array<DataModels.Kpi.FlowNodeRuntimeInformation>,
     modeler: IBpmnModeler,
   ): Promise<string>;
-  getActiveTokensForFlowNode(flowNodeId: string): Promise<Array<DataModels.Kpi.ActiveToken>>;
-  addOverlays(overlays: IOverlayManager, elementRegistry: IElementRegistry, processModelId: string): void;
-  setIdentity(identity: IIdentity): void;
+  getActiveTokensForFlowNode(identity: IIdentity, flowNodeId: string): Promise<DataModels.Kpi.ActiveTokenList>;
+  addOverlays(
+    identity: IIdentity,
+    overlays: IOverlayManager,
+    elementRegistry: IElementRegistry,
+    processModelId: string,
+  ): void;
 }

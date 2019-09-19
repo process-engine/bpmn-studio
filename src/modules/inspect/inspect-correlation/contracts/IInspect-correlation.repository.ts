@@ -5,22 +5,30 @@ export interface IInspectCorrelationRepository {
   getAllCorrelationsForProcessModelId(
     processModelId: string,
     identity: IIdentity,
-  ): Promise<Array<DataModels.Correlations.Correlation>>;
+    offset?: number,
+    limit?: number,
+  ): Promise<DataModels.Correlations.CorrelationList>;
   getLogsForCorrelation(
     correlation: DataModels.Correlations.Correlation,
     identity: IIdentity,
-  ): Promise<Array<DataModels.Logging.LogEntry>>;
+    offset?: number,
+    limit?: number,
+  ): Promise<Array<DataModels.Logging.LogEntryList>>;
   getLogsForProcessInstance(
     processModelId: string,
     processInstance: string,
     identity: IIdentity,
-  ): Promise<Array<DataModels.Logging.LogEntry>>;
+    offset?: number,
+    limit?: number,
+  ): Promise<DataModels.Logging.LogEntryList>;
   getTokenForFlowNodeInstance(
     processModelId: string,
     correlationId: string,
     flowNodeId: string,
     identity: IIdentity,
-  ): Promise<Array<DataModels.TokenHistory.TokenHistoryEntry>>;
+    offset?: number,
+    limit?: number,
+  ): Promise<DataModels.TokenHistory.TokenHistoryEntryList>;
   getTokenForFlowNodeByProcessInstanceId(
     processInstanceId: string,
     flowNodeId: string,

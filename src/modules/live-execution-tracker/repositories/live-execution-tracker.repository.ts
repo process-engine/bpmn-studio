@@ -2,25 +2,34 @@ import {inject} from 'aurelia-framework';
 
 import {Subscription} from '@essential-projects/event_aggregator_contracts';
 import {IIdentity} from '@essential-projects/iam_contracts';
-import {DataModels, IManagementApi, Messages} from '@process-engine/management_api_contracts';
+import {DataModels, IManagementApiClient, Messages} from '@process-engine/management_api_contracts';
 import {ILiveExecutionTrackerRepository, RequestError} from '../contracts/index';
 
 @inject('ManagementApiClientService')
 export class LiveExecutionTrackerRepository implements ILiveExecutionTrackerRepository {
-  private managementApiClient: IManagementApi;
+  protected managementApiClient: IManagementApiClient;
 
-  private maxRetries: number = 5;
-  private retryDelayInMs: number = 500;
+  protected maxRetries: number = 5;
+  protected retryDelayInMs: number = 500;
 
-  constructor(managementApiClientService: IManagementApi) {
+  constructor(managementApiClientService?: IManagementApiClient) {
     this.managementApiClient = managementApiClientService;
   }
 
   public async getFlowNodeInstancesForProcessInstance(
     identity: IIdentity,
     processInstanceId: string,
-  ): Promise<Array<DataModels.FlowNodeInstances.FlowNodeInstance>> {
-    return this.managementApiClient.getFlowNodeInstancesForProcessInstance(identity, processInstanceId);
+  ): Promise<DataModels.FlowNodeInstances.FlowNodeInstanceList> {
+    const flowNodeInstances: Array<
+      DataModels.FlowNodeInstances.FlowNodeInstance
+    > = (await this.managementApiClient.getFlowNodeInstancesForProcessInstance(identity, processInstanceId)) as any;
+
+    const flowNodeInstanceList: DataModels.FlowNodeInstances.FlowNodeInstanceList = {
+      flowNodeInstances: flowNodeInstances,
+      totalCount: flowNodeInstances.length,
+    };
+
+    return flowNodeInstanceList;
   }
 
   public async getCorrelationById(
@@ -47,7 +56,7 @@ export class LiveExecutionTrackerRepository implements ILiveExecutionTrackerRepo
     const getActiveTokens: Function = async (): Promise<Array<DataModels.Kpi.ActiveToken> | RequestError> => {
       for (let retries: number = 0; retries < this.maxRetries; retries++) {
         try {
-          return await this.managementApiClient.getActiveTokensForProcessInstance(identity, processInstanceId);
+          return (await this.managementApiClient.getActiveTokensForProcessInstance(identity, processInstanceId)) as any;
         } catch (error) {
           const errorIsConnectionLost: boolean = error.message === 'Failed to fetch';
 
@@ -86,7 +95,29 @@ export class LiveExecutionTrackerRepository implements ILiveExecutionTrackerRepo
   ): Promise<DataModels.TokenHistory.TokenHistoryGroup | null> {
     for (let retries: number = 0; retries < this.maxRetries; retries++) {
       try {
-        return await this.managementApiClient.getTokensForProcessInstance(identity, processInstanceId);
+        type OldTokenHistoryGroup = {
+          [name: string]: Array<DataModels.TokenHistory.TokenHistoryEntry>;
+        };
+
+        const oldTokenHistoryGroup: OldTokenHistoryGroup = (await this.managementApiClient.getTokensForProcessInstance(
+          identity,
+          processInstanceId,
+        )) as any;
+
+        const oldTokenHistoryKeys: Array<string> = Object.keys(oldTokenHistoryGroup);
+
+        const tokenHistoryGroup: DataModels.TokenHistory.TokenHistoryGroup = {};
+
+        oldTokenHistoryKeys.forEach((key: string) => {
+          const tokenHistoryEntryList: DataModels.TokenHistory.TokenHistoryEntryList = {
+            tokenHistoryEntries: oldTokenHistoryGroup[key],
+            totalCount: oldTokenHistoryGroup[key].length,
+          };
+
+          tokenHistoryGroup[key] = tokenHistoryEntryList;
+        });
+
+        return tokenHistoryGroup;
       } catch {
         await new Promise((resolve: Function): void => {
           setTimeout(() => {
@@ -102,10 +133,19 @@ export class LiveExecutionTrackerRepository implements ILiveExecutionTrackerRepo
   public async getActiveTokensForProcessInstance(
     identity: IIdentity,
     processInstanceId: string,
-  ): Promise<Array<DataModels.Kpi.ActiveToken> | null> {
+  ): Promise<DataModels.Kpi.ActiveTokenList | null> {
     for (let retries: number = 0; retries < this.maxRetries; retries++) {
       try {
-        return await this.managementApiClient.getActiveTokensForProcessInstance(identity, processInstanceId);
+        const activeTokens: Array<
+          DataModels.Kpi.ActiveToken
+        > = (await this.managementApiClient.getActiveTokensForProcessInstance(identity, processInstanceId)) as any;
+
+        const activeTokenList: DataModels.Kpi.ActiveTokenList = {
+          activeTokens: activeTokens,
+          totalCount: activeTokens.length,
+        };
+
+        return activeTokenList;
       } catch {
         await new Promise((resolve: Function): void => {
           setTimeout(() => {
@@ -124,7 +164,16 @@ export class LiveExecutionTrackerRepository implements ILiveExecutionTrackerRepo
   ): Promise<DataModels.EmptyActivities.EmptyActivityList | null> {
     for (let retries: number = 0; retries < this.maxRetries; retries++) {
       try {
-        return await this.managementApiClient.getEmptyActivitiesForProcessInstance(identity, processInstanceId);
+        const emptyActivities: Array<
+          DataModels.EmptyActivities.EmptyActivity
+        > = (await this.managementApiClient.getEmptyActivitiesForProcessInstance(identity, processInstanceId)) as any;
+
+        const emptyActivityList: DataModels.EmptyActivities.EmptyActivityList = {
+          emptyActivities: emptyActivities,
+          totalCount: emptyActivities.length,
+        };
+
+        return emptyActivityList;
       } catch {
         await new Promise((resolve: Function): void => {
           setTimeout(() => {

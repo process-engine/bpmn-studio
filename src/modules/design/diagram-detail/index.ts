@@ -3,13 +3,13 @@ import {EventAggregator} from 'aurelia-event-aggregator';
 
 import {IManagementApiClient} from '@process-engine/management_api_contracts';
 
-import {TokenViewerService} from './service/token-viewer.service';
+import {DiagramDetailService} from './service/diagram-detail.service';
 
 export function configure(config: FrameworkConfiguration): void {
   const eventAggregator: EventAggregator = config.container.get(EventAggregator);
   const managementApiClient: IManagementApiClient = config.container.get('ManagementApiClientService');
 
-  const tokenViewerService: TokenViewerService = new TokenViewerService(eventAggregator, managementApiClient);
+  const diagramDetailService: DiagramDetailService = new DiagramDetailService(eventAggregator, managementApiClient);
 
-  config.container.registerInstance('TokenViewerService', tokenViewerService);
+  config.container.registerInstance('DiagramDetailService', diagramDetailService);
 }

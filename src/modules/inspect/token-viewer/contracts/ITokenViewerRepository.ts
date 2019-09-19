@@ -7,7 +7,7 @@ export interface ITokenViewerRepository {
     correlationId: string,
     flowNodeId: string,
     identity: IIdentity,
-  ): Promise<Array<DataModels.TokenHistory.TokenHistoryEntry>>;
+  ): Promise<DataModels.TokenHistory.TokenHistoryEntryList>;
   getTokenForFlowNodeByProcessInstanceId(
     processInstanceId: string,
     flowNodeId: string,

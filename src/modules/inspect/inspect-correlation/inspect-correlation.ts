@@ -47,10 +47,12 @@ export class InspectCorrelation {
 
   public async attached(): Promise<void> {
     try {
-      this.correlations = await this.inspectCorrelationService.getAllCorrelationsForProcessModelId(
+      const correlationList = await this.inspectCorrelationService.getAllCorrelationsForProcessModelId(
         this.activeDiagram.id,
         this.activeSolutionEntry.identity,
       );
+
+      this.correlations = correlationList.correlations;
     } catch (error) {
       this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
       this.correlations = [];
@@ -138,10 +140,12 @@ export class InspectCorrelation {
   public async activeDiagramChanged(): Promise<void> {
     if (this.viewIsAttached) {
       try {
-        this.correlations = await this.inspectCorrelationService.getAllCorrelationsForProcessModelId(
+        const correlationList = await this.inspectCorrelationService.getAllCorrelationsForProcessModelId(
           this.activeDiagram.id,
           this.activeSolutionEntry.identity,
         );
+
+        this.correlations = correlationList.correlations;
       } catch (error) {
         this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
         this.correlations = [];
