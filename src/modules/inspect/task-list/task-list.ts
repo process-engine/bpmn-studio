@@ -1,12 +1,13 @@
-import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
+import {Subscription} from 'aurelia-event-aggregator';
 import {bindable, inject} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 
 import {ForbiddenError, NotFoundError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
-import {DataModels, IManagementApi} from '@process-engine/management_api_contracts';
+import {DataModels} from '@process-engine/management_api_contracts';
 
 import {AuthenticationStateEvent, ISolutionEntry, ISolutionService} from '../../../contracts/index';
 import environment from '../../../environment';
+import {DashboardService} from '../dashboard/dashboard-service/dashboard-service';
 
 interface ITaskListRouteParameters {
   processInstanceId?: string;
@@ -35,7 +36,7 @@ type TaskListEntry = {
   taskType: TaskType;
 };
 
-@inject(EventAggregator, 'ManagementApiClientService', Router, 'SolutionService')
+@inject('DashboardService', Router, 'SolutionService')
 export class TaskList {
   @bindable() public activeSolutionEntry: ISolutionEntry;
 
@@ -48,8 +49,7 @@ export class TaskList {
   public showError: boolean = false;
 
   private activeSolutionUri: string;
-  private eventAggregator: EventAggregator;
-  private managementApiService: IManagementApi;
+  private dashboardService: DashboardService;
   private router: Router;
   private solutionService: ISolutionService;
 
@@ -58,14 +58,8 @@ export class TaskList {
   private getTasks: () => Promise<Array<TaskListEntry>>;
   private isAttached: boolean = false;
 
-  constructor(
-    eventAggregator: EventAggregator,
-    managementApiService: IManagementApi,
-    router: Router,
-    solutionService: ISolutionService,
-  ) {
-    this.eventAggregator = eventAggregator;
-    this.managementApiService = managementApiService;
+  constructor(dashboardService: DashboardService, router: Router, solutionService: ISolutionService) {
+    this.dashboardService = dashboardService;
     this.router = router;
     this.solutionService = solutionService;
   }
@@ -105,7 +99,7 @@ export class TaskList {
       this.tasks = [];
       this.initialLoadingFinished = false;
       this.showError = false;
-      this.eventAggregator.publish(environment.events.configPanel.solutionEntryChanged, newValue);
+      this.dashboardService.eventAggregator.publish(environment.events.configPanel.solutionEntryChanged, newValue);
 
       await this.updateTasks();
     }
@@ -129,41 +123,41 @@ export class TaskList {
     }
 
     this.subscriptions = [
-      this.eventAggregator.subscribe(AuthenticationStateEvent.LOGIN, async () => {
+      this.dashboardService.eventAggregator.subscribe(AuthenticationStateEvent.LOGIN, async () => {
         await this.updateTasks();
       }),
-      this.eventAggregator.subscribe(AuthenticationStateEvent.LOGOUT, async () => {
+      this.dashboardService.eventAggregator.subscribe(AuthenticationStateEvent.LOGOUT, async () => {
         await this.updateTasks();
       }),
     ];
 
     await this.updateTasks();
 
-    this.managementApiService.onEmptyActivityFinished(this.activeSolutionEntry.identity, async () => {
+    this.dashboardService.onEmptyActivityFinished(this.activeSolutionEntry.identity, async () => {
       await this.updateTasks();
     });
 
-    this.managementApiService.onEmptyActivityWaiting(this.activeSolutionEntry.identity, async () => {
+    this.dashboardService.onEmptyActivityWaiting(this.activeSolutionEntry.identity, async () => {
       await this.updateTasks();
     });
 
-    this.managementApiService.onUserTaskFinished(this.activeSolutionEntry.identity, async () => {
+    this.dashboardService.onUserTaskFinished(this.activeSolutionEntry.identity, async () => {
       await this.updateTasks();
     });
 
-    this.managementApiService.onUserTaskWaiting(this.activeSolutionEntry.identity, async () => {
+    this.dashboardService.onUserTaskWaiting(this.activeSolutionEntry.identity, async () => {
       await this.updateTasks();
     });
 
-    this.managementApiService.onManualTaskFinished(this.activeSolutionEntry.identity, async () => {
+    this.dashboardService.onManualTaskFinished(this.activeSolutionEntry.identity, async () => {
       await this.updateTasks();
     });
 
-    this.managementApiService.onManualTaskWaiting(this.activeSolutionEntry.identity, async () => {
+    this.dashboardService.onManualTaskWaiting(this.activeSolutionEntry.identity, async () => {
       await this.updateTasks();
     });
 
-    this.managementApiService.onProcessError(this.activeSolutionEntry.identity, async () => {
+    this.dashboardService.onProcessError(this.activeSolutionEntry.identity, async () => {
       await this.updateTasks();
     });
 
@@ -195,14 +189,14 @@ export class TaskList {
   }
 
   private async getAllTasks(): Promise<Array<TaskListEntry>> {
-    const allProcessModels: DataModels.ProcessModels.ProcessModelList = await this.managementApiService.getProcessModels(
+    const allProcessModels: DataModels.ProcessModels.ProcessModelList = await this.dashboardService.getProcessModels(
       this.activeSolutionEntry.identity,
     );
 
     // TODO (ph): This will create 1 + n http reqeusts, where n is the number of process models in the processengine.
     const promisesForAllUserTasks: Array<Promise<Array<TaskListEntry>>> = allProcessModels.processModels.map(
       async (processModel: DataModels.ProcessModels.ProcessModel): Promise<Array<TaskListEntry>> => {
-        const userTaskList: DataModels.UserTasks.UserTaskList = await this.managementApiService.getUserTasksForProcessModel(
+        const userTaskList: DataModels.UserTasks.UserTaskList = await this.dashboardService.getUserTasksForProcessModel(
           this.activeSolutionEntry.identity,
           processModel.id,
         );
@@ -213,7 +207,7 @@ export class TaskList {
 
     const promisesForAllManualTasks: Array<Promise<Array<TaskListEntry>>> = allProcessModels.processModels.map(
       async (processModel: DataModels.ProcessModels.ProcessModel): Promise<Array<TaskListEntry>> => {
-        const manualTaskList: DataModels.ManualTasks.ManualTaskList = await this.managementApiService.getManualTasksForProcessModel(
+        const manualTaskList: DataModels.ManualTasks.ManualTaskList = await this.dashboardService.getManualTasksForProcessModel(
           this.activeSolutionEntry.identity,
           processModel.id,
         );
@@ -224,7 +218,7 @@ export class TaskList {
 
     const promisesForAllEmptyActivities: Array<Promise<Array<TaskListEntry>>> = allProcessModels.processModels.map(
       async (processModel: DataModels.ProcessModels.ProcessModel): Promise<Array<TaskListEntry>> => {
-        const emptyActivityList: DataModels.EmptyActivities.EmptyActivityList = await this.managementApiService.getEmptyActivitiesForProcessModel(
+        const emptyActivityList: DataModels.EmptyActivities.EmptyActivityList = await this.dashboardService.getEmptyActivitiesForProcessModel(
           this.activeSolutionEntry.identity,
           processModel.id,
         );
@@ -249,17 +243,17 @@ export class TaskList {
   }
 
   private async getTasksForProcessModel(processModelId: string): Promise<Array<TaskListEntry>> {
-    const userTaskList: DataModels.UserTasks.UserTaskList = await this.managementApiService.getUserTasksForProcessModel(
+    const userTaskList: DataModels.UserTasks.UserTaskList = await this.dashboardService.getUserTasksForProcessModel(
       this.activeSolutionEntry.identity,
       processModelId,
     );
 
-    const manualTaskList: DataModels.ManualTasks.ManualTaskList = await this.managementApiService.getManualTasksForProcessModel(
+    const manualTaskList: DataModels.ManualTasks.ManualTaskList = await this.dashboardService.getManualTasksForProcessModel(
       this.activeSolutionEntry.identity,
       processModelId,
     );
 
-    const emptyActivityList: DataModels.EmptyActivities.EmptyActivityList = await this.managementApiService.getEmptyActivitiesForProcessModel(
+    const emptyActivityList: DataModels.EmptyActivities.EmptyActivityList = await this.dashboardService.getEmptyActivitiesForProcessModel(
       this.activeSolutionEntry.identity,
       processModelId,
     );
@@ -275,11 +269,11 @@ export class TaskList {
   }
 
   private async getTasksForCorrelation(correlationId: string): Promise<Array<TaskListEntry>> {
-    const runningCorrelations: Array<
-      DataModels.Correlations.Correlation
-    > = await this.managementApiService.getActiveCorrelations(this.activeSolutionEntry.identity);
+    const runningCorrelations: DataModels.Correlations.CorrelationList = await this.dashboardService.getActiveCorrelations(
+      this.activeSolutionEntry.identity,
+    );
 
-    const correlation: DataModels.Correlations.Correlation = runningCorrelations.find(
+    const correlation: DataModels.Correlations.Correlation = runningCorrelations.correlations.find(
       (otherCorrelation: DataModels.Correlations.Correlation) => {
         return otherCorrelation.id === correlationId;
       },
@@ -290,17 +284,17 @@ export class TaskList {
       throw new NotFoundError(`No correlation found with id ${correlationId}.`);
     }
 
-    const userTaskList: DataModels.UserTasks.UserTaskList = await this.managementApiService.getUserTasksForCorrelation(
+    const userTaskList: DataModels.UserTasks.UserTaskList = await this.dashboardService.getUserTasksForCorrelation(
       this.activeSolutionEntry.identity,
       correlationId,
     );
 
-    const manualTaskList: DataModels.ManualTasks.ManualTaskList = await this.managementApiService.getManualTasksForCorrelation(
+    const manualTaskList: DataModels.ManualTasks.ManualTaskList = await this.dashboardService.getManualTasksForCorrelation(
       this.activeSolutionEntry.identity,
       correlationId,
     );
 
-    const emptyActivityList: DataModels.EmptyActivities.EmptyActivityList = await this.managementApiService.getEmptyActivitiesForCorrelation(
+    const emptyActivityList: DataModels.EmptyActivities.EmptyActivityList = await this.dashboardService.getEmptyActivitiesForCorrelation(
       this.activeSolutionEntry.identity,
       correlationId,
     );
@@ -318,17 +312,17 @@ export class TaskList {
   }
 
   private async getTasksForProcessInstanceId(processInstanceId: string): Promise<Array<TaskListEntry>> {
-    const userTaskList: DataModels.UserTasks.UserTaskList = await this.managementApiService.getUserTasksForProcessInstance(
+    const userTaskList: DataModels.UserTasks.UserTaskList = await this.dashboardService.getUserTasksForProcessInstance(
       this.activeSolutionEntry.identity,
       processInstanceId,
     );
 
-    const manualTaskList: DataModels.ManualTasks.ManualTaskList = await this.managementApiService.getManualTasksForProcessInstance(
+    const manualTaskList: DataModels.ManualTasks.ManualTaskList = await this.dashboardService.getManualTasksForProcessInstance(
       this.activeSolutionEntry.identity,
       processInstanceId,
     );
 
-    const emptyActivityList: DataModels.EmptyActivities.EmptyActivityList = await this.managementApiService.getEmptyActivitiesForProcessInstance(
+    const emptyActivityList: DataModels.EmptyActivities.EmptyActivityList = await this.dashboardService.getEmptyActivitiesForProcessInstance(
       this.activeSolutionEntry.identity,
       processInstanceId,
     );

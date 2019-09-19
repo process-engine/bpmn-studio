@@ -16,7 +16,7 @@ export interface ILiveExecutionTrackerService {
   getActiveTokensForProcessInstance(
     identity: IIdentity,
     processInstanceId: string,
-  ): Promise<Array<DataModels.Kpi.ActiveToken> | null>;
+  ): Promise<DataModels.Kpi.ActiveTokenList | null>;
   getCorrelationById(identity: IIdentity, correlationId: string): Promise<DataModels.Correlations.Correlation>;
   getEmptyActivitiesForProcessInstance(
     identity: IIdentity,

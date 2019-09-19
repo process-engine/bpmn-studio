@@ -1,37 +1,57 @@
 import {inject} from 'aurelia-framework';
 
 import {IIdentity} from '@essential-projects/iam_contracts';
-import {DataModels} from '@process-engine/management_api_contracts';
+import {DataModels, IManagementApiClient} from '@process-engine/management_api_contracts';
 
+import {EventAggregator} from 'aurelia-event-aggregator';
 import {IInspectCorrelationRepository, IInspectCorrelationService} from '../contracts';
+import {InspectCorrelationPaginationRepository} from '../repositories/inspect-correlation.pagination.repository';
+import environment from '../../../../environment';
+import {InspectCorrelationRepository} from '../repositories/inspect-correlation.repository';
+import {ISolutionEntry} from '../../../../contracts';
+import {processEngineSupportsPagination} from '../../../../services/process-engine-version-module/process-engine-version-module';
 
-@inject('InspectCorrelationRepository')
+@inject(EventAggregator, 'ManagementApiClientService')
 export class InspectCorrelationService implements IInspectCorrelationService {
   private inspectCorrelationRepository: IInspectCorrelationRepository;
+  private eventAggregator: EventAggregator;
+  private managementApiService: IManagementApiClient;
 
-  constructor(inspectCorrelationRepository: IInspectCorrelationRepository) {
-    this.inspectCorrelationRepository = inspectCorrelationRepository;
+  constructor(eventAggregator: EventAggregator, managementApiService: IManagementApiClient) {
+    this.eventAggregator = eventAggregator;
+    this.managementApiService = managementApiService;
+
+    this.eventAggregator.subscribe(
+      environment.events.configPanel.solutionEntryChanged,
+      (solutionEntry: ISolutionEntry) => {
+        if (processEngineSupportsPagination(solutionEntry.processEngineVersion)) {
+          this.inspectCorrelationRepository = new InspectCorrelationPaginationRepository(this.managementApiService);
+        } else {
+          this.inspectCorrelationRepository = new InspectCorrelationRepository(this.managementApiService);
+        }
+      },
+    );
   }
 
-  public getAllCorrelationsForProcessModelId(
+  public async getAllCorrelationsForProcessModelId(
     processModelId: string,
     identity: IIdentity,
-  ): Promise<Array<DataModels.Correlations.Correlation>> {
+  ): Promise<DataModels.Correlations.CorrelationList> {
     return this.inspectCorrelationRepository.getAllCorrelationsForProcessModelId(processModelId, identity);
   }
 
-  public getLogsForCorrelation(
+  public async getLogsForCorrelation(
     correlation: DataModels.Correlations.Correlation,
     identity: IIdentity,
-  ): Promise<Array<DataModels.Logging.LogEntry>> {
+  ): Promise<Array<DataModels.Logging.LogEntryList>> {
     return this.inspectCorrelationRepository.getLogsForCorrelation(correlation, identity);
   }
 
-  public getLogsForProcessInstance(
+  public async getLogsForProcessInstance(
     processModelId: string,
     processInstanceId: string,
     identity: IIdentity,
-  ): Promise<Array<DataModels.Logging.LogEntry>> {
+  ): Promise<DataModels.Logging.LogEntryList> {
     return this.inspectCorrelationRepository.getLogsForProcessInstance(processModelId, processInstanceId, identity);
   }
 
@@ -43,9 +63,7 @@ export class InspectCorrelationService implements IInspectCorrelationService {
   ): Promise<DataModels.TokenHistory.TokenHistoryGroup | undefined> {
     try {
       const tokenHistory: DataModels.TokenHistory.TokenHistoryGroup = {};
-      const tokenForFlowNodeInstance: Array<
-        DataModels.TokenHistory.TokenHistoryEntry
-      > = await this.inspectCorrelationRepository.getTokenForFlowNodeInstance(
+      const tokenForFlowNodeInstance: DataModels.TokenHistory.TokenHistoryEntryList = await this.inspectCorrelationRepository.getTokenForFlowNodeInstance(
         processModelId,
         correlationId,
         flowNodeId,

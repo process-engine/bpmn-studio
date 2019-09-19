@@ -2,7 +2,7 @@ import {EventAggregator} from 'aurelia-event-aggregator';
 import {FrameworkConfiguration} from 'aurelia-framework';
 
 import {IHttpClient} from '@essential-projects/http_contracts';
-import {ExternalAccessor, ManagementApiClientService} from '@process-engine/management_api_client';
+import {ExternalAccessor, ManagementApiClient} from '@process-engine/management_api_client';
 
 import {ISolutionEntry} from '../../contracts';
 import environment from '../../environment';
@@ -17,7 +17,7 @@ export async function configure(config: FrameworkConfiguration): Promise<void> {
   const proxiedHttpClient: HttpClientProxy = new HttpClientProxy(httpClient, urlPrefix);
 
   const externalAccessor: ExternalAccessor = createExternalAccessor(proxiedHttpClient, configuredBaseRoute);
-  const clientService: ManagementApiClientService = createManagementApiClient(externalAccessor);
+  const clientService: ManagementApiClient = createManagementApiClient(externalAccessor);
 
   let socketIsAlreadyInitialized: boolean = false;
 
@@ -51,6 +51,6 @@ function createExternalAccessor(httpClient: IHttpClient, socketUrl: string): Ext
   return externalAccessor;
 }
 
-function createManagementApiClient(externalAccessor: ExternalAccessor): ManagementApiClientService {
-  return new ManagementApiClientService(externalAccessor);
+function createManagementApiClient(externalAccessor: ExternalAccessor): ManagementApiClient {
+  return new ManagementApiClient(externalAccessor);
 }

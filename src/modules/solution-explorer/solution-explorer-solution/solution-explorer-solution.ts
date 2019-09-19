@@ -724,26 +724,6 @@ export class SolutionExplorerSolution {
 
   // TODO: This method is copied all over the place.
   private async navigateToDetailView(diagram: IDiagram): Promise<void> {
-    const diagramIsNoRemoteDiagram: boolean = !this.isUriFromRemoteSolution(diagram.uri);
-    if (diagramIsNoRemoteDiagram) {
-      const viewIsHeatmapOrInspectCorrelation: boolean =
-        this.inspectView === 'inspect-correlation' || this.inspectView === 'heatmap';
-
-      if (viewIsHeatmapOrInspectCorrelation) {
-        this.inspectView = 'dashboard';
-      }
-
-      this.eventAggregator.publish(environment.events.navBar.inspectNavigateToDashboard);
-
-      const activeRouteIsInspect: boolean = this.diagramRoute === 'inspect';
-      if (activeRouteIsInspect) {
-        this.notificationService.showNotification(
-          NotificationType.INFO,
-          'There are currently no runtime information about this process available.',
-        );
-      }
-    }
-
     await this.router.navigateToRoute(this.diagramRoute, {
       view: this.inspectView ? this.inspectView : this.designView,
       diagramName: diagram.name,

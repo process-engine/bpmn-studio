@@ -1,4 +1,5 @@
 .heatmap {
+  display: flex;
   position: relative;
   width: 100%;
   height: 100%;
@@ -7,6 +8,7 @@
 
 .heatmap__viewer-container {
   height: 100%;
+  width: 100%;
 }
 
 .heatmap__legend {
@@ -61,6 +63,8 @@
 }
 
 .heatmap__empty-message {
-  margin: 20px;
+  width: 100%;
+  text-align: center;
+  transform: translateY(50%);
   user-select: none;
 }

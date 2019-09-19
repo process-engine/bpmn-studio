@@ -1,15 +1,14 @@
 import {bindable, computedFrom, inject} from 'aurelia-framework';
 
-import {ManagementApiClientService} from '@process-engine/management_api_client';
 import {DataModels} from '@process-engine/management_api_contracts';
 
 import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
-import {EventAggregator} from 'aurelia-event-aggregator';
 import {ISolutionEntry} from '../../../contracts/index';
 import environment from '../../../environment';
 import {getBeautifiedDate} from '../../../services/date-service/date.service';
+import {DashboardService} from '../dashboard/dashboard-service/dashboard-service';
 
-@inject('ManagementApiClientService', EventAggregator)
+@inject('DashboardService')
 export class CronjobList {
   @bindable public activeSolutionEntry: ISolutionEntry;
   public initialLoadingFinished: boolean = false;
@@ -18,16 +17,13 @@ export class CronjobList {
   public paginationSize: number = 10;
   public showError: boolean;
 
-  private managementApiService: ManagementApiClientService;
-
   private cronjobs: Array<DataModels.Cronjobs.CronjobConfiguration> = [];
   private pollingTimeout: NodeJS.Timeout;
   private isAttached: boolean;
-  private eventAggregator: EventAggregator;
+  private dashboardService: DashboardService;
 
-  constructor(managementApiService: ManagementApiClientService, eventAggregator: EventAggregator) {
-    this.managementApiService = managementApiService;
-    this.eventAggregator = eventAggregator;
+  constructor(dashboardService: DashboardService) {
+    this.dashboardService = dashboardService;
   }
 
   public async activeSolutionEntryChanged(newValue): Promise<void> {
@@ -35,7 +31,7 @@ export class CronjobList {
       this.cronjobs = [];
       this.initialLoadingFinished = false;
       this.showError = false;
-      this.eventAggregator.publish(environment.events.configPanel.solutionEntryChanged, newValue);
+      this.dashboardService.eventAggregator.publish(environment.events.configPanel.solutionEntryChanged, newValue);
 
       await this.updateCronjobs();
     }
@@ -63,6 +59,7 @@ export class CronjobList {
     return this.cronjobsToDisplay !== undefined && this.cronjobsToDisplay.length > 0;
   }
 
+  @computedFrom('cronjobs.length')
   public get cronjobsToDisplay(): Array<DataModels.Cronjobs.CronjobConfiguration> {
     const firstCronjobIndex: number = (this.currentPage - 1) * this.pageSize;
     const lastCronjobIndex: number = this.pageSize * this.currentPage;
@@ -82,8 +79,8 @@ export class CronjobList {
 
   public async updateCronjobs(): Promise<void> {
     try {
-      this.cronjobs = await this.managementApiService.getAllActiveCronjobs(this.activeSolutionEntry.identity);
-
+      const cronjobList = await this.dashboardService.getAllActiveCronjobs(this.activeSolutionEntry.identity);
+      this.cronjobs = cronjobList.cronjobs;
       this.initialLoadingFinished = true;
     } catch (error) {
       this.initialLoadingFinished = true;

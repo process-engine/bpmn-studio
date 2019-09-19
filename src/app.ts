@@ -38,6 +38,10 @@ export class App {
 
     if (this.isRunningInElectron) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
+
+      this.ipcRenderer.on('database-export-error', (event: Event, errorMessage: string) => {
+        this.notificationService.showNotification(NotificationType.ERROR, errorMessage);
+      });
     }
   }
 
@@ -65,14 +69,18 @@ export class App {
     window.localStorage.setItem('SolutionExplorerVisibility', showSolutionExplorer);
 
     this.subscriptions = [
-      this.eventAggregator.subscribe(environment.events.processSolutionPanel.toggleProcessSolutionExplorer, () => {
-        this.showSolutionExplorer = !this.showSolutionExplorer;
-        if (this.showSolutionExplorer) {
-          window.localStorage.setItem('SolutionExplorerVisibility', 'true');
-        } else {
-          window.localStorage.setItem('SolutionExplorerVisibility', 'false');
-        }
-      }),
+      this.eventAggregator.subscribe(
+        environment.events.solutionExplorerPanel.toggleSolutionExplorer,
+        (show: boolean) => {
+          this.showSolutionExplorer = show;
+
+          if (this.showSolutionExplorer) {
+            window.localStorage.setItem('SolutionExplorerVisibility', 'true');
+          } else {
+            window.localStorage.setItem('SolutionExplorerVisibility', 'false');
+          }
+        },
+      ),
     ];
 
     /*

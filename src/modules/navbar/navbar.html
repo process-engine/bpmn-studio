@@ -1,24 +1,25 @@
 <template>
   <require from="./navbar.css"></require>
-  <div class="bpmn-studio-navbar" class.bind="showLeftMarginInNavbar ? 'bpmn-studio-navbar--left-margin' : ''" id="navBarContainer">
+  <div class="bpmn-studio-navbar" class.bind="showLeftMarginInNavbar ? 'bpmn-studio-navbar--left-margin' : ''" ref="navbarContainer">
     <div class="menu-bar__menu--left" id="navBarLeft">
       <div class="menu__menu-tabbed-link">
-        <button class="button menu-tabbed-link action-button" class.bind="solutionExplorerIsActive ? 'button--active' : ''" click.delegate="toggleSolutionExplorer()" title="Toggle visibility of the Solution Explorer" data-test-toggle-solution-explorer>
+        <button class="button menu-tabbed-link action-button" class.bind="solutionExplorerIsActive ? 'button--active' : ''" click.delegate="toggleSolutionExplorer($event)" dblclick.trigger="$event.stopPropagation()" title="Toggle visibility of the Solution Explorer" data-test-toggle-solution-explorer>
           <i class="fas fa-project-diagram"></i>
         </button>
       </div>
       <div repeat.for="nav of router.navigation" class="button menu__menu-tabbed-link" class.bind="nav.isActive ? 'button--active menu__menu-tabbed-link--active' : ''">
-        <a class="menu-tabbed-link" click.delegate="navigate(nav)" data-test-navbar="${nav.title}">${nav.title}</a>
+        <a class="menu-tabbed-link" click.delegate="navigate(nav)" dblclick.trigger="$event.stopPropagation()" data-test-navbar="${nav.title}">${nav.title}</a>
       </div>
     </div>
-    <div class="menu-bar__menu--center" id="navBarCenter">
+    <div class="menu-bar__menu--center">
       <div class="menu__element menu__element--title btn-group" if.bind="showProcessName" ref="diagramInfo">
-        <span class="fas menu__origin-icon" class.bind="getClassNameForNavbarIcon" data-test-navbar-icon="${savingTargetIsRemoteSolution}"></span>
+        <span if.bind="savingTargetIsRemoteSolution" class="fas menu__origin-icon fa-database" data-test-navbar-icon-remote-solution></span>
+        <span else class="fas menu__origin-icon fa-folder" data-test-navbar-icon-local-solution></span>
         <span class="process-details-title" title.bind="navbarTitle" data-test-navbar-title>${navbarTitle}</span>
         <span if.bind="diagramContainsUnsavedChanges" class="edited-label" data-test-edited-label>- edited</span>
       </div>
     </div>
-    <div class="menu-bar__menu--right" id="navBarRight">
+    <div class="menu-bar__menu--right">
       <template if.bind="showTools">
         <button class="button menu-bar__menu-center--action-button menu-bar__menu-center--back-button back-button" click.delegate="navigateBack()" title="Navigate back">
           <i class="fas fa-arrow-circle-left"></i>

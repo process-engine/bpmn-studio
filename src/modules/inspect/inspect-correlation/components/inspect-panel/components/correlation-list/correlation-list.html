@@ -5,8 +5,8 @@
     <table else class="table table-striped table-hover correlation-table">
       <thead>
         <tr class="correlation-table__headlines">
-          <th class="correlation-table__headline--number" click.delegate="sortList(correlationListSortProperty.Number)">
-            Number <i if.bind="sortSettings.sortProperty === correlationListSortProperty.Number" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
+          <th class="correlation-table__headline" click.delegate="sortList(correlationListSortProperty.CorrelationId)">
+            Correlation ID <i if.bind="sortSettings.sortProperty === correlationListSortProperty.CorrelationId" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
           <th class="correlation-table__headline" click.delegate="sortList(correlationListSortProperty.StartedAt)">
             Started at <i if.bind="sortSettings.sortProperty === correlationListSortProperty.StartedAt" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
@@ -20,19 +20,15 @@
           <th class="correlation-table__headline" click.delegate="sortList(correlationListSortProperty.ProcessInstanceId)">
             Process Instance ID <i if.bind="sortSettings.sortProperty === correlationListSortProperty.ProcessInstanceId" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
-          <th class="correlation-table__headline" click.delegate="sortList(correlationListSortProperty.CorrelationId)">
-            Correlation ID <i if.bind="sortSettings.sortProperty === correlationListSortProperty.CorrelationId" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
-          </th>
         </tr>
       </thead>
       <tbody class="correlation-table__body">
         <tr dblclick.delegate="showLogViewer()" class="correlation-table__table-row" repeat.for="tableEntry of sortedTableData" class.bind="tableEntry.processInstanceId === selectedTableEntry.processInstanceId ? 'correlation-table__selected-entry': ''" click.delegate="selectCorrelation(tableEntry)">
-          <td class="correlation-table__table-entry--number">${tableEntry.index}</td>
+          <td class="correlation-table__table-entry">${tableEntry.correlationId}</td>
           <td class="correlation-table__table-entry">${tableEntry.startedAt}</td>
-          <td class="correlation-table__table-entry">${tableEntry.state}</td>
+          <td class="correlation-table__table-entry correlation-table__table-entry--state">${tableEntry.state}</td>
           <td if.bind="false" class="correlation-table__table-entry">${tableEntry.user}</td>
           <td class="correlation-table__table-entry">${tableEntry.processInstanceId}</td>
-          <td class="correlation-table__table-entry">${tableEntry.correlationId}</td>
         </tr>
       </tbody>
     </table>
