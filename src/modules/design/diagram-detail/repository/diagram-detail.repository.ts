@@ -20,8 +20,6 @@ export class DiagramDetailRepository implements IDiagramDetailRepository {
       events: Array<DataModels.Events.Event>;
     } = (await this.managementApiClient.getStartEventsForProcessModel(identity, processModelId)) as any;
 
-    console.log(startEvents);
-
     const eventList: DataModels.Events.EventList = {
       events: startEvents.events,
       totalCount: startEvents.events.length,
