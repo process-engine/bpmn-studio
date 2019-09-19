@@ -686,9 +686,6 @@ function getWindowMenu(): MenuItem {
     {
       role: 'reload',
     },
-    {
-      role: 'toggleDevTools',
-    },
   ];
 
   const submenu: Menu = electron.Menu.buildFromTemplate(submenuOptions);
@@ -711,7 +708,7 @@ function getHelpMenu(): MenuItem {
       },
     },
     {
-      label: 'Release Notes for Current Version',
+      label: 'Release Notes',
       click: (): void => {
         const currentVersion = app.getVersion();
         const currentReleaseNotesUrl = `https://github.com/process-engine/bpmn-studio/releases/tag/v${currentVersion}`;
@@ -722,14 +719,31 @@ function getHelpMenu(): MenuItem {
       type: 'separator',
     },
     {
-      label: 'Export Databases',
-      click: async (): Promise<void> => {
-        try {
-          await exportDatabases();
-        } catch (error) {
-          browserWindow.webContents.send('database-export-error', error.message);
-        }
-      },
+      label: 'Developer Support',
+      submenu: [
+        {
+          role: 'toggleDevTools',
+        },
+        {
+          type: 'separator',
+        },
+        {
+          label: 'Export Databases to ZIP File ...',
+          click: async (): Promise<void> => {
+            try {
+              await exportDatabases();
+            } catch (error) {
+              browserWindow.webContents.send('database-export-error', error.message);
+            }
+          },
+        },
+        {
+          label: 'Open Folder for Databases',
+          click: async (): Promise<void> => {
+            electron.shell.openItem(getConfigFolder());
+          },
+        },
+      ],
     },
   ];
 
@@ -978,7 +992,7 @@ function bringExistingInstanceToForeground(): void {
 async function exportDatabases(): Promise<void> {
   const zip = new JSZip();
 
-  const img = zip.folder('databases');
+  const img = zip.folder(getProcessEngineDatabaseFolderName());
 
   const foldername: string = getDatabaseFolder();
 
@@ -993,8 +1007,11 @@ async function exportDatabases(): Promise<void> {
   // eslint-disable-next-line newline-per-chained-call
   const now = new Date().toISOString().replace(/:/g, '-');
 
+  const downloadPath = electron.app.getPath('downloads');
+  const defaultPath = path.join(downloadPath, `database-backup-${now}.zip`);
+
   const savePath: string = dialog.showSaveDialogSync({
-    defaultPath: `database-backup-${now}.zip`,
+    defaultPath: defaultPath,
     filters: [
       {
         name: 'zip',
