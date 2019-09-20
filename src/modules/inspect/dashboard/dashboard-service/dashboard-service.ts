@@ -11,10 +11,10 @@ import {processEngineSupportsPagination} from '../../../../services/process-engi
 import {DashboardPaginationRepository} from '../dashboard-repositories/dashboard-pagination-repository';
 import {DashboardRepository} from '../dashboard-repositories/dashboard-repository';
 import {IDashboardRepository} from '../dashboard-repositories/IDashboardRepository';
-import {TaskListEntry} from '../contracts/index';
+import {IDashboardService, TaskListEntry} from '../contracts/index';
 
 @inject(EventAggregator, 'ManagementApiClientService')
-export class DashboardService {
+export class DashboardService implements IDashboardService {
   public eventAggregator: EventAggregator;
 
   private dashboardRepository: IDashboardRepository;

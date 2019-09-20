@@ -12,7 +12,7 @@ import {AuthenticationStateEvent, ISolutionEntry, ISolutionService, Notification
 import {getBeautifiedDate} from '../../../services/date-service/date.service';
 import {NotificationService} from '../../../services/notification-service/notification.service';
 import environment from '../../../environment';
-import {DashboardService} from '../dashboard/dashboard-service/dashboard-service';
+import {IDashboardService} from '../dashboard/contracts';
 
 Bluebird.Promise.config({cancellation: true});
 
@@ -32,7 +32,7 @@ export class ProcessList {
   public processInstancesToDisplay: Array<ProcessInstanceWithCorrelation> = [];
   public showError: boolean;
 
-  private dashboardService: DashboardService;
+  private dashboardService: IDashboardService;
   private notificationService: NotificationService;
   private solutionService: ISolutionService;
   private activeSolutionUri: string;
@@ -46,7 +46,7 @@ export class ProcessList {
   private handlerPromise: any;
 
   constructor(
-    dashboardService: DashboardService,
+    dashboardService: IDashboardService,
     notificationService: NotificationService,
     solutionService: ISolutionService,
     router: Router,
