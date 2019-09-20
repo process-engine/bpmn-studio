@@ -1,3 +1,5 @@
+import {EventAggregator} from 'aurelia-event-aggregator';
+
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {Subscription} from '@essential-projects/event_aggregator_contracts';
 import {DataModels} from '@process-engine/management_api_contracts';
@@ -5,6 +7,8 @@ import {DataModels} from '@process-engine/management_api_contracts';
 import {TaskListEntry} from './index';
 
 export interface IDashboardService {
+  eventAggregator: EventAggregator;
+
   getAllSuspendedTasks(identity: IIdentity): Promise<Array<TaskListEntry>>;
   getAllActiveCronjobs(identity: IIdentity): Promise<DataModels.Cronjobs.CronjobList>;
   getProcessModels(identity: IIdentity): Promise<DataModels.ProcessModels.ProcessModelList>;
