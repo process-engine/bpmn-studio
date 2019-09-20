@@ -1,7 +1,7 @@
 import {DataModels, IManagementApiClient, Messages} from '@process-engine/management_api_contracts';
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {Subscription} from '@essential-projects/event_aggregator_contracts';
-import {IDashboardRepository} from './IDashboardRepository';
+import {IDashboardRepository} from '../contracts/IDashboardRepository';
 import {TaskListEntry, TaskSource, TaskType} from '../contracts/index';
 
 export class DashboardRepository implements IDashboardRepository {
