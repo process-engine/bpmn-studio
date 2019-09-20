@@ -6,7 +6,7 @@ import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/er
 import {ISolutionEntry} from '../../../contracts/index';
 import environment from '../../../environment';
 import {getBeautifiedDate} from '../../../services/date-service/date.service';
-import {DashboardService} from '../dashboard/dashboard-service/dashboard-service';
+import {IDashboardService} from '../dashboard/contracts';
 
 @inject('DashboardService')
 export class CronjobList {
@@ -20,9 +20,9 @@ export class CronjobList {
   private cronjobs: Array<DataModels.Cronjobs.CronjobConfiguration> = [];
   private pollingTimeout: NodeJS.Timeout;
   private isAttached: boolean;
-  private dashboardService: DashboardService;
+  private dashboardService: IDashboardService;
 
-  constructor(dashboardService: DashboardService) {
+  constructor(dashboardService: IDashboardService) {
     this.dashboardService = dashboardService;
   }
 

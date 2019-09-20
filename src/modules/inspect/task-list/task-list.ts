@@ -7,8 +7,7 @@ import {DataModels} from '@process-engine/management_api_contracts';
 
 import {AuthenticationStateEvent, ISolutionEntry, ISolutionService} from '../../../contracts/index';
 import environment from '../../../environment';
-import {DashboardService} from '../dashboard/dashboard-service/dashboard-service';
-import {TaskListEntry, TaskSource, TaskType} from '../dashboard/contracts/index';
+import {IDashboardService, TaskListEntry, TaskSource, TaskType} from '../dashboard/contracts/index';
 
 interface ITaskListRouteParameters {
   processInstanceId?: string;
@@ -29,7 +28,7 @@ export class TaskList {
   public showError: boolean = false;
 
   private activeSolutionUri: string;
-  private dashboardService: DashboardService;
+  private dashboardService: IDashboardService;
   private router: Router;
   private solutionService: ISolutionService;
 
@@ -38,7 +37,7 @@ export class TaskList {
   private getTasks: () => Promise<Array<TaskListEntry>>;
   private isAttached: boolean = false;
 
-  constructor(dashboardService: DashboardService, router: Router, solutionService: ISolutionService) {
+  constructor(dashboardService: IDashboardService, router: Router, solutionService: ISolutionService) {
     this.dashboardService = dashboardService;
     this.router = router;
     this.solutionService = solutionService;
