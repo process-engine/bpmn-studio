@@ -2,16 +2,16 @@ import {bindable, computedFrom, inject, observable} from 'aurelia-framework';
 
 import * as Bluebird from 'bluebird';
 
-import {DataModels,DataModels, IManagementApiClient} from '@process-engine/management_api_contracts';
-
+import {DataModels} from '@process-engine/management_api_contracts';
 
 import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
-import {SemVer} from 'semver';
 
+import {Subscription} from '@essential-projects/event_aggregator_contracts';
 import {ISolutionEntry} from '../../../contracts/index';
 import environment from '../../../environment';
 import {getBeautifiedDate} from '../../../services/date-service/date.service';
 import {IDashboardService} from '../dashboard/contracts';
+import {processEngineSupportsCronjobEvents} from '../../../services/process-engine-version-module/process-engine-version-module';
 
 @inject('DashboardService')
 export class CronjobList {
@@ -29,6 +29,7 @@ export class CronjobList {
   private dashboardService: IDashboardService;
 
   private updatePromise: any;
+  private subscriptions: Array<Subscription> = [];
 
   constructor(dashboardService: IDashboardService) {
     this.dashboardService = dashboardService;
@@ -41,6 +42,17 @@ export class CronjobList {
 
     if (this.updatePromise) {
       this.updatePromise.cancel();
+      await this.updateCronjobs();
+
+      if (processEngineSupportsCronjobEvents(this.activeSolutionEntry.processEngineVersion)) {
+        clearTimeout(this.pollingTimeout);
+        this.subscribeToEvents();
+      } else {
+        for (const subscription of this.subscriptions) {
+          await this.dashboardService.removeSubscription(this.activeSolutionEntry.identity, subscription);
+        }
+        this.startPolling();
+      }
     }
 
     this.cronjobsToDisplay = [];
@@ -57,16 +69,19 @@ export class CronjobList {
 
     await this.updateCronjobs();
 
-    if (this.processEngineSupportsCronjobEvents()) {
+    if (processEngineSupportsCronjobEvents(this.activeSolutionEntry.processEngineVersion)) {
       this.subscribeToEvents();
     } else {
       this.startPolling();
     }
   }
 
-  public detached(): void {
+  public async detached(): Promise<void> {
     this.isAttached = false;
     clearTimeout(this.pollingTimeout);
+    for (const subscription of this.subscriptions) {
+      await this.dashboardService.removeSubscription(this.activeSolutionEntry.identity, subscription);
+    }
   }
 
   public currentPageChanged(): void {
@@ -135,16 +150,6 @@ export class CronjobList {
     );
   }
 
-  private startPolling(): void {
-    this.pollingTimeout = setTimeout(async () => {
-      await this.updateCronjobs();
-
-      if (this.isAttached) {
-        this.startPolling();
-      }
-    }, environment.processengine.dashboardPollingIntervalInMs);
-  }
-
   private stopPolling(): void {
     clearTimeout(this.pollingTimeout);
   }
@@ -166,56 +171,27 @@ export class CronjobList {
     }, environment.processengine.dashboardPollingIntervalInMs);
   }
 
-  private subscribeToEvents(): void {
-    this.managementApiService.onCronjobCreated(this.activeSolutionEntry.identity, async (message) => {
-      console.log(message);
-      await this.updateCronjobs();
-    });
+  private async subscribeToEvents(): Promise<void> {
+    this.subscriptions = [
+      await this.dashboardService.onCronjobCreated(this.activeSolutionEntry.identity, async (message) => {
+        await this.updateCronjobs();
+      }),
 
-    this.managementApiService.onCronjobExecuted(this.activeSolutionEntry.identity, async (message) => {
-      console.log(message);
+      await this.dashboardService.onCronjobExecuted(this.activeSolutionEntry.identity, async (message) => {
+        await this.updateCronjobs();
+      }),
 
-      await this.updateCronjobs();
-    });
+      await this.dashboardService.onCronjobStopped(this.activeSolutionEntry.identity, async (message) => {
+        await this.updateCronjobs();
+      }),
 
-    this.managementApiService.onCronjobStopped(this.activeSolutionEntry.identity, async (message) => {
-      console.log(message);
+      await this.dashboardService.onCronjobUpdated(this.activeSolutionEntry.identity, async (message) => {
+        await this.updateCronjobs();
+      }),
 
-      await this.updateCronjobs();
-    });
-
-    this.managementApiService.onCronjobUpdated(this.activeSolutionEntry.identity, async (message) => {
-      console.log(message);
-
-      await this.updateCronjobs();
-    });
-
-    this.managementApiService.onCronjobRemoved(this.activeSolutionEntry.identity, async (message) => {
-      console.log(message);
-
-      await this.updateCronjobs();
-    });
-  }
-
-  private processEngineSupportsCronjobEvents(): boolean {
-    const processEngineVersion: string = this.activeSolutionEntry.processEngineVersion;
-
-    const solutionEntryPEVersion = new SemVer(processEngineVersion);
-
-    const alphaVersionWithEvents = new SemVer('8.6.0-alpha.18');
-    const betaVersionWithEvents = new SemVer('8.6.0-beta.2');
-    const stableVersionWithEvents = new SemVer('8.6.0');
-
-    const solutionEntryIsAlpha: boolean = solutionEntryPEVersion.prerelease[0] === 'alpha';
-    const solutionEntryIsBeta: boolean = solutionEntryPEVersion.prerelease[0] === 'beta';
-
-    if (solutionEntryIsAlpha) {
-      return solutionEntryPEVersion.compare(alphaVersionWithEvents) >= 0;
-    }
-    if (solutionEntryIsBeta) {
-      return solutionEntryPEVersion.compare(betaVersionWithEvents) >= 0;
-    }
-
-    return solutionEntryPEVersion.compare(stableVersionWithEvents) >= 0;
+      await this.dashboardService.onCronjobRemoved(this.activeSolutionEntry.identity, async (message) => {
+        await this.updateCronjobs();
+      }),
+    ];
   }
 }
