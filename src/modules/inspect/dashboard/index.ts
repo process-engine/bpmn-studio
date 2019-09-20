@@ -1,7 +1,7 @@
 import {FrameworkConfiguration} from 'aurelia-framework';
+import {EventAggregator} from 'aurelia-event-aggregator';
 
 import {IManagementApiClient} from '@process-engine/management_api_contracts';
-import {EventAggregator} from 'aurelia-event-aggregator';
 
 import {IDashboardService} from './contracts';
 import {DashboardService} from './dashboard-service/dashboard-service';
