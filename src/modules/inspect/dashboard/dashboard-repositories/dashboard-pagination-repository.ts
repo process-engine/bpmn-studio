@@ -88,6 +88,42 @@ export class DashboardPaginationRepository extends DashboardRepository implement
     return this.mapTaskListToTaskListEntry(taskList);
   }
 
+  public async getSuspendedTasksForProcessInstance(
+    identity: IIdentity,
+    processInstanceId: string,
+  ): Promise<Array<TaskListEntry>> {
+    const taskList: DataModels.FlowNodeInstances.TaskList = await this.managementApiService.getSuspendedTasksForProcessInstance(
+      identity,
+      processInstanceId,
+    );
+
+    return this.mapTaskListToTaskListEntry(taskList);
+  }
+
+  public async getSuspendedTasksForCorrelation(
+    identity: IIdentity,
+    correlationId: string,
+  ): Promise<Array<TaskListEntry>> {
+    const taskList: DataModels.FlowNodeInstances.TaskList = await this.managementApiService.getSuspendedTasksForCorrelation(
+      identity,
+      correlationId,
+    );
+
+    return this.mapTaskListToTaskListEntry(taskList);
+  }
+
+  public async getSuspendedTasksForProcessModel(
+    identity: IIdentity,
+    processModelId: string,
+  ): Promise<Array<TaskListEntry>> {
+    const taskList: DataModels.FlowNodeInstances.TaskList = await this.managementApiService.getSuspendedTasksForProcessModel(
+      identity,
+      processModelId,
+    );
+
+    return this.mapTaskListToTaskListEntry(taskList);
+  }
+
   private mapTaskListToTaskListEntry(taskList: DataModels.FlowNodeInstances.TaskList): Array<TaskListEntry> {
     const taskListEntries: Array<TaskListEntry> = taskList.tasks.map((task) => {
       return {

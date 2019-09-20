@@ -9,10 +9,13 @@ import {TaskListEntry} from './index';
 export interface IDashboardService {
   eventAggregator: EventAggregator;
 
-  getAllSuspendedTasks(identity: IIdentity): Promise<Array<TaskListEntry>>;
   getAllActiveCronjobs(identity: IIdentity): Promise<DataModels.Cronjobs.CronjobList>;
   getProcessModels(identity: IIdentity): Promise<DataModels.ProcessModels.ProcessModelList>;
   getActiveCorrelations(identity: IIdentity): Promise<DataModels.Correlations.CorrelationList>;
+  getAllSuspendedTasks(identity: IIdentity): Promise<Array<TaskListEntry>>;
+  getSuspendedTasksForProcessInstance(identity: IIdentity, processInstanceId: string): Promise<Array<TaskListEntry>>;
+  getSuspendedTasksForCorrelation(identity: IIdentity, correlationId: string): Promise<Array<TaskListEntry>>;
+  getSuspendedTasksForProcessModel(identity: IIdentity, processModelId: string): Promise<Array<TaskListEntry>>;
   getManualTasksForProcessModel(
     identity: IIdentity,
     processModelId: string,

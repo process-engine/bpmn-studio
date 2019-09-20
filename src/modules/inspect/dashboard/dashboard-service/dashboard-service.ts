@@ -40,6 +40,27 @@ export class DashboardService implements IDashboardService {
     return this.dashboardRepository.getAllSuspendedTasks(identity);
   }
 
+  public async getSuspendedTasksForProcessInstance(
+    identity: IIdentity,
+    processInstanceId: string,
+  ): Promise<Array<TaskListEntry>> {
+    return this.dashboardRepository.getSuspendedTasksForProcessInstance(identity, processInstanceId);
+  }
+
+  public async getSuspendedTasksForCorrelation(
+    identity: IIdentity,
+    correlationId: string,
+  ): Promise<Array<TaskListEntry>> {
+    return this.dashboardRepository.getSuspendedTasksForCorrelation(identity, correlationId);
+  }
+
+  public async getSuspendedTasksForProcessModel(
+    identity: IIdentity,
+    processModelId: string,
+  ): Promise<Array<TaskListEntry>> {
+    return this.dashboardRepository.getSuspendedTasksForProcessModel(identity, processModelId);
+  }
+
   public getAllActiveCronjobs(identity: IIdentity): Promise<DataModels.Cronjobs.CronjobList> {
     return this.dashboardRepository.getAllActiveCronjobs(identity);
   }
