@@ -10,7 +10,7 @@ import {ISolutionEntry} from '../../../../contracts';
 import {processEngineSupportsPagination} from '../../../../services/process-engine-version-module/process-engine-version-module';
 import {DashboardPaginationRepository} from '../dashboard-repositories/dashboard-pagination-repository';
 import {DashboardRepository} from '../dashboard-repositories/dashboard-repository';
-import {IDashboardRepository} from '../dashboard-repositories/IDashboardRepository';
+import {IDashboardRepository} from '../contracts/IDashboardRepository';
 import {IDashboardService, TaskListEntry} from '../contracts/index';
 
 @inject(EventAggregator, 'ManagementApiClientService')

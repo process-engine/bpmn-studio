@@ -1,9 +1,10 @@
 import {DataModels} from '@process-engine/management_api_contracts';
 import {IIdentity} from '@essential-projects/iam_contracts';
-import {DashboardRepository} from './dashboard-repository';
-import {TaskListEntry, TaskType} from '../contracts/index';
 
-export class DashboardPaginationRepository extends DashboardRepository {
+import {DashboardRepository} from './dashboard-repository';
+import {IDashboardRepository, TaskListEntry, TaskType} from '../contracts/index';
+
+export class DashboardPaginationRepository extends DashboardRepository implements IDashboardRepository {
   public getAllActiveCronjobs(identity: IIdentity): Promise<DataModels.Cronjobs.CronjobList> {
     return this.managementApiService.getAllActiveCronjobs(identity);
   }
