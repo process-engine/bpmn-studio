@@ -2,12 +2,11 @@ import {Subscription} from 'aurelia-event-aggregator';
 import {bindable, inject} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 
-import {ForbiddenError, NotFoundError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
-import {DataModels} from '@process-engine/management_api_contracts';
+import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
 
 import {AuthenticationStateEvent, ISolutionEntry, ISolutionService} from '../../../contracts/index';
 import environment from '../../../environment';
-import {IDashboardService, TaskListEntry, TaskSource, TaskType} from '../dashboard/contracts/index';
+import {IDashboardService, TaskListEntry} from '../dashboard/contracts/index';
 
 interface ITaskListRouteParameters {
   processInstanceId?: string;
@@ -167,139 +166,23 @@ export class TaskList {
     });
   }
 
-  private async getAllTasks(): Promise<Array<TaskListEntry>> {
-    const allSuspendedTasks: Array<TaskListEntry> = await this.dashboardService.getAllSuspendedTasks(
-      this.activeSolutionEntry.identity,
-    );
-
-    return allSuspendedTasks;
+  private getAllTasks(): Promise<Array<TaskListEntry>> {
+    return this.dashboardService.getAllSuspendedTasks(this.activeSolutionEntry.identity);
   }
 
   private async getTasksForProcessModel(processModelId: string): Promise<Array<TaskListEntry>> {
-    const userTaskList: DataModels.UserTasks.UserTaskList = await this.dashboardService.getUserTasksForProcessModel(
-      this.activeSolutionEntry.identity,
-      processModelId,
-    );
-
-    const manualTaskList: DataModels.ManualTasks.ManualTaskList = await this.dashboardService.getManualTasksForProcessModel(
-      this.activeSolutionEntry.identity,
-      processModelId,
-    );
-
-    const emptyActivityList: DataModels.EmptyActivities.EmptyActivityList = await this.dashboardService.getEmptyActivitiesForProcessModel(
-      this.activeSolutionEntry.identity,
-      processModelId,
-    );
-
-    const userTasks: Array<TaskListEntry> = this.mapTasksToTaskListEntry(userTaskList.userTasks, TaskType.UserTask);
-    const manualTasks: Array<TaskListEntry> = this.mapTasksToTaskListEntry(
-      manualTaskList.manualTasks,
-      TaskType.ManualTask,
-    );
-    const emptyActivities: Array<TaskListEntry> = this.mapTasksToTaskListEntry(
-      emptyActivityList.emptyActivities,
-      TaskType.EmptyActivity,
-    );
-
-    return [].concat(userTasks, manualTasks, emptyActivities);
+    return this.dashboardService.getSuspendedTasksForProcessModel(this.activeSolutionEntry.identity, processModelId);
   }
 
   private async getTasksForCorrelation(correlationId: string): Promise<Array<TaskListEntry>> {
-    const runningCorrelations: DataModels.Correlations.CorrelationList = await this.dashboardService.getActiveCorrelations(
-      this.activeSolutionEntry.identity,
-    );
-
-    const correlation: DataModels.Correlations.Correlation = runningCorrelations.correlations.find(
-      (otherCorrelation: DataModels.Correlations.Correlation) => {
-        return otherCorrelation.id === correlationId;
-      },
-    );
-
-    const correlationWasNotFound: boolean = correlation === undefined;
-    if (correlationWasNotFound) {
-      throw new NotFoundError(`No correlation found with id ${correlationId}.`);
-    }
-
-    const userTaskList: DataModels.UserTasks.UserTaskList = await this.dashboardService.getUserTasksForCorrelation(
-      this.activeSolutionEntry.identity,
-      correlationId,
-    );
-
-    const manualTaskList: DataModels.ManualTasks.ManualTaskList = await this.dashboardService.getManualTasksForCorrelation(
-      this.activeSolutionEntry.identity,
-      correlationId,
-    );
-
-    const emptyActivityList: DataModels.EmptyActivities.EmptyActivityList = await this.dashboardService.getEmptyActivitiesForCorrelation(
-      this.activeSolutionEntry.identity,
-      correlationId,
-    );
-
-    const userTasks: Array<TaskListEntry> = this.mapTasksToTaskListEntry(userTaskList.userTasks, TaskType.UserTask);
-
-    const manualTasks: Array<TaskListEntry> = this.mapTasksToTaskListEntry(
-      manualTaskList.manualTasks,
-      TaskType.ManualTask,
-    );
-
-    const emptyActivities: Array<TaskListEntry> = this.mapTasksToTaskListEntry(
-      emptyActivityList.emptyActivities,
-      TaskType.EmptyActivity,
-    );
-
-    return [].concat(userTasks, manualTasks, emptyActivities);
+    return this.dashboardService.getSuspendedTasksForCorrelation(this.activeSolutionEntry.identity, correlationId);
   }
 
   private async getTasksForProcessInstanceId(processInstanceId: string): Promise<Array<TaskListEntry>> {
-    const userTaskList: DataModels.UserTasks.UserTaskList = await this.dashboardService.getUserTasksForProcessInstance(
+    return this.dashboardService.getSuspendedTasksForProcessInstance(
       this.activeSolutionEntry.identity,
       processInstanceId,
     );
-
-    const manualTaskList: DataModels.ManualTasks.ManualTaskList = await this.dashboardService.getManualTasksForProcessInstance(
-      this.activeSolutionEntry.identity,
-      processInstanceId,
-    );
-
-    const emptyActivityList: DataModels.EmptyActivities.EmptyActivityList = await this.dashboardService.getEmptyActivitiesForProcessInstance(
-      this.activeSolutionEntry.identity,
-      processInstanceId,
-    );
-
-    const userTasksAndProcessModels: Array<TaskListEntry> = this.mapTasksToTaskListEntry(
-      userTaskList.userTasks,
-      TaskType.UserTask,
-    );
-    const manualTasks: Array<TaskListEntry> = this.mapTasksToTaskListEntry(
-      manualTaskList.manualTasks,
-      TaskType.ManualTask,
-    );
-    const emptyActivities: Array<TaskListEntry> = this.mapTasksToTaskListEntry(
-      emptyActivityList.emptyActivities,
-      TaskType.EmptyActivity,
-    );
-
-    return [].concat(userTasksAndProcessModels, manualTasks, emptyActivities);
-  }
-
-  private mapTasksToTaskListEntry(tasks: Array<TaskSource>, targetType: TaskType): Array<TaskListEntry> {
-    const mappedTasks: Array<TaskListEntry> = tasks.map(
-      (task: TaskSource): TaskListEntry => {
-        return {
-          correlationId: task.correlationId,
-          id: task.id,
-          flowNodeInstanceId: task.flowNodeInstanceId,
-          processInstanceId: task.processInstanceId,
-          processModelId: task.processModelId,
-          name: task.name,
-          // NOTE: Can't use instanceof or typeof, because the tasks were received as a plain JSON that does not have any type infos.
-          // TODO: Add type mapping to the Management API Client.
-          taskType: targetType,
-        };
-      },
-    );
-
-    return mappedTasks;
   }
 
   private async updateTasks(): Promise<void> {

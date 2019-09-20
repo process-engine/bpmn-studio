@@ -1,6 +1,7 @@
 import {DataModels, IManagementApiClient, Messages} from '@process-engine/management_api_contracts';
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {Subscription} from '@essential-projects/event_aggregator_contracts';
+import {NotFoundError} from '@essential-projects/errors_ts';
 import {IDashboardRepository} from '../contracts/IDashboardRepository';
 import {TaskListEntry, TaskSource, TaskType} from '../contracts/index';
 
@@ -274,6 +275,120 @@ export class DashboardRepository implements IDashboardRepository {
     const allTasks: Array<TaskListEntry> = [].concat(...allTasksForAllProcessModels);
 
     return allTasks;
+  }
+
+  public async getSuspendedTasksForProcessInstance(
+    identity: IIdentity,
+    processInstanceId: string,
+  ): Promise<Array<TaskListEntry>> {
+    const userTaskList: DataModels.UserTasks.UserTaskList = await this.getUserTasksForProcessInstance(
+      identity,
+      processInstanceId,
+    );
+
+    const manualTaskList: DataModels.ManualTasks.ManualTaskList = await this.getManualTasksForProcessInstance(
+      identity,
+      processInstanceId,
+    );
+
+    const emptyActivityList: DataModels.EmptyActivities.EmptyActivityList = await this.getEmptyActivitiesForProcessInstance(
+      identity,
+      processInstanceId,
+    );
+
+    const userTasksAndProcessModels: Array<TaskListEntry> = this.mapTasksToTaskListEntry(
+      userTaskList.userTasks,
+      TaskType.UserTask,
+    );
+    const manualTasks: Array<TaskListEntry> = this.mapTasksToTaskListEntry(
+      manualTaskList.manualTasks,
+      TaskType.ManualTask,
+    );
+    const emptyActivities: Array<TaskListEntry> = this.mapTasksToTaskListEntry(
+      emptyActivityList.emptyActivities,
+      TaskType.EmptyActivity,
+    );
+
+    return [].concat(userTasksAndProcessModels, manualTasks, emptyActivities);
+  }
+
+  public async getSuspendedTasksForCorrelation(
+    identity: IIdentity,
+    correlationId: string,
+  ): Promise<Array<TaskListEntry>> {
+    const runningCorrelations: DataModels.Correlations.CorrelationList = await this.getActiveCorrelations(identity);
+
+    const correlation: DataModels.Correlations.Correlation = runningCorrelations.correlations.find(
+      (otherCorrelation: DataModels.Correlations.Correlation) => {
+        return otherCorrelation.id === correlationId;
+      },
+    );
+
+    const correlationWasNotFound: boolean = correlation === undefined;
+    if (correlationWasNotFound) {
+      throw new NotFoundError(`No correlation found with id ${correlationId}.`);
+    }
+
+    const userTaskList: DataModels.UserTasks.UserTaskList = await this.getUserTasksForCorrelation(
+      identity,
+      correlationId,
+    );
+
+    const manualTaskList: DataModels.ManualTasks.ManualTaskList = await this.getManualTasksForCorrelation(
+      identity,
+      correlationId,
+    );
+
+    const emptyActivityList: DataModels.EmptyActivities.EmptyActivityList = await this.getEmptyActivitiesForCorrelation(
+      identity,
+      correlationId,
+    );
+
+    const userTasks: Array<TaskListEntry> = this.mapTasksToTaskListEntry(userTaskList.userTasks, TaskType.UserTask);
+
+    const manualTasks: Array<TaskListEntry> = this.mapTasksToTaskListEntry(
+      manualTaskList.manualTasks,
+      TaskType.ManualTask,
+    );
+
+    const emptyActivities: Array<TaskListEntry> = this.mapTasksToTaskListEntry(
+      emptyActivityList.emptyActivities,
+      TaskType.EmptyActivity,
+    );
+
+    return [].concat(userTasks, manualTasks, emptyActivities);
+  }
+
+  public async getSuspendedTasksForProcessModel(
+    identity: IIdentity,
+    processModelId: string,
+  ): Promise<Array<TaskListEntry>> {
+    const userTaskList: DataModels.UserTasks.UserTaskList = await this.getUserTasksForProcessModel(
+      identity,
+      processModelId,
+    );
+
+    const manualTaskList: DataModels.ManualTasks.ManualTaskList = await this.getManualTasksForProcessModel(
+      identity,
+      processModelId,
+    );
+
+    const emptyActivityList: DataModels.EmptyActivities.EmptyActivityList = await this.getEmptyActivitiesForProcessModel(
+      identity,
+      processModelId,
+    );
+
+    const userTasks: Array<TaskListEntry> = this.mapTasksToTaskListEntry(userTaskList.userTasks, TaskType.UserTask);
+    const manualTasks: Array<TaskListEntry> = this.mapTasksToTaskListEntry(
+      manualTaskList.manualTasks,
+      TaskType.ManualTask,
+    );
+    const emptyActivities: Array<TaskListEntry> = this.mapTasksToTaskListEntry(
+      emptyActivityList.emptyActivities,
+      TaskType.EmptyActivity,
+    );
+
+    return [].concat(userTasks, manualTasks, emptyActivities);
   }
 
   private mapTasksToTaskListEntry(tasks: Array<TaskSource>, targetType: TaskType): Array<TaskListEntry> {

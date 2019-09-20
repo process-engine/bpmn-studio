@@ -4,7 +4,6 @@ import {Subscription} from '@essential-projects/event_aggregator_contracts';
 import {TaskListEntry} from './index';
 
 export interface IDashboardRepository {
-  getAllSuspendedTasks(identity: IIdentity): Promise<Array<TaskListEntry>>;
   getAllActiveCronjobs(identity: IIdentity, offset?: number, limit?: number): Promise<DataModels.Cronjobs.CronjobList>;
   getActiveCorrelations(
     identity: IIdentity,
@@ -16,6 +15,10 @@ export interface IDashboardRepository {
     offset?: number,
     limit?: number,
   ): Promise<DataModels.ProcessModels.ProcessModelList>;
+  getAllSuspendedTasks(identity: IIdentity): Promise<Array<TaskListEntry>>;
+  getSuspendedTasksForProcessInstance(identity: IIdentity, processInstanceId: string): Promise<Array<TaskListEntry>>;
+  getSuspendedTasksForCorrelation(identity: IIdentity, correlationId: string): Promise<Array<TaskListEntry>>;
+  getSuspendedTasksForProcessModel(identity: IIdentity, processModelId: string): Promise<Array<TaskListEntry>>;
   getManualTasksForProcessModel(
     identity: IIdentity,
     processModelId: string,
