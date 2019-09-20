@@ -240,6 +240,51 @@ export class DashboardRepository implements IDashboardRepository {
     );
   }
 
+  public onCronjobCreated(identity: IIdentity, callback: Function): Promise<Subscription> {
+    return this.managementApiService.onCronjobCreated(
+      identity,
+      (message: Messages.SystemEvents.CronjobCreatedMessage): void => {
+        callback(message);
+      },
+    );
+  }
+
+  public onCronjobExecuted(identity: IIdentity, callback: Function): Promise<Subscription> {
+    return this.managementApiService.onCronjobExecuted(
+      identity,
+      (message: Messages.SystemEvents.CronjobExecutedMessage): void => {
+        callback(message);
+      },
+    );
+  }
+
+  public onCronjobRemoved(identity: IIdentity, callback: Function): Promise<Subscription> {
+    return this.managementApiService.onCronjobRemoved(
+      identity,
+      (message: Messages.SystemEvents.CronjobRemovedMessage): void => {
+        callback(message);
+      },
+    );
+  }
+
+  public onCronjobStopped(identity: IIdentity, callback: Function): Promise<Subscription> {
+    return this.managementApiService.onCronjobStopped(
+      identity,
+      (message: Messages.SystemEvents.CronjobStoppedMessage): void => {
+        callback(message);
+      },
+    );
+  }
+
+  public onCronjobUpdated(identity: IIdentity, callback: Function): Promise<Subscription> {
+    return this.managementApiService.onCronjobUpdated(
+      identity,
+      (message: Messages.SystemEvents.CronjobUpdatedMessage): void => {
+        callback(message);
+      },
+    );
+  }
+
   public finishManualTask(
     identity: IIdentity,
     processInstanceId: string,
