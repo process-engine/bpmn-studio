@@ -1,7 +1,7 @@
 import {DataModels} from '@process-engine/management_api_contracts';
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {Subscription} from '@essential-projects/event_aggregator_contracts';
-import {TaskListEntry} from './index';
+import {TaskList} from './index';
 
 export interface IDashboardRepository {
   getAllActiveCronjobs(identity: IIdentity, offset?: number, limit?: number): Promise<DataModels.Cronjobs.CronjobList>;
@@ -15,10 +15,25 @@ export interface IDashboardRepository {
     offset?: number,
     limit?: number,
   ): Promise<DataModels.ProcessModels.ProcessModelList>;
-  getAllSuspendedTasks(identity: IIdentity): Promise<Array<TaskListEntry>>;
-  getSuspendedTasksForProcessInstance(identity: IIdentity, processInstanceId: string): Promise<Array<TaskListEntry>>;
-  getSuspendedTasksForCorrelation(identity: IIdentity, correlationId: string): Promise<Array<TaskListEntry>>;
-  getSuspendedTasksForProcessModel(identity: IIdentity, processModelId: string): Promise<Array<TaskListEntry>>;
+  getAllSuspendedTasks(identity: IIdentity, offset?: number, limit?: number): Promise<TaskList>;
+  getSuspendedTasksForProcessInstance(
+    identity: IIdentity,
+    processInstanceId: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<TaskList>;
+  getSuspendedTasksForCorrelation(
+    identity: IIdentity,
+    correlationId: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<TaskList>;
+  getSuspendedTasksForProcessModel(
+    identity: IIdentity,
+    processModelId: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<TaskList>;
   getManualTasksForProcessModel(
     identity: IIdentity,
     processModelId: string,

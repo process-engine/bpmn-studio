@@ -11,7 +11,7 @@ import {processEngineSupportsPagination} from '../../../../services/process-engi
 import {DashboardPaginationRepository} from '../dashboard-repositories/dashboard-pagination-repository';
 import {DashboardRepository} from '../dashboard-repositories/dashboard-repository';
 import {IDashboardRepository} from '../contracts/IDashboardRepository';
-import {IDashboardService, TaskListEntry} from '../contracts/index';
+import {IDashboardService, TaskList} from '../contracts/index';
 
 @inject(EventAggregator, 'ManagementApiClientService')
 export class DashboardService implements IDashboardService {
@@ -36,29 +36,35 @@ export class DashboardService implements IDashboardService {
     );
   }
 
-  public getAllSuspendedTasks(identity: IIdentity): Promise<Array<TaskListEntry>> {
-    return this.dashboardRepository.getAllSuspendedTasks(identity);
+  public getAllSuspendedTasks(identity: IIdentity, offset?: number, limit?: number): Promise<TaskList> {
+    return this.dashboardRepository.getAllSuspendedTasks(identity, offset, limit);
   }
 
   public async getSuspendedTasksForProcessInstance(
     identity: IIdentity,
     processInstanceId: string,
-  ): Promise<Array<TaskListEntry>> {
-    return this.dashboardRepository.getSuspendedTasksForProcessInstance(identity, processInstanceId);
+    offset?: number,
+    limit?: number,
+  ): Promise<TaskList> {
+    return this.dashboardRepository.getSuspendedTasksForProcessInstance(identity, processInstanceId, offset, limit);
   }
 
   public async getSuspendedTasksForCorrelation(
     identity: IIdentity,
     correlationId: string,
-  ): Promise<Array<TaskListEntry>> {
-    return this.dashboardRepository.getSuspendedTasksForCorrelation(identity, correlationId);
+    offset?: number,
+    limit?: number,
+  ): Promise<TaskList> {
+    return this.dashboardRepository.getSuspendedTasksForCorrelation(identity, correlationId, offset, limit);
   }
 
   public async getSuspendedTasksForProcessModel(
     identity: IIdentity,
     processModelId: string,
-  ): Promise<Array<TaskListEntry>> {
-    return this.dashboardRepository.getSuspendedTasksForProcessModel(identity, processModelId);
+    offset?: number,
+    limit?: number,
+  ): Promise<TaskList> {
+    return this.dashboardRepository.getSuspendedTasksForProcessModel(identity, processModelId, offset, limit);
   }
 
   public getAllActiveCronjobs(identity: IIdentity): Promise<DataModels.Cronjobs.CronjobList> {

@@ -4,7 +4,7 @@ import {IIdentity} from '@essential-projects/iam_contracts';
 import {Subscription} from '@essential-projects/event_aggregator_contracts';
 import {DataModels} from '@process-engine/management_api_contracts';
 
-import {TaskListEntry} from './index';
+import {TaskList} from './index';
 
 export interface IDashboardService {
   eventAggregator: EventAggregator;
@@ -12,10 +12,25 @@ export interface IDashboardService {
   getAllActiveCronjobs(identity: IIdentity): Promise<DataModels.Cronjobs.CronjobList>;
   getProcessModels(identity: IIdentity): Promise<DataModels.ProcessModels.ProcessModelList>;
   getActiveCorrelations(identity: IIdentity): Promise<DataModels.Correlations.CorrelationList>;
-  getAllSuspendedTasks(identity: IIdentity): Promise<Array<TaskListEntry>>;
-  getSuspendedTasksForProcessInstance(identity: IIdentity, processInstanceId: string): Promise<Array<TaskListEntry>>;
-  getSuspendedTasksForCorrelation(identity: IIdentity, correlationId: string): Promise<Array<TaskListEntry>>;
-  getSuspendedTasksForProcessModel(identity: IIdentity, processModelId: string): Promise<Array<TaskListEntry>>;
+  getAllSuspendedTasks(identity: IIdentity, offset?: number, limit?: number): Promise<TaskList>;
+  getSuspendedTasksForProcessInstance(
+    identity: IIdentity,
+    processInstanceId: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<TaskList>;
+  getSuspendedTasksForCorrelation(
+    identity: IIdentity,
+    correlationId: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<TaskList>;
+  getSuspendedTasksForProcessModel(
+    identity: IIdentity,
+    processModelId: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<TaskList>;
   getManualTasksForProcessModel(
     identity: IIdentity,
     processModelId: string,

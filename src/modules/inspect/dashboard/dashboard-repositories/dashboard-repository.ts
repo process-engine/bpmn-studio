@@ -3,7 +3,7 @@ import {IIdentity} from '@essential-projects/iam_contracts';
 import {Subscription} from '@essential-projects/event_aggregator_contracts';
 import {NotFoundError} from '@essential-projects/errors_ts';
 import {IDashboardRepository} from '../contracts/IDashboardRepository';
-import {TaskListEntry, TaskSource, TaskType} from '../contracts/index';
+import {TaskList, TaskListEntry, TaskSource, TaskType} from '../contracts/index';
 
 export class DashboardRepository implements IDashboardRepository {
   protected managementApiService: IManagementApiClient;
@@ -225,7 +225,7 @@ export class DashboardRepository implements IDashboardRepository {
     return this.managementApiService.removeSubscription(identity, subscription);
   }
 
-  public async getAllSuspendedTasks(identity: IIdentity): Promise<Array<TaskListEntry>> {
+  public async getAllSuspendedTasks(identity: IIdentity): Promise<TaskList> {
     const allProcessModels: DataModels.ProcessModels.ProcessModelList = await this.getProcessModels(identity);
 
     // TODO (ph): This will create 1 + n http reqeusts, where n is the number of process models in the processengine.
@@ -274,13 +274,15 @@ export class DashboardRepository implements IDashboardRepository {
     // Flatten all results.
     const allTasks: Array<TaskListEntry> = [].concat(...allTasksForAllProcessModels);
 
-    return allTasks;
+    const taskList: TaskList = {
+      taskListEntries: allTasks,
+      totalCount: allTasks.length,
+    };
+
+    return taskList;
   }
 
-  public async getSuspendedTasksForProcessInstance(
-    identity: IIdentity,
-    processInstanceId: string,
-  ): Promise<Array<TaskListEntry>> {
+  public async getSuspendedTasksForProcessInstance(identity: IIdentity, processInstanceId: string): Promise<TaskList> {
     const userTaskList: DataModels.UserTasks.UserTaskList = await this.getUserTasksForProcessInstance(
       identity,
       processInstanceId,
@@ -296,10 +298,7 @@ export class DashboardRepository implements IDashboardRepository {
       processInstanceId,
     );
 
-    const userTasksAndProcessModels: Array<TaskListEntry> = this.mapTasksToTaskListEntry(
-      userTaskList.userTasks,
-      TaskType.UserTask,
-    );
+    const userTasks: Array<TaskListEntry> = this.mapTasksToTaskListEntry(userTaskList.userTasks, TaskType.UserTask);
     const manualTasks: Array<TaskListEntry> = this.mapTasksToTaskListEntry(
       manualTaskList.manualTasks,
       TaskType.ManualTask,
@@ -309,13 +308,17 @@ export class DashboardRepository implements IDashboardRepository {
       TaskType.EmptyActivity,
     );
 
-    return [].concat(userTasksAndProcessModels, manualTasks, emptyActivities);
+    const taskListEntries: Array<TaskListEntry> = [].concat(userTasks, manualTasks, emptyActivities);
+
+    const taskList: TaskList = {
+      taskListEntries: taskListEntries,
+      totalCount: taskListEntries.length,
+    };
+
+    return taskList;
   }
 
-  public async getSuspendedTasksForCorrelation(
-    identity: IIdentity,
-    correlationId: string,
-  ): Promise<Array<TaskListEntry>> {
+  public async getSuspendedTasksForCorrelation(identity: IIdentity, correlationId: string): Promise<TaskList> {
     const runningCorrelations: DataModels.Correlations.CorrelationList = await this.getActiveCorrelations(identity);
 
     const correlation: DataModels.Correlations.Correlation = runningCorrelations.correlations.find(
@@ -356,13 +359,17 @@ export class DashboardRepository implements IDashboardRepository {
       TaskType.EmptyActivity,
     );
 
-    return [].concat(userTasks, manualTasks, emptyActivities);
+    const taskListEntries: Array<TaskListEntry> = [].concat(userTasks, manualTasks, emptyActivities);
+
+    const taskList: TaskList = {
+      taskListEntries: taskListEntries,
+      totalCount: taskListEntries.length,
+    };
+
+    return taskList;
   }
 
-  public async getSuspendedTasksForProcessModel(
-    identity: IIdentity,
-    processModelId: string,
-  ): Promise<Array<TaskListEntry>> {
+  public async getSuspendedTasksForProcessModel(identity: IIdentity, processModelId: string): Promise<TaskList> {
     const userTaskList: DataModels.UserTasks.UserTaskList = await this.getUserTasksForProcessModel(
       identity,
       processModelId,
@@ -388,7 +395,14 @@ export class DashboardRepository implements IDashboardRepository {
       TaskType.EmptyActivity,
     );
 
-    return [].concat(userTasks, manualTasks, emptyActivities);
+    const taskListEntries: Array<TaskListEntry> = [].concat(userTasks, manualTasks, emptyActivities);
+
+    const taskList: TaskList = {
+      taskListEntries: taskListEntries,
+      totalCount: taskListEntries.length,
+    };
+
+    return taskList;
   }
 
   private mapTasksToTaskListEntry(tasks: Array<TaskSource>, targetType: TaskType): Array<TaskListEntry> {

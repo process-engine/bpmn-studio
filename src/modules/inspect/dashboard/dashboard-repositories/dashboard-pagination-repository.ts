@@ -2,7 +2,7 @@ import {DataModels} from '@process-engine/management_api_contracts';
 import {IIdentity} from '@essential-projects/iam_contracts';
 
 import {DashboardRepository} from './dashboard-repository';
-import {IDashboardRepository, TaskListEntry, TaskType} from '../contracts/index';
+import {IDashboardRepository, TaskList, TaskListEntry, TaskType} from '../contracts/index';
 
 export class DashboardPaginationRepository extends DashboardRepository implements IDashboardRepository {
   public getAllActiveCronjobs(identity: IIdentity): Promise<DataModels.Cronjobs.CronjobList> {
@@ -80,48 +80,90 @@ export class DashboardPaginationRepository extends DashboardRepository implement
     return this.managementApiService.getUserTasksForProcessInstance(identity, correlationId);
   }
 
-  public async getAllSuspendedTasks(identity: IIdentity): Promise<Array<TaskListEntry>> {
-    const taskList: DataModels.FlowNodeInstances.TaskList = await this.managementApiService.getAllSuspendedTasks(
+  public async getAllSuspendedTasks(identity: IIdentity, offset?: number, limit?: number): Promise<TaskList> {
+    const tasks: DataModels.FlowNodeInstances.TaskList = await this.managementApiService.getAllSuspendedTasks(
       identity,
+      offset,
+      limit,
     );
 
-    return this.mapTaskListToTaskListEntry(taskList);
+    const taskListEntries: Array<TaskListEntry> = this.mapTaskListToTaskListEntry(tasks);
+
+    const taskList: TaskList = {
+      taskListEntries: taskListEntries,
+      totalCount: taskListEntries.length,
+    };
+
+    return taskList;
   }
 
   public async getSuspendedTasksForProcessInstance(
     identity: IIdentity,
     processInstanceId: string,
-  ): Promise<Array<TaskListEntry>> {
-    const taskList: DataModels.FlowNodeInstances.TaskList = await this.managementApiService.getSuspendedTasksForProcessInstance(
+    offset?: number,
+    limit?: number,
+  ): Promise<TaskList> {
+    const tasks: DataModels.FlowNodeInstances.TaskList = await this.managementApiService.getSuspendedTasksForProcessInstance(
       identity,
       processInstanceId,
+      offset,
+      limit,
     );
 
-    return this.mapTaskListToTaskListEntry(taskList);
+    const taskListEntries: Array<TaskListEntry> = this.mapTaskListToTaskListEntry(tasks);
+
+    const taskList: TaskList = {
+      taskListEntries: taskListEntries,
+      totalCount: taskListEntries.length,
+    };
+
+    return taskList;
   }
 
   public async getSuspendedTasksForCorrelation(
     identity: IIdentity,
     correlationId: string,
-  ): Promise<Array<TaskListEntry>> {
-    const taskList: DataModels.FlowNodeInstances.TaskList = await this.managementApiService.getSuspendedTasksForCorrelation(
+    offset?: number,
+    limit?: number,
+  ): Promise<TaskList> {
+    const tasks: DataModels.FlowNodeInstances.TaskList = await this.managementApiService.getSuspendedTasksForCorrelation(
       identity,
       correlationId,
+      offset,
+      limit,
     );
 
-    return this.mapTaskListToTaskListEntry(taskList);
+    const taskListEntries: Array<TaskListEntry> = this.mapTaskListToTaskListEntry(tasks);
+
+    const taskList: TaskList = {
+      taskListEntries: taskListEntries,
+      totalCount: taskListEntries.length,
+    };
+
+    return taskList;
   }
 
   public async getSuspendedTasksForProcessModel(
     identity: IIdentity,
     processModelId: string,
-  ): Promise<Array<TaskListEntry>> {
-    const taskList: DataModels.FlowNodeInstances.TaskList = await this.managementApiService.getSuspendedTasksForProcessModel(
+    offset?: number,
+    limit?: number,
+  ): Promise<TaskList> {
+    const tasks: DataModels.FlowNodeInstances.TaskList = await this.managementApiService.getSuspendedTasksForProcessModel(
       identity,
       processModelId,
+      offset,
+      limit,
     );
 
-    return this.mapTaskListToTaskListEntry(taskList);
+    const taskListEntries: Array<TaskListEntry> = this.mapTaskListToTaskListEntry(tasks);
+
+    const taskList: TaskList = {
+      taskListEntries: taskListEntries,
+      totalCount: taskListEntries.length,
+    };
+
+    return taskList;
   }
 
   private mapTaskListToTaskListEntry(taskList: DataModels.FlowNodeInstances.TaskList): Array<TaskListEntry> {

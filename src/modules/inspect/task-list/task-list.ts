@@ -6,7 +6,7 @@ import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/er
 
 import {AuthenticationStateEvent, ISolutionEntry, ISolutionService} from '../../../contracts/index';
 import environment from '../../../environment';
-import {IDashboardService, TaskListEntry} from '../dashboard/contracts/index';
+import {IDashboardService, TaskList as SuspendedTaskList, TaskListEntry} from '../dashboard/contracts/index';
 
 interface ITaskListRouteParameters {
   processInstanceId?: string;
@@ -33,7 +33,7 @@ export class TaskList {
 
   private subscriptions: Array<Subscription>;
   private tasks: Array<TaskListEntry> = [];
-  private getTasks: () => Promise<Array<TaskListEntry>>;
+  private getTasks: (offset?: number, limit?: number) => Promise<SuspendedTaskList>;
   private isAttached: boolean = false;
 
   constructor(dashboardService: IDashboardService, router: Router, solutionService: ISolutionService) {
@@ -56,16 +56,16 @@ export class TaskList {
     const hasProcessInstanceId: boolean = processInstanceId !== undefined;
 
     if (hasDiagramName) {
-      this.getTasks = (): Promise<Array<TaskListEntry>> => {
-        return this.getTasksForProcessModel(diagramName);
+      this.getTasks = (offset?: number, limit?: number): Promise<SuspendedTaskList> => {
+        return this.getTasksForProcessModel(diagramName, offset, limit);
       };
     } else if (hasCorrelationId) {
-      this.getTasks = (): Promise<Array<TaskListEntry>> => {
-        return this.getTasksForCorrelation(correlationId);
+      this.getTasks = (offset?: number, limit?: number): Promise<SuspendedTaskList> => {
+        return this.getTasksForCorrelation(correlationId, offset, limit);
       };
     } else if (hasProcessInstanceId) {
-      this.getTasks = (): Promise<Array<TaskListEntry>> => {
-        return this.getTasksForProcessInstanceId(processInstanceId);
+      this.getTasks = (offset?: number, limit?: number): Promise<SuspendedTaskList> => {
+        return this.getTasksForProcessInstanceId(processInstanceId, offset, limit);
       };
     } else {
       this.getTasks = this.getAllTasks;
@@ -166,31 +166,63 @@ export class TaskList {
     });
   }
 
-  private getAllTasks(): Promise<Array<TaskListEntry>> {
-    return this.dashboardService.getAllSuspendedTasks(this.activeSolutionEntry.identity);
+  private getAllTasks(offset?: number, limit?: number): Promise<SuspendedTaskList> {
+    return this.dashboardService.getAllSuspendedTasks(this.activeSolutionEntry.identity, offset, limit);
   }
 
-  private async getTasksForProcessModel(processModelId: string): Promise<Array<TaskListEntry>> {
-    return this.dashboardService.getSuspendedTasksForProcessModel(this.activeSolutionEntry.identity, processModelId);
+  private async getTasksForProcessModel(
+    processModelId: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<SuspendedTaskList> {
+    return this.dashboardService.getSuspendedTasksForProcessModel(
+      this.activeSolutionEntry.identity,
+      processModelId,
+      offset,
+      limit,
+    );
   }
 
-  private async getTasksForCorrelation(correlationId: string): Promise<Array<TaskListEntry>> {
-    return this.dashboardService.getSuspendedTasksForCorrelation(this.activeSolutionEntry.identity, correlationId);
+  private async getTasksForCorrelation(
+    correlationId: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<SuspendedTaskList> {
+    return this.dashboardService.getSuspendedTasksForCorrelation(
+      this.activeSolutionEntry.identity,
+      correlationId,
+      offset,
+      limit,
+    );
   }
 
-  private async getTasksForProcessInstanceId(processInstanceId: string): Promise<Array<TaskListEntry>> {
+  private async getTasksForProcessInstanceId(
+    processInstanceId: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<SuspendedTaskList> {
     return this.dashboardService.getSuspendedTasksForProcessInstance(
       this.activeSolutionEntry.identity,
       processInstanceId,
+      offset,
+      limit,
     );
   }
 
   private async updateTasks(): Promise<void> {
     try {
-      this.tasks = await this.getTasks();
+      console.log(this.currentPage);
+      const suspendedTaskList: SuspendedTaskList = await this.getTasks(
+        this.currentPage * this.paginationSize,
+        this.paginationSize,
+      );
+
+      this.tasks = suspendedTaskList.taskListEntries;
+      this.totalItems = suspendedTaskList.totalCount;
       this.initialLoadingFinished = true;
     } catch (error) {
       this.tasks = [];
+      this.totalItems = 0;
       this.initialLoadingFinished = true;
 
       const errorIsForbiddenError: boolean = isError(error, ForbiddenError);
@@ -201,7 +233,5 @@ export class TaskList {
         this.showError = true;
       }
     }
-
-    this.totalItems = this.tasks.length;
   }
 }
