@@ -98,7 +98,7 @@ export class TestClient {
       const files = fs.readdirSync(DATABASE_PATH, {encoding: 'utf8'});
       files.forEach((file: string) => {
         console.log(file);
-        const filePath = process.platform === 'win32' ? `${SAVE_DIAGRAM_DIR}\\${file}` : `${SAVE_DIAGRAM_DIR}/${file}`;
+        const filePath = process.platform === 'win32' ? `${DATABASE_PATH}\\${file}` : `${DATABASE_PATH}/${file}`;
 
         fs.unlinkSync(filePath);
       });
