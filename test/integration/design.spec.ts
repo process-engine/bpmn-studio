@@ -11,6 +11,8 @@ describe('Design View', function foo() {
   beforeEach(async () => {
     testClient = new TestClient(applicationArgs);
 
+    await testClient.clearDatabase();
+    await testClient.clearSavedDiagrams();
     testClient.creatingFirstDiagram = true;
     await testClient.startSpectronApp();
     await testClient.awaitReadiness();
@@ -20,22 +22,22 @@ describe('Design View', function foo() {
     async (): Promise<void> => {
       if (await testClient.isSpectronAppRunning()) {
         await testClient.stopSpectronApp();
-        const appIsStopped = !(await testClient.isSpectronAppRunning());
+        // const appIsStopped = !(await testClient.isSpectronAppRunning());
 
-        if (!appIsStopped) {
-          setTimeout(async () => {
-            await testClient.clearDatabase();
-          }, 300);
-        } else {
-          await testClient.clearDatabase();
-        }
+        // if (!appIsStopped) {
+        //   setTimeout(async () => {
+        //     await testClient.clearDatabase();
+        //   }, 300);
+        // } else {
+        //   await testClient.clearDatabase();
+        // }
       }
     },
   );
 
-  this.afterAll(async () => {
-    await testClient.clearSavedDiagrams();
-  });
+  // this.afterAll(async () => {
+  //   await testClient.clearSavedDiagrams();
+  // });
 
   it('should save a diagram', async () => {
     // Arrange
