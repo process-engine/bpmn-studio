@@ -98,7 +98,7 @@ export class TestClient {
     if (process.platform === 'win32') {
       const result = await this.execCommand(`IF EXIST ${DATABASE_PATH.replace(/\s/g, '\\ ')} ECHO true`);
       console.log(result);
-      if (result === 'true') {
+      if (result.trim() === 'true' || result === true) {
         console.log('geht hier rein weil true');
 
         await this.execCommand(`${REMOVE_COMMAND} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
@@ -115,7 +115,7 @@ export class TestClient {
     if (process.platform === 'win32') {
       const result = await this.execCommand(`IF EXIST ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')} ECHO true`);
       console.log(result);
-      if (result === 'true') {
+      if (result.trim() === 'true' || result === true) {
         console.log('geht hier rein weil true');
 
         await this.execCommand(`${REMOVE_COMMAND} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
