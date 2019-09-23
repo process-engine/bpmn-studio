@@ -94,13 +94,7 @@ export class TestClient {
   }
 
   public async clearDatabase(): Promise<void> {
-    try {
-      await fs.remove(DATABASE_PATH);
-      console.log('success!');
-    } catch (err) {
-      console.error(err);
-    }
-
+    fs.removeSync(DATABASE_PATH);
     // if (fs.existsSync(DATABASE_PATH)) {
     //   const files = fs.readdirSync(DATABASE_PATH, {encoding: 'utf8'});
     //   files.forEach((file: string) => {
@@ -130,12 +124,7 @@ export class TestClient {
   }
 
   public async clearSavedDiagrams(): Promise<void> {
-    try {
-      await fs.remove(SAVE_DIAGRAM_DIR);
-      console.log('success!');
-    } catch (err) {
-      console.error(err);
-    }
+    fs.removeSync(SAVE_DIAGRAM_DIR);
     // if (fs.existsSync(SAVE_DIAGRAM_DIR)) {
     //   const files = fs.readdirSync(SAVE_DIAGRAM_DIR, {encoding: 'utf8'});
     //   files.forEach((file: string) => {
