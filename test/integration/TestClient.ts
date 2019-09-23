@@ -114,17 +114,12 @@ export class TestClient {
   public async clearSavedDiagrams(): Promise<void> {
     console.log(this.applicationArgs.path);
     // C:\Jenkins\ws\b1568297968023\
-
     if (process.platform === 'win32') {
-      const currentDir = await this.execCommand('CD');
-      console.log('currentDir', currentDir);
-      const result = await this.execCommand('dir bpmn-studio-tests /ad /s /p');
+      const result = await this.execCommand(`IF EXIST ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')} ECHO true`);
       console.log(result);
-      const files = result.split('\n');
-
-      console.log(files);
+    } else {
+      await this.execCommand(`${REMOVE_COMMAND} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
     }
-    await this.execCommand(`${REMOVE_COMMAND} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
   }
 
   public async isSpectronAppRunning(): Promise<boolean> {
