@@ -98,7 +98,9 @@ export class TestClient {
       const files = fs.readdirSync(DATABASE_PATH, {encoding: 'utf8'});
       files.forEach((file: string) => {
         console.log(file);
-        fs.unlinkSync(`${DATABASE_PATH}/${file}`);
+        const filePath = process.platform === 'win32' ? `${SAVE_DIAGRAM_DIR}\\${file}` : `${SAVE_DIAGRAM_DIR}/${file}`;
+
+        fs.unlinkSync(filePath);
       });
       fs.rmdirSync(DATABASE_PATH);
     }
@@ -125,7 +127,8 @@ export class TestClient {
       const files = fs.readdirSync(SAVE_DIAGRAM_DIR, {encoding: 'utf8'});
       files.forEach((file: string) => {
         console.log(file);
-        fs.unlinkSync(`${SAVE_DIAGRAM_DIR}/${file}`);
+        const filePath = process.platform === 'win32' ? `${SAVE_DIAGRAM_DIR}\\${file}` : `${SAVE_DIAGRAM_DIR}/${file}`;
+        fs.unlinkSync(filePath);
       });
       fs.rmdirSync(SAVE_DIAGRAM_DIR);
     }
