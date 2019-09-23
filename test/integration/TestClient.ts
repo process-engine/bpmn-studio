@@ -35,9 +35,11 @@ export class TestClient {
   public creatingFirstDiagram: boolean = true;
 
   private app: Application;
+  private applicationArgs: AppConstructorOptions;
 
   constructor(applicationArgs: AppConstructorOptions) {
     this.app = new Application(applicationArgs);
+    this.applicationArgs = applicationArgs;
   }
 
   public async startSpectronApp(): Promise<any> {
@@ -91,10 +93,37 @@ export class TestClient {
   }
 
   public async clearDatabase(): Promise<void> {
+    console.log(this.applicationArgs.path);
+    if (process.platform === 'win32') {
+      const currentDir = await this.execCommand('CD');
+      console.log('currentDir', currentDir);
+      const result = await this.execCommand('dir bpmn-studio-tests /ad /s /p');
+      console.log(result);
+      const files = result.split('\n');
+
+      console.log(files);
+      // const correctPath = files.find((path) => {
+      //   // return path.includes('win-unpacked');
+      // });
+
+      // return `"${correctPath.trim()}"`;
+    }
     await this.execCommand(`${REMOVE_COMMAND} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
   }
 
   public async clearSavedDiagrams(): Promise<void> {
+    console.log(this.applicationArgs.path);
+    // C:\Jenkins\ws\b1568297968023\
+
+    if (process.platform === 'win32') {
+      const currentDir = await this.execCommand('CD');
+      console.log('currentDir', currentDir);
+      const result = await this.execCommand('dir bpmn-studio-tests /ad /s /p');
+      console.log(result);
+      const files = result.split('\n');
+
+      console.log(files);
+    }
     await this.execCommand(`${REMOVE_COMMAND} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
   }
 
