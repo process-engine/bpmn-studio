@@ -125,7 +125,7 @@ export class TestClient {
       const files = fs.readdirSync(SAVE_DIAGRAM_DIR, {encoding: 'utf8'});
       files.forEach((file: string) => {
         console.log(file);
-        fs.unlinkSync(`${DATABASE_PATH}/${file}`);
+        fs.unlinkSync(`${SAVE_DIAGRAM_DIR}/${file}`);
       });
       fs.rmdirSync(SAVE_DIAGRAM_DIR);
     }
