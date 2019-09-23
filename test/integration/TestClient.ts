@@ -93,7 +93,7 @@ export class TestClient {
   }
 
   public async clearDatabase(): Promise<void> {
-    console.log(this.applicationArgs.path);
+    console.log('clearDatabase', this.applicationArgs.path);
     if (process.platform === 'win32') {
       const result = await this.execCommand(`IF EXIST ${DATABASE_PATH.replace(/\s/g, '\\ ')} ECHO true`);
       console.log(result);
@@ -110,7 +110,7 @@ export class TestClient {
   }
 
   public async clearSavedDiagrams(): Promise<void> {
-    console.log(this.applicationArgs.path);
+    console.log('clearSavedDiagrams', this.applicationArgs.path);
     // C:\Jenkins\ws\b1568297968023\
     if (process.platform === 'win32') {
       const result = await this.execCommand(`IF EXIST ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')} ECHO true`);
