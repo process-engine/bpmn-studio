@@ -4,6 +4,7 @@ import path from 'path';
 import os from 'os';
 import {exec} from 'child_process';
 import fs from 'fs-extra';
+import {lock, unlock} from 'os-lock';
 
 import {AppConstructorOptions, Application} from 'spectron';
 import assert from 'assert';
@@ -94,7 +95,16 @@ export class TestClient {
   }
 
   public async clearDatabase(): Promise<void> {
-    fs.removeSync(DATABASE_PATH);
+    try {
+      await fs.remove(DATABASE_PATH);
+      console.log('success!');
+    } catch (error) {
+      console.log(error);
+      const fd = fs.openSync(error.path, 'wx');
+      await unlock(fd);
+      await fs.remove(DATABASE_PATH);
+      console.log('success!');
+    }
     // if (fs.existsSync(DATABASE_PATH)) {
     //   const files = fs.readdirSync(DATABASE_PATH, {encoding: 'utf8'});
     //   files.forEach((file: string) => {
@@ -124,7 +134,17 @@ export class TestClient {
   }
 
   public async clearSavedDiagrams(): Promise<void> {
-    fs.removeSync(SAVE_DIAGRAM_DIR);
+    try {
+      await fs.remove(DATABASE_PATH);
+      console.log('success!');
+    } catch (error) {
+      console.log(error);
+      const fd = fs.openSync(error.path, 'wx');
+      await unlock(fd);
+      await fs.remove(DATABASE_PATH);
+      console.log('success!');
+    }
+
     // if (fs.existsSync(SAVE_DIAGRAM_DIR)) {
     //   const files = fs.readdirSync(SAVE_DIAGRAM_DIR, {encoding: 'utf8'});
     //   files.forEach((file: string) => {
