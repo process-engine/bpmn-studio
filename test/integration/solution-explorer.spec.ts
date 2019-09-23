@@ -18,7 +18,15 @@ describe('SolutionExplorer', function foo() {
     async (): Promise<void> => {
       if (await testClient.isSpectronAppRunning()) {
         await testClient.stopSpectronApp();
-        await testClient.clearDatabase();
+        const appIsStopped = !(await testClient.isSpectronAppRunning());
+
+        if (!appIsStopped) {
+          setTimeout(async () => {
+            await testClient.clearDatabase();
+          }, 300);
+        } else {
+          await testClient.clearDatabase();
+        }
       }
     },
   );
