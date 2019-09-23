@@ -94,11 +94,13 @@ export class TestClient {
   }
 
   public async clearDatabase(): Promise<void> {
-    try {
-      await this.execCommand(`${REMOVE_COMMAND} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
-      console.log('success!');
-    } catch (error) {
-      console.log(error);
+    if (fs.existsSync(DATABASE_PATH)) {
+      try {
+        await this.execCommand(`${REMOVE_COMMAND} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
+        console.log('success!');
+      } catch (error) {
+        console.log(error);
+      }
     }
     // if (fs.existsSync(DATABASE_PATH)) {
     //   const files = fs.readdirSync(DATABASE_PATH, {encoding: 'utf8'});
@@ -129,13 +131,14 @@ export class TestClient {
   }
 
   public async clearSavedDiagrams(): Promise<void> {
-    try {
-      await this.execCommand(`${REMOVE_COMMAND} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
-      console.log('success!');
-    } catch (error) {
-      console.log(error);
+    if (fs.existsSync(SAVE_DIAGRAM_DIR)) {
+      try {
+        await this.execCommand(`${REMOVE_COMMAND} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
+        console.log('success!');
+      } catch (error) {
+        console.log(error);
+      }
     }
-
     // if (fs.existsSync(SAVE_DIAGRAM_DIR)) {
     //   const files = fs.readdirSync(SAVE_DIAGRAM_DIR, {encoding: 'utf8'});
     //   files.forEach((file: string) => {
