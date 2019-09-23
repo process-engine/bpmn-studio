@@ -101,8 +101,12 @@ export class TestClient {
       if (result.trim() === 'true' || result === true) {
         console.log('geht hier rein weil true');
 
-        await this.execCommand(`${REMOVE_COMMAND} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
-        console.log('removed', DATABASE_PATH);
+        try {
+          await this.execCommand(`${REMOVE_COMMAND} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
+          console.log('removed', DATABASE_PATH);
+        } catch (error) {
+          console.error(error);
+        }
       }
     } else {
       await this.execCommand(`${REMOVE_COMMAND} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
@@ -118,8 +122,12 @@ export class TestClient {
       if (result.trim() === 'true' || result === true) {
         console.log('geht hier rein weil true');
 
-        await this.execCommand(`${REMOVE_COMMAND} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
-        console.log('removed', SAVE_DIAGRAM_DIR);
+        try {
+          await this.execCommand(`${REMOVE_COMMAND} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
+          console.log('removed', SAVE_DIAGRAM_DIR);
+        } catch (error) {
+          console.error(error);
+        }
       }
     } else {
       await this.execCommand(`${REMOVE_COMMAND} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
