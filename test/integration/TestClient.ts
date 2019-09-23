@@ -8,6 +8,7 @@ import {AppConstructorOptions, Application} from 'spectron';
 import assert from 'assert';
 import {IIdentity} from '@essential-projects/iam_contracts';
 
+import {fstat} from 'fs';
 import {SolutionExplorer} from './test-classes/solution-explorer';
 import {DesignViewClient} from './test-classes/design-view';
 
@@ -98,12 +99,10 @@ export class TestClient {
       const result = await this.execCommand(`IF EXIST ${DATABASE_PATH.replace(/\s/g, '\\ ')} ECHO true`);
       console.log(result);
       if (result === 'true') {
-        try {
-          await this.execCommand(`${REMOVE_COMMAND} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
-          console.log('removed', DATABASE_PATH);
-        } catch (error) {
-          console.error(error);
-        }
+        console.log('geht hier rein weil true');
+
+        await this.execCommand(`${REMOVE_COMMAND} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
+        console.log('removed', DATABASE_PATH);
       }
     } else {
       await this.execCommand(`${REMOVE_COMMAND} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
@@ -117,12 +116,10 @@ export class TestClient {
       const result = await this.execCommand(`IF EXIST ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')} ECHO true`);
       console.log(result);
       if (result === 'true') {
-        try {
-          await this.execCommand(`${REMOVE_COMMAND} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
-          console.log('removed', SAVE_DIAGRAM_DIR);
-        } catch (error) {
-          console.error(error);
-        }
+        console.log('geht hier rein weil true');
+
+        await this.execCommand(`${REMOVE_COMMAND} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
+        console.log('removed', SAVE_DIAGRAM_DIR);
       }
     } else {
       await this.execCommand(`${REMOVE_COMMAND} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
