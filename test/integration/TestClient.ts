@@ -95,20 +95,18 @@ export class TestClient {
   public async clearDatabase(): Promise<void> {
     console.log(this.applicationArgs.path);
     if (process.platform === 'win32') {
-      const currentDir = await this.execCommand('CD');
-      console.log('currentDir', currentDir);
-      const result = await this.execCommand('dir bpmn-studio-tests /ad /s /p');
+      const result = await this.execCommand(`IF EXIST ${DATABASE_PATH.replace(/\s/g, '\\ ')} ECHO true`);
       console.log(result);
-      const files = result.split('\n');
-
-      console.log(files);
-      // const correctPath = files.find((path) => {
-      //   // return path.includes('win-unpacked');
-      // });
-
-      // return `"${correctPath.trim()}"`;
+      if (result === 'true') {
+        try {
+          await this.execCommand(`${REMOVE_COMMAND} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    } else {
+      await this.execCommand(`${REMOVE_COMMAND} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
     }
-    await this.execCommand(`${REMOVE_COMMAND} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
   }
 
   public async clearSavedDiagrams(): Promise<void> {
@@ -117,6 +115,13 @@ export class TestClient {
     if (process.platform === 'win32') {
       const result = await this.execCommand(`IF EXIST ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')} ECHO true`);
       console.log(result);
+      if (result === 'true') {
+        try {
+          await this.execCommand(`${REMOVE_COMMAND} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
+        } catch (error) {
+          console.error(error);
+        }
+      }
     } else {
       await this.execCommand(`${REMOVE_COMMAND} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
     }
