@@ -3,12 +3,12 @@
 import path from 'path';
 import os from 'os';
 import {exec} from 'child_process';
+import fs from 'fs';
 
 import {AppConstructorOptions, Application} from 'spectron';
 import assert from 'assert';
 import {IIdentity} from '@essential-projects/iam_contracts';
 
-import {fstat} from 'fs';
 import {SolutionExplorer} from './test-classes/solution-explorer';
 import {DesignViewClient} from './test-classes/design-view';
 
@@ -94,44 +94,58 @@ export class TestClient {
   }
 
   public async clearDatabase(): Promise<void> {
-    console.log('clearDatabase', this.applicationArgs.path);
-    if (process.platform === 'win32') {
-      const result = await this.execCommand(`IF EXIST ${DATABASE_PATH.replace(/\s/g, '\\ ')} ECHO true`);
-      console.log(result);
-      if (result.trim() === 'true' || result === true) {
-        console.log('geht hier rein weil true');
-
-        try {
-          await this.execCommand(`${REMOVE_COMMAND} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
-          console.log('removed', DATABASE_PATH);
-        } catch (error) {
-          console.error(error);
-        }
-      }
-    } else {
-      await this.execCommand(`${REMOVE_COMMAND} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
+    if (fs.existsSync(DATABASE_PATH)) {
+      const files = fs.readdirSync(DATABASE_PATH, {encoding: 'utf8'});
+      files.forEach((file: string) => {
+        console.log(file);
+        fs.unlinkSync(`${DATABASE_PATH}/${file}`);
+      });
+      fs.rmdirSync(DATABASE_PATH);
     }
+    // console.log('clearDatabase', this.applicationArgs.path);
+    // if (process.platform === 'win32') {
+    //   const result = await this.execCommand(`IF EXIST ${DATABASE_PATH.replace(/\s/g, '\\ ')} ECHO true`);
+    //   console.log(result);
+    //   if (result.trim() === 'true' || result === true) {
+    //     console.log('geht hier rein weil true');
+    //     try {
+    //       await this.execCommand(`${REMOVE_COMMAND} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
+    //       console.log('removed', DATABASE_PATH);
+    //     } catch (error) {
+    //       console.error(error);
+    //     }
+    //   }
+    // } else {
+    //   await this.execCommand(`${REMOVE_COMMAND} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
+    // }
   }
 
   public async clearSavedDiagrams(): Promise<void> {
-    console.log('clearSavedDiagrams', this.applicationArgs.path);
-    // C:\Jenkins\ws\b1568297968023\
-    if (process.platform === 'win32') {
-      const result = await this.execCommand(`IF EXIST ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')} ECHO true`);
-      console.log(result);
-      if (result.trim() === 'true' || result === true) {
-        console.log('geht hier rein weil true');
-
-        try {
-          await this.execCommand(`${REMOVE_COMMAND} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
-          console.log('removed', SAVE_DIAGRAM_DIR);
-        } catch (error) {
-          console.error(error);
-        }
-      }
-    } else {
-      await this.execCommand(`${REMOVE_COMMAND} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
+    if (fs.existsSync(SAVE_DIAGRAM_DIR)) {
+      const files = fs.readdirSync(SAVE_DIAGRAM_DIR, {encoding: 'utf8'});
+      files.forEach((file: string) => {
+        console.log(file);
+        fs.unlinkSync(`${DATABASE_PATH}/${file}`);
+      });
+      fs.rmdirSync(SAVE_DIAGRAM_DIR);
     }
+    // console.log('clearSavedDiagrams', this.applicationArgs.path);
+    // // C:\Jenkins\ws\b1568297968023\
+    // if (process.platform === 'win32') {
+    //   const result = await this.execCommand(`IF EXIST ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')} ECHO true`);
+    //   console.log(result);
+    //   if (result.trim() === 'true' || result === true) {
+    //     console.log('geht hier rein weil true');
+    //     try {
+    //       await this.execCommand(`${REMOVE_COMMAND} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
+    //       console.log('removed', SAVE_DIAGRAM_DIR);
+    //     } catch (error) {
+    //       console.error(error);
+    //     }
+    //   }
+    // } else {
+    //   await this.execCommand(`${REMOVE_COMMAND} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
+    // }
   }
 
   public async isSpectronAppRunning(): Promise<boolean> {
