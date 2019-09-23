@@ -90,7 +90,7 @@
     "@essential-projects/eslint-config": "^1.0.4",
     "@essential-projects/http_contracts": "^2.4.0",
     "@essential-projects/iam_contracts": "^3.6.0",
-    "@process-engine/bpmn-elements_contracts": "2.0.0-bc9a859f-b2",
+    "@process-engine/bpmn-elements_contracts": "^2.1.0",
     "@process-engine/management_api_contracts": "13.0.0-beta.2",
     "@process-engine/solutionexplorer.contracts": "1.1.0-alpha.1",
     "@process-engine/solutionexplorer.repository.contracts": "4.3.0-alpha.1",
