@@ -3,7 +3,7 @@
 import path from 'path';
 import os from 'os';
 import {exec} from 'child_process';
-import fs from 'fs';
+import fs from 'fs-extra';
 
 import {AppConstructorOptions, Application} from 'spectron';
 import assert from 'assert';
@@ -94,16 +94,23 @@ export class TestClient {
   }
 
   public async clearDatabase(): Promise<void> {
-    if (fs.existsSync(DATABASE_PATH)) {
-      const files = fs.readdirSync(DATABASE_PATH, {encoding: 'utf8'});
-      files.forEach((file: string) => {
-        console.log(file);
-        const filePath = process.platform === 'win32' ? `${DATABASE_PATH}\\${file}` : `${DATABASE_PATH}/${file}`;
-
-        fs.unlinkSync(filePath);
-      });
-      fs.rmdirSync(DATABASE_PATH);
+    try {
+      await fs.remove(DATABASE_PATH);
+      console.log('success!');
+    } catch (err) {
+      console.error(err);
     }
+
+    // if (fs.existsSync(DATABASE_PATH)) {
+    //   const files = fs.readdirSync(DATABASE_PATH, {encoding: 'utf8'});
+    //   files.forEach((file: string) => {
+    //     console.log(file);
+    //     const filePath = process.platform === 'win32' ? `${DATABASE_PATH}\\${file}` : `${DATABASE_PATH}/${file}`;
+
+    //     fs.unlinkSync(filePath);
+    //   });
+    //   fs.rmdirSync(DATABASE_PATH);
+    // }
     // console.log('clearDatabase', this.applicationArgs.path);
     // if (process.platform === 'win32') {
     //   const result = await this.execCommand(`IF EXIST ${DATABASE_PATH.replace(/\s/g, '\\ ')} ECHO true`);
@@ -123,15 +130,21 @@ export class TestClient {
   }
 
   public async clearSavedDiagrams(): Promise<void> {
-    if (fs.existsSync(SAVE_DIAGRAM_DIR)) {
-      const files = fs.readdirSync(SAVE_DIAGRAM_DIR, {encoding: 'utf8'});
-      files.forEach((file: string) => {
-        console.log(file);
-        const filePath = process.platform === 'win32' ? `${SAVE_DIAGRAM_DIR}\\${file}` : `${SAVE_DIAGRAM_DIR}/${file}`;
-        fs.unlinkSync(filePath);
-      });
-      fs.rmdirSync(SAVE_DIAGRAM_DIR);
+    try {
+      await fs.remove(SAVE_DIAGRAM_DIR);
+      console.log('success!');
+    } catch (err) {
+      console.error(err);
     }
+    // if (fs.existsSync(SAVE_DIAGRAM_DIR)) {
+    //   const files = fs.readdirSync(SAVE_DIAGRAM_DIR, {encoding: 'utf8'});
+    //   files.forEach((file: string) => {
+    //     console.log(file);
+    //     const filePath = process.platform === 'win32' ? `${SAVE_DIAGRAM_DIR}\\${file}` : `${SAVE_DIAGRAM_DIR}/${file}`;
+    //     fs.unlinkSync(filePath);
+    //   });
+    //   fs.rmdirSync(SAVE_DIAGRAM_DIR);
+    // }
     // console.log('clearSavedDiagrams', this.applicationArgs.path);
     // // C:\Jenkins\ws\b1568297968023\
     // if (process.platform === 'win32') {
