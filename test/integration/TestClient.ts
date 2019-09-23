@@ -4,7 +4,6 @@ import path from 'path';
 import os from 'os';
 import {exec} from 'child_process';
 import fs from 'fs-extra';
-import {lock, unlock} from 'os-lock';
 
 import {AppConstructorOptions, Application} from 'spectron';
 import assert from 'assert';
@@ -100,9 +99,9 @@ export class TestClient {
       console.log('success!');
     } catch (error) {
       console.log(error);
-      const fd = fs.openSync(error.path, 'wx');
-      await unlock(fd);
-      await fs.remove(DATABASE_PATH);
+
+      await this.execCommand(`del /f ${error.path}`);
+      await this.clearDatabase();
       console.log('success!');
     }
     // if (fs.existsSync(DATABASE_PATH)) {
@@ -139,9 +138,8 @@ export class TestClient {
       console.log('success!');
     } catch (error) {
       console.log(error);
-      const fd = fs.openSync(error.path, 'wx');
-      await unlock(fd);
-      await fs.remove(DATABASE_PATH);
+      await this.execCommand(`del /f ${error.path}`);
+      await this.clearSavedDiagrams();
       console.log('success!');
     }
 
