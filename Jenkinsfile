@@ -36,6 +36,14 @@ pipeline {
     }
     stage('Build & test') {
       parallel {
+        stage('Lint sources') {
+          steps {
+            unstash('npm_package_node_modules')
+            unstash('package_json')
+
+            sh('npm run lint')
+          }
+        }
         stage('Build & test npm package') {
           steps {
             unstash('package_json')
@@ -98,14 +106,6 @@ pipeline {
             }
           }
         }
-      }
-    }
-    stage('Lint sources') {
-      steps {
-        unstash('npm_package_node_modules')
-        unstash('package_json')
-
-        sh('npm run lint')
       }
     }
     stage('Commit & tag version') {
