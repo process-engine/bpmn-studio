@@ -4,7 +4,7 @@ import {applicationArgs} from './modules/get-application-args';
 const VISIBLE_TIMEOUT = 40000;
 let testClient: TestClient;
 
-describe.only('Design View', function foo() {
+describe('Design View', function foo() {
   this.slow(10000);
   this.timeout(15000);
 
