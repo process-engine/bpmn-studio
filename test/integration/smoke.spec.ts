@@ -103,7 +103,6 @@ describe('Application launch', function foo() {
 
   it('should open the Think view from navbar', async () => {
     await testClient.createAndOpenNewDiagram();
-    await testClient.assertWindowTitleIs('Design | BPMN Studio');
 
     await testClient.openThinkViewFromNavbar();
 
