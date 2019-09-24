@@ -40,6 +40,8 @@ pipeline {
           steps {
             unstash('package_json')
 
+            sh('npm ci')
+
             sh('npm run lint')
           }
         }
