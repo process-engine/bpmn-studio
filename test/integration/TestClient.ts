@@ -2,7 +2,7 @@
 /* eslint-disable no-empty-function */
 import path from 'path';
 import {exec} from 'child_process';
-import fs from 'fs-extra';
+import fs from 'fs';
 
 import {AppConstructorOptions, Application} from 'spectron';
 import assert from 'assert';

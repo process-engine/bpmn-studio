@@ -1162,10 +1162,11 @@ function getBranchOfCurrentVersion(): string {
 }
 
 function getUserConfigFolder(): string {
-  const userHomeDir = homedir();
   if (process.env.SPECTRON_TESTS) {
     return process.cwd();
   }
+
+  const userHomeDir = homedir();
 
   switch (process.platform) {
     case 'darwin':
