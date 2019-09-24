@@ -32,12 +32,14 @@ pipeline {
         sh('node ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir')
 
         stash(includes: 'package.json', name: 'package_json')
+        stash(includes: 'node_modules/', name: 'npm_package_node_modules')
       }
     }
     stage('Build & test') {
       parallel {
         stage('Lint sources') {
           steps {
+            unstash('npm_package_node_modules')
             unstash('package_json')
 
             sh('npm ci')
@@ -47,6 +49,7 @@ pipeline {
         }
         stage('Build & test npm package') {
           steps {
+            unstash('npm_package_node_modules')
             unstash('package_json')
 
             sh('npm ci')
@@ -57,7 +60,6 @@ pipeline {
             sh('npm test')
 
             stash(includes: 'dist/web/@fortawesome/, dist/web/, config/', name: 'npm_package_results')
-            stash(includes: 'node_modules/', name: 'npm_package_node_modules')
           }
         }
         stage('Build & test on MacOS') {
