@@ -6,7 +6,7 @@ let testClient: TestClient;
 
 describe('Design View', function foo() {
   this.slow(10000);
-  this.timeout(15000);
+  this.timeout(20000);
 
   beforeEach(async () => {
     testClient = new TestClient(applicationArgs);

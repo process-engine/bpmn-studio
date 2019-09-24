@@ -1,7 +1,6 @@
 /* eslint-disable no-useless-escape */
 /* eslint-disable no-empty-function */
 import path from 'path';
-import os from 'os';
 import {exec} from 'child_process';
 import fs from 'fs-extra';
 
@@ -11,18 +10,6 @@ import {IIdentity} from '@essential-projects/iam_contracts';
 
 import {SolutionExplorer} from './test-classes/solution-explorer';
 import {DesignViewClient} from './test-classes/design-view';
-
-function getUserConfigFolder(): string {
-  const userHomeDir = os.homedir();
-  switch (process.platform) {
-    case 'darwin':
-      return path.join(userHomeDir, 'Library', 'Application Support');
-    case 'win32':
-      return path.join(userHomeDir, 'AppData', 'Roaming');
-    default:
-      return path.join(userHomeDir, '.config');
-  }
-}
 
 const APP_BASE_URL = `file://${__dirname}/../../../../index.html`;
 const DATABASE_PATH = path.join(getUserConfigFolder(), 'bpmn-studio-tests', 'process_engine_databases');
@@ -36,11 +23,9 @@ export class TestClient {
   public creatingFirstDiagram: boolean = true;
 
   private app: Application;
-  private applicationArgs: AppConstructorOptions;
 
   constructor(applicationArgs: AppConstructorOptions) {
     this.app = new Application(applicationArgs);
-    this.applicationArgs = applicationArgs;
   }
 
   public async startSpectronApp(): Promise<any> {
@@ -101,9 +86,8 @@ export class TestClient {
     if (fs.existsSync(DATABASE_PATH)) {
       try {
         await this.execCommand(`${REMOVE_COMMAND} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
-        console.log('success!');
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
   }
@@ -112,9 +96,8 @@ export class TestClient {
     if (fs.existsSync(SAVE_DIAGRAM_DIR)) {
       try {
         await this.execCommand(`${REMOVE_COMMAND} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
-        console.log('success!');
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     }
   }
@@ -185,14 +168,14 @@ export class TestClient {
   }
 
   public async assertSelectedBpmnElementHasName(name): Promise<void> {
-    await this.ensureVisible('[data-test-property-panel-element-name]', 15000);
+    await this.ensureVisible('[data-test-property-panel-element-name]', 20000);
     const selectedElementText = await this.getValueFromElement('[data-test-property-panel-element-name]');
 
     assert.equal(selectedElementText, name);
   }
 
   public async rejectSelectedBpmnElementHasName(name): Promise<void> {
-    await this.ensureVisible('[data-test-property-panel-element-name]', 15000);
+    await this.ensureVisible('[data-test-property-panel-element-name]', 20000);
     const selectedElementText = await this.getValueFromElement('[data-test-property-panel-element-name]');
 
     assert.notEqual(selectedElementText, name);
