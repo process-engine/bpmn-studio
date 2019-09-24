@@ -38,7 +38,6 @@ pipeline {
       parallel {
         stage('Lint sources') {
           steps {
-            unstash('npm_package_node_modules')
             unstash('package_json')
 
             sh('npm run lint')
