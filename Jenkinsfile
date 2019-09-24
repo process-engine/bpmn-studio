@@ -42,8 +42,6 @@ pipeline {
             unstash('npm_package_node_modules')
             unstash('package_json')
 
-            sh('npm ci')
-
             sh('npm run lint')
           }
         }
@@ -51,9 +49,6 @@ pipeline {
           steps {
             unstash('npm_package_node_modules')
             unstash('package_json')
-
-            sh('npm ci')
-            // sh('node ./node_modules/.bin/ci_tools npm-install-only @process-engine/ @essential-projects/')
 
             sh('npm run build')
 
