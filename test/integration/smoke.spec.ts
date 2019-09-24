@@ -28,22 +28,15 @@ describe('Application launch', function foo() {
     async (): Promise<void> => {
       if (await testClient.isSpectronAppRunning()) {
         await testClient.stopSpectronApp();
-        // const appIsStopped = !(await testClient.isSpectronAppRunning());
-
-        // if (!appIsStopped) {
-        //   setTimeout(async () => {
-        //     await testClient.clearDatabase();
-        //   }, 300);
-        // } else {
-        //   await testClient.clearDatabase();
-        // }
       }
     },
   );
 
-  // this.afterAll(async () => {
-  //   await testClient.clearSavedDiagrams();
-  // });
+  this.afterAll(async () => {
+    await testClient.clearDatabase();
+    await testClient.clearSavedDiagrams();
+    await testClient.rmeoveTestsFolder();
+  });
 
   it('should start the application', async () => {
     await testClient.elementHasText('h3', 'Welcome');
@@ -110,8 +103,10 @@ describe('Application launch', function foo() {
 
   it('should open the Think view from navbar', async () => {
     await testClient.createAndOpenNewDiagram();
+    await testClient.assertWindowTitleIs('Design | BPMN Studio');
 
-    await testClient.openThinkView();
+    await testClient.openThinkViewFromNavbar();
+
     await testClient.assertWindowTitleIs('Think | BPMN Studio');
   });
 
@@ -120,6 +115,7 @@ describe('Application launch', function foo() {
     await testClient.startPageLoaded();
     await testClient.solutionExplorer.openDirectoryAsSolution('fixtures', diagramName);
     await testClient.assertDiagramIsOnFileSystem();
+    await testClient.solutionExplorer.assertInternalProcessEngineIsOpenedAsSolution();
     await testClient.designView.deployDiagram();
     await testClient.assertNavbarTitleIs(diagramName);
     await testClient.assertDiagramIsOnProcessEngine();

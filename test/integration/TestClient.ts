@@ -93,6 +93,10 @@ export class TestClient {
     return this.webdriverClient.waitForVisible(selector, timeout);
   }
 
+  public async rmeoveTestsFolder(): Promise<void> {
+    await this.execCommand(`${REMOVE_COMMAND} ${TESTS_FOLDER_PATH.replace(/\s/g, '\\ ')}`);
+  }
+
   public async clearDatabase(): Promise<void> {
     if (fs.existsSync(DATABASE_PATH)) {
       try {
@@ -102,32 +106,6 @@ export class TestClient {
         console.log(error);
       }
     }
-    // if (fs.existsSync(DATABASE_PATH)) {
-    //   const files = fs.readdirSync(DATABASE_PATH, {encoding: 'utf8'});
-    //   files.forEach((file: string) => {
-    //     console.log(file);
-    //     const filePath = process.platform === 'win32' ? `${DATABASE_PATH}\\${file}` : `${DATABASE_PATH}/${file}`;
-
-    //     fs.unlinkSync(filePath);
-    //   });
-    //   fs.rmdirSync(DATABASE_PATH);
-    // }
-    // console.log('clearDatabase', this.applicationArgs.path);
-    // if (process.platform === 'win32') {
-    //   const result = await this.execCommand(`IF EXIST ${DATABASE_PATH.replace(/\s/g, '\\ ')} ECHO true`);
-    //   console.log(result);
-    //   if (result.trim() === 'true' || result === true) {
-    //     console.log('geht hier rein weil true');
-    //     try {
-    //       await this.execCommand(`${REMOVE_COMMAND} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
-    //       console.log('removed', DATABASE_PATH);
-    //     } catch (error) {
-    //       console.error(error);
-    //     }
-    //   }
-    // } else {
-    //   await this.execCommand(`${REMOVE_COMMAND} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
-    // }
   }
 
   public async clearSavedDiagrams(): Promise<void> {
@@ -139,32 +117,6 @@ export class TestClient {
         console.log(error);
       }
     }
-    // if (fs.existsSync(SAVE_DIAGRAM_DIR)) {
-    //   const files = fs.readdirSync(SAVE_DIAGRAM_DIR, {encoding: 'utf8'});
-    //   files.forEach((file: string) => {
-    //     console.log(file);
-    //     const filePath = process.platform === 'win32' ? `${SAVE_DIAGRAM_DIR}\\${file}` : `${SAVE_DIAGRAM_DIR}/${file}`;
-    //     fs.unlinkSync(filePath);
-    //   });
-    //   fs.rmdirSync(SAVE_DIAGRAM_DIR);
-    // }
-    // console.log('clearSavedDiagrams', this.applicationArgs.path);
-    // // C:\Jenkins\ws\b1568297968023\
-    // if (process.platform === 'win32') {
-    //   const result = await this.execCommand(`IF EXIST ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')} ECHO true`);
-    //   console.log(result);
-    //   if (result.trim() === 'true' || result === true) {
-    //     console.log('geht hier rein weil true');
-    //     try {
-    //       await this.execCommand(`${REMOVE_COMMAND} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
-    //       console.log('removed', SAVE_DIAGRAM_DIR);
-    //     } catch (error) {
-    //       console.error(error);
-    //     }
-    //   }
-    // } else {
-    //   await this.execCommand(`${REMOVE_COMMAND} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
-    // }
   }
 
   public async isSpectronAppRunning(): Promise<boolean> {
@@ -233,12 +185,14 @@ export class TestClient {
   }
 
   public async assertSelectedBpmnElementHasName(name): Promise<void> {
+    await this.ensureVisible('[data-test-property-panel-element-name]', 15000);
     const selectedElementText = await this.getValueFromElement('[data-test-property-panel-element-name]');
 
     assert.equal(selectedElementText, name);
   }
 
   public async rejectSelectedBpmnElementHasName(name): Promise<void> {
+    await this.ensureVisible('[data-test-property-panel-element-name]', 15000);
     const selectedElementText = await this.getValueFromElement('[data-test-property-panel-element-name]');
 
     assert.notEqual(selectedElementText, name);

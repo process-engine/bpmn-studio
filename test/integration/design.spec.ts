@@ -4,7 +4,7 @@ import {applicationArgs} from './modules/get-application-args';
 const VISIBLE_TIMEOUT = 40000;
 let testClient: TestClient;
 
-describe('Design View', function foo() {
+describe.only('Design View', function foo() {
   this.slow(10000);
   this.timeout(15000);
 
@@ -22,22 +22,15 @@ describe('Design View', function foo() {
     async (): Promise<void> => {
       if (await testClient.isSpectronAppRunning()) {
         await testClient.stopSpectronApp();
-        // const appIsStopped = !(await testClient.isSpectronAppRunning());
-
-        // if (!appIsStopped) {
-        //   setTimeout(async () => {
-        //     await testClient.clearDatabase();
-        //   }, 300);
-        // } else {
-        //   await testClient.clearDatabase();
-        // }
       }
     },
   );
 
-  // this.afterAll(async () => {
-  //   await testClient.clearSavedDiagrams();
-  // });
+  this.afterAll(async () => {
+    await testClient.clearDatabase();
+    await testClient.clearSavedDiagrams();
+    await testClient.rmeoveTestsFolder();
+  });
 
   it('should save a diagram', async () => {
     // Arrange
@@ -55,6 +48,7 @@ describe('Design View', function foo() {
     await testClient.startPageLoaded();
     await testClient.solutionExplorer.openDirectoryAsSolution('fixtures', diagramName);
     await testClient.assertDiagramIsOnFileSystem();
+    await testClient.solutionExplorer.assertInternalProcessEngineIsOpenedAsSolution();
 
     // Act
     await testClient.designView.deployDiagram();
@@ -68,6 +62,7 @@ describe('Design View', function foo() {
     await testClient.startPageLoaded();
     await testClient.solutionExplorer.openDirectoryAsSolution('fixtures', diagramName);
     await testClient.assertDiagramIsOnFileSystem();
+    await testClient.solutionExplorer.assertInternalProcessEngineIsOpenedAsSolution();
     await testClient.designView.deployDiagram();
     await testClient.assertNavbarTitleIs(diagramName);
     await testClient.assertDiagramIsOnProcessEngine();

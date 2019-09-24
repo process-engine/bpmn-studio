@@ -39,22 +39,15 @@ describe('XML View', function foo() {
     async (): Promise<void> => {
       if (await testClient.isSpectronAppRunning()) {
         await testClient.stopSpectronApp();
-        // const appIsStopped = !(await testClient.isSpectronAppRunning());
-
-        // if (!appIsStopped) {
-        //   setTimeout(async () => {
-        //     await testClient.clearDatabase();
-        //   }, 300);
-        // } else {
-        //   await testClient.clearDatabase();
-        // }
       }
     },
   );
 
-  // this.afterAll(async () => {
-  //   await testClient.clearSavedDiagrams();
-  // });
+  this.afterAll(async () => {
+    await testClient.clearDatabase();
+    await testClient.clearSavedDiagrams();
+    await testClient.rmeoveTestsFolder();
+  });
 
   it('should have content', async () => {
     await testClient.createAndOpenNewDiagram();
