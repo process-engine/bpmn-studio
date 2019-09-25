@@ -70,6 +70,9 @@ jobs:
         mkdir -p dist_web/dist/web
         cp index.html dist_web/index.html
         cp -r dist/web dist_web/dist
+        mkdir -p dist_web/src/resources
+        cp -r src/resources dist_web/src
+        cp favicon.ico dist_web/
 
     - uses: actions/upload-artifact@master
       with:
