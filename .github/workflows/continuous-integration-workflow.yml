@@ -95,6 +95,8 @@ jobs:
 
     - name: Build the Electron app
       run: npm run electron-build-macos
+      env: 
+        CSC_LINK: ${{ secrets.CSC_LINK }}
 
     - name: Run the tests
       run: npm test
