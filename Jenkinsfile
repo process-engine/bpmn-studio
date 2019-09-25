@@ -17,6 +17,9 @@ def buildIsRequired = true
 
 pipeline {
   agent any
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20'))
+  }
   tools {
     nodejs "node-lts"
   }
