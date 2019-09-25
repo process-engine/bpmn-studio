@@ -12,7 +12,7 @@ async function stopProcess(): Promise<void> {
 
 describe('Application launch', function foo() {
   this.slow(10000);
-  this.timeout(20000);
+  this.timeout(40000);
 
   beforeEach(async () => {
     testClient = new TestClient(applicationArgs);
