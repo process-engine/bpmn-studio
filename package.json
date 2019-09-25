@@ -61,7 +61,7 @@
     "@types/mocha": "^5.2.7",
     "about-window": "1.13.0",
     "aurelia-open-id-connect": "2.0.2",
-    "aurelia-validation": "1.4.0",
+    "aurelia-validation": "1.5.0",
     "bootstrap": "^4.3.1",
     "bpmn-js-differ": "2.0.2",
     "clipboard-polyfill": "2.8.1",
