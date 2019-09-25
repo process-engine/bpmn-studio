@@ -65,12 +65,16 @@ jobs:
     - name: Run the tests
       run: npm test
 
+    - name: Bundle web
+      run: | 
+        mkdir -p dist_web/dist/web
+        cp index.html dist_web/index.html
+        cp -r dist/web dist_web/dist
+
     - uses: actions/upload-artifact@master
       with:
         name: dist_web
-        path: dist/web
-
-        # TODO: Include index.html with correct paths to zip
+        path: dist_web
 
   build_and_test_macos:
     name: "Build & Test (macOS)"
