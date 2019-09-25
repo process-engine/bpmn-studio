@@ -102,9 +102,6 @@ jobs:
       env: 
         CSC_LINK: ${{ secrets.CSC_LINK }}
 
-    - name: Run the tests
-      run: npm test
-
     - uses: actions/upload-artifact@master
       with:
         name: dist_electron_macos
