@@ -422,10 +422,10 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
     }
 
     const processInstance: DataModels.Correlations.ProcessInstance = correlation.processInstances.find(
-      (processInstance: DataModels.Correlations.ProcessInstance): boolean => {
+      (currentProcessInstance: DataModels.Correlations.ProcessInstance): boolean => {
         const targetProcessModelFound: boolean =
-          processInstance.parentProcessInstanceId === processInstanceIdOfOrigin &&
-          processInstance.processModelId === callActivityTargetId;
+          currentProcessInstance.parentProcessInstanceId === processInstanceIdOfOrigin &&
+          currentProcessInstance.processModelId === callActivityTargetId;
 
         return targetProcessModelFound;
       },
