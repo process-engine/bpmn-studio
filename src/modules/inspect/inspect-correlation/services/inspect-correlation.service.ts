@@ -4,12 +4,17 @@ import {IIdentity} from '@essential-projects/iam_contracts';
 import {DataModels, IManagementApiClient} from '@process-engine/management_api_contracts';
 
 import {EventAggregator} from 'aurelia-event-aggregator';
+import {ProcessInstanceList} from '@process-engine/management_api_contracts/dist/data_models/correlation';
 import {IInspectCorrelationRepository, IInspectCorrelationService} from '../contracts';
 import {InspectCorrelationPaginationRepository} from '../repositories/inspect-correlation.pagination.repository';
 import environment from '../../../../environment';
 import {InspectCorrelationRepository} from '../repositories/inspect-correlation.repository';
 import {ISolutionEntry} from '../../../../contracts';
-import {processEngineSupportsPagination} from '../../../../services/process-engine-version-module/process-engine-version-module';
+import {
+  processEngineSupportsPagination,
+  processEngineSupportsProcessInstancesQueries,
+} from '../../../../services/process-engine-version-module/process-engine-version-module';
+import {InspectCorrelationProcessInstancesQueryRepository} from '../repositories/inspect-correlation.process-instances.queries.repository';
 
 @inject(EventAggregator, 'ManagementApiClientService')
 export class InspectCorrelationService implements IInspectCorrelationService {
@@ -26,6 +31,10 @@ export class InspectCorrelationService implements IInspectCorrelationService {
       (solutionEntry: ISolutionEntry) => {
         if (processEngineSupportsPagination(solutionEntry.processEngineVersion)) {
           this.inspectCorrelationRepository = new InspectCorrelationPaginationRepository(this.managementApiService);
+        } else if (processEngineSupportsProcessInstancesQueries(solutionEntry.processEngineVersion)) {
+          this.inspectCorrelationRepository = new InspectCorrelationProcessInstancesQueryRepository(
+            this.managementApiService,
+          );
         } else {
           this.inspectCorrelationRepository = new InspectCorrelationRepository(this.managementApiService);
         }
@@ -91,5 +100,19 @@ export class InspectCorrelationService implements IInspectCorrelationService {
     } catch (error) {
       return undefined;
     }
+  }
+
+  public getProcessInstancesForProcessModel(
+    identity: IIdentity,
+    processModelId: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<ProcessInstanceList> {
+    return this.inspectCorrelationRepository.getProcessInstancesForProcessModel(
+      identity,
+      processModelId,
+      offset,
+      limit,
+    );
   }
 }
