@@ -105,10 +105,16 @@ jobs:
       env: 
         CSC_LINK: ${{ secrets.CSC_LINK }}
 
+    - name: Prepare macOS Bundle
+      run: |
+        mkdir dist_electron_macos
+        cp dist/electron/bpmn-studio-setup**.zip dist_electron_macos
+        cp dist/electron/bpmn-studio-setup**.dmg dist_electron_macos
+
     - uses: actions/upload-artifact@master
       with:
         name: dist_electron_macos
-        path: dist/electron
+        path: dist_electron_macos
 
   build_and_test_windows:
     name: "Build & Test (Windows)"
@@ -139,7 +145,13 @@ jobs:
     - name: Run the tests
       run: npm test
 
+    - name: Prepare Windows Bundle
+      run: |
+        mkdir dist_electron_windows
+        copy-item .\dist\electron\bpmn-studio-setup-**.exe .\dist_electron_windows\
+      shell: powershell
+
     - uses: actions/upload-artifact@master
       with:
         name: dist_electron_windows
-        path: dist/electron
+        path: dist_electron_windows
