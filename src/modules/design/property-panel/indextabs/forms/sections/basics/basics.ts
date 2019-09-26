@@ -470,8 +470,9 @@ export class BasicsSection implements ISection {
       if (isNoUserTask) {
         return false;
       }
+
       const formData: IFormElement = this.getFormDataFromBusinessObject(currentBusinessObject);
-      if (formData === undefined) {
+      if (formData === undefined || formData.fields === undefined) {
         return false;
       }
 
