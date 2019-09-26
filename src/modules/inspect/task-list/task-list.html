@@ -30,7 +30,7 @@
           </td>
         </tr>
       </table>
-      <div class="col-md-12 col-xs-12 pagination">
+      <div class="col-md-12 col-xs-12 pagination" if.bind="totalItems > pageSize">
         <aubs-pagination page-size.bind="pageSize" total-items.bind="totalItems" current-page.bind="currentPage"
           boundary-links.bind="true" pagination-size.bind="paginationSize">
         </aubs-pagination>

@@ -1,5 +1,5 @@
 import {Subscription} from 'aurelia-event-aggregator';
-import {bindable, inject} from 'aurelia-framework';
+import {bindable, inject, observable} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 
 import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
@@ -18,7 +18,7 @@ interface ITaskListRouteParameters {
 export class TaskList {
   @bindable() public activeSolutionEntry: ISolutionEntry;
 
-  public currentPage: number = 0;
+  @observable public currentPage: number = 0;
   public pageSize: number = 10;
   public totalItems: number;
   public paginationSize: number = 10;
@@ -44,7 +44,7 @@ export class TaskList {
   }
 
   public get shownTasks(): Array<TaskListEntry> {
-    return this.tasks.slice((this.currentPage - 1) * this.pageSize, this.pageSize * this.currentPage);
+    return this.tasks;
   }
 
   public initializeTaskList(routeParameters: ITaskListRouteParameters): void {
@@ -175,6 +175,10 @@ export class TaskList {
     });
   }
 
+  public currentPageChanged(): void {
+    this.updateTasks();
+  }
+
   private getAllTasks(offset?: number, limit?: number): Promise<SuspendedTaskList> {
     return this.dashboardService.getAllSuspendedTasks(this.activeSolutionEntry.identity, offset, limit);
   }
@@ -220,11 +224,10 @@ export class TaskList {
 
   private async updateTasks(): Promise<void> {
     try {
-      console.log(this.currentPage);
-      const suspendedTaskList: SuspendedTaskList = await this.getTasks(
-        this.currentPage * this.paginationSize,
-        this.paginationSize,
-      );
+      const pageIndex: number = this.currentPage > 0 ? this.currentPage - 1 : 0;
+      const taskOffset: number = pageIndex * this.pageSize;
+
+      const suspendedTaskList: SuspendedTaskList = await this.getTasks(taskOffset, this.pageSize);
 
       this.tasks = suspendedTaskList.taskListEntries;
       this.totalItems = suspendedTaskList.totalCount;

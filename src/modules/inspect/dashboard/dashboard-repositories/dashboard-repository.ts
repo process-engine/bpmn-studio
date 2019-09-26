@@ -225,7 +225,7 @@ export class DashboardRepository implements IDashboardRepository {
     return this.managementApiService.removeSubscription(identity, subscription);
   }
 
-  public async getAllSuspendedTasks(identity: IIdentity): Promise<TaskList> {
+  public async getAllSuspendedTasks(identity: IIdentity, offset: number = 0, limit: number = 0): Promise<TaskList> {
     const allProcessModels: DataModels.ProcessModels.ProcessModelList = await this.getProcessModels(identity);
 
     // TODO (ph): This will create 1 + n http reqeusts, where n is the number of process models in the processengine.
@@ -275,14 +275,19 @@ export class DashboardRepository implements IDashboardRepository {
     const allTasks: Array<TaskListEntry> = [].concat(...allTasksForAllProcessModels);
 
     const taskList: TaskList = {
-      taskListEntries: allTasks,
+      taskListEntries: this.applyPagination(allTasks, offset, limit),
       totalCount: allTasks.length,
     };
 
     return taskList;
   }
 
-  public async getSuspendedTasksForProcessInstance(identity: IIdentity, processInstanceId: string): Promise<TaskList> {
+  public async getSuspendedTasksForProcessInstance(
+    identity: IIdentity,
+    processInstanceId: string,
+    offset: number = 0,
+    limit: number = 0,
+  ): Promise<TaskList> {
     const userTaskList: DataModels.UserTasks.UserTaskList = await this.getUserTasksForProcessInstance(
       identity,
       processInstanceId,
@@ -311,14 +316,19 @@ export class DashboardRepository implements IDashboardRepository {
     const taskListEntries: Array<TaskListEntry> = [].concat(userTasks, manualTasks, emptyActivities);
 
     const taskList: TaskList = {
-      taskListEntries: taskListEntries,
+      taskListEntries: this.applyPagination(taskListEntries, offset, limit),
       totalCount: taskListEntries.length,
     };
 
     return taskList;
   }
 
-  public async getSuspendedTasksForCorrelation(identity: IIdentity, correlationId: string): Promise<TaskList> {
+  public async getSuspendedTasksForCorrelation(
+    identity: IIdentity,
+    correlationId: string,
+    offset: number = 0,
+    limit: number = 0,
+  ): Promise<TaskList> {
     const runningCorrelations: DataModels.Correlations.CorrelationList = await this.getActiveCorrelations(identity);
 
     const correlation: DataModels.Correlations.Correlation = runningCorrelations.correlations.find(
@@ -362,14 +372,19 @@ export class DashboardRepository implements IDashboardRepository {
     const taskListEntries: Array<TaskListEntry> = [].concat(userTasks, manualTasks, emptyActivities);
 
     const taskList: TaskList = {
-      taskListEntries: taskListEntries,
+      taskListEntries: this.applyPagination(taskListEntries, offset, limit),
       totalCount: taskListEntries.length,
     };
 
     return taskList;
   }
 
-  public async getSuspendedTasksForProcessModel(identity: IIdentity, processModelId: string): Promise<TaskList> {
+  public async getSuspendedTasksForProcessModel(
+    identity: IIdentity,
+    processModelId: string,
+    offset: number = 0,
+    limit: number = 0,
+  ): Promise<TaskList> {
     const userTaskList: DataModels.UserTasks.UserTaskList = await this.getUserTasksForProcessModel(
       identity,
       processModelId,
@@ -398,11 +413,25 @@ export class DashboardRepository implements IDashboardRepository {
     const taskListEntries: Array<TaskListEntry> = [].concat(userTasks, manualTasks, emptyActivities);
 
     const taskList: TaskList = {
-      taskListEntries: taskListEntries,
+      taskListEntries: this.applyPagination(taskListEntries, offset, limit),
       totalCount: taskListEntries.length,
     };
 
     return taskList;
+  }
+
+  private applyPagination<TList>(list: Array<TList>, offset: number, limit: number): Array<TList> {
+    const paginatedList: Array<TList> = list.slice();
+
+    if (offset > 0) {
+      paginatedList.splice(0, offset);
+    }
+
+    if (limit > 0) {
+      paginatedList.splice(limit, paginatedList.length - limit);
+    }
+
+    return paginatedList;
   }
 
   private mapTasksToTaskListEntry(tasks: Array<TaskSource>, targetType: TaskType): Array<TaskListEntry> {
