@@ -16,7 +16,7 @@ import {IProcessInstanceWithCorrelation} from '../../../../contracts/index';
 @inject(EventAggregator)
 export class CorrelationList {
   @bindable public processInstanceToSelect: string;
-  @bindable public selectedProcessInstance: DataModels.Correlations.CorrelationProcessInstance;
+  @bindable public selectedProcessInstance: DataModels.Correlations.ProcessInstance;
   @bindable public selectedCorrelation: DataModels.Correlations.Correlation;
   @bindable public correlations: Array<DataModels.Correlations.Correlation>;
   @bindable public activeDiagram: IDiagram;
@@ -92,8 +92,7 @@ export class CorrelationList {
   ): Array<ICorrelationTableEntry> {
     return processInstancesWithCorrelation.map((processInstanceWithCorrelation: IProcessInstanceWithCorrelation) => {
       const correlation: DataModels.Correlations.Correlation = processInstanceWithCorrelation.correlation;
-      const processInstance: DataModels.Correlations.CorrelationProcessInstance =
-        processInstanceWithCorrelation.processInstance;
+      const processInstance: DataModels.Correlations.ProcessInstance = processInstanceWithCorrelation.processInstance;
 
       const formattedStartedDate: string = getBeautifiedDate(processInstanceWithCorrelation.correlation.createdAt);
 
@@ -181,13 +180,11 @@ export class CorrelationList {
     return correlationForTableEntry;
   }
 
-  private getProcessModelForTableEntry(
-    tableEntry: ICorrelationTableEntry,
-  ): DataModels.Correlations.CorrelationProcessInstance {
+  private getProcessModelForTableEntry(tableEntry: ICorrelationTableEntry): DataModels.Correlations.ProcessInstance {
     const correlationForTableEntry = this.getCorrelationForTableEntry(tableEntry);
 
-    const processModelForTableEntry: DataModels.Correlations.CorrelationProcessInstance = correlationForTableEntry.processInstances.find(
-      (processModel: DataModels.Correlations.CorrelationProcessInstance) => {
+    const processModelForTableEntry: DataModels.Correlations.ProcessInstance = correlationForTableEntry.processInstances.find(
+      (processModel: DataModels.Correlations.ProcessInstance) => {
         return processModel.processInstanceId === tableEntry.processInstanceId;
       },
     );
@@ -202,7 +199,7 @@ export class CorrelationList {
     const processInstancesWithCorrelation: Array<IProcessInstanceWithCorrelation> = [];
 
     correlations.forEach((correlation: DataModels.Correlations.Correlation) => {
-      correlation.processInstances.forEach((processInstance: DataModels.Correlations.CorrelationProcessInstance) => {
+      correlation.processInstances.forEach((processInstance: DataModels.Correlations.ProcessInstance) => {
         const isNotSelectedProcessModel: boolean = processInstance.processModelId !== processModelId;
 
         if (isNotSelectedProcessModel) {

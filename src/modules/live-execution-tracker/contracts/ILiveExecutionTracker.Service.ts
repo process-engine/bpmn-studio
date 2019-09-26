@@ -26,7 +26,7 @@ export interface ILiveExecutionTrackerService {
     identity: IIdentity,
     correlationId: string,
     processInstanceId: string,
-  ): Promise<DataModels.Correlations.CorrelationProcessInstance>;
+  ): Promise<DataModels.Correlations.ProcessInstance>;
   getProcessModelById(identity: IIdentity, processModelId: string): Promise<DataModels.ProcessModels.ProcessModel>;
   getTokenHistoryGroupForProcessInstance(
     identity: IIdentity,

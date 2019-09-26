@@ -21,7 +21,7 @@ interface IClipboard {
 @inject('NotificationService', 'InspectCorrelationService')
 export class LogViewer {
   @bindable public log: Array<DataModels.Logging.LogEntry>;
-  @bindable public processInstance: DataModels.Correlations.CorrelationProcessInstance;
+  @bindable public processInstance: DataModels.Correlations.ProcessInstance;
   @bindable public activeSolutionEntry: ISolutionEntry;
   public logSortProperty: typeof LogSortProperty = LogSortProperty;
   public sortedLog: Array<DataModels.Logging.LogEntry>;
