@@ -17,7 +17,7 @@ import {DashboardService} from '../dashboard/dashboard-service/dashboard-service
 Bluebird.Promise.config({cancellation: true});
 
 type ProcessInstanceWithCorrelation = {
-  processInstance: DataModels.Correlations.CorrelationProcessInstance;
+  processInstance: DataModels.Correlations.ProcessInstance;
   correlation: DataModels.Correlations.Correlation;
 };
 
@@ -151,14 +151,12 @@ export class ProcessList {
         for (const correlation of this.correlations) {
           const processInstancesWithCorrelation: Array<
             ProcessInstanceWithCorrelation
-          > = correlation.processInstances.map(
-            (processInstance: DataModels.Correlations.CorrelationProcessInstance) => {
-              return {
-                processInstance: processInstance,
-                correlation: correlation,
-              };
-            },
-          );
+          > = correlation.processInstances.map((processInstance: DataModels.Correlations.ProcessInstance) => {
+            return {
+              processInstance: processInstance,
+              correlation: correlation,
+            };
+          });
 
           this.processInstancesWithCorrelation.push(...processInstancesWithCorrelation);
         }
@@ -192,7 +190,7 @@ export class ProcessList {
   }
 
   public async stopProcessInstance(
-    processInstance: DataModels.Correlations.CorrelationProcessInstance,
+    processInstance: DataModels.Correlations.ProcessInstance,
     correlation: DataModels.Correlations.Correlation,
   ): Promise<void> {
     try {
@@ -229,6 +227,7 @@ export class ProcessList {
       async (resolve: Function, reject: Function): Promise<any> => {
         try {
           const activeCorreations = await this.dashboardService.getActiveCorrelations(identity);
+
           resolve(activeCorreations);
         } catch (error) {
           reject(error);
@@ -258,9 +257,9 @@ export class ProcessList {
       return Date.parse(secondCorrelation.createdAt.toString()) - Date.parse(firstCorrelation.createdAt.toString());
     }
 
-    const firstProcessInstance: DataModels.Correlations.CorrelationProcessInstance =
+    const firstProcessInstance: DataModels.Correlations.ProcessInstance =
       firstProcessInstanceWithCorrelation.processInstance;
-    const secondProcessInstance: DataModels.Correlations.CorrelationProcessInstance =
+    const secondProcessInstance: DataModels.Correlations.ProcessInstance =
       secondProcessInstanceWithCorrelation.processInstance;
 
     return (

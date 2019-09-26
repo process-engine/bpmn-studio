@@ -22,7 +22,7 @@ import {ILiveExecutionTrackerService} from '../../../../live-execution-tracker/c
 
 @inject('NotificationService', EventAggregator, 'LiveExecutionTrackerService')
 export class DiagramViewer {
-  @bindable public processInstance: DataModels.Correlations.CorrelationProcessInstance;
+  @bindable public processInstance: DataModels.Correlations.ProcessInstance;
   @bindable public xml: string;
   @bindable public activeDiagram: IDiagram;
   @bindable public selectedFlowNode: IShape;
