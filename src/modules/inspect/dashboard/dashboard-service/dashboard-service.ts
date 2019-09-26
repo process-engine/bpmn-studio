@@ -10,10 +10,11 @@ import {ISolutionEntry} from '../../../../contracts';
 import {processEngineSupportsPagination} from '../../../../services/process-engine-version-module/process-engine-version-module';
 import {DashboardPaginationRepository} from '../dashboard-repositories/dashboard-pagination-repository';
 import {DashboardRepository} from '../dashboard-repositories/dashboard-repository';
-import {IDashboardRepository} from '../dashboard-repositories/IDashboardRepository';
+import {IDashboardRepository} from '../contracts/IDashboardRepository';
+import {IDashboardService, TaskListEntry} from '../contracts/index';
 
 @inject(EventAggregator, 'ManagementApiClientService')
-export class DashboardService {
+export class DashboardService implements IDashboardService {
   public eventAggregator: EventAggregator;
 
   private dashboardRepository: IDashboardRepository;
@@ -33,6 +34,31 @@ export class DashboardService {
         }
       },
     );
+  }
+
+  public getAllSuspendedTasks(identity: IIdentity): Promise<Array<TaskListEntry>> {
+    return this.dashboardRepository.getAllSuspendedTasks(identity);
+  }
+
+  public async getSuspendedTasksForProcessInstance(
+    identity: IIdentity,
+    processInstanceId: string,
+  ): Promise<Array<TaskListEntry>> {
+    return this.dashboardRepository.getSuspendedTasksForProcessInstance(identity, processInstanceId);
+  }
+
+  public async getSuspendedTasksForCorrelation(
+    identity: IIdentity,
+    correlationId: string,
+  ): Promise<Array<TaskListEntry>> {
+    return this.dashboardRepository.getSuspendedTasksForCorrelation(identity, correlationId);
+  }
+
+  public async getSuspendedTasksForProcessModel(
+    identity: IIdentity,
+    processModelId: string,
+  ): Promise<Array<TaskListEntry>> {
+    return this.dashboardRepository.getSuspendedTasksForProcessModel(identity, processModelId);
   }
 
   public getAllActiveCronjobs(identity: IIdentity): Promise<DataModels.Cronjobs.CronjobList> {
