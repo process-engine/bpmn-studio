@@ -155,9 +155,10 @@ export class BasicsSection implements ISection {
       }
       if (result.valid === false) {
         this.validationError = true;
-        document.getElementById(result.rule.property.displayName).style.border = '2px solid red';
+        (document.querySelector('[data-test-property-panel-element-id]') as HTMLInputElement).style.border =
+          '2px solid red';
       } else {
-        document.getElementById(result.rule.property.displayName).style.border = '';
+        (document.querySelector('[data-test-property-panel-element-id]') as HTMLInputElement).style.border = '';
       }
     }
   }
