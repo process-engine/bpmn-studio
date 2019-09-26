@@ -31,6 +31,7 @@ export class TaskList {
   private router: Router;
   private solutionService: ISolutionService;
 
+  private dashboardServiceSubscriptions: Array<any> = [];
   private subscriptions: Array<Subscription>;
   private tasks: Array<TaskListEntry> = [];
   private getTasks: (offset?: number, limit?: number) => Promise<SuspendedTaskList>;
@@ -72,15 +73,51 @@ export class TaskList {
     }
   }
 
-  public async activeSolutionEntryChanged(newValue): Promise<void> {
-    if (this.isAttached) {
-      this.tasks = [];
-      this.initialLoadingFinished = false;
-      this.showError = false;
-      this.dashboardService.eventAggregator.publish(environment.events.configPanel.solutionEntryChanged, newValue);
-
-      await this.updateTasks();
+  public async activeSolutionEntryChanged(
+    newActiveSolutionEntry: ISolutionEntry,
+    previousActiveSolutioEntry: ISolutionEntry,
+  ): Promise<void> {
+    if (!this.isAttached) {
+      return;
     }
+
+    for (const subscription of this.dashboardServiceSubscriptions) {
+      this.dashboardService.removeSubscription(previousActiveSolutioEntry.identity, subscription);
+    }
+
+    this.tasks = [];
+    this.initialLoadingFinished = false;
+    this.showError = false;
+    this.dashboardService.eventAggregator.publish(
+      environment.events.configPanel.solutionEntryChanged,
+      newActiveSolutionEntry,
+    );
+
+    await this.updateTasks();
+
+    this.dashboardServiceSubscriptions = [
+      this.dashboardService.onEmptyActivityFinished(this.activeSolutionEntry.identity, async () => {
+        await this.updateTasks();
+      }),
+      this.dashboardService.onEmptyActivityWaiting(this.activeSolutionEntry.identity, async () => {
+        await this.updateTasks();
+      }),
+      this.dashboardService.onUserTaskFinished(this.activeSolutionEntry.identity, async () => {
+        await this.updateTasks();
+      }),
+      this.dashboardService.onUserTaskWaiting(this.activeSolutionEntry.identity, async () => {
+        await this.updateTasks();
+      }),
+      this.dashboardService.onManualTaskFinished(this.activeSolutionEntry.identity, async () => {
+        await this.updateTasks();
+      }),
+      this.dashboardService.onManualTaskWaiting(this.activeSolutionEntry.identity, async () => {
+        await this.updateTasks();
+      }),
+      this.dashboardService.onProcessError(this.activeSolutionEntry.identity, async () => {
+        await this.updateTasks();
+      }),
+    ];
   }
 
   public async attached(): Promise<void> {
@@ -110,34 +147,6 @@ export class TaskList {
     ];
 
     await this.updateTasks();
-
-    this.dashboardService.onEmptyActivityFinished(this.activeSolutionEntry.identity, async () => {
-      await this.updateTasks();
-    });
-
-    this.dashboardService.onEmptyActivityWaiting(this.activeSolutionEntry.identity, async () => {
-      await this.updateTasks();
-    });
-
-    this.dashboardService.onUserTaskFinished(this.activeSolutionEntry.identity, async () => {
-      await this.updateTasks();
-    });
-
-    this.dashboardService.onUserTaskWaiting(this.activeSolutionEntry.identity, async () => {
-      await this.updateTasks();
-    });
-
-    this.dashboardService.onManualTaskFinished(this.activeSolutionEntry.identity, async () => {
-      await this.updateTasks();
-    });
-
-    this.dashboardService.onManualTaskWaiting(this.activeSolutionEntry.identity, async () => {
-      await this.updateTasks();
-    });
-
-    this.dashboardService.onProcessError(this.activeSolutionEntry.identity, async () => {
-      await this.updateTasks();
-    });
 
     this.isAttached = true;
   }
