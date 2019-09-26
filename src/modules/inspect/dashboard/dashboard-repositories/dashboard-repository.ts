@@ -2,8 +2,10 @@ import {DataModels, IManagementApiClient, Messages} from '@process-engine/manage
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {Subscription} from '@essential-projects/event_aggregator_contracts';
 import {NotFoundError} from '@essential-projects/errors_ts';
+
 import {IDashboardRepository} from '../contracts/IDashboardRepository';
 import {TaskList, TaskListEntry, TaskSource, TaskType} from '../contracts/index';
+import {applyPagination} from '../../../../services/pagination-module/pagination-module';
 
 export class DashboardRepository implements IDashboardRepository {
   protected managementApiService: IManagementApiClient;
@@ -275,7 +277,7 @@ export class DashboardRepository implements IDashboardRepository {
     const allTasks: Array<TaskListEntry> = [].concat(...allTasksForAllProcessModels);
 
     const taskList: TaskList = {
-      taskListEntries: this.applyPagination(allTasks, offset, limit),
+      taskListEntries: applyPagination(allTasks, offset, limit),
       totalCount: allTasks.length,
     };
 
@@ -316,7 +318,7 @@ export class DashboardRepository implements IDashboardRepository {
     const taskListEntries: Array<TaskListEntry> = [].concat(userTasks, manualTasks, emptyActivities);
 
     const taskList: TaskList = {
-      taskListEntries: this.applyPagination(taskListEntries, offset, limit),
+      taskListEntries: applyPagination(taskListEntries, offset, limit),
       totalCount: taskListEntries.length,
     };
 
@@ -372,7 +374,7 @@ export class DashboardRepository implements IDashboardRepository {
     const taskListEntries: Array<TaskListEntry> = [].concat(userTasks, manualTasks, emptyActivities);
 
     const taskList: TaskList = {
-      taskListEntries: this.applyPagination(taskListEntries, offset, limit),
+      taskListEntries: applyPagination(taskListEntries, offset, limit),
       totalCount: taskListEntries.length,
     };
 
@@ -413,25 +415,11 @@ export class DashboardRepository implements IDashboardRepository {
     const taskListEntries: Array<TaskListEntry> = [].concat(userTasks, manualTasks, emptyActivities);
 
     const taskList: TaskList = {
-      taskListEntries: this.applyPagination(taskListEntries, offset, limit),
+      taskListEntries: applyPagination(taskListEntries, offset, limit),
       totalCount: taskListEntries.length,
     };
 
     return taskList;
-  }
-
-  private applyPagination<TList>(list: Array<TList>, offset: number, limit: number): Array<TList> {
-    const paginatedList: Array<TList> = list.slice();
-
-    if (offset > 0) {
-      paginatedList.splice(0, offset);
-    }
-
-    if (limit > 0) {
-      paginatedList.splice(limit, paginatedList.length - limit);
-    }
-
-    return paginatedList;
   }
 
   private mapTasksToTaskListEntry(tasks: Array<TaskSource>, targetType: TaskType): Array<TaskListEntry> {
