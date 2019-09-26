@@ -2,14 +2,13 @@
 import {inject} from 'aurelia-framework';
 
 import {IIdentity} from '@essential-projects/iam_contracts';
-import {ManagementApiClient} from '@process-engine/management_api_client';
-import {DataModels} from '@process-engine/management_api_contracts';
+import {DataModels, IManagementApiClient} from '@process-engine/management_api_contracts';
 
 import {IHeatmapRepository} from '../contracts/IHeatmap.Repository';
 
 @inject('ManagementApiClientService')
 export class HeatmapMockRepository implements IHeatmapRepository {
-  private managementApiClient: ManagementApiClient;
+  private managementApiClient: IManagementApiClient;
   private identity: IIdentity;
 
   private mockDataForHeatmapSampleProcess: Array<DataModels.Kpi.FlowNodeRuntimeInformation> = [
@@ -1779,7 +1778,7 @@ export class HeatmapMockRepository implements IHeatmapRepository {
     },
   ];
 
-  constructor(manegementApiClient: ManagementApiClient) {
+  constructor(manegementApiClient: IManagementApiClient) {
     this.managementApiClient = manegementApiClient;
   }
 

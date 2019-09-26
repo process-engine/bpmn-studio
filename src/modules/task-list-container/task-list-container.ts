@@ -7,7 +7,7 @@ import {IIdentity} from '@essential-projects/iam_contracts';
 import {ISolutionEntry, ISolutionService, NotificationType} from '../../contracts/index';
 import {NotificationService} from '../../services/notification-service/notification.service';
 import {TaskList} from '../inspect/task-list/task-list';
-import {DashboardService} from '../inspect/dashboard/dashboard-service/dashboard-service';
+import {IDashboardService} from '../inspect/dashboard/contracts';
 
 interface ITaskListRouteParameters {
   processModelId?: string;
@@ -23,13 +23,13 @@ export class TaskListContainer {
   private routeParameters: ITaskListRouteParameters;
   private notificationService: NotificationService;
   private router: Router;
-  private dashboardService: DashboardService;
+  private dashboardService: IDashboardService;
   private solutionService: ISolutionService;
 
   constructor(
     notificationService: NotificationService,
     router: Router,
-    dashboardService: DashboardService,
+    dashboardService: IDashboardService,
     solutionService: ISolutionService,
   ) {
     this.notificationService = notificationService;

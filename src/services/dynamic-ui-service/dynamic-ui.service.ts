@@ -4,13 +4,13 @@ import {IIdentity} from '@essential-projects/iam_contracts';
 import {DataModels} from '@process-engine/management_api_contracts';
 
 import {IDynamicUiService} from '../../contracts';
-import {DashboardService} from '../../modules/inspect/dashboard/dashboard-service/dashboard-service';
+import {IDashboardService} from '../../modules/inspect/dashboard/contracts';
 
 @inject('DashboardService')
 export class DynamicUiService implements IDynamicUiService {
-  private dashboardService: DashboardService;
+  private dashboardService: IDashboardService;
 
-  constructor(managmentApiClient: DashboardService) {
+  constructor(managmentApiClient: IDashboardService) {
     this.dashboardService = managmentApiClient;
   }
 
