@@ -91,7 +91,7 @@ export class DashboardPaginationRepository extends DashboardRepository implement
 
     const taskList: TaskList = {
       taskListEntries: taskListEntries,
-      totalCount: taskListEntries.length,
+      totalCount: tasks.totalCount,
     };
 
     return taskList;
@@ -114,7 +114,7 @@ export class DashboardPaginationRepository extends DashboardRepository implement
 
     const taskList: TaskList = {
       taskListEntries: taskListEntries,
-      totalCount: taskListEntries.length,
+      totalCount: tasks.totalCount,
     };
 
     return taskList;
@@ -137,7 +137,7 @@ export class DashboardPaginationRepository extends DashboardRepository implement
 
     const taskList: TaskList = {
       taskListEntries: taskListEntries,
-      totalCount: taskListEntries.length,
+      totalCount: tasks.totalCount,
     };
 
     return taskList;
@@ -160,7 +160,7 @@ export class DashboardPaginationRepository extends DashboardRepository implement
 
     const taskList: TaskList = {
       taskListEntries: taskListEntries,
-      totalCount: taskListEntries.length,
+      totalCount: tasks.totalCount,
     };
 
     return taskList;
