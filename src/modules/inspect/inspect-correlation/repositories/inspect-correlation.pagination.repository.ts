@@ -1,6 +1,10 @@
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {DataModels} from '@process-engine/management_api_contracts';
 
+import {
+  ProcessInstance,
+  ProcessInstanceList,
+} from '@process-engine/management_api_contracts/dist/data_models/correlation';
 import {IInspectCorrelationRepository} from '../contracts';
 import {InspectCorrelationRepository} from './inspect-correlation.repository';
 
@@ -76,5 +80,26 @@ export class InspectCorrelationPaginationRepository extends InspectCorrelationRe
       offset,
       limit,
     );
+  }
+
+  public async getProcessInstancesForProcessModel(
+    identity: IIdentity,
+    processModelId: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<ProcessInstanceList> {
+    const result: DataModels.Correlations.CorrelationList = await this.managementApiService.getCorrelationsByProcessModelId(
+      identity,
+      processModelId,
+    );
+    const processInstances: Array<ProcessInstance> = [];
+
+    result.correlations.forEach((correlation: DataModels.Correlations.Correlation) => {
+      processInstances.push(...correlation.processInstances);
+    });
+
+    const paginizedProcessInstances = this.applyPagination(processInstances, offset, limit);
+
+    return {processInstances: paginizedProcessInstances, totalCount: processInstances.length};
   }
 }
