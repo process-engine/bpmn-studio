@@ -128,7 +128,7 @@ export class DashboardRepository implements IDashboardRepository {
     return this.managementApiService.onProcessStarted(
       identity,
       (processStarted: Messages.SystemEvents.ProcessStartedMessage): void => {
-        callback();
+        callback(processStarted);
       },
     );
   }
@@ -136,8 +136,8 @@ export class DashboardRepository implements IDashboardRepository {
   public onProcessError(identity: IIdentity, callback: Function): Promise<Subscription> {
     return this.managementApiService.onProcessError(
       identity,
-      (message: Messages.SystemEvents.ProcessErrorMessage): void => {
-        callback();
+      (processErrorMessage: Messages.SystemEvents.ProcessErrorMessage): void => {
+        callback(processErrorMessage);
       },
     );
   }
@@ -145,8 +145,8 @@ export class DashboardRepository implements IDashboardRepository {
   public onEmptyActivityFinished(identity: IIdentity, callback: Function): Promise<Subscription> {
     return this.managementApiService.onEmptyActivityFinished(
       identity,
-      (message: Messages.SystemEvents.EmptyActivityFinishedMessage): void => {
-        callback();
+      (emptyActivityFinishedMessage: Messages.SystemEvents.EmptyActivityFinishedMessage): void => {
+        callback(emptyActivityFinishedMessage);
       },
     );
   }
@@ -154,8 +154,8 @@ export class DashboardRepository implements IDashboardRepository {
   public onEmptyActivityWaiting(identity: IIdentity, callback: Function): Promise<Subscription> {
     return this.managementApiService.onEmptyActivityWaiting(
       identity,
-      (message: Messages.SystemEvents.EmptyActivityReachedMessage): void => {
-        callback();
+      (emptyActivityReachedMessage: Messages.SystemEvents.EmptyActivityReachedMessage): void => {
+        callback(emptyActivityReachedMessage);
       },
     );
   }
@@ -163,8 +163,8 @@ export class DashboardRepository implements IDashboardRepository {
   public onManualTaskFinished(identity: IIdentity, callback: Function): Promise<Subscription> {
     return this.managementApiService.onManualTaskFinished(
       identity,
-      (message: Messages.SystemEvents.ManualTaskFinishedMessage): void => {
-        callback();
+      (manualTaskFinishedMessage: Messages.SystemEvents.ManualTaskFinishedMessage): void => {
+        callback(manualTaskFinishedMessage);
       },
     );
   }
@@ -172,8 +172,8 @@ export class DashboardRepository implements IDashboardRepository {
   public onManualTaskWaiting(identity: IIdentity, callback: Function): Promise<Subscription> {
     return this.managementApiService.onManualTaskWaiting(
       identity,
-      (message: Messages.SystemEvents.ManualTaskReachedMessage): void => {
-        callback();
+      (manualTaskReachedMessage: Messages.SystemEvents.ManualTaskReachedMessage): void => {
+        callback(manualTaskReachedMessage);
       },
     );
   }
@@ -181,8 +181,8 @@ export class DashboardRepository implements IDashboardRepository {
   public onUserTaskFinished(identity: IIdentity, callback: Function): Promise<Subscription> {
     return this.managementApiService.onUserTaskFinished(
       identity,
-      (message: Messages.SystemEvents.UserTaskFinishedMessage): void => {
-        callback();
+      (userTaskFinishedMessage: Messages.SystemEvents.UserTaskFinishedMessage): void => {
+        callback(userTaskFinishedMessage);
       },
     );
   }
@@ -190,8 +190,8 @@ export class DashboardRepository implements IDashboardRepository {
   public onUserTaskWaiting(identity: IIdentity, callback: Function): Promise<Subscription> {
     return this.managementApiService.onUserTaskWaiting(
       identity,
-      (message: Messages.SystemEvents.UserTaskReachedMessage): void => {
-        callback();
+      (userTaskReachedMessage: Messages.SystemEvents.UserTaskReachedMessage): void => {
+        callback(userTaskReachedMessage);
       },
     );
   }
