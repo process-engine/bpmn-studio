@@ -389,7 +389,7 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
     identity: IIdentity,
     correlationId: string,
     processInstanceId: string,
-  ): Promise<DataModels.Correlations.CorrelationProcessInstance> {
+  ): Promise<DataModels.Correlations.ProcessInstance> {
     const correlation: DataModels.Correlations.Correlation = await this.getCorrelationById(identity, correlationId);
 
     const errorGettingCorrelation: boolean = correlation === undefined;
@@ -397,9 +397,9 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
       return undefined;
     }
 
-    const processModel: DataModels.Correlations.CorrelationProcessInstance = correlation.processInstances.find(
-      (correlationProcessInstance: DataModels.Correlations.CorrelationProcessInstance): boolean => {
-        const processModelFound: boolean = correlationProcessInstance.processInstanceId === processInstanceId;
+    const processModel: DataModels.Correlations.ProcessInstance = correlation.processInstances.find(
+      (processInstance: DataModels.Correlations.ProcessInstance): boolean => {
+        const processModelFound: boolean = processInstance.processInstanceId === processInstanceId;
 
         return processModelFound;
       },
@@ -421,11 +421,11 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
       return undefined;
     }
 
-    const processInstance: DataModels.Correlations.CorrelationProcessInstance = correlation.processInstances.find(
-      (correlationProcessInstance: DataModels.Correlations.CorrelationProcessInstance): boolean => {
+    const processInstance: DataModels.Correlations.ProcessInstance = correlation.processInstances.find(
+      (processInstance: DataModels.Correlations.ProcessInstance): boolean => {
         const targetProcessModelFound: boolean =
-          correlationProcessInstance.parentProcessInstanceId === processInstanceIdOfOrigin &&
-          correlationProcessInstance.processModelId === callActivityTargetId;
+          processInstance.parentProcessInstanceId === processInstanceIdOfOrigin &&
+          processInstance.processModelId === callActivityTargetId;
 
         return targetProcessModelFound;
       },
