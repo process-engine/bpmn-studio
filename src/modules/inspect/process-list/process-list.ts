@@ -16,7 +16,7 @@ import {IDashboardService} from '../dashboard/contracts';
 
 @inject('DashboardService', 'NotificationService', 'SolutionService', Router)
 export class ProcessList {
-  @observable public currentPage: number = 1;
+  @observable public currentPage: number = 0;
   @bindable() public activeSolutionEntry: ISolutionEntry;
   public pageSize: number = 10;
   public totalItems: number;
