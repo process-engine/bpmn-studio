@@ -6,7 +6,7 @@ import {processEngineSupportsPagination} from '../../../services/process-engine-
 import {LiveExecutionTrackerPaginationRepository} from './live-execution-tracker.pagination-repository';
 import {LiveExecutionTrackerRepository} from './live-execution-tracker.repository';
 
-export function createRepository(
+export function createLiveExecutionTrackerRepository(
   managementApiClient: IManagementApiClient,
   runtimeVersion: string,
 ): ILiveExecutionTrackerRepository {

@@ -18,7 +18,7 @@ import {
   defaultBpmnColors,
 } from '../../../contracts/index';
 import {ILiveExecutionTrackerRepository, ILiveExecutionTrackerService} from '../contracts/index';
-import {createRepository} from '../repositories/live-execution-tracker-repository-factory';
+import {createLiveExecutionTrackerRepository} from '../repositories/live-execution-tracker-repository-factory';
 import environment from '../../../environment';
 
 export class LiveExecutionTrackerService implements ILiveExecutionTrackerService {
@@ -26,7 +26,10 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
 
   constructor(eventAggregator: EventAggregator, managementApiClient: IManagementApiClient) {
     eventAggregator.subscribe(environment.events.configPanel.solutionEntryChanged, (solutionEntry: ISolutionEntry) => {
-      this.liveExecutionTrackerRepository = createRepository(managementApiClient, solutionEntry.processEngineVersion);
+      this.liveExecutionTrackerRepository = createLiveExecutionTrackerRepository(
+        managementApiClient,
+        solutionEntry.processEngineVersion,
+      );
     });
   }
 

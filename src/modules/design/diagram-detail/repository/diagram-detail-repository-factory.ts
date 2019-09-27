@@ -6,7 +6,7 @@ import {processEngineSupportsPagination} from '../../../../services/process-engi
 import {DiagramDetailPaginationRepository} from './diagram-detail.pagination-repository';
 import {DiagramDetailRepository} from './diagram-detail.repository';
 
-export function createRepository(
+export function createDiagramDetailRepository(
   managementApiClient: IManagementApiClient,
   runtimeVersion: string,
 ): IDiagramDetailRepository {

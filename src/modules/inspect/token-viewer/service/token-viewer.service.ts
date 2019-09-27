@@ -10,7 +10,7 @@ import environment from '../../../../environment';
 import {ITokenViewerRepository, ITokenViewerService} from '../contracts';
 import {ISolutionEntry} from '../../../../contracts';
 
-import {createRepository} from '../repository/token-viewer-repository-factory';
+import {createTokenViewerRepository} from '../repository/token-viewer-repository-factory';
 
 @inject(EventAggregator, ManagementApiClient)
 export class TokenViewerService implements ITokenViewerService {
@@ -18,7 +18,7 @@ export class TokenViewerService implements ITokenViewerService {
 
   constructor(eventAggregator: EventAggregator, managementApiClient: IManagementApiClient) {
     eventAggregator.subscribe(environment.events.configPanel.solutionEntryChanged, (solutionEntry: ISolutionEntry) => {
-      this.tokenViewerRepository = createRepository(managementApiClient, solutionEntry.processEngineVersion);
+      this.tokenViewerRepository = createTokenViewerRepository(managementApiClient, solutionEntry.processEngineVersion);
     });
   }
 
