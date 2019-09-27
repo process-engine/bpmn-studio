@@ -7,19 +7,19 @@ export function processEngineSupportsPagination(processEngineVersion: string): b
 
   const solutionEntryPEVersion = new SemVer(processEngineVersion);
 
-  const alphaVersionWithEvents = new SemVer('8.6.0-alpha.24');
-  const betaVersionWithEvents = new SemVer('9.0.0-beta.1');
-  const stableVersionWithEvents = new SemVer('8.6.0');
+  const alphaVersionWithPagination = new SemVer('8.6.0-alpha.24');
+  const betaVersionWithPagination = new SemVer('9.0.0-beta.1');
+  const stableVersionWithPagination = new SemVer('8.6.0');
 
   const solutionEntryIsAlpha: boolean = solutionEntryPEVersion.prerelease[0] === 'alpha';
   const solutionEntryIsBeta: boolean = solutionEntryPEVersion.prerelease[0] === 'beta';
 
   if (solutionEntryIsAlpha) {
-    return solutionEntryPEVersion.compare(alphaVersionWithEvents) >= 0;
+    return solutionEntryPEVersion.compare(alphaVersionWithPagination) >= 0;
   }
   if (solutionEntryIsBeta) {
-    return solutionEntryPEVersion.compare(betaVersionWithEvents) >= 0;
+    return solutionEntryPEVersion.compare(betaVersionWithPagination) >= 0;
   }
 
-  return solutionEntryPEVersion.compare(stableVersionWithEvents) >= 0;
+  return solutionEntryPEVersion.compare(stableVersionWithPagination) >= 0;
 }
