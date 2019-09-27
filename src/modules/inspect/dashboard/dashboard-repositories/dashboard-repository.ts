@@ -20,14 +20,47 @@ export class DashboardRepository implements IDashboardRepository {
     return {cronjobs: result, totalCount: result.length};
   }
 
+  public async getAllActiveProcessInstances(
+    identity: IIdentity,
+    offset: number = 0,
+    limit: number = 0,
+  ): Promise<DataModels.Correlations.ProcessInstanceList> {
+    const activeCorrelations: Array<DataModels.Correlations.Correlation> = (await this.getActiveCorrelations(identity))
+      .correlations;
+
+    const processInstancesForCorrelations: Array<
+      Array<DataModels.Correlations.ProcessInstance>
+    > = activeCorrelations.map((correlation) => {
+      const processInstances: Array<DataModels.Correlations.ProcessInstance> = correlation.processInstances.map(
+        (processInstance) => {
+          processInstance.correlationId = correlation.id;
+
+          return processInstance;
+        },
+      );
+
+      return processInstances;
+    });
+
+    const processInstances: Array<DataModels.Correlations.ProcessInstance> = [].concat(
+      ...processInstancesForCorrelations,
+    );
+
+    return {processInstances: applyPagination(processInstances, offset, limit), totalCount: processInstances.length};
+  }
+
   public async getProcessModels(identity: IIdentity): Promise<DataModels.ProcessModels.ProcessModelList> {
     const result = await this.managementApiService.getProcessModels(identity);
 
     return {processModels: result.processModels, totalCount: result.processModels.length};
   }
 
-  public async getActiveCorrelations(identity: IIdentity): Promise<DataModels.Correlations.CorrelationList> {
-    const result = (await this.managementApiService.getActiveCorrelations(identity)) as any;
+  public async getActiveCorrelations(
+    identity: IIdentity,
+    offset: number = 0,
+    limit: number = 0,
+  ): Promise<DataModels.Correlations.CorrelationList> {
+    const result = (await this.managementApiService.getActiveCorrelations(identity, offset, limit)) as any;
 
     return {correlations: result, totalCount: result.length};
   }

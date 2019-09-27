@@ -40,6 +40,14 @@ export class DashboardService implements IDashboardService {
     return this.dashboardRepository.getAllSuspendedTasks(identity, offset, limit);
   }
 
+  public getAllActiveProcessInstances(
+    identity: IIdentity,
+    offset?: number,
+    limit?: number,
+  ): Promise<DataModels.Correlations.ProcessInstanceList> {
+    return this.dashboardRepository.getAllActiveProcessInstances(identity, offset, limit);
+  }
+
   public async getSuspendedTasksForProcessInstance(
     identity: IIdentity,
     processInstanceId: string,

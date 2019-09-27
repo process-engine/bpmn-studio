@@ -13,8 +13,12 @@ export class DashboardPaginationRepository extends DashboardRepository implement
     return this.managementApiService.getProcessModels(identity);
   }
 
-  public getActiveCorrelations(identity: IIdentity): Promise<DataModels.Correlations.CorrelationList> {
-    return this.managementApiService.getActiveCorrelations(identity);
+  public getActiveCorrelations(
+    identity: IIdentity,
+    offset?: number,
+    limit?: number,
+  ): Promise<DataModels.Correlations.CorrelationList> {
+    return this.managementApiService.getActiveCorrelations(identity, offset, limit);
   }
 
   public getManualTasksForProcessModel(

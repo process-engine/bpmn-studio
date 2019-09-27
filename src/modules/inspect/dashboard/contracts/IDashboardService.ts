@@ -11,7 +11,16 @@ export interface IDashboardService {
 
   getAllActiveCronjobs(identity: IIdentity): Promise<DataModels.Cronjobs.CronjobList>;
   getProcessModels(identity: IIdentity): Promise<DataModels.ProcessModels.ProcessModelList>;
-  getActiveCorrelations(identity: IIdentity): Promise<DataModels.Correlations.CorrelationList>;
+  getAllActiveProcessInstances(
+    identity: IIdentity,
+    offset?: number,
+    limit?: number,
+  ): Promise<DataModels.Correlations.ProcessInstanceList>;
+  getActiveCorrelations(
+    identity: IIdentity,
+    offset?: number,
+    limit?: number,
+  ): Promise<DataModels.Correlations.CorrelationList>;
   getAllSuspendedTasks(identity: IIdentity, offset?: number, limit?: number): Promise<TaskList>;
   getSuspendedTasksForProcessInstance(
     identity: IIdentity,

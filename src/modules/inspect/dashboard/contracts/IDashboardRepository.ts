@@ -5,6 +5,11 @@ import {TaskList} from './index';
 
 export interface IDashboardRepository {
   getAllActiveCronjobs(identity: IIdentity, offset?: number, limit?: number): Promise<DataModels.Cronjobs.CronjobList>;
+  getAllActiveProcessInstances(
+    identity: IIdentity,
+    offset?: number,
+    limit?: number,
+  ): Promise<DataModels.Correlations.ProcessInstanceList>;
   getActiveCorrelations(
     identity: IIdentity,
     offset?: number,
