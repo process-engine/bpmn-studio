@@ -9,7 +9,7 @@ import {TaskList} from './index';
 export interface IDashboardService {
   eventAggregator: EventAggregator;
 
-  getAllActiveCronjobs(identity: IIdentity): Promise<DataModels.Cronjobs.CronjobList>;
+  getAllActiveCronjobs(identity: IIdentity, offset?: number, limit?: number): Promise<DataModels.Cronjobs.CronjobList>;
   getProcessModels(identity: IIdentity): Promise<DataModels.ProcessModels.ProcessModelList>;
   getAllActiveProcessInstances(
     identity: IIdentity,

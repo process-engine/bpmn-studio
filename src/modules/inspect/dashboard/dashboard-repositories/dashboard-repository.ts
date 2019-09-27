@@ -14,10 +14,19 @@ export class DashboardRepository implements IDashboardRepository {
     this.managementApiService = managementApi;
   }
 
-  public async getAllActiveCronjobs(identity: IIdentity): Promise<DataModels.Cronjobs.CronjobList> {
-    const result = (await this.managementApiService.getAllActiveCronjobs(identity)) as any;
+  public async getAllActiveCronjobs(
+    identity: IIdentity,
+    offset: number = 0,
+    limit: number = 0,
+  ): Promise<DataModels.Cronjobs.CronjobList> {
+    const cronjobs: Array<
+      DataModels.Cronjobs.CronjobConfiguration
+    > = (await this.managementApiService.getAllActiveCronjobs(identity)) as any;
 
-    return {cronjobs: result, totalCount: result.length};
+    return {
+      cronjobs: applyPagination(cronjobs, offset, limit),
+      totalCount: cronjobs.length,
+    };
   }
 
   public async getAllActiveProcessInstances(

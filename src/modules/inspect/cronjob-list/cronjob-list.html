@@ -11,7 +11,7 @@
           <th>Crontab</th>
           <th>Next Execution</th>
         </tr>
-        <tr repeat.for="cronjob of cronjobsToDisplay" class="cronjob-list-item" id="cronjobList-${cronjob.processModelId}">
+        <tr repeat.for="cronjob of cronjobs" class="cronjob-list-item" id="cronjobList-${cronjob.processModelId}">
           <td>
             <a route-href="route: design; params.bind: { view: 'detail', diagramName: cronjob.processModelId, solutionUri: activeSolutionEntry.uri }" class="cronjob-list-item-modelname">${cronjob.processModelId}</a>
           </td>

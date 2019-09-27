@@ -75,8 +75,12 @@ export class DashboardService implements IDashboardService {
     return this.dashboardRepository.getSuspendedTasksForProcessModel(identity, processModelId, offset, limit);
   }
 
-  public getAllActiveCronjobs(identity: IIdentity): Promise<DataModels.Cronjobs.CronjobList> {
-    return this.dashboardRepository.getAllActiveCronjobs(identity);
+  public getAllActiveCronjobs(
+    identity: IIdentity,
+    offset?: number,
+    limit?: number,
+  ): Promise<DataModels.Cronjobs.CronjobList> {
+    return this.dashboardRepository.getAllActiveCronjobs(identity, offset, limit);
   }
 
   public getProcessModels(identity: IIdentity): Promise<DataModels.ProcessModels.ProcessModelList> {

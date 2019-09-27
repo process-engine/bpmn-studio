@@ -5,8 +5,12 @@ import {DashboardRepository} from './dashboard-repository';
 import {IDashboardRepository, TaskList, TaskListEntry, TaskType} from '../contracts/index';
 
 export class DashboardPaginationRepository extends DashboardRepository implements IDashboardRepository {
-  public getAllActiveCronjobs(identity: IIdentity): Promise<DataModels.Cronjobs.CronjobList> {
-    return this.managementApiService.getAllActiveCronjobs(identity);
+  public getAllActiveCronjobs(
+    identity: IIdentity,
+    offset?: number,
+    limit?: number,
+  ): Promise<DataModels.Cronjobs.CronjobList> {
+    return this.managementApiService.getAllActiveCronjobs(identity, offset, limit);
   }
 
   public getProcessModels(identity: IIdentity): Promise<DataModels.ProcessModels.ProcessModelList> {

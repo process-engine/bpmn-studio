@@ -1,4 +1,4 @@
-import {bindable, computedFrom, inject} from 'aurelia-framework';
+import {bindable, computedFrom, inject, observable} from 'aurelia-framework';
 
 import {DataModels} from '@process-engine/management_api_contracts';
 
@@ -12,9 +12,10 @@ import {IDashboardService} from '../dashboard/contracts';
 export class CronjobList {
   @bindable public activeSolutionEntry: ISolutionEntry;
   public initialLoadingFinished: boolean = false;
-  public currentPage: number = 1;
+  @observable public currentPage: number = 0;
   public pageSize: number = 10;
   public paginationSize: number = 10;
+  public totalItems: number;
   public showError: boolean;
 
   private cronjobs: Array<DataModels.Cronjobs.CronjobConfiguration> = [];
@@ -26,12 +27,15 @@ export class CronjobList {
     this.dashboardService = dashboardService;
   }
 
-  public async activeSolutionEntryChanged(newValue): Promise<void> {
+  public async activeSolutionEntryChanged(newSolutionEntry: ISolutionEntry): Promise<void> {
     if (this.isAttached) {
       this.cronjobs = [];
       this.initialLoadingFinished = false;
       this.showError = false;
-      this.dashboardService.eventAggregator.publish(environment.events.configPanel.solutionEntryChanged, newValue);
+      this.dashboardService.eventAggregator.publish(
+        environment.events.configPanel.solutionEntryChanged,
+        newSolutionEntry,
+      );
 
       await this.updateCronjobs();
     }
@@ -49,26 +53,13 @@ export class CronjobList {
     this.stopPolling();
   }
 
-  @computedFrom('cronjobs.length')
-  public get totalItems(): number {
-    return this.cronjobs.length;
+  public currentPageChanged(): void {
+    this.updateCronjobs();
   }
 
-  @computedFrom('cronjobsToDisplay.length')
+  @computedFrom('cronjobs.length')
   public get showCronjobList(): boolean {
-    return this.cronjobsToDisplay !== undefined && this.cronjobsToDisplay.length > 0;
-  }
-
-  @computedFrom('cronjobs.length')
-  public get cronjobsToDisplay(): Array<DataModels.Cronjobs.CronjobConfiguration> {
-    const firstCronjobIndex: number = (this.currentPage - 1) * this.pageSize;
-    const lastCronjobIndex: number = this.pageSize * this.currentPage;
-
-    const cronjobsToDisplay: Array<DataModels.Cronjobs.CronjobConfiguration> = [...this.cronjobs]
-      .sort(this.sortCronjobs)
-      .slice(firstCronjobIndex, lastCronjobIndex);
-
-    return cronjobsToDisplay;
+    return this.cronjobs !== undefined && this.cronjobs.length > 0;
   }
 
   public getBeautifiedDate(date: Date): string {
@@ -79,8 +70,17 @@ export class CronjobList {
 
   public async updateCronjobs(): Promise<void> {
     try {
-      const cronjobList = await this.dashboardService.getAllActiveCronjobs(this.activeSolutionEntry.identity);
+      const pageIndex: number = Math.max(this.currentPage - 1, 0);
+      const cronjobOffset: number = pageIndex * this.pageSize;
+
+      const cronjobList = await this.dashboardService.getAllActiveCronjobs(
+        this.activeSolutionEntry.identity,
+        cronjobOffset,
+        this.pageSize,
+      );
+
       this.cronjobs = cronjobList.cronjobs;
+      this.totalItems = cronjobList.totalCount;
       this.initialLoadingFinished = true;
     } catch (error) {
       this.initialLoadingFinished = true;
@@ -91,6 +91,7 @@ export class CronjobList {
 
       if (!errorIsAuthenticationRelated) {
         this.cronjobs = [];
+        this.totalItems = 0;
         this.showError = true;
       }
     }
