@@ -18,19 +18,19 @@ export class DashboardService implements IDashboardService {
   public eventAggregator: EventAggregator;
 
   private dashboardRepository: IDashboardRepository;
-  private managementApiService: IManagementApiClient;
+  private managementApiClient: IManagementApiClient;
 
-  constructor(eventAggregator: EventAggregator, managementApiService: IManagementApiClient) {
+  constructor(eventAggregator: EventAggregator, managementApiClient: IManagementApiClient) {
     this.eventAggregator = eventAggregator;
-    this.managementApiService = managementApiService;
+    this.managementApiClient = managementApiClient;
 
     this.eventAggregator.subscribe(
       environment.events.configPanel.solutionEntryChanged,
       (solutionEntry: ISolutionEntry) => {
         if (processEngineSupportsPagination(solutionEntry.processEngineVersion)) {
-          this.dashboardRepository = new DashboardPaginationRepository(this.managementApiService);
+          this.dashboardRepository = new DashboardPaginationRepository(this.managementApiClient);
         } else {
-          this.dashboardRepository = new DashboardRepository(this.managementApiService);
+          this.dashboardRepository = new DashboardRepository(this.managementApiClient);
         }
       },
     );
@@ -210,7 +210,7 @@ export class DashboardService implements IDashboardService {
     userTaskInstanceId: string,
     userTaskResult: DataModels.UserTasks.UserTaskResult,
   ): Promise<void> {
-    return this.managementApiService.finishUserTask(
+    return this.managementApiClient.finishUserTask(
       identity,
       processInstanceId,
       correlationId,
