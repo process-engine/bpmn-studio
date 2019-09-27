@@ -18,13 +18,16 @@ export class InspectCorrelation {
   @bindable public activeDiagram: IDiagram;
   @bindable public activeSolutionEntry: ISolutionEntry;
   @bindable public selectedProcessInstance: DataModels.Correlations.ProcessInstance;
-  @bindable public selectedCorrelation: DataModels.Correlations.Correlation;
   @bindable public inspectPanelFullscreen: boolean = false;
   @observable public bottomPanelHeight: number = 250;
   @observable public tokenViewerWidth: number = 250;
   @bindable public diagramViewer: DiagramViewer;
   @bindable public inspectPanel: InspectPanel;
   @bindable public inspectPanelTabToShow: InspectPanelTab;
+  @bindable public totalCount: number;
+
+  public offset: number = 0;
+  public limit: number = 50;
 
   public correlations: Array<DataModels.Correlations.Correlation>;
   public token: string;
@@ -46,23 +49,7 @@ export class InspectCorrelation {
   }
 
   public async attached(): Promise<void> {
-    try {
-      const correlationList = await this.inspectCorrelationService.getAllCorrelationsForProcessModelId(
-        this.activeDiagram.id,
-        this.activeSolutionEntry.identity,
-      );
-
-      // https://github.com/process-engine/process_engine_runtime/issues/432
-      if (correlationList.totalCount === 0) {
-        this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
-        this.correlations = [];
-      } else {
-        this.correlations = correlationList.correlations;
-      }
-    } catch (error) {
-      this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
-      this.correlations = [];
-    }
+    this.updateProcessInstances();
 
     this.eventAggregator.publish(environment.events.statusBar.showInspectCorrelationButtons, true);
 
@@ -79,6 +66,13 @@ export class InspectCorrelation {
           this.showTokenViewer = showTokenViewer;
         },
       ),
+
+      this.eventAggregator.subscribe('updateProcessInstances', async (payload) => {
+        const {pageSize, currentPage} = payload;
+        this.offset = (currentPage - 1) * pageSize;
+        this.limit = pageSize;
+        await this.updateProcessInstances();
+      }),
     ];
 
     this.bottomPanelResizeDiv.addEventListener('mousedown', (mouseDownEvent: Event) => {
@@ -135,6 +129,19 @@ export class InspectCorrelation {
     }
   }
 
+  private async updateProcessInstances(): Promise<void> {
+    try {
+      const correlationList = await this.getProcessInstacesForProcessModel();
+
+      this.totalCount = correlationList.totalCount;
+      this.correlations = correlationList.processInstances;
+    } catch (error) {
+      this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
+      this.correlations = [];
+      this.totalCount = 0;
+    }
+  }
+
   public detached(): void {
     this.eventAggregator.publish(environment.events.statusBar.showInspectCorrelationButtons, false);
 
@@ -145,23 +152,9 @@ export class InspectCorrelation {
 
   public async activeDiagramChanged(): Promise<void> {
     if (this.viewIsAttached) {
-      try {
-        const correlationList = await this.inspectCorrelationService.getAllCorrelationsForProcessModelId(
-          this.activeDiagram.id,
-          this.activeSolutionEntry.identity,
-        );
-
-        // https://github.com/process-engine/process_engine_runtime/issues/432
-        if (correlationList.totalCount === 0) {
-          this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
-          this.correlations = [];
-        } else {
-          this.correlations = correlationList.correlations;
-        }
-      } catch (error) {
-        this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
-        this.correlations = [];
-      }
+      this.offset = 0;
+      this.limit = 50;
+      this.updateProcessInstances();
     }
   }
 
