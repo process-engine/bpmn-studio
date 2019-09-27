@@ -5,12 +5,15 @@ import {IShape} from '@process-engine/bpmn-elements_contracts';
 import {DataModels} from '@process-engine/management_api_contracts';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 
+import * as Bluebird from 'bluebird';
+
 import {IEventFunction, ISolutionEntry, InspectPanelTab} from '../../../contracts/index';
 import environment from '../../../environment';
 import {IInspectCorrelationService} from './contracts';
 import {DiagramViewer} from './components/diagram-viewer/diagram-viewer';
 import {InspectPanel} from './components/inspect-panel/inspect-panel';
 
+Bluebird.Promise.config({cancellation: true});
 @inject('InspectCorrelationService', EventAggregator)
 export class InspectCorrelation {
   @bindable public processInstanceToSelect: string;
@@ -29,7 +32,7 @@ export class InspectCorrelation {
   public offset: number = 0;
   public limit: number = 50;
 
-  public correlations: Array<DataModels.Correlations.Correlation>;
+  public correlations: Array<DataModels.Correlations.ProcessInstance>;
   public token: string;
   public showInspectPanel: boolean = true;
   public showTokenViewer: boolean = false;
@@ -42,6 +45,8 @@ export class InspectCorrelation {
   private inspectCorrelationService: IInspectCorrelationService;
   private eventAggregator: EventAggregator;
   private subscriptions: Array<Subscription>;
+
+  private handlerPromise: any;
 
   constructor(inspectCorrelationService: IInspectCorrelationService, eventAggregator: EventAggregator) {
     this.inspectCorrelationService = inspectCorrelationService;
@@ -71,6 +76,9 @@ export class InspectCorrelation {
         const {pageSize, currentPage} = payload;
         this.offset = (currentPage - 1) * pageSize;
         this.limit = pageSize;
+        if (this.handlerPromise) {
+          this.handlerPromise.cancel();
+        }
         await this.updateProcessInstances();
       }),
     ];
@@ -140,6 +148,27 @@ export class InspectCorrelation {
       this.correlations = [];
       this.totalCount = 0;
     }
+  }
+
+  private getProcessInstacesForProcessModel(): Promise<DataModels.Correlations.ProcessInstanceList> {
+    this.handlerPromise = new Bluebird.Promise(
+      async (resolve: Function, reject: Function): Promise<any> => {
+        try {
+          const processInstances = await this.inspectCorrelationService.getProcessInstancesForProcessModel(
+            this.activeSolutionEntry.identity,
+            this.activeDiagram.id,
+            this.offset,
+            this.limit,
+          );
+
+          resolve(processInstances);
+        } catch (error) {
+          reject(error);
+        }
+      },
+    );
+
+    return this.handlerPromise;
   }
 
   public detached(): void {
