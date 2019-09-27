@@ -30,6 +30,19 @@
           <td if.bind="false" class="correlation-table__table-entry">${tableEntry.user}</td>
           <td class="correlation-table__table-entry">${tableEntry.processInstanceId}</td>
         </tr>
+        <tr style="display: flex; width: 100%;">
+          <td>
+            <div style="float: left; margin-top: 5px; margin-right: 5px;">
+              PageSize: 
+            </div>
+            <select class="form-control" style="width: 70px; margin: unset;" value.bind="pageSize">
+              <option repeat.for="size of pageSizes" model.bind="size">${size}</option>
+            </select>
+          </td>
+          <td style="width: 70%">
+            <aubs-pagination page-size.bind="pageSize" total-items.bind="totalCount" current-page.bind="currentPage" boundary-links.bind="true" pagination-size.bind="paginationSize"></aubs-pagination>
+          </td>
+        </tr>
       </tbody>
     </table>
   </div>
