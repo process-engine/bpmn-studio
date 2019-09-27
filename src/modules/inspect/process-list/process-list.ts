@@ -37,7 +37,6 @@ export class ProcessList {
 
   private limit: number = this.pageSize;
   private offset: number = 0;
-  private previousPage: number = 1;
 
   private handlerPromise: any;
 
@@ -92,7 +91,6 @@ export class ProcessList {
     this.limit = this.pageSize;
 
     this.updateProcessInstanceList();
-    this.previousPage = newValue;
   }
 
   public async attached(): Promise<void> {
