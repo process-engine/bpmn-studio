@@ -140,12 +140,16 @@ export class ProcessList {
   public async updateCorrelationList(): Promise<void> {
     try {
       const correlationList: DataModels.Correlations.CorrelationList = await this.getAllActiveCorrelations();
+
+      const sortedCorrelationList: Array<DataModels.Correlations.Correlation> = correlationList.correlations.sort(
+        this.sortCorrelations,
+      );
+
       const correlationListWasUpdated: boolean =
-        JSON.stringify(correlationList.correlations.sort(this.sortCorrelations)) !== JSON.stringify(this.correlations);
+        JSON.stringify(sortedCorrelationList) !== JSON.stringify(this.correlations);
 
       if (correlationListWasUpdated) {
-        this.correlations = correlationList.correlations;
-        this.correlations.sort(this.sortCorrelations);
+        this.correlations = sortedCorrelationList;
 
         this.processInstancesWithCorrelation = [];
         for (const correlation of this.correlations) {
