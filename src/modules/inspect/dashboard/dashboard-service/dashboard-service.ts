@@ -7,11 +7,9 @@ import {IIdentity} from '@essential-projects/iam_contracts';
 import {Subscription} from '@essential-projects/event_aggregator_contracts';
 import environment from '../../../../environment';
 import {ISolutionEntry} from '../../../../contracts';
-import {processEngineSupportsPagination} from '../../../../services/process-engine-version-module/process-engine-version-module';
-import {DashboardPaginationRepository} from '../dashboard-repositories/dashboard-pagination-repository';
-import {DashboardRepository} from '../dashboard-repositories/dashboard-repository';
 import {IDashboardRepository} from '../contracts/IDashboardRepository';
 import {IDashboardService, TaskList} from '../contracts/index';
+import {createDashboardRepository} from '../dashboard-repositories/dashboard-repository-factory';
 
 @inject(EventAggregator, 'ManagementApiClientService')
 export class DashboardService implements IDashboardService {
@@ -27,11 +25,7 @@ export class DashboardService implements IDashboardService {
     this.eventAggregator.subscribe(
       environment.events.configPanel.solutionEntryChanged,
       (solutionEntry: ISolutionEntry) => {
-        if (processEngineSupportsPagination(solutionEntry.processEngineVersion)) {
-          this.dashboardRepository = new DashboardPaginationRepository(this.managementApiClient);
-        } else {
-          this.dashboardRepository = new DashboardRepository(this.managementApiClient);
-        }
+        this.dashboardRepository = createDashboardRepository(managementApiClient, solutionEntry.processEngineVersion);
       },
     );
   }
