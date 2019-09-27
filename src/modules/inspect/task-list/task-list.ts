@@ -224,7 +224,7 @@ export class TaskList {
 
   private async updateTasks(): Promise<void> {
     try {
-      const pageIndex: number = this.currentPage > 0 ? this.currentPage - 1 : 0;
+      const pageIndex: number = Math.max(this.currentPage - 1, 0);
       const taskOffset: number = pageIndex * this.pageSize;
 
       const suspendedTaskList: SuspendedTaskList = await this.getTasks(taskOffset, this.pageSize);
