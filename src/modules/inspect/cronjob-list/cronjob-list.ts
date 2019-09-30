@@ -1,5 +1,7 @@
 import {bindable, computedFrom, inject, observable} from 'aurelia-framework';
 
+import * as Bluebird from 'bluebird';
+
 import {DataModels} from '@process-engine/management_api_contracts';
 
 import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
@@ -7,6 +9,8 @@ import {ISolutionEntry} from '../../../contracts/index';
 import environment from '../../../environment';
 import {getBeautifiedDate} from '../../../services/date-service/date.service';
 import {IDashboardService} from '../dashboard/contracts';
+
+Bluebird.Promise.config({cancellation: true});
 
 @inject('DashboardService')
 export class CronjobList {
@@ -23,22 +27,28 @@ export class CronjobList {
   private isAttached: boolean;
   private dashboardService: IDashboardService;
 
+  private updatePromise: any;
+
   constructor(dashboardService: IDashboardService) {
     this.dashboardService = dashboardService;
   }
 
   public async activeSolutionEntryChanged(newSolutionEntry: ISolutionEntry): Promise<void> {
-    if (this.isAttached) {
-      this.cronjobs = [];
-      this.initialLoadingFinished = false;
-      this.showError = false;
-      this.dashboardService.eventAggregator.publish(
-        environment.events.configPanel.solutionEntryChanged,
-        newSolutionEntry,
-      );
-
-      await this.updateCronjobs();
+    if (!this.isAttached) {
+      return;
     }
+
+    if (this.updatePromise) {
+      this.updatePromise.cancel();
+    }
+
+    this.cronjobs = [];
+    this.initialLoadingFinished = false;
+    this.showError = false;
+    this.dashboardService.eventAggregator.publish(
+      environment.events.configPanel.solutionEntryChanged,
+      newSolutionEntry,
+    );
   }
 
   public async attached(): Promise<void> {
@@ -54,6 +64,14 @@ export class CronjobList {
   }
 
   public currentPageChanged(): void {
+    if (this.updatePromise) {
+      this.updatePromise.cancel();
+    }
+
+    if (!this.dashboardService) {
+      return;
+    }
+
     this.updateCronjobs();
   }
 
@@ -68,18 +86,13 @@ export class CronjobList {
     return beautifiedDate;
   }
 
-  public async updateCronjobs(): Promise<void> {
+  private async updateCronjobs(): Promise<void> {
     try {
-      const pageIndex: number = Math.max(this.currentPage - 1, 0);
-      const cronjobOffset: number = pageIndex * this.pageSize;
+      this.updatePromise = this.getCronjobList();
 
-      const cronjobList = await this.dashboardService.getAllActiveCronjobs(
-        this.activeSolutionEntry.identity,
-        cronjobOffset,
-        this.pageSize,
-      );
+      const cronjobList = await this.updatePromise;
 
-      this.cronjobs = cronjobList.cronjobs;
+      this.cronjobs = cronjobList.cronjobs.sort(this.sortCronjobs);
       this.totalItems = cronjobList.totalCount;
       this.initialLoadingFinished = true;
     } catch (error) {
@@ -95,6 +108,27 @@ export class CronjobList {
         this.showError = true;
       }
     }
+  }
+
+  private getCronjobList(): Promise<DataModels.Cronjobs.CronjobList> {
+    return new Bluebird.Promise(
+      async (resolve: Function, reject: Function): Promise<void> => {
+        const pageIndex: number = Math.max(this.currentPage - 1, 0);
+        const cronjobOffset: number = pageIndex * this.pageSize;
+
+        try {
+          const cronjobList = await this.dashboardService.getAllActiveCronjobs(
+            this.activeSolutionEntry.identity,
+            cronjobOffset,
+            this.pageSize,
+          );
+
+          resolve(cronjobList);
+        } catch (error) {
+          reject(error);
+        }
+      },
+    );
   }
 
   private startPolling(): void {
