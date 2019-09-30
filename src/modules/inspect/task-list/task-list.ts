@@ -2,7 +2,7 @@ import {Subscription} from 'aurelia-event-aggregator';
 import {bindable, inject, observable} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 
-import {Promise as BluebirdPromise} from 'bluebird';
+import * as Bluebird from 'bluebird';
 
 import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
 
@@ -10,7 +10,7 @@ import {AuthenticationStateEvent, ISolutionEntry, ISolutionService} from '../../
 import environment from '../../../environment';
 import {IDashboardService, TaskList as SuspendedTaskList, TaskListEntry} from '../dashboard/contracts/index';
 
-BluebirdPromise.config({cancellation: true, warnings: false});
+Bluebird.Promise.config({cancellation: true, warnings: false});
 
 interface ITaskListRouteParameters {
   processInstanceId?: string;
@@ -194,7 +194,7 @@ export class TaskList {
   }
 
   private getAllTasks(offset?: number, limit?: number): Promise<SuspendedTaskList> {
-    return new BluebirdPromise(
+    return new Bluebird.Promise(
       async (resolve: Function, reject: Function, onCancel): Promise<void> => {
         try {
           const taskList: SuspendedTaskList = await this.dashboardService.getAllSuspendedTasks(
@@ -216,7 +216,7 @@ export class TaskList {
     offset?: number,
     limit?: number,
   ): Promise<SuspendedTaskList> {
-    return new BluebirdPromise(
+    return new Bluebird.Promise(
       async (resolve: Function, reject: Function): Promise<void> => {
         try {
           const taskList: SuspendedTaskList = await this.dashboardService.getSuspendedTasksForProcessModel(
@@ -239,7 +239,7 @@ export class TaskList {
     offset?: number,
     limit?: number,
   ): Promise<SuspendedTaskList> {
-    return new BluebirdPromise(
+    return new Bluebird.Promise(
       async (resolve: Function, reject: Function): Promise<void> => {
         try {
           const taskList: SuspendedTaskList = await this.dashboardService.getSuspendedTasksForCorrelation(
