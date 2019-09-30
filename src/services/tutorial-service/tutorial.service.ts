@@ -2,13 +2,15 @@ import {inject} from 'aurelia-framework';
 import {EventAggregator} from 'aurelia-event-aggregator';
 import {Router} from 'aurelia-router';
 
-import uuid from 'node-uuid';
 import Driver from 'driver.js';
 import 'driver.js/dist/driver.min.css';
+import * as Bluebird from 'bluebird';
 
 import {NotificationService} from '../notification-service/notification.service';
 import environment from '../../environment';
 import {Chapter, NotificationType} from '../../contracts/index';
+
+Bluebird.Promise.config({cancellation: true});
 
 @inject(EventAggregator, 'NotificationService', Router)
 export class TutorialService {
@@ -18,7 +20,7 @@ export class TutorialService {
   private notificationService: NotificationService;
   private chapters: Array<Chapter> = [];
 
-  private activeTutorial: string = '';
+  private activePromise: any;
 
   constructor(eventAggregator: EventAggregator, notificationService: NotificationService, router: Router) {
     this.notificationService = notificationService;
@@ -31,7 +33,7 @@ export class TutorialService {
       showButtons: false,
       padding: 2,
       onDeselected: async (): Promise<void> => {
-        this.activeTutorial = '';
+        this.activePromise.cancel();
       },
     });
 
@@ -63,15 +65,12 @@ export class TutorialService {
   }
 
   private startChapterOne: Function = async (): Promise<void> => {
-    const tutorialId: string = uuid.v4();
-    this.activeTutorial = tutorialId;
+    this.activePromise = this.navigateToStartView();
+    await this.activePromise;
 
-    await this.navigateToStartView();
     const openDiagramElementId: string = '#open-a-diagram-button';
     const deployDiagramElementId: string = '#deploy-diagram-button';
     const startDiagramElementId: string = '#start-diagram-button';
-
-    // TODO Disable Click outside highlighted area
 
     this.driver.highlight({
       element: openDiagramElementId,
@@ -81,14 +80,11 @@ export class TutorialService {
       },
     });
 
-    await this.waitUntilDiagramIsOpen();
+    this.activePromise = this.waitUntilDiagramIsOpen();
+    await this.activePromise;
 
-    if (tutorialId !== this.activeTutorial) {
-      return;
-    }
-
-    this.driver.reset();
-    await this.waitUntilOverlayIsGone();
+    this.activePromise = this.waitUntilOverlayIsGone();
+    await this.activePromise;
 
     this.driver.highlight({
       element: deployDiagramElementId,
@@ -99,14 +95,11 @@ export class TutorialService {
       },
     });
 
-    await this.waitUntilDiagramIsDeployed();
+    this.activePromise = this.waitUntilDiagramIsDeployed();
+    await this.activePromise;
 
-    if (tutorialId !== this.activeTutorial) {
-      return;
-    }
-
-    this.driver.reset();
-    await this.waitUntilOverlayIsGone();
+    this.activePromise = this.waitUntilOverlayIsGone();
+    await this.activePromise;
 
     this.driver.highlight({
       element: startDiagramElementId,
@@ -117,24 +110,19 @@ export class TutorialService {
       },
     });
 
-    await this.waitUntilDiagramIsStarted();
+    this.activePromise = this.waitUntilDiagramIsStarted();
+    await this.activePromise;
     this.driver.reset();
-    await this.waitUntilOverlayIsGone();
-
-    this.activeTutorial = '';
+    this.activePromise = this.waitUntilOverlayIsGone();
+    await this.activePromise;
   };
 
   private startChapterTwo: Function = (): void => {
-    const tutorialId: string = uuid.v4();
-    this.activeTutorial = tutorialId;
-
     this.notificationService.showNotification(NotificationType.INFO, 'This chapter is not yet implemented.');
-
-    this.activeTutorial = '';
   };
 
   private waitUntilDiagramIsOpen(): Promise<void> {
-    return new Promise((resolve: Function): void => {
+    return new Bluebird.Promise((resolve: Function): void => {
       this.eventAggregator.subscribeOnce(environment.events.tutorial.diagramOpened, () => {
         resolve();
       });
@@ -142,7 +130,7 @@ export class TutorialService {
   }
 
   private waitUntilDiagramIsDeployed(): Promise<void> {
-    return new Promise((resolve: Function): void => {
+    return new Bluebird.Promise((resolve: Function): void => {
       this.eventAggregator.subscribeOnce(environment.events.tutorial.diagramDeployed, () => {
         resolve();
       });
@@ -150,7 +138,7 @@ export class TutorialService {
   }
 
   private waitUntilDiagramIsStarted(): Promise<void> {
-    return new Promise((resolve: Function): void => {
+    return new Bluebird.Promise((resolve: Function): void => {
       this.eventAggregator.subscribeOnce(environment.events.tutorial.diagramStarted, () => {
         resolve();
       });
@@ -158,7 +146,7 @@ export class TutorialService {
   }
 
   private waitUntilOverlayIsGone(): Promise<void> {
-    return new Promise((resolve: Function): void => {
+    return new Bluebird.Promise((resolve: Function): void => {
       setTimeout(() => {
         resolve();
       }, 0);
@@ -168,18 +156,18 @@ export class TutorialService {
   private async navigateToStartView(): Promise<void> {
     const isAlreadyOnStartPage: boolean = this.router.currentInstruction.config.name === 'start-page';
     if (isAlreadyOnStartPage) {
-      return;
+      return undefined;
     }
 
     const waitingForNavigationPromise = this.waitForNavigation();
 
     this.router.navigateToRoute('start-page');
 
-    await waitingForNavigationPromise;
+    return waitingForNavigationPromise;
   }
 
   private waitForNavigation(): Promise<void> {
-    return new Promise((resolve: Function): void => {
+    return new Bluebird.Promise((resolve: Function): void => {
       this.eventAggregator.subscribeOnce('router:navigation:success', () => {
         resolve();
       });
