@@ -2,11 +2,15 @@ import {Subscription} from 'aurelia-event-aggregator';
 import {bindable, inject, observable} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 
+import {Promise as BluebirdPromise} from 'bluebird';
+
 import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
 
 import {AuthenticationStateEvent, ISolutionEntry, ISolutionService} from '../../../contracts/index';
 import environment from '../../../environment';
 import {IDashboardService, TaskList as SuspendedTaskList, TaskListEntry} from '../dashboard/contracts/index';
+
+BluebirdPromise.config({cancellation: true, warnings: false});
 
 interface ITaskListRouteParameters {
   processInstanceId?: string;
@@ -36,6 +40,8 @@ export class TaskList {
   private tasks: Array<TaskListEntry> = [];
   private getTasks: (offset?: number, limit?: number) => Promise<SuspendedTaskList>;
   private isAttached: boolean = false;
+
+  private updatePromise: any;
 
   constructor(dashboardService: IDashboardService, router: Router, solutionService: ISolutionService) {
     this.dashboardService = dashboardService;
@@ -79,6 +85,10 @@ export class TaskList {
   ): Promise<void> {
     if (!this.isAttached) {
       return;
+    }
+
+    if (this.updatePromise) {
+      this.updatePromise.cancel();
     }
 
     for (const subscription of this.dashboardServiceSubscriptions) {
@@ -176,11 +186,29 @@ export class TaskList {
   }
 
   public currentPageChanged(): void {
+    if (this.updatePromise) {
+      this.updatePromise.cancel();
+    }
+
     this.updateTasks();
   }
 
   private getAllTasks(offset?: number, limit?: number): Promise<SuspendedTaskList> {
-    return this.dashboardService.getAllSuspendedTasks(this.activeSolutionEntry.identity, offset, limit);
+    return new BluebirdPromise(
+      async (resolve: Function, reject: Function, onCancel): Promise<void> => {
+        try {
+          const taskList: SuspendedTaskList = await this.dashboardService.getAllSuspendedTasks(
+            this.activeSolutionEntry.identity,
+            offset,
+            limit,
+          );
+
+          resolve(taskList);
+        } catch (error) {
+          reject(error);
+        }
+      },
+    );
   }
 
   private async getTasksForProcessModel(
@@ -188,11 +216,21 @@ export class TaskList {
     offset?: number,
     limit?: number,
   ): Promise<SuspendedTaskList> {
-    return this.dashboardService.getSuspendedTasksForProcessModel(
-      this.activeSolutionEntry.identity,
-      processModelId,
-      offset,
-      limit,
+    return new BluebirdPromise(
+      async (resolve: Function, reject: Function): Promise<void> => {
+        try {
+          const taskList: SuspendedTaskList = await this.dashboardService.getSuspendedTasksForProcessModel(
+            this.activeSolutionEntry.identity,
+            processModelId,
+            offset,
+            limit,
+          );
+
+          resolve(taskList);
+        } catch (error) {
+          reject(error);
+        }
+      },
     );
   }
 
@@ -201,11 +239,21 @@ export class TaskList {
     offset?: number,
     limit?: number,
   ): Promise<SuspendedTaskList> {
-    return this.dashboardService.getSuspendedTasksForCorrelation(
-      this.activeSolutionEntry.identity,
-      correlationId,
-      offset,
-      limit,
+    return new BluebirdPromise(
+      async (resolve: Function, reject: Function): Promise<void> => {
+        try {
+          const taskList: SuspendedTaskList = await this.dashboardService.getSuspendedTasksForCorrelation(
+            this.activeSolutionEntry.identity,
+            correlationId,
+            offset,
+            limit,
+          );
+
+          resolve(taskList);
+        } catch (error) {
+          reject(error);
+        }
+      },
     );
   }
 
@@ -227,7 +275,9 @@ export class TaskList {
       const pageIndex: number = Math.max(this.currentPage - 1, 0);
       const taskOffset: number = pageIndex * this.pageSize;
 
-      const suspendedTaskList: SuspendedTaskList = await this.getTasks(taskOffset, this.pageSize);
+      this.updatePromise = this.getTasks(taskOffset, this.pageSize);
+
+      const suspendedTaskList: SuspendedTaskList = await this.updatePromise;
 
       this.tasks = suspendedTaskList.taskListEntries;
       this.totalItems = suspendedTaskList.totalCount;
