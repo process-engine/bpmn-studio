@@ -164,6 +164,25 @@ export class InspectCorrelation {
             this.limit,
           );
 
+          if (this.processInstanceToSelect) {
+            const processInstanceAlreadyExist = processInstances.processInstances.some(
+              (instance: DataModels.Correlations.ProcessInstance) => {
+                return instance.processInstanceId === this.processInstanceToSelect;
+              },
+            );
+
+            if (!processInstanceAlreadyExist) {
+              const processInstance = await this.inspectCorrelationService.getProcessInstanceById(
+                this.activeSolutionEntry.identity,
+                this.processInstanceToSelect,
+                this.activeDiagram.id,
+              );
+
+              processInstances.processInstances.shift();
+              processInstances.processInstances.push(processInstance);
+            }
+          }
+
           resolve(processInstances);
         } catch (error) {
           reject(error);

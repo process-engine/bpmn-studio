@@ -16,7 +16,7 @@ import {getBeautifiedDate} from '../../../../../../../services/date-service/date
 export class CorrelationList {
   @bindable public processInstanceToSelect: string;
   @bindable public selectedProcessInstance: DataModels.Correlations.ProcessInstance;
-  @bindable public correlations: Array<DataModels.Correlations.ProcessInstance>;
+  @bindable @observable public correlations: Array<DataModels.Correlations.ProcessInstance>;
   @bindable public activeDiagram: IDiagram;
   @bindable public sortedTableData: Array<ICorrelationTableEntry>;
   @bindable public totalCount: number;
