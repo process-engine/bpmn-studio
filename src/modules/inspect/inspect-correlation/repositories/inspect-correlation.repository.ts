@@ -101,10 +101,17 @@ export class InspectCorrelationRepository implements IInspectCorrelationReposito
       identity,
       processModelId,
     )) as unknown) as Array<DataModels.Correlations.Correlation>;
+
     const processInstances: Array<ProcessInstance> = [];
 
     result.forEach((correlation: DataModels.Correlations.Correlation) => {
-      processInstances.push(...correlation.processInstances);
+      processInstances.push(
+        ...correlation.processInstances.map((instance: DataModels.Correlations.ProcessInstance) => {
+          instance.correlationId = correlation.id;
+
+          return instance;
+        }),
+      );
     });
 
     const paginizedProcessInstances = this.applyPagination(processInstances, offset, limit);
