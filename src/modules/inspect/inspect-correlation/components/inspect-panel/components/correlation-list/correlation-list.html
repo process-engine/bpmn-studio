@@ -30,7 +30,7 @@
           <td if.bind="false" class="correlation-table__table-entry">${tableEntry.user}</td>
           <td class="correlation-table__table-entry">${tableEntry.processInstanceId}</td>
         </tr>
-        <tr style="display: flex; width: 100%;">
+        <tr if.bind="totalCount > 20" style="display: flex; width: 100%;">
           <td>
             <div style="float: left; margin-top: 5px; margin-right: 5px;">
               PageSize: 
