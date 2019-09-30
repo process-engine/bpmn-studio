@@ -68,10 +68,6 @@ export class CronjobList {
       this.updatePromise.cancel();
     }
 
-    if (!this.dashboardService) {
-      return;
-    }
-
     this.updateCronjobs();
   }
 
