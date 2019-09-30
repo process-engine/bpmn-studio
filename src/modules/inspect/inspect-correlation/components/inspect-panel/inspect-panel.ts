@@ -63,7 +63,7 @@ export class InspectPanel {
     this.showLogViewer = shouldShowLogViewer;
   }
 
-  public correlationChanged(
+  public correlationsChanged(
     newCorrelation: DataModels.Correlations.Correlation,
     oldCorrelation: DataModels.Correlations.Correlation,
   ): void {
