@@ -258,13 +258,13 @@ export class ProcessList {
     this.processInstancesToDisplay = this.processInstances;
 
     this.stoppedProcessInstances.forEach((stoppedProcessInstance: DataModels.Correlations.ProcessInstance) => {
-      const processInstanceExistInDisplayArray: boolean = this.processInstancesToDisplay.some(
+      const processInstanceGetsDisplayed: boolean = this.processInstancesToDisplay.some(
         (processInstance: DataModels.Correlations.ProcessInstance) => {
           return stoppedProcessInstance.processInstanceId === processInstance.processInstanceId;
         },
       );
 
-      if (!processInstanceExistInDisplayArray) {
+      if (!processInstanceGetsDisplayed) {
         this.processInstancesToDisplay.push(stoppedProcessInstance);
       }
     });
