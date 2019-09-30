@@ -106,7 +106,7 @@ export class CorrelationList {
       currentPage: this.currentPage,
     };
 
-    this.eventAggregator.publish('updateProcessInstances', payload);
+    this.eventAggregator.publish(environment.events.inspectCorrelation.updateProcessInstances, payload);
   }
 
   public currentPageChanged(newValue: number, oldValue: number): void {
@@ -118,7 +118,7 @@ export class CorrelationList {
         currentPage: this.currentPage,
       };
 
-      this.eventAggregator.publish('updateProcessInstances', payload);
+      this.eventAggregator.publish(environment.events.inspectCorrelation.updateProcessInstances, payload);
     }
   }
 
