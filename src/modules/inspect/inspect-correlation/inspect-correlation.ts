@@ -54,6 +54,9 @@ export class InspectCorrelation {
   }
 
   public async attached(): Promise<void> {
+    if (this.handlerPromise) {
+      this.handlerPromise.cancel();
+    }
     this.updateProcessInstances();
 
     this.eventAggregator.publish(environment.events.statusBar.showInspectCorrelationButtons, true);
@@ -183,6 +186,9 @@ export class InspectCorrelation {
     if (this.viewIsAttached) {
       this.offset = 0;
       this.limit = 50;
+      if (this.handlerPromise) {
+        this.handlerPromise.cancel();
+      }
       this.updateProcessInstances();
     }
   }
