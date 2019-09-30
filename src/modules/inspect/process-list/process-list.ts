@@ -192,7 +192,7 @@ export class ProcessList {
       if (processInstanceListWasUpdated) {
         this.processInstances = sortedProcessInstances;
 
-        this.totalItems = processInstanceList.totalCount;
+        this.totalItems = processInstanceList.totalCount + this.stoppedProcessInstances.length;
 
         this.updateProcessInstancesToDisplay();
       }

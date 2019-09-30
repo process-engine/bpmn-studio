@@ -31,7 +31,7 @@
         <span else class="process-list__no-processes-text">No process instances found for this user.</span>
       </template>
       <div class="col-md-12 col-xs-12 pagination" show.bind="processInstancesToDisplay && processInstancesToDisplay.length > 0">
-        <aubs-pagination page-size.bind="pageSize" total-items.bind="totalItems + stoppedProcessInstances.length" current-page.bind="currentPage" boundary-links.bind="true" pagination-size.bind="paginationSize">
+        <aubs-pagination page-size.bind="pageSize" total-items.bind="totalItems" current-page.bind="currentPage" boundary-links.bind="true" pagination-size.bind="paginationSize">
         </aubs-pagination>
       </div>
       <div if.bind="!initialLoadingFinished" class="container">
