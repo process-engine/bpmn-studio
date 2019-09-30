@@ -38,7 +38,7 @@ export class ProcessList {
   private limit: number = this.pageSize;
   private offset: number = 0;
 
-  private handlerPromise: any;
+  private updatePromise: any;
 
   constructor(
     dashboardService: IDashboardService,
@@ -57,8 +57,8 @@ export class ProcessList {
       return;
     }
 
-    if (this.handlerPromise) {
-      this.handlerPromise.cancel();
+    if (this.updatePromise) {
+      this.updatePromise.cancel();
     }
 
     this.processInstances = [];
@@ -222,7 +222,7 @@ export class ProcessList {
       return undefined;
     }
 
-    this.handlerPromise = new Bluebird.Promise(
+    this.updatePromise = new Bluebird.Promise(
       async (resolve: Function, reject: Function): Promise<any> => {
         try {
           const activeProcessInstances = await this.dashboardService.getAllActiveProcessInstances(
@@ -238,7 +238,7 @@ export class ProcessList {
       },
     );
 
-    return this.handlerPromise;
+    return this.updatePromise;
   }
 
   private sortProcessInstances(
