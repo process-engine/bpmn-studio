@@ -157,6 +157,9 @@ export class SolutionExplorerSolution {
       this.eventAggregator.subscribe('router:navigation:success', () => {
         this.updateSolutionExplorer();
       }),
+      this.eventAggregator.subscribe(environment.events.hideAllModals, () => {
+        this.showCloseModal = false;
+      }),
     ];
 
     if (this.displayedSolutionEntry.isOpenDiagramService) {

@@ -20,6 +20,7 @@ import {OpenDiagramsSolutionExplorerService} from '../../../services/solution-ex
 import {SolutionExplorerServiceFactory} from '../../../services/solution-explorer-services/SolutionExplorerServiceFactory';
 import {SolutionExplorerSolution} from '../solution-explorer-solution/solution-explorer-solution';
 import {exposeFunctionForTesting} from '../../../services/expose-functionality-module/expose-functionality-module';
+import environment from '../../../environment';
 
 interface IUriToViewModelMap {
   [key: string]: SolutionExplorerSolution;
@@ -62,6 +63,7 @@ export class SolutionExplorerList {
   private openedSolutions: Array<ISolutionEntry> = [];
   private solutionsToOpen: Array<string> = [];
   private solutionsWhoseOpeningShouldGetAborted: Array<string> = [];
+  private subscriptions: Array<Subscription> = [];
 
   constructor(
     router: Router,
@@ -88,6 +90,21 @@ export class SolutionExplorerList {
     });
 
     this.internalSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
+  }
+
+  public attached(): void {
+    this.subscriptions = [
+      this.eventAggregator.subscribe(environment.events.hideAllModals, () => {
+        this.processEngineIsNewerModal = false;
+        this.processEngineIsOlderModal = false;
+      }),
+    ];
+  }
+
+  public detached(): void {
+    for (const subscription of this.subscriptions) {
+      subscription.dispose();
+    }
   }
 
   /**

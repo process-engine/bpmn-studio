@@ -44,6 +44,11 @@ export class DeployModals {
           this.handleOverwriting(callback);
         },
       ),
+
+      this.eventAggregator.subscribe(environment.events.hideAllModals, (callback: Function) => {
+        this.showOverwriteDiagramModal = false;
+        this.showRemoteSolutionOnDeployModal = false;
+      }),
     ];
   }
 

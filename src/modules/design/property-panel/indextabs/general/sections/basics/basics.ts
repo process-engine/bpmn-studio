@@ -1,4 +1,4 @@
-import {EventAggregator} from 'aurelia-event-aggregator';
+import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {inject} from 'aurelia-framework';
 import {ValidateEvent, ValidationController, ValidationRules} from 'aurelia-validation';
 
@@ -33,6 +33,7 @@ export class BasicsSection implements ISection {
   private previousProcessRefId: string;
   private validationController: ValidationController;
   private eventAggregator: EventAggregator;
+  private subscriptions: Array<Subscription>;
 
   constructor(controller?: ValidationController, eventAggregator?: EventAggregator) {
     this.validationController = controller;
@@ -66,6 +67,12 @@ export class BasicsSection implements ISection {
     this.recoverInputHeight();
 
     this.saveInputHeightOnChange();
+
+    this.subscriptions = [
+      this.eventAggregator.subscribe(environment.events.hideAllModals, () => {
+        this.showModal = false;
+      }),
+    ];
   }
 
   public detached(): void {
@@ -77,6 +84,10 @@ export class BasicsSection implements ISection {
 
     this.businessObjInPanel.id = this.previousProcessRefId;
     this.validationController.validate();
+
+    for (const subscription of this.subscriptions) {
+      subscription.dispose();
+    }
   }
 
   public isSuitableForElement(element: IShape): boolean {

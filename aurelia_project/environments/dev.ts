@@ -34,6 +34,7 @@ export default {
     xmlChanged: 'xmlChanged',
     diagramWasSaved: 'diagramWasSaved',
     updatingNavbarDone: 'updatingNavbarDone',
+    hideAllModals: 'hideAllModals',
     deployModals: {
       showRemoteSolutionSelectionModal: 'deployModals:remoteSolutionSelectionModal:show',
       showOverwriteDiagramModal: 'deployModals:overwriteDiagramModal:show',

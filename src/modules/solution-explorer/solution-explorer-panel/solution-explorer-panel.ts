@@ -145,6 +145,9 @@ export class SolutionExplorerPanel {
       this.eventAggregator.subscribe(AuthenticationStateEvent.LOGOUT, () => {
         this.solutionExplorerList.refreshSolutions();
       }),
+      this.eventAggregator.subscribe(environment.events.hideAllModals, () => {
+        this.showOpenRemoteSolutionModal = false;
+      }),
     ];
   }
 

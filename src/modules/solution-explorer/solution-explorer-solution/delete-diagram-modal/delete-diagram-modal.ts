@@ -5,6 +5,7 @@
  */
 import {bindable, inject} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
+import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 import {ISolutionExplorerService} from '@process-engine/solutionexplorer.service.contracts';
@@ -13,6 +14,7 @@ import {IEventFunction, ISolutionService, NotificationType} from '../../../../co
 import {NotificationService} from '../../../../services/notification-service/notification.service';
 import {OpenDiagramsSolutionExplorerService} from '../../../../services/solution-explorer-services/OpenDiagramsSolutionExplorerService';
 import {OpenDiagramStateService} from '../../../../services/solution-explorer-services/OpenDiagramStateService';
+import environment from '../../../../environment';
 
 @inject('NotificationService', 'OpenDiagramStateService', Router, 'OpenDiagramService', 'SolutionService')
 export class DeleteDiagramModal {
@@ -27,6 +29,8 @@ export class DeleteDiagramModal {
   private openDiagramService: OpenDiagramsSolutionExplorerService;
   private router: Router;
   private solutionService: ISolutionService;
+  private eventAggregator: EventAggregator;
+  private subscriptions: Array<Subscription>;
 
   constructor(
     notificationService: NotificationService,
@@ -34,12 +38,28 @@ export class DeleteDiagramModal {
     router: Router,
     openDiagramService: OpenDiagramsSolutionExplorerService,
     solutionService: ISolutionService,
+    eventAggregator: EventAggregator,
   ) {
     this.notificationService = notificationService;
     this.openDiagramStateService = openDiagramStateService;
     this.router = router;
     this.openDiagramService = openDiagramService;
     this.solutionService = solutionService;
+    this.eventAggregator = eventAggregator;
+  }
+
+  public attached(): void {
+    this.subscriptions = [
+      this.eventAggregator.subscribe(environment.events.hideAllModals, () => {
+        this.showModal = false;
+      }),
+    ];
+  }
+
+  public detached(): void {
+    for (const subscription of this.subscriptions) {
+      subscription.dispose();
+    }
   }
 
   public async show(diagram: IDiagram, solutionExplorerService: ISolutionExplorerService): Promise<boolean> {
