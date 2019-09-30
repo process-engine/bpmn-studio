@@ -1,6 +1,9 @@
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {DataModels} from '@process-engine/management_api_contracts';
-import {ProcessInstanceList} from '@process-engine/management_api_contracts/dist/data_models/correlation';
+import {
+  ProcessInstance,
+  ProcessInstanceList,
+} from '@process-engine/management_api_contracts/dist/data_models/correlation';
 
 export interface IInspectCorrelationService {
   getAllCorrelationsForProcessModelId(
@@ -43,4 +46,9 @@ export interface IInspectCorrelationService {
     offset?: number,
     limit?: number,
   ): Promise<ProcessInstanceList>;
+  getProcessInstanceById(
+    identity: IIdentity,
+    processInstanceId: string,
+    processModelId?: string,
+  ): Promise<ProcessInstance>;
 }

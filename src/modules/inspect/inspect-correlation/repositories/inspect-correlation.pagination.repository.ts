@@ -108,4 +108,32 @@ export class InspectCorrelationPaginationRepository extends InspectCorrelationRe
 
     return {processInstances: paginizedProcessInstances, totalCount: processInstances.length};
   }
+
+  public async getProcessInstancesById(
+    identity: IIdentity,
+    processInstanceId: string,
+    processModelId: string,
+  ): Promise<ProcessInstance> {
+    const result: DataModels.Correlations.CorrelationList = await this.managementApiService.getCorrelationsByProcessModelId(
+      identity,
+      processModelId,
+    );
+    const processInstances: Array<ProcessInstance> = [];
+
+    result.correlations.forEach((correlation: DataModels.Correlations.Correlation) => {
+      processInstances.push(
+        ...correlation.processInstances.map((instance: DataModels.Correlations.ProcessInstance) => {
+          instance.correlationId = correlation.id;
+
+          return instance;
+        }),
+      );
+    });
+
+    const processInstance = processInstances.find((instance: DataModels.Correlations.ProcessInstance) => {
+      return instance.processInstanceId === processInstanceId;
+    });
+
+    return processInstance;
+  }
 }

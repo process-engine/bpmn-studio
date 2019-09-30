@@ -4,7 +4,10 @@ import {IIdentity} from '@essential-projects/iam_contracts';
 import {DataModels, IManagementApiClient} from '@process-engine/management_api_contracts';
 
 import {EventAggregator} from 'aurelia-event-aggregator';
-import {ProcessInstanceList} from '@process-engine/management_api_contracts/dist/data_models/correlation';
+import {
+  ProcessInstance,
+  ProcessInstanceList,
+} from '@process-engine/management_api_contracts/dist/data_models/correlation';
 import {IInspectCorrelationRepository, IInspectCorrelationService} from '../contracts';
 import {InspectCorrelationPaginationRepository} from '../repositories/inspect-correlation.pagination.repository';
 import environment from '../../../../environment';
@@ -29,9 +32,9 @@ export class InspectCorrelationService implements IInspectCorrelationService {
     this.eventAggregator.subscribe(
       environment.events.configPanel.solutionEntryChanged,
       (solutionEntry: ISolutionEntry) => {
-        if (processEngineSupportsPagination(solutionEntry.processEngineVersion)) {
+        if (processEngineSupportsProcessInstancesQueries(solutionEntry.processEngineVersion)) {
           this.inspectCorrelationRepository = new InspectCorrelationPaginationRepository(this.managementApiService);
-        } else if (processEngineSupportsProcessInstancesQueries(solutionEntry.processEngineVersion)) {
+        } else if (processEngineSupportsPagination(solutionEntry.processEngineVersion)) {
           this.inspectCorrelationRepository = new InspectCorrelationProcessInstancesQueryRepository(
             this.managementApiService,
           );
@@ -114,5 +117,13 @@ export class InspectCorrelationService implements IInspectCorrelationService {
       offset,
       limit,
     );
+  }
+
+  public getProcessInstanceById(
+    identity: IIdentity,
+    processInstanceId: string,
+    processModelId: string,
+  ): Promise<ProcessInstance> {
+    return this.inspectCorrelationRepository.getProcessInstancesById(identity, processInstanceId, processModelId);
   }
 }

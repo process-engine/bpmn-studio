@@ -119,6 +119,35 @@ export class InspectCorrelationRepository implements IInspectCorrelationReposito
     return {processInstances: paginizedProcessInstances, totalCount: processInstances.length};
   }
 
+  public async getProcessInstancesById(
+    identity: IIdentity,
+    processInstanceId: string,
+    processModelId: string,
+  ): Promise<ProcessInstance> {
+    const result = ((await this.managementApiService.getCorrelationsByProcessModelId(
+      identity,
+      processModelId,
+    )) as unknown) as Array<DataModels.Correlations.Correlation>;
+
+    const processInstances: Array<ProcessInstance> = [];
+
+    result.forEach((correlation: DataModels.Correlations.Correlation) => {
+      processInstances.push(
+        ...correlation.processInstances.map((instance: DataModels.Correlations.ProcessInstance) => {
+          instance.correlationId = correlation.id;
+
+          return instance;
+        }),
+      );
+    });
+
+    const processInstance = processInstances.find((instance: DataModels.Correlations.ProcessInstance) => {
+      return instance.processInstanceId === processInstanceId;
+    });
+
+    return processInstance;
+  }
+
   public applyPagination<TList>(list: Array<TList>, offset: number, limit: number): Array<TList> {
     const paginatedList: Array<TList> = list.slice();
 
