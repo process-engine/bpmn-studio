@@ -95,7 +95,13 @@ export class InspectCorrelationPaginationRepository extends InspectCorrelationRe
     const processInstances: Array<ProcessInstance> = [];
 
     result.correlations.forEach((correlation: DataModels.Correlations.Correlation) => {
-      processInstances.push(...correlation.processInstances);
+      processInstances.push(
+        ...correlation.processInstances.map((instance: DataModels.Correlations.ProcessInstance) => {
+          instance.correlationId = correlation.id;
+
+          return instance;
+        }),
+      );
     });
 
     const paginizedProcessInstances = this.applyPagination(processInstances, offset, limit);
