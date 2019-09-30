@@ -10,8 +10,6 @@ import environment from '../../../environment';
 import {getBeautifiedDate} from '../../../services/date-service/date.service';
 import {IDashboardService} from '../dashboard/contracts';
 
-Bluebird.Promise.config({cancellation: true});
-
 @inject('DashboardService')
 export class CronjobList {
   @bindable public activeSolutionEntry: ISolutionEntry;

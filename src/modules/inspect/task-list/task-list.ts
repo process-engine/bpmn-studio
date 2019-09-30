@@ -10,8 +10,6 @@ import {AuthenticationStateEvent, ISolutionEntry, ISolutionService} from '../../
 import environment from '../../../environment';
 import {IDashboardService, TaskList as SuspendedTaskList, TaskListEntry} from '../dashboard/contracts/index';
 
-Bluebird.Promise.config({cancellation: true, warnings: false});
-
 interface ITaskListRouteParameters {
   processInstanceId?: string;
   diagramName?: string;
