@@ -101,6 +101,11 @@ export class CorrelationList {
       return;
     }
 
+    if (newValue < oldValue) {
+      this.sortedTableData = this.sortedTableData.slice(0, newValue);
+      return;
+    }
+
     const payload = {
       pageSize: this.pageSize,
       currentPage: this.currentPage,
