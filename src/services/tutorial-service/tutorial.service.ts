@@ -65,6 +65,8 @@ export class TutorialService {
   }
 
   private startChapterOne: Function = async (): Promise<void> => {
+    this.hideAllModals();
+
     this.activePromise = this.navigateToStartView();
     await this.activePromise;
 
@@ -118,8 +120,13 @@ export class TutorialService {
   };
 
   private startChapterTwo: Function = (): void => {
+    this.hideAllModals();
     this.notificationService.showNotification(NotificationType.INFO, 'This chapter is not yet implemented.');
   };
+
+  private hideAllModals(): void {
+    this.eventAggregator.publish(environment.events.hideAllModals);
+  }
 
   private waitUntilDiagramIsOpen(): Promise<void> {
     return new Bluebird.Promise((resolve: Function): void => {
