@@ -82,7 +82,7 @@ export class ProcessList {
     }
 
     this.stoppedProcessInstances = [];
-    if (newValue > oldValue) {
+    if (newValue > oldValue && oldValue > 0) {
       const skippedPages: number = Math.abs(newValue - oldValue) - 1;
 
       this.offset += this.limit + skippedPages * this.pageSize;
