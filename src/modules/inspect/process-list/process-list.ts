@@ -77,6 +77,10 @@ export class ProcessList {
       return;
     }
 
+    if (this.updatePromise) {
+      this.updatePromise.cancel();
+    }
+
     this.stoppedProcessInstances = [];
     if (newValue > oldValue) {
       const skippedPages: number = Math.abs(newValue - oldValue) - 1;
