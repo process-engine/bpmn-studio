@@ -221,7 +221,7 @@ export class ProcessList {
   private async getActiveProcessInstancesForCurrentPage(): Promise<DataModels.Correlations.ProcessInstanceList> {
     const identity: IIdentity = this.activeSolutionEntry.identity;
 
-    const shouldOnlyDisplayStoppedProcessInstances: boolean = this.limit < 1;
+    const shouldOnlyDisplayStoppedProcessInstances: boolean = this.limit === 0;
     if (shouldOnlyDisplayStoppedProcessInstances) {
       return undefined;
     }
