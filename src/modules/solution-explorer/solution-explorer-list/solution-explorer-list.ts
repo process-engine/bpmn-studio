@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {computedFrom, inject} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
@@ -5,7 +6,7 @@ import {Router} from 'aurelia-router';
 import {SemVer} from 'semver';
 
 import {IIdentity} from '@essential-projects/iam_contracts';
-import {IDiagram, ISolution} from '@process-engine/solutionexplorer.contracts';
+import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 import {ISolutionExplorerService} from '@process-engine/solutionexplorer.service.contracts';
 
 import {
@@ -283,8 +284,7 @@ export class SolutionExplorerList {
       throw error;
     }
 
-    const newOpenedSolution: ISolution = await solutionExplorer.loadSolution();
-    const solutionURI: string = newOpenedSolution.uri;
+    const solutionURI: string = uri;
 
     const arrayAlreadyContainedURI: boolean = this.getIndexOfSolution(solutionURI) >= 0;
 
