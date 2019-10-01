@@ -12,6 +12,13 @@ import {
 import environment from '../../../../../../../environment';
 import {getBeautifiedDate} from '../../../../../../../services/date-service/date.service';
 
+export enum PageSize {
+  twenty = 20,
+  fifty = 50,
+  hundred = 100,
+  twohundred = 200,
+}
+
 @inject(EventAggregator)
 export class CorrelationList {
   @bindable public processInstanceToSelect: string;
@@ -24,7 +31,8 @@ export class CorrelationList {
   @observable public pageSize: number = 50;
   public paginationSize: number = 10;
 
-  public pageSizes: Array<number> = [20, 50, 100, 200];
+  // eslint-disable-next-line @typescript-eslint/member-naming
+  public PageSize: typeof PageSize = PageSize;
   public correlationListSortProperty: typeof CorrelationListSortProperty = CorrelationListSortProperty;
   public sortSettings: ICorrelationSortSettings = {
     ascending: false,
