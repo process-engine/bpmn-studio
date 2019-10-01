@@ -20,7 +20,7 @@ export class CronjobList {
   public totalItems: number;
   public showError: boolean;
 
-  private cronjobs: Array<DataModels.Cronjobs.CronjobConfiguration> = [];
+  private cronjobsToDisplay: Array<DataModels.Cronjobs.CronjobConfiguration> = [];
   private pollingTimeout: NodeJS.Timeout;
   private isAttached: boolean;
   private dashboardService: IDashboardService;
@@ -40,7 +40,7 @@ export class CronjobList {
       this.updatePromise.cancel();
     }
 
-    this.cronjobs = [];
+    this.cronjobsToDisplay = [];
     this.initialLoadingFinished = false;
     this.showError = false;
     this.dashboardService.eventAggregator.publish(
@@ -69,9 +69,9 @@ export class CronjobList {
     this.updateCronjobs();
   }
 
-  @computedFrom('cronjobs.length')
+  @computedFrom('cronjobsToDisplay.length')
   public get showCronjobList(): boolean {
-    return this.cronjobs !== undefined && this.cronjobs.length > 0;
+    return this.cronjobsToDisplay !== undefined && this.cronjobsToDisplay.length > 0;
   }
 
   public getBeautifiedDate(date: Date): string {
@@ -86,7 +86,7 @@ export class CronjobList {
 
       const cronjobList = await this.updatePromise;
 
-      this.cronjobs = cronjobList.cronjobs.sort(this.sortCronjobs);
+      this.cronjobsToDisplay = cronjobList.cronjobs.sort(this.sortCronjobs);
       this.totalItems = cronjobList.totalCount;
       this.initialLoadingFinished = true;
     } catch (error) {
@@ -97,7 +97,7 @@ export class CronjobList {
       const errorIsAuthenticationRelated: boolean = errorIsForbiddenError || errorIsUnauthorizedError;
 
       if (!errorIsAuthenticationRelated) {
-        this.cronjobs = [];
+        this.cronjobsToDisplay = [];
         this.totalItems = 0;
         this.showError = true;
       }
