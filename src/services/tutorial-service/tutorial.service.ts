@@ -188,6 +188,7 @@ export class TutorialService {
 
     this.activePromise.cancel();
     this.driver.reset();
+    document.removeEventListener('click', this.cancelTutorialIfClickWasOutsideOfHighlightedArea);
   };
 
   private checkIfMouseClickWasInHighlightedArea(mouseEvent: MouseEvent): boolean {
