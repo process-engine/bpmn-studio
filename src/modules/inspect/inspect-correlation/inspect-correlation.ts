@@ -1,11 +1,11 @@
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {bindable, inject, observable} from 'aurelia-framework';
 
+import * as Bluebird from 'bluebird';
+
 import {IShape} from '@process-engine/bpmn-elements_contracts';
 import {DataModels} from '@process-engine/management_api_contracts';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
-
-import * as Bluebird from 'bluebird';
 
 import {IEventFunction, ISolutionEntry, InspectPanelTab} from '../../../contracts/index';
 import environment from '../../../environment';
