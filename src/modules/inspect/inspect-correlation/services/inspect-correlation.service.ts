@@ -13,11 +13,7 @@ import {InspectCorrelationPaginationRepository} from '../repositories/inspect-co
 import environment from '../../../../environment';
 import {InspectCorrelationRepository} from '../repositories/inspect-correlation.repository';
 import {ISolutionEntry} from '../../../../contracts';
-import {
-  processEngineSupportsPagination,
-  processEngineSupportsProcessInstancesQueries,
-} from '../../../../services/process-engine-version-module/process-engine-version-module';
-import {InspectCorrelationProcessInstancesQueryRepository} from '../repositories/inspect-correlation.process-instances.queries.repository';
+import {processEngineSupportsPagination} from '../../../../services/process-engine-version-module/process-engine-version-module';
 
 @inject(EventAggregator, 'ManagementApiClientService')
 export class InspectCorrelationService implements IInspectCorrelationService {
@@ -32,12 +28,8 @@ export class InspectCorrelationService implements IInspectCorrelationService {
     this.eventAggregator.subscribe(
       environment.events.configPanel.solutionEntryChanged,
       (solutionEntry: ISolutionEntry) => {
-        if (processEngineSupportsProcessInstancesQueries(solutionEntry.processEngineVersion)) {
+        if (processEngineSupportsPagination(solutionEntry.processEngineVersion)) {
           this.inspectCorrelationRepository = new InspectCorrelationPaginationRepository(this.managementApiService);
-        } else if (processEngineSupportsPagination(solutionEntry.processEngineVersion)) {
-          this.inspectCorrelationRepository = new InspectCorrelationProcessInstancesQueryRepository(
-            this.managementApiService,
-          );
         } else {
           this.inspectCorrelationRepository = new InspectCorrelationRepository(this.managementApiService);
         }
