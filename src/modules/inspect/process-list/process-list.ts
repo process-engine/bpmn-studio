@@ -82,7 +82,10 @@ export class ProcessList {
     }
 
     this.stoppedProcessInstances = [];
-    if (newValue > oldValue && oldValue > 0) {
+
+    const paginationWasUsed: boolean = oldValue > 0;
+    const showNewerProcessInstances: boolean = newValue > oldValue;
+    if (paginationWasUsed && showNewerProcessInstances) {
       const skippedPages: number = Math.abs(newValue - oldValue) - 1;
 
       this.amountOfActiveProcessInstancesToSkip +=
