@@ -81,8 +81,8 @@ export class TokenViewer {
     this.tokenEntries = [];
 
     if (this.processEngineSupportsFetchingTokensByProcessInstanceId()) {
-      const processInstanceIsUndefined: boolean = this.processInstance === undefined;
-      if (processInstanceIsUndefined) {
+      const noProcessInstance: boolean = this.processInstance === undefined;
+      if (noProcessInstance) {
         this.clearTokenViewer();
 
         return;
@@ -94,8 +94,8 @@ export class TokenViewer {
         this.activeSolutionEntry.identity,
       );
     } else {
-      const correlationIsUndefined: boolean = this.processInstance.correlationId === undefined;
-      if (correlationIsUndefined) {
+      const noCorrelationId: boolean = this.processInstance.correlationId === undefined;
+      if (noCorrelationId) {
         this.clearTokenViewer();
 
         return;
