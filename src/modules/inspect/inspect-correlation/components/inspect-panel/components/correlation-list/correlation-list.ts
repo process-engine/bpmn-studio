@@ -62,13 +62,6 @@ export class CorrelationList {
   }
 
   public correlationsChanged(): void {
-    const lastItem = this.pageSizes[this.pageSizes.length - 1];
-    if (lastItem !== 200) {
-      this.pageSizes.splice(-1, 1, this.totalCount);
-    } else {
-      this.pageSizes.push(this.totalCount);
-    }
-
     if (!this.activeDiagram) {
       return;
     }
