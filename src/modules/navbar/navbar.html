@@ -50,7 +50,7 @@
         <button class="button menu-bar__menu-center--action-button"  click.delegate="printDiagram()" title="Print Diagram">
           <i class="fas fa-print"></i>
         </button>
-        <button class="button menu-bar__menu-center--action-button" class.bind="validationError || disableDiagramUploadButton ? 'button--disabled' : ''" click.delegate="uploadProcess()" title.bind="diagramUploadButtonTitle" id="deploy-diagram-button" data-test-deploy-diagram-button>
+        <button class="button menu-bar__menu-center--action-button" class.bind="validationError || disableDiagramUploadButton ? 'button--disabled' : ''" click.delegate="uploadProcess($event)" title.bind="diagramUploadButtonTitle" id="deploy-diagram-button" data-test-deploy-diagram-button>
           <i class="fas fa-dolly-flatbed"></i>
         </button>
         <div class="btn-group">

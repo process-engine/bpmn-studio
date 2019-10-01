@@ -155,6 +155,7 @@ export class TutorialService {
 
     this.activePromise = this.waitUntilDiagramIsStarted();
     await this.activePromise;
+
     this.driver.reset();
     this.activePromise = this.waitUntilOverlayIsGone();
     await this.activePromise;
@@ -182,6 +183,11 @@ export class TutorialService {
 
   private checkIfMouseClickWasInHighlightedArea(mouseEvent: MouseEvent): boolean {
     const highlightedArea: HTMLElement = document.getElementById('driver-highlighted-element-stage');
+
+    if (!highlightedArea) {
+      return true;
+    }
+
     const highlightedAreaLeft: number = parseInt(highlightedArea.style.left.replace('px', ''));
     const highlightedAreaRight: number = highlightedAreaLeft + parseInt(highlightedArea.style.width.replace('px', ''));
 
@@ -270,7 +276,9 @@ export class TutorialService {
       this.eventAggregator.subscribeOnce(
         environment.events.tutorial.multipleConnectedProcessEnginesModalStarted,
         () => {
-          resolve();
+          setTimeout(() => {
+            resolve();
+          }, 0);
         },
       );
     });
@@ -290,7 +298,9 @@ export class TutorialService {
   private waitForDiagramAlreadyExistsModalToStart(): Promise<void> {
     return new Bluebird.Promise((resolve: Function): void => {
       this.eventAggregator.subscribeOnce(environment.events.tutorial.diagramAlreadyExistsModalStarted, () => {
-        resolve();
+        setTimeout(() => {
+          resolve();
+        }, 0);
       });
     });
   }
