@@ -5,9 +5,14 @@ export function processEngineSupportsPagination(processEngineVersion: string): b
     return undefined;
   }
 
-  const solutionEntryPEVersion = new SemVer(processEngineVersion);
+  const processEngineVersionWithoutReleaseChannel: string = processEngineVersion.slice(
+    0,
+    processEngineVersion.indexOf('-'),
+  );
+
+  const processEngineSemverVersion = new SemVer(processEngineVersionWithoutReleaseChannel);
 
   const firstVersionWithPagination = new SemVer('9.0.0');
 
-  return solutionEntryPEVersion.compare(firstVersionWithPagination) >= 0;
+  return processEngineSemverVersion.compare(firstVersionWithPagination) >= 0;
 }
