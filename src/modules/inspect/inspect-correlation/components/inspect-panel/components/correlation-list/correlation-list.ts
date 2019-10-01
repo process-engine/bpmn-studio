@@ -116,16 +116,16 @@ export class CorrelationList {
   }
 
   public currentPageChanged(newValue: number, oldValue: number): void {
-    const oldValueIsDefined: boolean = oldValue !== undefined && oldValue !== null;
-
-    if (oldValueIsDefined) {
-      const payload = {
-        pageSize: this.pageSize,
-        currentPage: this.currentPage,
-      };
-
-      this.eventAggregator.publish(environment.events.inspectCorrelation.updateProcessInstances, payload);
+    if (oldValue === undefined) {
+      return;
     }
+
+    const payload = {
+      pageSize: this.pageSize,
+      currentPage: this.currentPage,
+    };
+
+    this.eventAggregator.publish(environment.events.inspectCorrelation.updateProcessInstances, payload);
   }
 
   private convertProcessInstancesIntoTableData(
