@@ -98,7 +98,7 @@ export class TutorialService {
         popover: {
           title: 'Select a remote solution',
           description:
-            "When multiple remote solutions are opened you have to choose a remote solution. Select a solution via the selection and click on the 'Deploy process' button.",
+            "When multiple remote solutions are opened you have to choose a remote solution. Select a solution via the selection and click on the 'Deploy Process' button.",
         },
       });
 
@@ -117,7 +117,7 @@ export class TutorialService {
         popover: {
           title: 'Overwrite existing diagram',
           description:
-            "When a diagram with that name already exists you have to confirm that it gets overwritten. Hit the 'Continue' button to do so.",
+            "When a diagram with the same name already exists you have to confirm that it gets overwritten. Click on the 'Deploy' button to do so.",
         },
       });
 
