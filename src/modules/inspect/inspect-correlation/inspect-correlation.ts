@@ -13,7 +13,6 @@ import {IInspectCorrelationService} from './contracts';
 import {DiagramViewer} from './components/diagram-viewer/diagram-viewer';
 import {InspectPanel} from './components/inspect-panel/inspect-panel';
 
-Bluebird.Promise.config({cancellation: true});
 @inject('InspectCorrelationService', EventAggregator)
 export class InspectCorrelation {
   @bindable public processInstanceToSelect: string;
