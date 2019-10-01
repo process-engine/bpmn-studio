@@ -52,7 +52,7 @@ export class ProcessList {
     this.router = router;
   }
 
-  public async activeSolutionEntryChanged(newValue: ISolutionEntry, oldValue: ISolutionEntry): Promise<void> {
+  public async activeSolutionEntryChanged(newValue: ISolutionEntry): Promise<void> {
     if (!newValue.uri.includes('http')) {
       return;
     }
