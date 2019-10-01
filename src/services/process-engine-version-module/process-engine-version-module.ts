@@ -5,10 +5,11 @@ export function processEngineSupportsPagination(processEngineVersion: string): b
     return undefined;
   }
 
-  const processEngineVersionWithoutReleaseChannel: string = processEngineVersion.slice(
-    0,
-    processEngineVersion.indexOf('-'),
-  );
+  const processEngineIsNoStable: boolean = processEngineVersion.indexOf('-') !== -1;
+
+  const processEngineVersionWithoutReleaseChannel: string = processEngineIsNoStable
+    ? processEngineVersion.slice(0, processEngineVersion.indexOf('-'))
+    : processEngineVersion;
 
   const processEngineSemverVersion = new SemVer(processEngineVersionWithoutReleaseChannel);
 
