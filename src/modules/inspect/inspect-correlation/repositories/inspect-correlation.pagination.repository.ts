@@ -82,58 +82,16 @@ export class InspectCorrelationPaginationRepository extends InspectCorrelationRe
     );
   }
 
-  public async getProcessInstancesForProcessModel(
+  public getProcessInstancesForProcessModel(
     identity: IIdentity,
     processModelId: string,
     offset?: number,
     limit?: number,
   ): Promise<ProcessInstanceList> {
-    const result: DataModels.Correlations.CorrelationList = await this.managementApiService.getCorrelationsByProcessModelId(
-      identity,
-      processModelId,
-    );
-    const processInstances: Array<ProcessInstance> = [];
-
-    result.correlations.forEach((correlation: DataModels.Correlations.Correlation) => {
-      processInstances.push(
-        ...correlation.processInstances.map((instance: DataModels.Correlations.ProcessInstance) => {
-          instance.correlationId = correlation.id;
-
-          return instance;
-        }),
-      );
-    });
-
-    const paginizedProcessInstances = this.applyPagination(processInstances, offset, limit);
-
-    return {processInstances: paginizedProcessInstances, totalCount: processInstances.length};
+    return this.managementApiService.getProcessInstancesForProcessModel(identity, processModelId, offset, limit);
   }
 
-  public async getProcessInstancesById(
-    identity: IIdentity,
-    processInstanceId: string,
-    processModelId: string,
-  ): Promise<ProcessInstance> {
-    const result: DataModels.Correlations.CorrelationList = await this.managementApiService.getCorrelationsByProcessModelId(
-      identity,
-      processModelId,
-    );
-    const processInstances: Array<ProcessInstance> = [];
-
-    result.correlations.forEach((correlation: DataModels.Correlations.Correlation) => {
-      processInstances.push(
-        ...correlation.processInstances.map((instance: DataModels.Correlations.ProcessInstance) => {
-          instance.correlationId = correlation.id;
-
-          return instance;
-        }),
-      );
-    });
-
-    const processInstance = processInstances.find((instance: DataModels.Correlations.ProcessInstance) => {
-      return instance.processInstanceId === processInstanceId;
-    });
-
-    return processInstance;
+  public getProcessInstancesById(identity: IIdentity, processInstanceId: string): Promise<ProcessInstance> {
+    return this.managementApiService.getProcessInstanceById(identity, processInstanceId);
   }
 }
