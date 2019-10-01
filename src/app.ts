@@ -47,6 +47,8 @@ export class App {
       this.ipcRenderer.on('database-export-error', (event: Event, errorMessage: string) => {
         this.notificationService.showNotification(NotificationType.ERROR, errorMessage);
       });
+
+      this.ipcRenderer.send('update-tutorial-chapters', this.tutorialService.getAllChapters());
     }
   }
 

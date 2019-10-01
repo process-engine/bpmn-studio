@@ -1,5 +1,5 @@
 export type Chapter = {
   name: string;
-  description: string;
+  index: number;
   start: Function;
 };

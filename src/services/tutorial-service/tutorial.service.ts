@@ -49,14 +49,8 @@ export class TutorialService {
     this.chapters = [
       {
         name: 'Load, Deploy & Start',
-        description:
-          'In this chapter you will learn how to open a diagram, deploy it on a remote solution and how to start it.',
+        index: 0,
         start: this.startChapterOne,
-      },
-      {
-        name: 'Chapter Two: WIP',
-        description: 'This chapter is not yet implemented.',
-        start: this.startChapterTwo,
       },
     ];
   }
@@ -171,11 +165,6 @@ export class TutorialService {
       NotificationType.SUCCESS,
       `Good job! You finished the '${this.chapters[0].name}' chapter of the tutorial.`,
     );
-  };
-
-  private startChapterTwo: Function = (): void => {
-    this.hideAllModals();
-    this.notificationService.showNotification(NotificationType.INFO, 'This chapter is not yet implemented.');
   };
 
   private cancelTutorialIfClickWasOutsideOfHighlightedArea: (mouseEvent: MouseEvent) => void = (
