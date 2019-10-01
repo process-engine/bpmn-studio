@@ -36,7 +36,11 @@
               PageSize: 
             </div>
             <select class="form-control" style="width: 70px; margin: unset;" value.bind="pageSize">
-              <option repeat.for="size of pageSizes" model.bind="size">${size}</option>
+              <option model.bind="PageSize.twenty">${PageSize.twenty}</option>
+              <option model.bind="PageSize.fifty">${PageSize.fifty}</option>
+              <option model.bind="PageSize.hundred">${PageSize.hundred}</option>
+              <option model.bind="PageSize.twohundred">${PageSize.twohundred}</option>
+              <option model.bind="totalCount">${totalCount}</option>
             </select>
           </td>
           <td style="width: 70%">
