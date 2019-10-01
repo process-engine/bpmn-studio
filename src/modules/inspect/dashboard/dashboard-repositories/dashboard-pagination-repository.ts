@@ -3,6 +3,7 @@ import {IIdentity} from '@essential-projects/iam_contracts';
 
 import {DashboardRepository} from './dashboard-repository';
 import {IDashboardRepository, TaskList, TaskListEntry, TaskType} from '../contracts/index';
+import {applyPagination} from '../../../../services/pagination-module/pagination-module';
 
 export class DashboardPaginationRepository extends DashboardRepository implements IDashboardRepository {
   public getAllActiveProcessInstances(
@@ -20,6 +21,14 @@ export class DashboardPaginationRepository extends DashboardRepository implement
 
   public getProcessModels(identity: IIdentity): Promise<DataModels.ProcessModels.ProcessModelList> {
     return this.managementApiService.getProcessModels(identity);
+  }
+
+  public async getAllActiveCronjobs(
+    identity: IIdentity,
+    offset?: number,
+    limit?: number,
+  ): Promise<DataModels.Cronjobs.CronjobList> {
+    return this.managementApiService.getAllActiveCronjobs(identity, offset, limit);
   }
 
   public getActiveCorrelations(
