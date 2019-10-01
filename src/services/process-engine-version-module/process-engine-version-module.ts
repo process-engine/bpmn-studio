@@ -5,17 +5,15 @@ export function processEngineSupportsPagination(processEngineVersion: string): b
     return undefined;
   }
 
-  const processEngineIsNoStable: boolean = processEngineVersion.indexOf('-') !== -1;
+  return compareVersions(processEngineVersion, '9.0.0');
+}
 
-  const processEngineVersionWithoutReleaseChannel: string = processEngineIsNoStable
-    ? processEngineVersion.slice(0, processEngineVersion.indexOf('-'))
-    : processEngineVersion;
+function compareVersions(processEngineVersion: string, allowedVersion: string): boolean {
+  const solutionEntryPEVersion = new SemVer(processEngineVersion);
 
-  const processEngineSemverVersion = new SemVer(processEngineVersionWithoutReleaseChannel);
+  const allowedProcessEngineVersion = new SemVer(allowedVersion);
 
-  const firstVersionWithPagination = new SemVer('9.0.0');
-
-  return processEngineSemverVersion.compare(firstVersionWithPagination) >= 0;
+  return solutionEntryPEVersion.compare(allowedProcessEngineVersion) >= 0;
 }
 
 export function processEngineSupportsCronjobEvents(processEngineVersion): boolean {
