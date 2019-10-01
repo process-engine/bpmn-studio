@@ -178,7 +178,9 @@ export class TutorialService {
     this.notificationService.showNotification(NotificationType.INFO, 'This chapter is not yet implemented.');
   };
 
-  private cancelTutorialIfClickWasOutsideOfHighlightedArea(mouseEvent: MouseEvent): void {
+  private cancelTutorialIfClickWasOutsideOfHighlightedArea: (mouseEvent: MouseEvent) => void = (
+    mouseEvent: MouseEvent,
+  ) => {
     const clickedInHighlightedArea: boolean = this.checkIfMouseClickWasInHighlightedArea(mouseEvent);
     if (clickedInHighlightedArea) {
       return;
@@ -186,10 +188,10 @@ export class TutorialService {
 
     this.activePromise.cancel();
     this.driver.reset();
-  }
+  };
 
   private checkIfMouseClickWasInHighlightedArea(mouseEvent: MouseEvent): boolean {
-    const highlightedArea: HTMLElement = document.getElementById('driver-eded-element-stage');
+    const highlightedArea: HTMLElement = document.getElementById('driver-highlighted-element-stage');
     const highlightedAreaLeft: number = parseInt(highlightedArea.style.left.replace('px', ''));
     const highlightedAreaRight: number = highlightedAreaLeft + parseInt(highlightedArea.style.width.replace('px', ''));
 
