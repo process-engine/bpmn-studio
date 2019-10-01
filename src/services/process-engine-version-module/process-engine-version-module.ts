@@ -25,19 +25,7 @@ export function processEngineSupportsCronjobEvents(processEngineVersion): boolea
 
   const solutionEntryPEVersion = new SemVer(processEngineVersion);
 
-  const alphaVersionWithEvents = new SemVer('8.6.0-alpha.18');
-  const betaVersionWithEvents = new SemVer('8.6.0-beta.2');
-  const stableVersionWithEvents = new SemVer('8.6.0');
-
-  const solutionEntryIsAlpha: boolean = solutionEntryPEVersion.prerelease[0] === 'alpha';
-  const solutionEntryIsBeta: boolean = solutionEntryPEVersion.prerelease[0] === 'beta';
-
-  if (solutionEntryIsAlpha) {
-    return solutionEntryPEVersion.compare(alphaVersionWithEvents) >= 0;
-  }
-  if (solutionEntryIsBeta) {
-    return solutionEntryPEVersion.compare(betaVersionWithEvents) >= 0;
-  }
+  const stableVersionWithEvents = new SemVer('9.0.0');
 
   return solutionEntryPEVersion.compare(stableVersionWithEvents) >= 0;
 }
