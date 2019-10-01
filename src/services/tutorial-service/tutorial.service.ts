@@ -1,5 +1,5 @@
 import {inject} from 'aurelia-framework';
-import {EventAggregator} from 'aurelia-event-aggregator';
+import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {Router} from 'aurelia-router';
 
 import Driver from 'driver.js';
@@ -28,13 +28,10 @@ export class TutorialService {
     this.router = router;
 
     this.driver = new Driver({
-      allowClose: true,
+      allowClose: false,
       animate: false,
       showButtons: false,
-      padding: 2,
-      onDeselected: async (): Promise<void> => {
-        this.activePromise.cancel();
-      },
+      padding: 0,
     });
 
     this.initializeChapters();
@@ -51,7 +48,7 @@ export class TutorialService {
   private initializeChapters(): void {
     this.chapters = [
       {
-        name: 'Chapter One: Load, Deploy & Start',
+        name: 'Load, Deploy & Start',
         description:
           'In this chapter you will learn how to open a diagram, deploy it on a remote solution and how to start it.',
         start: this.startChapterOne,
@@ -65,6 +62,7 @@ export class TutorialService {
   }
 
   private startChapterOne: Function = async (): Promise<void> => {
+    document.addEventListener('click', this.cancelTutorialIfClickWasOutsideOfHighlightedArea);
     this.hideAllModals();
 
     this.activePromise = this.navigateToStartView();
@@ -78,30 +76,79 @@ export class TutorialService {
       element: openDiagramElementId,
       popover: {
         title: 'Open a diagram',
-        description: 'At first you need to open a new diagram via this button.',
+        description: 'At first you need to open a new diagram by clicking on this button.',
       },
     });
 
     this.activePromise = this.waitUntilDiagramIsOpen();
     await this.activePromise;
 
-    this.activePromise = this.waitUntilOverlayIsGone();
-    await this.activePromise;
-
     this.driver.highlight({
       element: deployDiagramElementId,
       popover: {
         title: 'Deploy the diagram',
-        description: 'Then deploy the diagram to a remote solution, by pressing this button.',
+        description: 'Then deploy the diagram to a remote solution, by clicking on this button.',
         position: 'left',
       },
     });
 
+    const highlightMultipleConnectedProcessEnginesModal: () => Promise<void> = async () => {
+      this.driver.highlight({
+        element: '#select-remote-solution-modal',
+        popover: {
+          title: 'Select a remote solution',
+          description:
+            "When multiple remote solutions are opened you have to choose a remote solution. Select a solution via the selection and click on the 'Deploy process' button.",
+        },
+      });
+
+      const modalWasCanceled: boolean = !(await this.waitForMultipleConnectedProcessEnginesModalToFinish());
+
+      if (modalWasCanceled) {
+        this.activePromise.cancel();
+      }
+
+      this.driver.reset();
+    };
+
+    const highlightDiagramAlreadyExistsModal: () => Promise<void> = async () => {
+      this.driver.highlight({
+        element: '#overwrite-deployed-diagram-modal',
+        popover: {
+          title: 'Overwrite existing diagram',
+          description:
+            "When a diagram with that name already exists you have to confirm that it gets overwritten. Hit the 'Continue' button to do so.",
+        },
+      });
+
+      const modalWasCanceled: boolean = !(await this.waitForDiagramAlreadyExistsModalToFinish());
+
+      if (modalWasCanceled) {
+        this.activePromise.cancel();
+      }
+
+      this.driver.reset();
+    };
+
+    const multipleConnectedProcessEnginesModalPromise: any = this.waitForMultipleConnectedProcessEnginesModalToStart().then(
+      highlightMultipleConnectedProcessEnginesModal,
+    );
+    const diagramAlreadyExistsModalPromise: any = this.waitForDiagramAlreadyExistsModalToStart().then(
+      highlightDiagramAlreadyExistsModal,
+    );
+
+    const cancelModalPromises: () => void = () => {
+      multipleConnectedProcessEnginesModalPromise.cancel();
+      diagramAlreadyExistsModalPromise.cancel();
+    };
+
     this.activePromise = this.waitUntilDiagramIsDeployed();
     await this.activePromise;
 
-    this.activePromise = this.waitUntilOverlayIsGone();
-    await this.activePromise;
+    cancelModalPromises();
+
+    this.driver.reset();
+    await this.waitUntilOverlayIsGone();
 
     this.driver.highlight({
       element: startDiagramElementId,
@@ -117,12 +164,46 @@ export class TutorialService {
     this.driver.reset();
     this.activePromise = this.waitUntilOverlayIsGone();
     await this.activePromise;
+
+    document.removeEventListener('click', this.cancelTutorialIfClickWasOutsideOfHighlightedArea);
+
+    this.notificationService.showNotification(
+      NotificationType.SUCCESS,
+      `Good job! You finished the '${this.chapters[0].name}' chapter of the tutorial.`,
+    );
   };
 
   private startChapterTwo: Function = (): void => {
     this.hideAllModals();
     this.notificationService.showNotification(NotificationType.INFO, 'This chapter is not yet implemented.');
   };
+
+  private cancelTutorialIfClickWasOutsideOfHighlightedArea(mouseEvent: MouseEvent): void {
+    const clickedInHighlightedArea: boolean = this.checkIfMouseClickWasInHighlightedArea(mouseEvent);
+    if (clickedInHighlightedArea) {
+      return;
+    }
+
+    this.activePromise.cancel();
+    this.driver.reset();
+  }
+
+  private checkIfMouseClickWasInHighlightedArea(mouseEvent: MouseEvent): boolean {
+    const highlightedArea: HTMLElement = document.getElementById('driver-eded-element-stage');
+    const highlightedAreaLeft: number = parseInt(highlightedArea.style.left.replace('px', ''));
+    const highlightedAreaRight: number = highlightedAreaLeft + parseInt(highlightedArea.style.width.replace('px', ''));
+
+    const highlightedAreaTop: number = parseInt(highlightedArea.style.top.replace('px', ''));
+    const highlightedAreaBottom: number = highlightedAreaTop + parseInt(highlightedArea.style.height.replace('px', ''));
+
+    const clickedInsideHighlightedElementArea: boolean =
+      highlightedAreaLeft <= mouseEvent.x &&
+      highlightedAreaRight >= mouseEvent.x &&
+      highlightedAreaTop <= mouseEvent.y &&
+      highlightedAreaBottom >= mouseEvent.y;
+
+    return clickedInsideHighlightedElementArea;
+  }
 
   private hideAllModals(): void {
     this.eventAggregator.publish(environment.events.hideAllModals);
@@ -136,10 +217,21 @@ export class TutorialService {
     });
   }
 
-  private waitUntilDiagramIsDeployed(): Promise<void> {
-    return new Bluebird.Promise((resolve: Function): void => {
-      this.eventAggregator.subscribeOnce(environment.events.tutorial.diagramDeployed, () => {
-        resolve();
+  private waitUntilDiagramIsDeployed(cancelCallback?: Function): Promise<void> {
+    return new Bluebird.Promise((resolve: Function, reject: Function, onCancel: Function): void => {
+      const subscription: Subscription = this.eventAggregator.subscribeOnce(
+        environment.events.tutorial.diagramDeployed,
+        () => {
+          resolve();
+        },
+      );
+
+      onCancel(() => {
+        subscription.dispose();
+
+        if (cancelCallback) {
+          cancelCallback();
+        }
       });
     });
   }
@@ -178,6 +270,47 @@ export class TutorialService {
       this.eventAggregator.subscribeOnce('router:navigation:success', () => {
         resolve();
       });
+    });
+  }
+
+  private waitForMultipleConnectedProcessEnginesModalToStart(): Promise<void> {
+    return new Bluebird.Promise((resolve: Function): void => {
+      this.eventAggregator.subscribeOnce(
+        environment.events.tutorial.multipleConnectedProcessEnginesModalStarted,
+        () => {
+          resolve();
+        },
+      );
+    });
+  }
+
+  private waitForMultipleConnectedProcessEnginesModalToFinish(): Promise<boolean> {
+    return new Bluebird.Promise((resolve: Function): void => {
+      this.eventAggregator.subscribeOnce(
+        environment.events.tutorial.multipleConnectedProcessEnginesModalFinished,
+        (success: boolean) => {
+          resolve(success);
+        },
+      );
+    });
+  }
+
+  private waitForDiagramAlreadyExistsModalToStart(): Promise<void> {
+    return new Bluebird.Promise((resolve: Function): void => {
+      this.eventAggregator.subscribeOnce(environment.events.tutorial.diagramAlreadyExistsModalStarted, () => {
+        resolve();
+      });
+    });
+  }
+
+  private waitForDiagramAlreadyExistsModalToFinish(): Promise<boolean> {
+    return new Bluebird.Promise((resolve: Function): void => {
+      this.eventAggregator.subscribeOnce(
+        environment.events.tutorial.diagramAlreadyExistsModalFinished,
+        (success: boolean) => {
+          resolve(success);
+        },
+      );
     });
   }
 }

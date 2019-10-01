@@ -16,7 +16,14 @@ import {OpenDiagramsSolutionExplorerService} from '../../../../services/solution
 import {OpenDiagramStateService} from '../../../../services/solution-explorer-services/OpenDiagramStateService';
 import environment from '../../../../environment';
 
-@inject('NotificationService', 'OpenDiagramStateService', Router, 'OpenDiagramService', 'SolutionService')
+@inject(
+  'NotificationService',
+  'OpenDiagramStateService',
+  Router,
+  'OpenDiagramService',
+  'SolutionService',
+  EventAggregator,
+)
 export class DeleteDiagramModal {
   @bindable public activeDiagram: IDiagram;
   public showModal: boolean = false;

@@ -455,8 +455,6 @@ export class DiagramDetail {
     const xml: string | undefined = this.diagramHasChanged ? await this.bpmnio.getXML() : undefined;
 
     await this.deployDiagramService.deployDiagram(this.activeDiagram, xml);
-
-    this.eventAggregator.publish(environment.events.tutorial.diagramDeployed);
   }
 
   /**
