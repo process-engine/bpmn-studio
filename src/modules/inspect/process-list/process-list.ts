@@ -35,8 +35,8 @@ export class ProcessList {
   private processInstances: Array<DataModels.Correlations.ProcessInstance> = [];
   private stoppedProcessInstances: Array<DataModels.Correlations.ProcessInstance> = [];
 
-  private limit: number = this.pageSize;
-  private offset: number = 0;
+  private amountOfActiveProcessInstancesToDisplay: number = this.pageSize;
+  private amountOfActiveProcessInstancesToSkip: number = 0;
 
   private updatePromise: any;
 
@@ -85,15 +85,16 @@ export class ProcessList {
     if (newValue > oldValue && oldValue > 0) {
       const skippedPages: number = Math.abs(newValue - oldValue) - 1;
 
-      this.offset += this.limit + skippedPages * this.pageSize;
+      this.amountOfActiveProcessInstancesToSkip +=
+        this.amountOfActiveProcessInstancesToDisplay + skippedPages * this.pageSize;
     } else {
       const paginationGetsDisplayed: boolean = this.currentPage > 0;
       const pageIndex: number = paginationGetsDisplayed ? this.currentPage - 1 : 0;
 
-      this.offset = pageIndex * this.pageSize;
+      this.amountOfActiveProcessInstancesToSkip = pageIndex * this.pageSize;
     }
 
-    this.limit = this.pageSize;
+    this.amountOfActiveProcessInstancesToDisplay = this.pageSize;
 
     this.updateProcessInstanceList();
   }
@@ -163,7 +164,7 @@ export class ProcessList {
 
       this.stoppedProcessInstances.push(processInstance);
 
-      this.limit--;
+      this.amountOfActiveProcessInstancesToDisplay--;
 
       this.updateProcessInstancesToDisplay();
     } catch (error) {
@@ -222,7 +223,7 @@ export class ProcessList {
   private async getActiveProcessInstancesForCurrentPage(): Promise<DataModels.Correlations.ProcessInstanceList> {
     const identity: IIdentity = this.activeSolutionEntry.identity;
 
-    const shouldOnlyDisplayStoppedProcessInstances: boolean = this.limit === 0;
+    const shouldOnlyDisplayStoppedProcessInstances: boolean = this.amountOfActiveProcessInstancesToDisplay === 0;
     if (shouldOnlyDisplayStoppedProcessInstances) {
       return undefined;
     }
@@ -232,8 +233,8 @@ export class ProcessList {
         try {
           const activeProcessInstances = await this.dashboardService.getAllActiveProcessInstances(
             identity,
-            this.offset,
-            this.limit,
+            this.amountOfActiveProcessInstancesToSkip,
+            this.amountOfActiveProcessInstancesToDisplay,
           );
 
           resolve(activeProcessInstances);
