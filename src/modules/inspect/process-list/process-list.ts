@@ -72,8 +72,8 @@ export class ProcessList {
   }
 
   public async currentPageChanged(newValue: number, oldValue: number): Promise<void> {
-    const oldValueIsNotDefined: boolean = oldValue === undefined || oldValue === null;
-    if (oldValueIsNotDefined) {
+    const isInitialEvent: boolean = oldValue === undefined || oldValue === null;
+    if (isInitialEvent) {
       return;
     }
 
