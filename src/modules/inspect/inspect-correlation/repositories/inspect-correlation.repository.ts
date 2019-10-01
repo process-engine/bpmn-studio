@@ -21,10 +21,9 @@ export class InspectCorrelationRepository implements IInspectCorrelationReposito
     offset?: number,
     limit?: number,
   ): Promise<DataModels.Correlations.CorrelationList> {
-    const result = ((await this.managementApiService.getCorrelationsByProcessModelId(
-      identity,
-      processModelId,
-    )) as unknown) as Array<DataModels.Correlations.Correlation>;
+    const result: Array<
+      DataModels.Correlations.Correlation
+    > = (await this.managementApiService.getCorrelationsByProcessModelId(identity, processModelId)) as any;
 
     const paginizedCorrelations = applyPagination(result, offset, limit);
 
@@ -98,24 +97,9 @@ export class InspectCorrelationRepository implements IInspectCorrelationReposito
     offset?: number,
     limit?: number,
   ): Promise<ProcessInstanceList> {
-    const result = ((await this.managementApiService.getCorrelationsByProcessModelId(
-      identity,
-      processModelId,
-    )) as unknown) as Array<DataModels.Correlations.Correlation>;
+    const processInstances = await this.getMappedProcessInstances(identity, processModelId);
 
-    const processInstances: Array<ProcessInstance> = [];
-
-    result.forEach((correlation: DataModels.Correlations.Correlation) => {
-      processInstances.push(
-        ...correlation.processInstances.map((instance: DataModels.Correlations.ProcessInstance) => {
-          instance.correlationId = correlation.id;
-
-          return instance;
-        }),
-      );
-    });
-
-    const paginizedProcessInstances = this.applyPagination(processInstances, offset, limit);
+    const paginizedProcessInstances = applyPagination(processInstances, offset, limit);
 
     return {processInstances: paginizedProcessInstances, totalCount: processInstances.length};
   }
@@ -125,10 +109,22 @@ export class InspectCorrelationRepository implements IInspectCorrelationReposito
     processInstanceId: string,
     processModelId: string,
   ): Promise<ProcessInstance> {
-    const result = ((await this.managementApiService.getCorrelationsByProcessModelId(
-      identity,
-      processModelId,
-    )) as unknown) as Array<DataModels.Correlations.Correlation>;
+    const processInstances = await this.getMappedProcessInstances(identity, processModelId);
+
+    const processInstance = processInstances.find((instance: DataModels.Correlations.ProcessInstance) => {
+      return instance.processInstanceId === processInstanceId;
+    });
+
+    return processInstance;
+  }
+
+  private async getMappedProcessInstances(
+    identity: IIdentity,
+    processModelId: string,
+  ): Promise<Array<ProcessInstance>> {
+    const result: Array<
+      DataModels.Correlations.Correlation
+    > = (await this.managementApiService.getCorrelationsByProcessModelId(identity, processModelId)) as any;
 
     const processInstances: Array<ProcessInstance> = [];
 
@@ -142,24 +138,6 @@ export class InspectCorrelationRepository implements IInspectCorrelationReposito
       );
     });
 
-    const processInstance = processInstances.find((instance: DataModels.Correlations.ProcessInstance) => {
-      return instance.processInstanceId === processInstanceId;
-    });
-
-    return processInstance;
-  }
-
-  public applyPagination<TList>(list: Array<TList>, offset: number, limit: number): Array<TList> {
-    const paginatedList: Array<TList> = list.slice();
-
-    if (offset > 0) {
-      paginatedList.splice(0, offset);
-    }
-
-    if (limit > 0) {
-      paginatedList.splice(limit, paginatedList.length - limit);
-    }
-
-    return paginatedList;
+    return processInstances;
   }
 }
