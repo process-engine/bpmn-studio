@@ -45,7 +45,7 @@ export class InspectCorrelation {
   private eventAggregator: EventAggregator;
   private subscriptions: Array<Subscription>;
 
-  private handlerPromise: any;
+  private updatePromise: any;
 
   constructor(inspectCorrelationService: IInspectCorrelationService, eventAggregator: EventAggregator) {
     this.inspectCorrelationService = inspectCorrelationService;
@@ -53,9 +53,6 @@ export class InspectCorrelation {
   }
 
   public async attached(): Promise<void> {
-    if (this.handlerPromise) {
-      this.handlerPromise.cancel();
-    }
     this.updateProcessInstances();
 
     this.eventAggregator.publish(environment.events.statusBar.showInspectCorrelationButtons, true);
@@ -78,9 +75,7 @@ export class InspectCorrelation {
         const {pageSize, currentPage} = payload;
         this.offset = (currentPage - 1) * pageSize;
         this.limit = pageSize;
-        if (this.handlerPromise) {
-          this.handlerPromise.cancel();
-        }
+
         await this.updateProcessInstances();
       }),
     ];
@@ -153,7 +148,11 @@ export class InspectCorrelation {
   }
 
   private getProcessInstacesForProcessModel(): Promise<DataModels.Correlations.ProcessInstanceList> {
-    this.handlerPromise = new Bluebird.Promise(
+    if (this.updatePromise) {
+      this.updatePromise.cancel();
+    }
+
+    this.updatePromise = new Bluebird.Promise(
       async (resolve: Function, reject: Function): Promise<any> => {
         try {
           const processInstances = await this.inspectCorrelationService.getProcessInstancesForProcessModel(
@@ -189,7 +188,7 @@ export class InspectCorrelation {
       },
     );
 
-    return this.handlerPromise;
+    return this.updatePromise;
   }
 
   public detached(): void {
@@ -204,9 +203,7 @@ export class InspectCorrelation {
     if (this.viewIsAttached) {
       this.offset = 0;
       this.limit = 50;
-      if (this.handlerPromise) {
-        this.handlerPromise.cancel();
-      }
+
       this.updateProcessInstances();
     }
   }
