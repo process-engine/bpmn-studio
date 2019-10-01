@@ -64,6 +64,21 @@
   text-transform: uppercase;
 }
 
+.correlation-table__pagesize-entry {
+  float: left;
+  margin-top: 5px;
+  margin-right: 5px;
+}
+
+.correlation-table__pagesize-entry--select {
+  width: 70px;
+  margin: unset;
+}
+
+.correlation-table__pagination-entry {
+  width: 70%;
+}
+
 .correlation-table__selected-entry {
   background-color: #d3d3d3 !important;
 }

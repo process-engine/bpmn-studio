@@ -30,12 +30,12 @@
           <td if.bind="false" class="correlation-table__table-entry">${tableEntry.user}</td>
           <td class="correlation-table__table-entry">${tableEntry.processInstanceId}</td>
         </tr>
-        <tr if.bind="totalCount > 20" style="display: flex; width: 100%;">
+        <tr if.bind="totalCount > 20" class="correlation-table__table-row">
           <td>
-            <div style="float: left; margin-top: 5px; margin-right: 5px;">
+            <div class="correlation-table__pagesize-entry">
               PageSize: 
             </div>
-            <select class="form-control" style="width: 70px; margin: unset;" value.bind="pageSize">
+            <select class="form-control correlation-table__pagesize-entry--select" value.bind="pageSize">
               <option model.bind="PageSize.twenty">${PageSize.twenty}</option>
               <option model.bind="PageSize.fifty">${PageSize.fifty}</option>
               <option model.bind="PageSize.hundred">${PageSize.hundred}</option>
@@ -43,7 +43,7 @@
               <option model.bind="totalCount">${totalCount}</option>
             </select>
           </td>
-          <td style="width: 70%">
+          <td class="correlation-table__pagination-entry">
             <aubs-pagination page-size.bind="pageSize" total-items.bind="totalCount" current-page.bind="currentPage" boundary-links.bind="true" pagination-size.bind="paginationSize"></aubs-pagination>
           </td>
         </tr>
