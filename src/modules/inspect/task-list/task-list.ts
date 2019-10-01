@@ -270,7 +270,9 @@ export class TaskList {
 
   private async updateTasks(): Promise<void> {
     try {
-      const pageIndex: number = Math.max(this.currentPage - 1, 0);
+      const paginationGetsDisplayed: boolean = this.currentPage > 0;
+      const pageIndex: number = paginationGetsDisplayed ? this.currentPage - 1 : 0;
+
       const taskOffset: number = pageIndex * this.pageSize;
 
       this.updatePromise = this.getTasks(taskOffset, this.pageSize);

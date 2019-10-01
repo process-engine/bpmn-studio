@@ -87,7 +87,8 @@ export class ProcessList {
 
       this.offset += this.limit + skippedPages * this.pageSize;
     } else {
-      const pageIndex: number = Math.max(this.currentPage - 1, 0);
+      const paginationGetsDisplayed: boolean = this.currentPage > 0;
+      const pageIndex: number = paginationGetsDisplayed ? this.currentPage - 1 : 0;
 
       this.offset = pageIndex * this.pageSize;
     }

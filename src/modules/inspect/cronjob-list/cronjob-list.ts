@@ -107,7 +107,9 @@ export class CronjobList {
   private getCronjobList(): Promise<DataModels.Cronjobs.CronjobList> {
     return new Bluebird.Promise(
       async (resolve: Function, reject: Function): Promise<void> => {
-        const pageIndex: number = Math.max(this.currentPage - 1, 0);
+        const paginationGetsDisplayed: boolean = this.currentPage > 0;
+        const pageIndex: number = paginationGetsDisplayed ? this.currentPage - 1 : 0;
+
         const cronjobOffset: number = pageIndex * this.pageSize;
 
         try {
