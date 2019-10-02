@@ -22,6 +22,7 @@ export enum PageSize {
 @inject(EventAggregator)
 export class CorrelationList {
   @bindable public processInstanceToSelect: DataModels.Correlations.ProcessInstance;
+  @bindable public processInstanceToSelectTableEntry: ICorrelationTableEntry;
   @bindable public selectedProcessInstance: DataModels.Correlations.ProcessInstance;
   @bindable @observable public correlations: Array<DataModels.Correlations.ProcessInstance>;
   @bindable public activeDiagram: IDiagram;
@@ -87,11 +88,22 @@ export class CorrelationList {
 
     const processInstanceToSelectExists: boolean = this.processInstanceToSelect !== undefined;
     if (processInstanceToSelectExists) {
-      const entryToSelect: ICorrelationTableEntry = this.sortedTableData.find((entry: ICorrelationTableEntry) => {
-        return entry.processInstanceId === this.processInstanceToSelect;
-      });
+      const instanceAlreadyExistInList: ICorrelationTableEntry = this.sortedTableData.find(
+        (processInstance: ICorrelationTableEntry) => {
+          return processInstance.processInstanceId === this.processInstanceToSelect.processInstanceId;
+        },
+      );
 
-      this.selectCorrelation(entryToSelect);
+      if (!instanceAlreadyExistInList) {
+        const processInstanceToSelectTableEntry: Array<
+          ICorrelationTableEntry
+        > = this.convertProcessInstancesIntoTableData([this.processInstanceToSelect]);
+
+        this.processInstanceToSelectTableEntry = processInstanceToSelectTableEntry[0];
+        this.selectCorrelation(this.processInstanceToSelectTableEntry);
+      } else {
+        this.processInstanceToSelectTableEntry = undefined;
+      }
 
       this.processInstanceToSelect = undefined;
     }
@@ -212,6 +224,6 @@ export class CorrelationList {
       },
     );
 
-    return processInstanceForTableEntry;
+    return processInstanceForTableEntry || this.processInstanceToSelect;
   }
 }
