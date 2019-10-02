@@ -9,33 +9,40 @@ import 'bootstrap';
 
 import {OpenIdConnect} from 'aurelia-open-id-connect';
 
-import {IAuthenticationService, NotificationType} from './contracts/index';
+import {NotificationType} from './contracts/index';
 import environment from './environment';
 import {NotificationService} from './services/notification-service/notification.service';
 
 import {oidcConfig} from './open-id-connect-configuration';
-@inject(OpenIdConnect, 'AuthenticationService', 'NotificationService', EventAggregator)
+@inject(OpenIdConnect, 'NotificationService', EventAggregator)
 export class App {
   public showSolutionExplorer: boolean = false;
 
   private openIdConnect: OpenIdConnect | any;
-  private authenticationService: IAuthenticationService;
   private notificationService: NotificationService;
   private eventAggregator: EventAggregator;
   private subscriptions: Array<Subscription>;
 
   private preventDefaultBehaviour: EventListener;
+  private ipcRenderer: any | null = null;
+  private router: Router;
 
   constructor(
     openIdConnect: OpenIdConnect,
-    authenticationService: IAuthenticationService,
     notificationService: NotificationService,
     eventAggregator: EventAggregator,
   ) {
     this.openIdConnect = openIdConnect;
-    this.authenticationService = authenticationService;
     this.notificationService = notificationService;
     this.eventAggregator = eventAggregator;
+
+    if (this.isRunningInElectron) {
+      this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
+
+      this.ipcRenderer.on('database-export-error', (event: Event, errorMessage: string) => {
+        this.notificationService.showNotification(NotificationType.ERROR, errorMessage);
+      });
+    }
   }
 
   public activate(): void {
@@ -44,9 +51,7 @@ export class App {
     this.preventDefaultBehaviour = (event: Event): boolean => {
       event.preventDefault();
 
-      const isRunningInBrowser: boolean = Boolean(!(window as any).nodeRequire);
-
-      if (isRunningInBrowser) {
+      if (!this.isRunningInElectron) {
         this.notificationService.showNotification(
           NotificationType.INFO,
           'Drag-and-Drop is currently only available for the Electron application.',
@@ -64,14 +69,18 @@ export class App {
     window.localStorage.setItem('SolutionExplorerVisibility', showSolutionExplorer);
 
     this.subscriptions = [
-      this.eventAggregator.subscribe(environment.events.processSolutionPanel.toggleProcessSolutionExplorer, () => {
-        this.showSolutionExplorer = !this.showSolutionExplorer;
-        if (this.showSolutionExplorer) {
-          window.localStorage.setItem('SolutionExplorerVisibility', 'true');
-        } else {
-          window.localStorage.setItem('SolutionExplorerVisibility', 'false');
-        }
-      }),
+      this.eventAggregator.subscribe(
+        environment.events.solutionExplorerPanel.toggleSolutionExplorer,
+        (show: boolean) => {
+          this.showSolutionExplorer = show;
+
+          if (this.showSolutionExplorer) {
+            window.localStorage.setItem('SolutionExplorerVisibility', 'true');
+          } else {
+            window.localStorage.setItem('SolutionExplorerVisibility', 'false');
+          }
+        },
+      ),
     ];
 
     /*
@@ -99,6 +108,10 @@ export class App {
 
       oidcConfig.userManagerSettings.authority = openIdConnectRoute;
     }
+
+    if (this.isRunningInElectron) {
+      this.ipcRenderer.on('menubar__open_preferences', this.openPreferences);
+    }
   }
 
   public deactivate(): void {
@@ -108,6 +121,14 @@ export class App {
     this.disposeAllSubscriptions();
   }
 
+  private openPreferences = async (_: Event): Promise<void> => {
+    this.router.navigateToRoute('preferences');
+  };
+
+  private get isRunningInElectron(): boolean {
+    return Boolean((window as any).nodeRequire);
+  }
+
   private disposeAllSubscriptions(): void {
     this.subscriptions.forEach((subscription: Subscription) => {
       subscription.dispose();
@@ -115,9 +136,7 @@ export class App {
   }
 
   public configureRouter(config: RouterConfiguration, router: Router): void {
-    const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
-
-    if (!isRunningInElectron) {
+    if (!this.isRunningInElectron) {
       config.options.pushState = true;
       config.options.baseRoute = '/';
     }
@@ -214,9 +233,16 @@ export class App {
         nav: 2,
         href: '',
       },
+      {
+        route: 'preferences',
+        title: 'Preferences',
+        name: 'preferences',
+        moduleId: 'modules/user-preferences/user-preferences',
+      },
     ]);
 
     this.openIdConnect.configure(config);
+    this.router = router;
   }
 
   private migrateOpenDiagramStatesInLocalStorage(): void {

@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "outDir": "../dist/test-integration",
+    "sourceMap": false,
+    "target": "esnext",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "lib": ["esnext", "dom"]
+  },
+  "filesGlob": [
+    "./**/*.ts"
+  ]
+}

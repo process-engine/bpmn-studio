@@ -63,11 +63,6 @@ export class Inspect {
         window.localStorage.getItem('InternalProcessEngineRoute'),
       );
 
-      this.notificationService.showNotification(
-        NotificationType.INFO,
-        'There is currently no runtime information about this process available.',
-      );
-
       return true;
     }
 
@@ -102,14 +97,6 @@ export class Inspect {
       this.showDashboard = true;
       this.showInspectCorrelation = false;
 
-      setTimeout(() => {
-        const dashboardIsAttached: boolean = this.dashboard !== undefined;
-
-        if (dashboardIsAttached) {
-          this.dashboard.canActivate(this.activeSolutionEntry);
-        }
-      }, 0);
-
       this.eventAggregator.publish(environment.events.navBar.toggleDashboardView);
     } else if (routeViewIsHeatmap) {
       this.eventAggregator.publish(environment.events.navBar.toggleHeatmapView);
@@ -142,12 +129,6 @@ export class Inspect {
   }
 
   public attached(): void {
-    const dashboardIsAttached: boolean = this.dashboard !== undefined;
-
-    if (dashboardIsAttached) {
-      this.dashboard.canActivate(this.activeSolutionEntry);
-    }
-
     this.subscriptions = [
       this.eventAggregator.subscribe(
         environment.events.inspect.shouldDisableTokenViewerButton,

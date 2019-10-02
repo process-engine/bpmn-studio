@@ -1,0 +1,12 @@
+<template>
+  <require from="./user-preferences.css"></require>
+  <div class="user-preferences">
+    <div class="user-preferences__title">
+      <h1>Preferences</h1>
+    </div>
+
+    <textarea class="form-control user-preferences__input" value.bind="preferences"></textarea>
+    <button class="btn btn-primary" click.delegate="save()">Save</button>
+
+  </div>
+</template>

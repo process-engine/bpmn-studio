@@ -4,7 +4,7 @@
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {bindable, bindingMode, inject, observable} from 'aurelia-framework';
 
-import {IModdleElement, IProcessRef, IPropertiesElement, IShape} from '@process-engine/bpmn-elements_contracts';
+import {IModdleElement, IPropertiesElement, IShape} from '@process-engine/bpmn-elements_contracts';
 import * as bundle from '@process-engine/bpmn-js-custom-bundle';
 import * as bpmnlintConfig from '@process-engine/bpmn-lint_rules';
 
@@ -35,9 +35,11 @@ import {NotificationService} from '../../../services/notification-service/notifi
 import {OpenDiagramStateService} from '../../../services/solution-explorer-services/OpenDiagramStateService';
 import {PropertyPanel} from '../property-panel/property-panel';
 import {DiagramExportService, DiagramPrintService} from './services/index';
+import {UserConfigService} from '../../../services/user-config-service/userconfig.service';
 
 const sideBarRightSize: number = 35;
-@inject('NotificationService', EventAggregator, 'OpenDiagramStateService', 'SolutionService')
+
+@inject('NotificationService', EventAggregator, 'OpenDiagramStateService', 'SolutionService', 'UserConfigService')
 export class BpmnIo {
   @bindable public propertyPanelViewModel: PropertyPanel;
   public modeler: IBpmnModeler;
@@ -61,6 +63,7 @@ export class BpmnIo {
   public diagramIsInvalid: boolean = false;
   public diagramHasChanged: boolean = false;
   public saveStateForNewUri: boolean = false;
+  public linterIsActive: boolean = true;
 
   private bpmnLintButton: HTMLElement;
   private linting: ILinting;
@@ -77,17 +80,20 @@ export class BpmnIo {
   private diagramPrintService: IDiagramPrintService;
   private openDiagramStateService: OpenDiagramStateService;
   private solutionService: ISolutionService;
+  private userConfigService: UserConfigService;
 
   constructor(
     notificationService: NotificationService,
     eventAggregator: EventAggregator,
     openDiagramStateService: OpenDiagramStateService,
     solutionService: ISolutionService,
+    userConfigService: UserConfigService,
   ) {
     this.notificationService = notificationService;
     this.eventAggregator = eventAggregator;
     this.openDiagramStateService = openDiagramStateService;
     this.solutionService = solutionService;
+    this.userConfigService = userConfigService;
   }
 
   public created(): void {
@@ -196,6 +202,8 @@ export class BpmnIo {
   }
 
   public async attached(): Promise<void> {
+    this.linterIsActive = this.userConfigService.getUserConfig('design.activate_linter');
+
     if (this.diagramHasState(this.diagramUri)) {
       const diagramState: IDiagramState = this.loadDiagramState(this.diagramUri);
 
@@ -257,9 +265,14 @@ export class BpmnIo {
     this.hideOrShowPpForSpaceReasons();
 
     this.subscriptions = [
-      this.eventAggregator.subscribe(environment.events.processSolutionPanel.toggleProcessSolutionExplorer, () => {
-        this.hideOrShowPpForSpaceReasons();
-      }),
+      this.eventAggregator.subscribe(
+        environment.events.solutionExplorerPanel.toggleSolutionExplorer,
+        (showSolutionExplorer: boolean) => {
+          this.setDjsPaletteLeftStyle(showSolutionExplorer);
+
+          this.hideOrShowPpForSpaceReasons();
+        },
+      ),
 
       this.eventAggregator.subscribe(`${environment.events.diagramDetail.exportDiagramAs}:BPMN`, async () => {
         try {
@@ -418,6 +431,9 @@ export class BpmnIo {
     }
 
     bpmnIoPaletteContainer.className += ' djs-palette-override';
+
+    const showSolutionExplorer: boolean = localStorage.getItem('SolutionExplorerVisibility') !== 'false';
+    this.setDjsPaletteLeftStyle(showSolutionExplorer);
   }
 
   public async saveCurrentXML(): Promise<void> {
@@ -588,6 +604,10 @@ export class BpmnIo {
   }
 
   private async validateDiagram(): Promise<void> {
+    if (!this.linterIsActive) {
+      return;
+    }
+
     const validationResult: IValidateResult = await this.linting.lint();
     this.linting.update();
 
@@ -887,6 +907,15 @@ export class BpmnIo {
     } else if (this.propertyPanelHiddenForSpaceReasons) {
       this.showPropertyPanelForSpaceReasons();
     }
+  }
+
+  private setDjsPaletteLeftStyle(solutionExplorerIsActive: boolean): void {
+    const bpmnIoPaletteContainer: HTMLElement = this.canvasModel.getElementsByClassName(
+      'djs-palette',
+    )[0] as HTMLElement;
+    const djsPaletteLeft: number = solutionExplorerIsActive ? 250 : 0;
+
+    bpmnIoPaletteContainer.style.left = `${djsPaletteLeft}px`;
   }
 
   /**

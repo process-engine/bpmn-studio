@@ -12,6 +12,10 @@ export class ScriptTaskSection implements ISection {
   public canHandleElement: boolean = false;
   public businessObjInPanel: IScriptTaskElement;
 
+  public showModal: boolean = false;
+
+  public scriptInput: HTMLElement;
+
   private eventAggregator: EventAggregator;
 
   constructor(eventAggregator?: EventAggregator) {
@@ -20,6 +24,16 @@ export class ScriptTaskSection implements ISection {
 
   public activate(model: IPageModel): void {
     this.businessObjInPanel = model.elementInPanel.businessObject;
+  }
+
+  public attached(): void {
+    this.recoverInputHeight();
+
+    this.saveInputHeightOnChange();
+  }
+
+  public detached(): void {
+    this.scriptInput.removeEventListener('mousedown', this.saveInputHeightOnMouseUp);
   }
 
   public isSuitableForElement(element: IShape): boolean {
@@ -37,6 +51,22 @@ export class ScriptTaskSection implements ISection {
       element.businessObject.$type === 'bpmn:ScriptTask'
     );
   }
+
+  private saveInputHeightOnChange(): void {
+    this.scriptInput.addEventListener('mousedown', this.saveInputHeightOnMouseUp);
+  }
+
+  private recoverInputHeight(): void {
+    this.scriptInput.style.height = `${localStorage.getItem('scriptTaskInputHeight')}px`;
+  }
+
+  private saveInputHeightOnMouseUp: EventListenerOrEventListenerObject = () => {
+    const resizeListenerFunction: EventListenerOrEventListenerObject = (): void => {
+      localStorage.setItem('scriptTaskInputHeight', this.scriptInput.clientHeight.toString());
+      window.removeEventListener('mouseup', resizeListenerFunction);
+    };
+    window.addEventListener('mouseup', resizeListenerFunction);
+  };
 
   private publishDiagramChange(): void {
     this.eventAggregator.publish(environment.events.diagramChange);

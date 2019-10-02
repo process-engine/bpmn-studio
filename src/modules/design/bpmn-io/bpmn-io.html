@@ -20,13 +20,13 @@
     -->
     <div class="bpmn-io-layout__main js-main">
       <div class="modeler">
-        <div if.bind="solutionIsRemote" class="modeler__diagram" id="bpmnIoDiagram">
-          <div ref="canvasModel" class="canvasModel"></div>
+        <div if.bind="solutionIsRemote" class="modeler__diagram">
+          <div ref="canvasModel" class="canvasModel" data-test-canvas-model></div>
         </div>
-        <div else class="modeler__diagram" id="bpmnIoDiagram">
-          <div ref="canvasModel" class="canvasModel"></div>
+        <div else class="modeler__diagram">
+          <div ref="canvasModel" class="canvasModel" data-test-canvas-model></div>
 
-          <div class="linter-toggle">
+          <div if.bind="linterIsActive" class="linter-toggle">
             <button class.bind="diagramIsInvalid ? 'linter-toggle__button linter-toggle__button--invalid-diagram' : 'linter-toggle__button'"
                     css.bind="showLinter || diagramIsInvalid? 'opacity: 1;' : ''"
                     title.bind="showLinter ? 'Hide Linter' : 'Show Linter'"
@@ -38,7 +38,7 @@
         <div class="modeler__properties" ref="propertyPanel" show.bind="showPropertyPanel" css="width: ${propertyPanelWidth}px; max-width: calc(100% - ${minCanvasWidth}px); min-width: ${minPropertyPanelWidth}px;">
           <div class="resize-div" ref="resizeButton"></div>
           <diagram-tools-right modeler.bind="modeler" viewer.bind="viewer" solution-is-remote.bind="solutionIsRemote"></diagram-tools-right>
-          <property-panel view-model.ref="propertyPanelViewModel" id="js-properties-panel" modeler.bind="modeler" diagram-uri.bind="diagramUri" xml.bind="xml" is-editable.bind="!solutionIsRemote"></property-panel>
+          <property-panel view-model.ref="propertyPanelViewModel" id="js-properties-panel" modeler.bind="modeler" diagram-uri.bind="diagramUri" xml.bind="xml" is-editable.bind="!solutionIsRemote" data-test-property-panel></property-panel>
         </div>
       </div>
     </div>

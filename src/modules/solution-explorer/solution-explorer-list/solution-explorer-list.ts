@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {computedFrom, inject} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
@@ -5,7 +6,7 @@ import {Router} from 'aurelia-router';
 import {SemVer} from 'semver';
 
 import {IIdentity} from '@essential-projects/iam_contracts';
-import {IDiagram, ISolution} from '@process-engine/solutionexplorer.contracts';
+import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 import {ISolutionExplorerService} from '@process-engine/solutionexplorer.service.contracts';
 
 import {
@@ -18,6 +19,7 @@ import {
 import {OpenDiagramsSolutionExplorerService} from '../../../services/solution-explorer-services/OpenDiagramsSolutionExplorerService';
 import {SolutionExplorerServiceFactory} from '../../../services/solution-explorer-services/SolutionExplorerServiceFactory';
 import {SolutionExplorerSolution} from '../solution-explorer-solution/solution-explorer-solution';
+import {exposeFunctionForTesting} from '../../../services/expose-functionality-module/expose-functionality-module';
 
 interface IUriToViewModelMap {
   [key: string]: SolutionExplorerSolution;
@@ -81,8 +83,9 @@ export class SolutionExplorerList {
       this.createOpenDiagramServiceEntry();
     }
 
-    // Allows us to debug the solution explorer list.
-    (window as any).solutionList = this;
+    exposeFunctionForTesting('openSolution', (uri: string, insertAtBeginning?: boolean, identity?: IIdentity): void => {
+      this.openSolution(uri, insertAtBeginning, identity);
+    });
 
     this.internalSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
   }
@@ -281,8 +284,7 @@ export class SolutionExplorerList {
       throw error;
     }
 
-    const newOpenedSolution: ISolution = await solutionExplorer.loadSolution();
-    const solutionURI: string = newOpenedSolution.uri;
+    const solutionURI: string = uri;
 
     const arrayAlreadyContainedURI: boolean = this.getIndexOfSolution(solutionURI) >= 0;
 

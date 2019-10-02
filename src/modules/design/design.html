@@ -6,14 +6,14 @@
 
   <div class="design">
 
-    <diagram-detail show.bind="showDetail" view-model.ref="diagramDetail" is-displayed.to-view="showDetail" active-diagram.bind="activeDiagram" xml.two-way="xml" active-solution-entry.bind="activeSolutionEntry"></diagram-detail>
-    <bpmn-xml-view show.bind="showXML" xml.bind="xml"></bpmn-xml-view>
-    <bpmn-diff-view if.bind="showDiff" saved-xml.to-view="activeDiagram.xml" unconverted-current-xml.to-view="xmlForDiff" process-model-id.to-view="activeDiagram.name"></bpmn-diff-view>
+    <diagram-detail show.bind="showDetail" view-model.ref="diagramDetail" is-displayed.to-view="showDetail" active-diagram.bind="activeDiagram" xml.two-way="xml" active-solution-entry.bind="activeSolutionEntry" data-test-diagram-detail></diagram-detail>
+    <bpmn-xml-view show.bind="showXML" xml.bind="xml" data-test-bpmn-xml-view></bpmn-xml-view>
+    <bpmn-diff-view if.bind="showDiff" saved-xml.to-view="activeDiagram.xml" unconverted-current-xml.to-view="xmlForDiff" process-model-id.to-view="activeDiagram.name" data-test-bpmn-diff-view></bpmn-diff-view>
 
     <div class="design-layout__tools-right">
       <div class="tool-list tool-list--vertical">
         <div show.bind="showPropertyPanelButton" id="toggleButtonPropertyPanel" class="design-layout__tool">
-          <button class="button menu-bar__menu-left--tool" class.bind="propertyPanelShown ? 'design-layout__tool--active' : ''" click.delegate="togglePanel()" title="Toggle visibility of the Property Panel">
+          <button class="button menu-bar__menu-left--tool" class.bind="propertyPanelShown ? 'design-layout__tool--active' : ''" click.delegate="togglePanel()" title="Toggle visibility of the Property Panel" data-test-toggle-propertypanel>
             <i class="fas fa-sliders-h"></i>
           </button>
         </div>
@@ -30,30 +30,6 @@
         </button>
       </div>
     </div>
-
-    <modal show.bind="showSaveBeforeDeployModal"
-          header-text="Save Diagram Before Deploying"
-          body-text="In order to deploy your diagram, you have to save your recent changes to disk.">
-      <template replace-part="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal" id="cancelDeploy" click.delegate="diagramDetail.cancelSaveBeforeDeployModal()"> Cancel</button>
-        <button type="button" class="btn btn-primary" data-dismiss="modal" id="saveButtonDeploy" click.delegate="diagramDetail.saveDiagramAndDeploy()"> Save and deploy</button>
-      </template>
-    </modal>
-
-    <modal if.bind="showRemoteSolutionOnDeployModal"
-          header-text="Multiple Connected ProcessEngines Found">
-      <template replace-part="modal-body">
-        Choose a remote ProcessEngines; the diagram will be deployed to your selection.
-        <select class="form-control" value.bind="diagramDetail.selectedRemoteSolution">
-          <option repeat.for="entry of connectedRemoteSolutions" model.bind="entry">${entry.uri}</option>
-        </select>
-      </template>
-
-      <template replace-part="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal" id="cancelButtonRemoteSolutionsOnDeploy" click.delegate="diagramDetail.cancelDialog()">Cancel</button>
-        <button type="button" class="btn btn-primary" data-dismiss="modal" id="saveButtonRemoteSolutionsOnDeploy" click.delegate="diagramDetail.uploadProcess(diagramDetail.selectedRemoteSolution)" >Deploy Process</button>
-      </template>
-    </modal>
 
     <modal show.bind="showSaveForStartModal"
           header-text="Document Contains Changes"
@@ -133,18 +109,5 @@
         <button type="button" class="btn btn-primary" data-dismiss="modal" id="js-choose-diagram" click.delegate="setDiffDestination(selectedDiagram.solutionUri, selectedDiagram.diagram.name)">Compare</button>
       </template>
     </modal>
-
-    <modal show.bind="diagramDetail.showDiagramExistingModal"
-          header-text="Warning: Diagram already exists!">
-      <template replace-part="modal-body">
-        The target solution already contains a diagram with that name and ID.<br>
-        Are you sure you want to overwrite the deployed diagram with your local version?
-      </template>
-      <template replace-part="modal-footer">
-        <button type="button" class="btn btn-default" id="cancelDiagramDeploy">Cancel</button>
-        <button type="button" class="btn btn-primary" id="overrideDiagramOnSolution">Deploy</button>
-      </template>
-    </modal>
-
   </div>
 </template>

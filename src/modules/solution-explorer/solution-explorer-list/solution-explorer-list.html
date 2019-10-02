@@ -21,7 +21,7 @@
             <i if.bind="solutionEntry.uri.startsWith('http') && isProcessEngineNewerThanInternal(solutionEntry)" class="fas fa-info-circle version-info version-info--new" click.capture="showNewerModal($event)" title="ProcessEngine is newer. Click to show more information."></i>
             <i if.bind="solutionEntry.uri.startsWith('http') && isProcessEngineOlderThanInternal(solutionEntry)" class="fas fa-info-circle version-info version-info--old" click.capture="showOlderModal($event)" title="ProcessEngine is outdated. Click to show more information."></i>
 
-            <span class="solution-entry__solution-name">${getSolutionName(solutionEntry.uri)}</span>
+            <span class="solution-entry__solution-name" data-test-solution-entry-name="${getSolutionName(solutionEntry.uri)}" data-test-solution-is-internal="${solutionIsInternalSolution(solutionEntry)}">${getSolutionName(solutionEntry.uri)}</span>
           </div>
           <div class="solution-entry__solution-path">
             <span

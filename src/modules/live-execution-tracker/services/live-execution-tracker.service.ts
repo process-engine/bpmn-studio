@@ -5,24 +5,29 @@ import {Subscription} from '@essential-projects/event_aggregator_contracts';
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {IModdleElement, IShape} from '@process-engine/bpmn-elements_contracts';
 import * as bundle from '@process-engine/bpmn-js-custom-bundle';
-import {DataModels} from '@process-engine/management_api_contracts';
+import {DataModels, IManagementApiClient} from '@process-engine/management_api_contracts';
 
+import {EventAggregator} from 'aurelia-event-aggregator';
 import {
   IBpmnModeler,
   IBpmnXmlSaveOptions,
   IColorPickerColor,
   IElementRegistry,
   IModeling,
+  ISolutionEntry,
   defaultBpmnColors,
 } from '../../../contracts/index';
 import {ILiveExecutionTrackerRepository, ILiveExecutionTrackerService} from '../contracts/index';
+import {createRepository} from '../repositories/live-execution-tracker-repository-factory';
+import environment from '../../../environment';
 
-@inject('LiveExecutionTrackerRepository')
 export class LiveExecutionTrackerService implements ILiveExecutionTrackerService {
   private liveExecutionTrackerRepository: ILiveExecutionTrackerRepository;
 
-  constructor(liveExecutionTrackerRepository: ILiveExecutionTrackerRepository) {
-    this.liveExecutionTrackerRepository = liveExecutionTrackerRepository;
+  constructor(eventAggregator: EventAggregator, managementApiClient: IManagementApiClient) {
+    eventAggregator.subscribe(environment.events.configPanel.solutionEntryChanged, (solutionEntry: ISolutionEntry) => {
+      this.liveExecutionTrackerRepository = createRepository(managementApiClient, solutionEntry.processEngineVersion);
+    });
   }
 
   public isProcessInstanceActive(identity: IIdentity, processInstanceId: string): Promise<boolean> {
@@ -43,7 +48,7 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
   public getActiveTokensForProcessInstance(
     identity: IIdentity,
     processInstanceId: string,
-  ): Promise<Array<DataModels.Kpi.ActiveToken>> {
+  ): Promise<DataModels.Kpi.ActiveTokenList> {
     return this.liveExecutionTrackerRepository.getActiveTokensForProcessInstance(identity, processInstanceId);
   }
 
@@ -250,16 +255,16 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
   ): Promise<Array<IShape> | null> {
     const elements: Array<IShape> = this.getAllElementsThatCanHaveAToken(elementRegistry);
 
-    const activeTokens: Array<DataModels.Kpi.ActiveToken> | null = await this.getActiveTokensForProcessInstance(
+    const activeTokenList: DataModels.Kpi.ActiveTokenList | null = await this.getActiveTokensForProcessInstance(
       identity,
       processInstanceId,
     );
-    const couldNotGetActiveTokens: boolean = activeTokens === null;
+    const couldNotGetActiveTokens: boolean = activeTokenList === null;
     if (couldNotGetActiveTokens) {
       return null;
     }
 
-    const elementsWithActiveToken: Array<IShape> = activeTokens.map(
+    const elementsWithActiveToken: Array<IShape> = activeTokenList.activeTokens.map(
       (activeToken: DataModels.Kpi.ActiveToken): IShape => {
         const elementWithActiveToken: IShape = elements.find((element: IShape) => {
           return element.id === activeToken.flowNodeId;
@@ -299,9 +304,11 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
       });
 
       const elementFinished: boolean =
-        tokenHistoryGroups[flowNodeId].find((tokenHistoryEntry: DataModels.TokenHistory.TokenHistoryEntry) => {
-          return tokenHistoryEntry.tokenEventType === DataModels.TokenHistory.TokenEventType.onExit;
-        }) !== undefined;
+        tokenHistoryGroups[flowNodeId].tokenHistoryEntries.find(
+          (tokenHistoryEntry: DataModels.TokenHistory.TokenHistoryEntry) => {
+            return tokenHistoryEntry.tokenEventType === DataModels.TokenHistory.TokenEventType.onExit;
+          },
+        ) !== undefined;
 
       if (elementFinished) {
         elementsWithTokenHistory.push(elementFromTokenHistory);
@@ -345,14 +352,15 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
     processInstanceId: string,
     elementRegistry: IElementRegistry,
   ): Promise<Array<IShape>> {
-    const activeTokens: Array<
-      DataModels.Kpi.ActiveToken
-    > = await this.liveExecutionTrackerRepository.getActiveTokensForProcessInstance(identity, processInstanceId);
+    const activeTokenList: DataModels.Kpi.ActiveTokenList = await this.liveExecutionTrackerRepository.getActiveTokensForProcessInstance(
+      identity,
+      processInstanceId,
+    );
 
     const callActivities: Array<IShape> = this.getCallActivities(elementRegistry);
 
     const inactiveCallActivities: Array<IShape> = callActivities.filter((callActivity: IShape) => {
-      return this.elementHasActiveToken(callActivity.id, activeTokens);
+      return this.elementHasActiveToken(callActivity.id, activeTokenList.activeTokens);
     });
 
     return inactiveCallActivities;
@@ -363,14 +371,15 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
     processInstanceId: string,
     elementRegistry: IElementRegistry,
   ): Promise<Array<IShape>> {
-    const activeTokens: Array<
-      DataModels.Kpi.ActiveToken
-    > = await this.liveExecutionTrackerRepository.getActiveTokensForProcessInstance(identity, processInstanceId);
+    const activeTokenList: DataModels.Kpi.ActiveTokenList = await this.liveExecutionTrackerRepository.getActiveTokensForProcessInstance(
+      identity,
+      processInstanceId,
+    );
 
     const callActivities: Array<IShape> = this.getCallActivities(elementRegistry);
 
     const inactiveCallActivities: Array<IShape> = callActivities.filter((callActivity: IShape) => {
-      return !this.elementHasActiveToken(callActivity.id, activeTokens);
+      return !this.elementHasActiveToken(callActivity.id, activeTokenList.activeTokens);
     });
 
     return inactiveCallActivities;
@@ -380,7 +389,7 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
     identity: IIdentity,
     correlationId: string,
     processInstanceId: string,
-  ): Promise<DataModels.Correlations.CorrelationProcessInstance> {
+  ): Promise<DataModels.Correlations.ProcessInstance> {
     const correlation: DataModels.Correlations.Correlation = await this.getCorrelationById(identity, correlationId);
 
     const errorGettingCorrelation: boolean = correlation === undefined;
@@ -388,9 +397,9 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
       return undefined;
     }
 
-    const processModel: DataModels.Correlations.CorrelationProcessInstance = correlation.processInstances.find(
-      (correlationProcessInstance: DataModels.Correlations.CorrelationProcessInstance): boolean => {
-        const processModelFound: boolean = correlationProcessInstance.processInstanceId === processInstanceId;
+    const processModel: DataModels.Correlations.ProcessInstance = correlation.processInstances.find(
+      (processInstance: DataModels.Correlations.ProcessInstance): boolean => {
+        const processModelFound: boolean = processInstance.processInstanceId === processInstanceId;
 
         return processModelFound;
       },
@@ -412,11 +421,11 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
       return undefined;
     }
 
-    const processInstance: DataModels.Correlations.CorrelationProcessInstance = correlation.processInstances.find(
-      (correlationProcessInstance: DataModels.Correlations.CorrelationProcessInstance): boolean => {
+    const processInstance: DataModels.Correlations.ProcessInstance = correlation.processInstances.find(
+      (currentProcessInstance: DataModels.Correlations.ProcessInstance): boolean => {
         const targetProcessModelFound: boolean =
-          correlationProcessInstance.parentProcessInstanceId === processInstanceIdOfOrigin &&
-          correlationProcessInstance.processModelId === callActivityTargetId;
+          currentProcessInstance.parentProcessInstanceId === processInstanceIdOfOrigin &&
+          currentProcessInstance.processModelId === callActivityTargetId;
 
         return targetProcessModelFound;
       },
@@ -514,11 +523,12 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
     processInstanceId: string,
     elementRegistry: IElementRegistry,
   ): Promise<Array<IShape>> {
-    const flowNodeInstances: Array<
-      DataModels.FlowNodeInstances.FlowNodeInstance
-    > = await this.liveExecutionTrackerRepository.getFlowNodeInstancesForProcessInstance(identity, processInstanceId);
+    const flowNodeInstanceList: DataModels.FlowNodeInstances.FlowNodeInstanceList = await this.liveExecutionTrackerRepository.getFlowNodeInstancesForProcessInstance(
+      identity,
+      processInstanceId,
+    );
 
-    return flowNodeInstances
+    return flowNodeInstanceList.flowNodeInstances
       .filter((flowNodeInstance: DataModels.FlowNodeInstances.FlowNodeInstance) => {
         return flowNodeInstance.state === 'error';
       })
@@ -578,10 +588,11 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
       const outgoingElementIsSequenceFlow: boolean = outgoingElementAsShape.type === 'bpmn:SequenceFlow';
       if (outgoingElementIsSequenceFlow) {
         const tokenHistoryForTarget: DataModels.TokenHistory.TokenHistoryEntry =
-          tokenHistoryGroups[targetOfOutgoingElement.id][0];
+          tokenHistoryGroups[targetOfOutgoingElement.id].tokenHistoryEntries[0];
         const previousFlowNodeInstanceIdOfTarget: string = tokenHistoryForTarget.previousFlowNodeInstanceId;
 
-        const tokenHistoryForElement: DataModels.TokenHistory.TokenHistoryEntry = tokenHistoryGroups[element.id][0];
+        const tokenHistoryForElement: DataModels.TokenHistory.TokenHistoryEntry =
+          tokenHistoryGroups[element.id].tokenHistoryEntries[0];
         const flowNodeInstanceIdOfElement: string = tokenHistoryForElement.flowNodeInstanceId;
 
         // This is needed because the ParallelGateway only knows the flowNodeId of the first element that reaches the ParallelGateway

@@ -31,6 +31,7 @@ import environment from '../../environment';
 import {NotificationService} from '../../services/notification-service/notification.service';
 import {TaskDynamicUi} from '../task-dynamic-ui/task-dynamic-ui';
 import {ILiveExecutionTrackerService, RequestError} from './contracts/index';
+import {LiveExecutionTrackerService} from './services/live-execution-tracker.service';
 
 type RouteParameters = {
   diagramName: string;
@@ -356,7 +357,7 @@ export class LiveExecutionTracker {
       return undefined;
     }
 
-    const parentProcessModel: DataModels.Correlations.CorrelationProcessInstance = await this.liveExecutionTrackerService.getProcessModelByProcessInstanceId(
+    const parentProcessModel: DataModels.Correlations.ProcessInstance = await this.liveExecutionTrackerService.getProcessModelByProcessInstanceId(
       this.activeSolutionEntry.identity,
       this.correlationId,
       this.parentProcessInstanceId,
@@ -807,8 +808,8 @@ export class LiveExecutionTracker {
       return undefined;
     }
 
-    const processModelFromCorrelation: DataModels.Correlations.CorrelationProcessInstance = correlation.processInstances.find(
-      (processModel: DataModels.Correlations.CorrelationProcessInstance) => {
+    const processModelFromCorrelation: DataModels.Correlations.ProcessInstance = correlation.processInstances.find(
+      (processModel: DataModels.Correlations.ProcessInstance) => {
         const processModelIsSearchedProcessModel: boolean = processModel.processInstanceId === this.processInstanceId;
 
         return processModelIsSearchedProcessModel;
@@ -952,9 +953,9 @@ export class LiveExecutionTracker {
       return undefined;
     }
 
-    const processInstanceFromCorrelation: DataModels.Correlations.CorrelationProcessInstance = correlation.processInstances.find(
-      (correlationProcessInstance: DataModels.Correlations.CorrelationProcessInstance): boolean => {
-        const processInstanceFound: boolean = correlationProcessInstance.processInstanceId === this.processInstanceId;
+    const processInstanceFromCorrelation: DataModels.Correlations.ProcessInstance = correlation.processInstances.find(
+      (processInstance: DataModels.Correlations.ProcessInstance): boolean => {
+        const processInstanceFound: boolean = processInstance.processInstanceId === this.processInstanceId;
 
         return processInstanceFound;
       },

@@ -153,20 +153,22 @@ export class TokenViewer {
     }
 
     Object.entries(tokenHistoryGroup).forEach(
-      ([flowNodeId, tokenHistoryEntries]: [string, Array<DataModels.TokenHistory.TokenHistoryEntry>]) => {
-        tokenHistoryEntries.forEach((historyEntry: DataModels.TokenHistory.TokenHistoryEntry, index: number) => {
-          // tslint:disable-next-line no-magic-numbers
-          const payloadAsString: string = JSON.stringify(historyEntry.payload, null, 2);
+      ([flowNodeId, tokenHistoryEntries]: [string, DataModels.TokenHistory.TokenHistoryEntryList]) => {
+        tokenHistoryEntries.tokenHistoryEntries.forEach(
+          (historyEntry: DataModels.TokenHistory.TokenHistoryEntry, index: number) => {
+            // tslint:disable-next-line no-magic-numbers
+            const payloadAsString: string = JSON.stringify(historyEntry.payload, null, 2);
 
-          const tokenEntry: IRawTokenEntry = {
-            entryNr: index,
-            eventType: historyEntry.tokenEventType,
-            createdAt: historyEntry.createdAt,
-            payload: payloadAsString,
-          };
+            const tokenEntry: IRawTokenEntry = {
+              entryNr: index,
+              eventType: historyEntry.tokenEventType,
+              createdAt: historyEntry.createdAt,
+              payload: payloadAsString,
+            };
 
-          tokenEntries.push(tokenEntry);
-        });
+            tokenEntries.push(tokenEntry);
+          },
+        );
       },
     );
 
@@ -184,28 +186,30 @@ export class TokenViewer {
     }
 
     Object.entries(tokenHistoryGroup).forEach(
-      ([flowNodeId, tokenHistoryEntries]: [string, Array<DataModels.TokenHistory.TokenHistoryEntry>]) => {
-        tokenHistoryEntries.forEach((historyEntry: DataModels.TokenHistory.TokenHistoryEntry, index: number) => {
-          const historyEntryPayload: any = historyEntry.payload;
+      ([flowNodeId, tokenHistoryEntries]: [string, DataModels.TokenHistory.TokenHistoryEntryList]) => {
+        tokenHistoryEntries.tokenHistoryEntries.forEach(
+          (historyEntry: DataModels.TokenHistory.TokenHistoryEntry, index: number) => {
+            const historyEntryPayload: any = historyEntry.payload;
 
-          const historyEntryHasNoPayload: boolean = historyEntryPayload === undefined;
-          if (historyEntryHasNoPayload) {
-            return;
-          }
+            const historyEntryHasNoPayload: boolean = historyEntryPayload === undefined;
+            if (historyEntryHasNoPayload) {
+              return;
+            }
 
-          const tokenEntryPayload: Array<IPayloadEntry> = this.convertHistoryEntryPayloadToTokenEntryPayload(
-            historyEntryPayload,
-          );
+            const tokenEntryPayload: Array<IPayloadEntry> = this.convertHistoryEntryPayloadToTokenEntryPayload(
+              historyEntryPayload,
+            );
 
-          const tokenEntry: ITokenEntry = {
-            entryNr: index,
-            eventType: historyEntry.tokenEventType,
-            createdAt: historyEntry.createdAt,
-            payload: tokenEntryPayload,
-          };
+            const tokenEntry: ITokenEntry = {
+              entryNr: index,
+              eventType: historyEntry.tokenEventType,
+              createdAt: historyEntry.createdAt,
+              payload: tokenEntryPayload,
+            };
 
-          tokenEntries.push(tokenEntry);
-        });
+            tokenEntries.push(tokenEntry);
+          },
+        );
       },
     );
 

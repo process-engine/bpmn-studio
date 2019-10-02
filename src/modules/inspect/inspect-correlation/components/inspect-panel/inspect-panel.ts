@@ -4,15 +4,15 @@ import {bindable, inject} from 'aurelia-framework';
 import {DataModels} from '@process-engine/management_api_contracts';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 
-import {ISolutionEntry, InspectPanelTab} from '../../../../../contracts/index';
+import {ICorrelationTableEntry, ISolutionEntry, InspectPanelTab} from '../../../../../contracts/index';
 import environment from '../../../../../environment';
 
 @inject(EventAggregator)
 export class InspectPanel {
   @bindable public processInstanceToSelect: string;
   @bindable public correlations: Array<DataModels.Correlations.Correlation>;
-  @bindable public processInstances: Array<DataModels.Correlations.CorrelationProcessInstance>;
-  @bindable public selectedProcessInstance: DataModels.Correlations.CorrelationProcessInstance;
+  @bindable public sortedTableData: Array<ICorrelationTableEntry>;
+  @bindable public selectedProcessInstance: DataModels.Correlations.ProcessInstance;
   @bindable public selectedCorrelation: DataModels.Correlations.Correlation;
   @bindable public fullscreen: boolean = false;
   @bindable public activeDiagram: IDiagram;

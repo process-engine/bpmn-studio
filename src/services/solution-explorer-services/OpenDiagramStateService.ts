@@ -1,8 +1,12 @@
+import uuid from 'node-uuid';
+
 import {IShape} from '@process-engine/bpmn-elements_contracts';
 
 import {DiagramStateChange, IDiagramState, IDiagramStateList, IDiagramStateListEntry} from '../../contracts';
 
 export class OpenDiagramStateService {
+  private diagramStatesChangedCallbacks: Map<string, Function> = new Map();
+
   public saveDiagramState(
     uri: string,
     xml: string,
@@ -27,6 +31,7 @@ export class OpenDiagramStateService {
     const value: string = JSON.stringify(diagramState);
 
     window.localStorage.setItem(key, value);
+    this.fireOnDiagramStatesChanged();
   }
 
   public updateDiagramState(uri: string, diagramState: IDiagramState): void {
@@ -34,6 +39,7 @@ export class OpenDiagramStateService {
     const value: string = JSON.stringify(diagramState);
 
     window.localStorage.setItem(key, value);
+    this.fireOnDiagramStatesChanged();
   }
 
   public loadDiagramState(uri: string): IDiagramState | null {
@@ -76,6 +82,18 @@ export class OpenDiagramStateService {
     window.localStorage.removeItem(key);
   }
 
+  public onDiagramStatesChanged(callback): string {
+    const callbackId: string = uuid.v4();
+
+    this.diagramStatesChangedCallbacks.set(callbackId, callback);
+
+    return callbackId;
+  }
+
+  public removeOnDiagramStatesChangedListener(callbackId: string): void {
+    this.diagramStatesChangedCallbacks.delete(callbackId);
+  }
+
   public setDiagramChange(uri: string, change: DiagramStateChange): void {
     const diagramState: IDiagramState | null = this.loadDiagramState(uri);
 
@@ -86,6 +104,12 @@ export class OpenDiagramStateService {
     diagramState.metadata.change = change;
 
     this.updateDiagramState(uri, diagramState);
+  }
+
+  private fireOnDiagramStatesChanged(): void {
+    this.diagramStatesChangedCallbacks.forEach((callback: Function): void => {
+      callback();
+    });
   }
 
   private getUrisForAllDiagramStates(): Array<string> {

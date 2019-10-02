@@ -24,6 +24,8 @@ export class BasicsSection implements ISection {
   public showModal: boolean = false;
   public elementType: string;
 
+  public docsInput: HTMLElement;
+
   private modeling: IModeling;
   private modeler: IBpmnModeler;
   private bpmnModdle: IBpmnModdle;
@@ -60,10 +62,19 @@ export class BasicsSection implements ISection {
     this.setValidationRules();
   }
 
+  public attached(): void {
+    this.recoverInputHeight();
+
+    this.saveInputHeightOnChange();
+  }
+
   public detached(): void {
+    this.docsInput.removeEventListener('mousedown', this.saveInputHeightOnMouseUp);
+
     if (!this.validationError) {
       return;
     }
+
     this.businessObjInPanel.id = this.previousProcessRefId;
     this.validationController.validate();
   }
@@ -144,9 +155,10 @@ export class BasicsSection implements ISection {
       }
       if (result.valid === false) {
         this.validationError = true;
-        document.getElementById(result.rule.property.displayName).style.border = '2px solid red';
+        (document.querySelector('[data-test-property-panel-element-id]') as HTMLInputElement).style.border =
+          '2px solid red';
       } else {
-        document.getElementById(result.rule.property.displayName).style.border = '';
+        (document.querySelector('[data-test-property-panel-element-id]') as HTMLInputElement).style.border = '';
       }
     }
   }
@@ -195,6 +207,22 @@ export class BasicsSection implements ISection {
       .withMessage('ID already exists.')
       .on(this.businessObjInPanel);
   }
+
+  private saveInputHeightOnChange(): void {
+    this.docsInput.addEventListener('mousedown', this.saveInputHeightOnMouseUp);
+  }
+
+  private recoverInputHeight(): void {
+    this.docsInput.style.height = `${localStorage.getItem('docsInputHeight')}px`;
+  }
+
+  private saveInputHeightOnMouseUp: EventListenerOrEventListenerObject = () => {
+    const resizeListenerFunction: EventListenerOrEventListenerObject = (): void => {
+      localStorage.setItem('docsInputHeight', this.docsInput.clientHeight.toString());
+      window.removeEventListener('mouseup', resizeListenerFunction);
+    };
+    window.addEventListener('mouseup', resizeListenerFunction);
+  };
 
   private publishDiagramChange(): void {
     this.eventAggregator.publish(environment.events.diagramChange);

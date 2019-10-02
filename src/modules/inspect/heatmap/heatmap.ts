@@ -18,6 +18,7 @@ import {IFlowNodeAssociation, IHeatmapService} from './contracts';
 @inject('HeatmapService')
 export class Heatmap {
   public viewerContainer: HTMLDivElement;
+  public noRuntimeInformation: boolean = false;
   @bindable() public activeDiagram: IDiagram;
   @bindable() public activeSolutionEntry: ISolutionEntry;
 
@@ -29,11 +30,8 @@ export class Heatmap {
     this.heatmapService = heatmapService;
   }
 
-  public activeSolutionEntryChanged(newValue: ISolutionEntry): void {
-    this.heatmapService.setIdentity(newValue.identity);
-  }
-
   public activeDiagramChanged(): void {
+    this.noRuntimeInformation = false;
     const attachedViewer: Element = document.getElementsByClassName('bjs-container')[0];
 
     const viewerContainerIsAttached: boolean =
@@ -64,6 +62,7 @@ export class Heatmap {
 
     const diagramIsNoRemoteDiagram: boolean = !this.activeDiagram.uri.startsWith('http');
     if (diagramIsNoRemoteDiagram) {
+      this.noRuntimeInformation = true;
       return;
     }
 
@@ -89,11 +88,16 @@ export class Heatmap {
       elementRegistry,
     );
 
-    const flowNodeRuntimeInformation: Array<
-      DataModels.Kpi.FlowNodeRuntimeInformation
-    > = await this.heatmapService.getRuntimeInformationForProcessModel(this.activeDiagram.id);
+    const flowNodeRuntimeInformationList: DataModels.Kpi.FlowNodeRuntimeInformationList = await this.heatmapService.getRuntimeInformationForProcessModel(
+      this.activeSolutionEntry.identity,
+      this.activeDiagram.id,
+    );
 
-    const xml: string = await this.heatmapService.getColoredXML(associations, flowNodeRuntimeInformation, this.modeler);
+    const xml: string = await this.heatmapService.getColoredXML(
+      associations,
+      flowNodeRuntimeInformationList.flowNodeRuntimeInformation,
+      this.modeler,
+    );
 
     // eslint-disable-next-line 6river/new-cap
     this.viewer = new bundle.viewer({
@@ -104,7 +108,12 @@ export class Heatmap {
 
     const overlays: IOverlayManager = this.viewer.get('overlays');
 
-    this.heatmapService.addOverlays(overlays, elementRegistry, this.activeDiagram.id);
+    this.heatmapService.addOverlays(
+      this.activeSolutionEntry.identity,
+      overlays,
+      elementRegistry,
+      this.activeDiagram.id,
+    );
 
     const containerIsPresent: boolean = this.viewerContainer !== null;
     if (containerIsPresent) {

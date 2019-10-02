@@ -17,10 +17,9 @@ export class InspectCorrelation {
   @bindable public flowNodeToSelect: string;
   @bindable public activeDiagram: IDiagram;
   @bindable public activeSolutionEntry: ISolutionEntry;
-  @bindable public selectedProcessInstance: DataModels.Correlations.CorrelationProcessInstance;
+  @bindable public selectedProcessInstance: DataModels.Correlations.ProcessInstance;
   @bindable public selectedCorrelation: DataModels.Correlations.Correlation;
   @bindable public inspectPanelFullscreen: boolean = false;
-  @bindable public noCorrelationsFound: boolean = false;
   @observable public bottomPanelHeight: number = 250;
   @observable public tokenViewerWidth: number = 250;
   @bindable public diagramViewer: DiagramViewer;
@@ -47,13 +46,23 @@ export class InspectCorrelation {
   }
 
   public async attached(): Promise<void> {
-    this.correlations = await this.inspectCorrelationService.getAllCorrelationsForProcessModelId(
-      this.activeDiagram.id,
-      this.activeSolutionEntry.identity,
-    );
+    try {
+      const correlationList = await this.inspectCorrelationService.getAllCorrelationsForProcessModelId(
+        this.activeDiagram.id,
+        this.activeSolutionEntry.identity,
+      );
 
-    this.noCorrelationsFound = this.correlations.length === 0;
-    this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, this.noCorrelationsFound);
+      // https://github.com/process-engine/process_engine_runtime/issues/432
+      if (correlationList.totalCount === 0) {
+        this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
+        this.correlations = [];
+      } else {
+        this.correlations = correlationList.correlations;
+      }
+    } catch (error) {
+      this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
+      this.correlations = [];
+    }
 
     this.eventAggregator.publish(environment.events.statusBar.showInspectCorrelationButtons, true);
 
@@ -136,14 +145,23 @@ export class InspectCorrelation {
 
   public async activeDiagramChanged(): Promise<void> {
     if (this.viewIsAttached) {
-      this.correlations = await this.inspectCorrelationService.getAllCorrelationsForProcessModelId(
-        this.activeDiagram.id,
-        this.activeSolutionEntry.identity,
-      );
+      try {
+        const correlationList = await this.inspectCorrelationService.getAllCorrelationsForProcessModelId(
+          this.activeDiagram.id,
+          this.activeSolutionEntry.identity,
+        );
 
-      this.noCorrelationsFound = this.correlations.length === 0;
-
-      this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, this.noCorrelationsFound);
+        // https://github.com/process-engine/process_engine_runtime/issues/432
+        if (correlationList.totalCount === 0) {
+          this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
+          this.correlations = [];
+        } else {
+          this.correlations = correlationList.correlations;
+        }
+      } catch (error) {
+        this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
+        this.correlations = [];
+      }
     }
   }
 

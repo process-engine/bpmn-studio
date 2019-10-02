@@ -1,8 +1,9 @@
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
-import {computedFrom, inject} from 'aurelia-framework';
+import {inject} from 'aurelia-framework';
 import {NavModel, Router} from 'aurelia-router';
 
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
+import {BrowserWindow} from 'electron';
 import {ISolutionEntry, ISolutionService, NotificationType} from '../../contracts/index';
 import environment from '../../environment';
 import {NotificationService} from '../../services/notification-service/notification.service';
@@ -11,6 +12,7 @@ import {NotificationService} from '../../services/notification-service/notificat
 export class NavBar {
   public activeSolutionEntry: ISolutionEntry;
   public activeDiagram: IDiagram;
+  public navbarContainer: HTMLDivElement;
 
   public diagramInfo: HTMLElement;
   public dropdown: HTMLElement;
@@ -88,7 +90,13 @@ export class NavBar {
         this.diagramContainsUnsavedChanges = isDiagramChanged;
       }),
 
-      this.eventAggregator.subscribe(environment.events.navBar.diagramChangesResolved, () => {
+      this.eventAggregator.subscribe(environment.events.diagramWasSaved, (diagramUri: string) => {
+        const activeDiagramWasSaved: boolean = diagramUri === this.activeDiagram.uri;
+
+        if (!activeDiagramWasSaved) {
+          return;
+        }
+
         this.diagramContainsUnsavedChanges = false;
       }),
 
@@ -114,21 +122,27 @@ export class NavBar {
         this.disableInspectCorrelationButton = true;
       }),
     ];
+
+    this.navbarContainer.addEventListener('dblclick', this.maximizeWindow);
   }
+
+  public maximizeWindow = (): void => {
+    if (!(window as any).nodeRequire) {
+      return undefined;
+    }
+
+    const browserWindow: BrowserWindow = (window as any).nodeRequire('electron').remote.getCurrentWindow();
+
+    const browserWindowIsMaximized: boolean = browserWindow.isMaximized();
+    if (browserWindowIsMaximized) {
+      return browserWindow.unmaximize();
+    }
+
+    return browserWindow.maximize();
+  };
 
   public detached(): void {
     this.disposeAllSubscriptions();
-  }
-
-  @computedFrom('savingTargetIsRemoteSolution')
-  public get getClassNameForNavbarIcon(): string {
-    const iconClassName: string = ((): string => {
-      if (this.savingTargetIsRemoteSolution) {
-        return 'fa-database';
-      }
-      return 'fa-folder';
-    })();
-    return iconClassName;
   }
 
   private disposeAllSubscriptions(): void {
@@ -216,7 +230,11 @@ export class NavBar {
 
   public toggleSolutionExplorer(): void {
     this.solutionExplorerIsActive = !this.solutionExplorerIsActive;
-    this.eventAggregator.publish(environment.events.processSolutionPanel.toggleProcessSolutionExplorer);
+
+    this.eventAggregator.publish(
+      environment.events.solutionExplorerPanel.toggleSolutionExplorer,
+      this.solutionExplorerIsActive,
+    );
   }
 
   public saveDiagram(): void {
@@ -323,17 +341,14 @@ export class NavBar {
       const inspectViewIsDashboard: boolean = inspectView === 'dashboard';
       const inspectViewIsHeatmap: boolean = inspectView === 'heatmap';
       const inspectViewIsInspectCorrelation: boolean = inspectView === 'inspect-correlation';
-      if (activeSolutionIsRemoteSolution) {
-        this.showInspectTools = true;
 
-        this.disableDashboardButton = inspectViewIsDashboard;
-        this.disableHeatmapButton = inspectViewIsHeatmap;
-        this.disableInspectCorrelationButton = inspectViewIsInspectCorrelation;
+      this.showInspectTools = true;
 
-        this.showExportOnInspectCorrelation = inspectViewIsInspectCorrelation || false;
-      } else {
-        this.showInspectTools = false;
-      }
+      this.disableDashboardButton = inspectViewIsDashboard;
+      this.disableHeatmapButton = inspectViewIsHeatmap;
+      this.disableInspectCorrelationButton = inspectViewIsInspectCorrelation;
+
+      this.showExportOnInspectCorrelation = inspectViewIsInspectCorrelation || false;
 
       this.showTools = false;
     } else if (activeRouteIsLET) {

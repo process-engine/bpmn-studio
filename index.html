@@ -1,26 +1,22 @@
 <!DOCTYPE html>
 <html>
-
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>BPMN Studio</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-
-    <script>
-      // if we're in the browser, we need to add <base href="/" /> to enable push state
-      if (!window.require) {
-        var base = document.createElement('base');
-        base.href = "/";
-        document.getElementsByTagName('head')[0].appendChild(base);
-      }
-    </script>
-    <script src="node_modules/@process-engine/dynamic_ui_core/dist/webcomponent/dynamic-task-components.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
   </head>
 
   <body aurelia-app="main" style="height: 100%;">
     <div>
       <script>
+        // if we're in the browser, we need to add <base href="/" /> to enable push state
+        if (!window.require) {
+          var base = document.createElement('base');
+          base.href = '/';
+          document.getElementsByTagName('head')[0].appendChild(base);
+        }
+
         // see https://electron.atom.io/docs/faq/#i-can-not-use-jqueryrequirejsmeteorangularjs-in-electron
         if (window.require) {
           window.nodeRequire = require;
@@ -32,8 +28,8 @@
           delete window.module;
         }
       </script>
+      <script src="node_modules/@process-engine/dynamic_ui_core/dist/webcomponent/dynamic-task-components.js"></script>
       <script src="dist/web/vendor-bundle.js" data-main="aurelia-bootstrapper"></script>
     </div>
   </body>
-
 </html>

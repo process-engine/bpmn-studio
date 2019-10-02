@@ -5,3 +5,4 @@ export {IUserIdentity} from './IUserIdentity';
 export {ILoginResult} from './ILoginResult';
 export {ILogoutResult} from './ILogoutResult';
 export {ITokenObject} from './ITokenObject';
+export {IOidcConfig} from './IOidcConfig';

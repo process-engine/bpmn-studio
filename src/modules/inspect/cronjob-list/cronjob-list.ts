@@ -1,31 +1,40 @@
 import {bindable, computedFrom, inject} from 'aurelia-framework';
 
-import {ManagementApiClientService} from '@process-engine/management_api_client';
 import {DataModels} from '@process-engine/management_api_contracts';
 
-import {ISolutionEntry, NotificationType} from '../../../contracts/index';
+import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
+import {ISolutionEntry} from '../../../contracts/index';
 import environment from '../../../environment';
 import {getBeautifiedDate} from '../../../services/date-service/date.service';
-import {NotificationService} from '../../../services/notification-service/notification.service';
+import {IDashboardService} from '../dashboard/contracts';
 
-@inject('ManagementApiClientService', 'NotificationService')
+@inject('DashboardService')
 export class CronjobList {
   @bindable public activeSolutionEntry: ISolutionEntry;
-  public requestSuccessful: boolean = false;
+  public initialLoadingFinished: boolean = false;
   public currentPage: number = 1;
   public pageSize: number = 10;
   public paginationSize: number = 10;
-
-  private managementApiService: ManagementApiClientService;
+  public showError: boolean;
 
   private cronjobs: Array<DataModels.Cronjobs.CronjobConfiguration> = [];
   private pollingTimeout: NodeJS.Timeout;
   private isAttached: boolean;
-  private notificationService: NotificationService;
+  private dashboardService: IDashboardService;
 
-  constructor(managementApiService: ManagementApiClientService, notificationService: NotificationService) {
-    this.managementApiService = managementApiService;
-    this.notificationService = notificationService;
+  constructor(dashboardService: IDashboardService) {
+    this.dashboardService = dashboardService;
+  }
+
+  public async activeSolutionEntryChanged(newValue): Promise<void> {
+    if (this.isAttached) {
+      this.cronjobs = [];
+      this.initialLoadingFinished = false;
+      this.showError = false;
+      this.dashboardService.eventAggregator.publish(environment.events.configPanel.solutionEntryChanged, newValue);
+
+      await this.updateCronjobs();
+    }
   }
 
   public async attached(): Promise<void> {
@@ -50,6 +59,7 @@ export class CronjobList {
     return this.cronjobsToDisplay !== undefined && this.cronjobsToDisplay.length > 0;
   }
 
+  @computedFrom('cronjobs.length')
   public get cronjobsToDisplay(): Array<DataModels.Cronjobs.CronjobConfiguration> {
     const firstCronjobIndex: number = (this.currentPage - 1) * this.pageSize;
     const lastCronjobIndex: number = this.pageSize * this.currentPage;
@@ -69,15 +79,20 @@ export class CronjobList {
 
   public async updateCronjobs(): Promise<void> {
     try {
-      this.cronjobs = await this.managementApiService.getAllActiveCronjobs(this.activeSolutionEntry.identity);
-
-      this.requestSuccessful = true;
+      const cronjobList = await this.dashboardService.getAllActiveCronjobs(this.activeSolutionEntry.identity);
+      this.cronjobs = cronjobList.cronjobs;
+      this.initialLoadingFinished = true;
     } catch (error) {
-      this.notificationService.showNotification(
-        NotificationType.ERROR,
-        `Error receiving process list: ${error.message}`,
-      );
-      this.requestSuccessful = false;
+      this.initialLoadingFinished = true;
+
+      const errorIsForbiddenError: boolean = isError(error, ForbiddenError);
+      const errorIsUnauthorizedError: boolean = isError(error, UnauthorizedError);
+      const errorIsAuthenticationRelated: boolean = errorIsForbiddenError || errorIsUnauthorizedError;
+
+      if (!errorIsAuthenticationRelated) {
+        this.cronjobs = [];
+        this.showError = true;
+      }
     }
   }
 

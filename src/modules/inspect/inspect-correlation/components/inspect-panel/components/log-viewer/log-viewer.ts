@@ -21,7 +21,7 @@ interface IClipboard {
 @inject('NotificationService', 'InspectCorrelationService')
 export class LogViewer {
   @bindable public log: Array<DataModels.Logging.LogEntry>;
-  @bindable public processInstance: DataModels.Correlations.CorrelationProcessInstance;
+  @bindable public processInstance: DataModels.Correlations.ProcessInstance;
   @bindable public activeSolutionEntry: ISolutionEntry;
   public logSortProperty: typeof LogSortProperty = LogSortProperty;
   public sortedLog: Array<DataModels.Logging.LogEntry>;
@@ -45,11 +45,13 @@ export class LogViewer {
     }
 
     setTimeout(async () => {
-      this.log = await this.inspectCorrelationService.getLogsForProcessInstance(
+      const logList = await this.inspectCorrelationService.getLogsForProcessInstance(
         this.processInstance.processModelId,
         this.processInstance.processInstanceId,
         this.activeSolutionEntry.identity,
       );
+
+      this.log = logList.logEntries;
 
       this.sortSettings = {
         ascending: false,

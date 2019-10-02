@@ -1,0 +1,31 @@
+<template>
+  <require from='./deploy-modals.css'></require>
+
+  <modal if.bind="showRemoteSolutionOnDeployModal"
+         header-text="Multiple Connected ProcessEngines Found">
+    <template replace-part="modal-body">
+      Choose the remote ProcessEngine to which to deploy the diagram.
+      <select class="form-control" value.bind="selectedRemoteSolution">
+        <option repeat.for="entry of remoteSolutions" model.bind="entry">${entry.uri}</option>
+      </select>
+    </template>
+
+    <template replace-part="modal-footer">
+      <button type="button" class="btn btn-default" data-dismiss="modal" click.delegate="cancelMultipleRemoteSolutionModal()">Cancel</button>
+      <button type="button" class="btn btn-primary" data-dismiss="modal" click.delegate="selectRemoteSolution(selectedRemoteSolution)">Deploy Process</button>
+    </template>
+  </modal>
+
+
+  <modal show.bind="showOverwriteDiagramModal"
+         header-text="Warning: Diagram already exists!">
+    <template replace-part="modal-body">
+      The target solution already contains a diagram with that name and ID.<br>
+      Are you sure you want to overwrite the deployed diagram with your local version?
+    </template>
+    <template replace-part="modal-footer">
+      <button type="button" class="btn btn-default" data-dismiss="modal" click.delegate="cancelOverwriteModal()">Cancel</button>
+      <button type="button" class="btn btn-primary" data-dismiss="modal" click.delegate="overwriteDiagram()">Deploy</button>
+    </template>
+  </modal>
+</template>

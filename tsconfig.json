@@ -3,6 +3,7 @@
   "compilerOptions": {
     "sourceMap": true,
     "target": "es5",
+    "resolveJsonModule": true,
     "module": "amd",
     "declaration": false,
     "noImplicitAny": false,

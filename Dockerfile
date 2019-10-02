@@ -1,31 +1,40 @@
-# Define NodeJS docker image.
-# Here we use alpine as distribution
-ARG node_version=10-alpine
+ARG NODE_IMAGE_VERSION=
 
+# Create base image
+FROM node:${NODE_IMAGE_VERSION} as base
 
-# Create base image with project files
-FROM node:${node_version} as base
+RUN apk add --no-cache tini python make g++ supervisor
+COPY Docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-RUN apk add --update git tini python make g++
+# Install process engine
+FROM base as process_engine
 
-COPY . /app
-WORKDIR /app
+ARG PROCESS_ENGINE_VERSION
+# Hack to compromise priviliges error https://github.com/npm/npm/issues/17851
+RUN npm config set user 0 &&\
+    npm config set unsafe-perm true
+RUN npm install -g @process-engine/process_engine_runtime@${PROCESS_ENGINE_VERSION}
 
-# Install dependencies
-FROM base as install
-RUN npm install
+# Install bpmn studio
+FROM process_engine as bpmn_studio
 
-# Create build image
-FROM install as build
-RUN npm run build
+ARG BPMN_STUDIO_VERSION
+RUN npm install -g bpmn-studio@${BPMN_STUDIO_VERSION}
 
 # Create release
-FROM build as release
-EXPOSE 9000
-ENTRYPOINT [ "/sbin/tini" ]
-CMD [ "npm", "start", "--", "--host=0.0.0.0", "--port=9000" ]
+FROM bpmn_studio as release
 
-LABEL de.5minds.version="1.0.0" \
-      de.5minds.release-date="2018-08-30" \
+EXPOSE 8000 9000
+ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+
+HEALTHCHECK --interval=5s \
+            --timeout=5s \
+            CMD curl -f http://127.0.0.1:9000 || exit 1
+
+ARG BUILD_DATE
+ARG PROCESS_ENGINE_VERSION
+
+LABEL de.5minds.version=${PROCESS_ENGINE_VERSION} \
+      de.5minds.release-date=${BUILD_DATE} \
       vendor="5Minds IT-Solutions GmbH & Co. KG" \
-      maintainer="Dominik Kaminski"
+      maintainer="5Minds IT-Solutions GmbH & Co. KG"

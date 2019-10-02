@@ -64,7 +64,7 @@ pipeline {
               sh('npm run electron-build-macos')
             }
 
-            sh('npm run test-electron-macos')
+            sh('npm run test')
 
             stash(includes: 'dist/electron/*.*, dist/electron/mac/*', excludes: 'electron-builder-effective-config.yaml', name: 'macos_electron_results')
           }
@@ -88,7 +88,7 @@ pipeline {
 
             bat('npm run electron-build-windows')
 
-            bat('npm run test-electron-windows')
+            bat('npm test')
 
             stash(includes: 'dist/electron/*.*', excludes: 'electron-builder-effective-config.yaml', name: 'windows_electron_results')
           }
@@ -171,6 +171,73 @@ pipeline {
                                                 --assets dist/electron/latest.yml
               """);
             }
+          }
+        }
+      }
+    }
+    stage('Build Docker') {
+      when {
+        anyOf {
+          branch "master"
+          branch "beta"
+          branch "develop"
+        }
+      }
+      steps {
+        script {
+          unstash('package_json')
+
+
+          script {
+            bpmn_studio_raw_package_version = sh(script: 'node --print --eval "require(\'./package.json\').version"', returnStdout: true)
+            bpmn_studio_version = bpmn_studio_raw_package_version.trim()
+            echo("bpmn_studio_version is '${bpmn_studio_version}'")
+          }
+
+          script {
+            process_engine_raw_package_version = sh(script: 'node --print --eval "require(\'./package.json\').dependencies[\'@process-engine/process_engine_runtime\']"', returnStdout: true)
+            process_engine_version = process_engine_raw_package_version.trim()
+            echo("process_engine_version is '${process_engine_version}'")
+          }
+
+          def docker_image_name = '5minds/bpmn-studio-bundle';
+          def docker_node_version = '10-alpine';
+
+
+          full_image_name = "${docker_image_name}:${bpmn_studio_version}";
+
+          sh("docker build --build-arg NODE_IMAGE_VERSION=${docker_node_version} \
+                          --build-arg PROCESS_ENGINE_VERSION=${process_engine_version} \
+                          --build-arg BPMN_STUDIO_VERSION=${bpmn_studio_version} \
+                          --build-arg BUILD_DATE=${BUILD_TIMESTAMP} \
+                          --no-cache \
+                          --tag ${full_image_name} .");
+
+
+
+          docker_image = docker.image(full_image_name);
+        }
+      }
+    }
+    stage('Publish Docker') {
+      when {
+        anyOf {
+          branch "master"
+          branch "beta"
+          branch "develop"
+        }
+      }
+      steps {
+        script {
+          try {
+            def bpmn_studio_version = bpmn_studio_version
+
+            withDockerRegistry([ credentialsId: "5mio-docker-hub-username-and-password" ]) {
+
+              docker_image.push("${bpmn_studio_version}");
+            }
+          } finally {
+            sh("docker rmi ${full_image_name} || true");
           }
         }
       }
