@@ -15,7 +15,7 @@ import {InspectPanel} from './components/inspect-panel/inspect-panel';
 
 @inject('InspectCorrelationService', EventAggregator)
 export class InspectCorrelation {
-  @bindable public processInstanceToSelect: string;
+  @bindable public processInstanceIdToSelect: string;
   @bindable public flowNodeToSelect: string;
   @bindable public activeDiagram: IDiagram;
   @bindable public activeSolutionEntry: ISolutionEntry;
