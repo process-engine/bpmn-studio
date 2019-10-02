@@ -129,13 +129,15 @@ export class InspectCorrelationRepository implements IInspectCorrelationReposito
     const processInstances: Array<ProcessInstance> = [];
 
     result.forEach((correlation: DataModels.Correlations.Correlation) => {
-      processInstances.push(
-        ...correlation.processInstances.map((instance: DataModels.Correlations.ProcessInstance) => {
+      const processInstancesForCorrelation = correlation.processInstances.map(
+        (instance: DataModels.Correlations.ProcessInstance) => {
           instance.correlationId = correlation.id;
 
           return instance;
-        }),
+        },
       );
+
+      processInstances.push(...processInstancesForCorrelation);
     });
 
     return processInstances;
