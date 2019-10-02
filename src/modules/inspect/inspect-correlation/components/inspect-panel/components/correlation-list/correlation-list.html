@@ -23,6 +23,13 @@
         </tr>
       </thead>
       <tbody class="correlation-table__body">
+        <tr if.bind="processInstanceToSelectTableEntry" dblclick.delegate="showLogViewer()" class="correlation-table__table-row" class.bind="processInstanceToSelectTableEntry.processInstanceId === selectedTableEntry.processInstanceId ? 'correlation-table__selected-entry': ''" click.delegate="selectCorrelation(processInstanceToSelectTableEntry)">
+          <td class="correlation-table__table-entry">${processInstanceToSelectTableEntry.correlationId}</td>
+          <td class="correlation-table__table-entry">${processInstanceToSelectTableEntry.startedAt}</td>
+          <td class="correlation-table__table-entry correlation-table__table-entry--state">${processInstanceToSelectTableEntry.state}</td>
+          <td if.bind="false" class="correlation-table__table-entry">${processInstanceToSelectTableEntry.user}</td>
+          <td class="correlation-table__table-entry">${processInstanceToSelectTableEntry.processInstanceId}</td>
+        </tr>
         <tr dblclick.delegate="showLogViewer()" class="correlation-table__table-row" repeat.for="tableEntry of sortedTableData" class.bind="tableEntry.processInstanceId === selectedTableEntry.processInstanceId ? 'correlation-table__selected-entry': ''" click.delegate="selectCorrelation(tableEntry)">
           <td class="correlation-table__table-entry">${tableEntry.correlationId}</td>
           <td class="correlation-table__table-entry">${tableEntry.startedAt}</td>
