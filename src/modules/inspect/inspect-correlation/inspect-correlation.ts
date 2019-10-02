@@ -136,7 +136,7 @@ export class InspectCorrelation {
 
   private async updateProcessInstances(): Promise<void> {
     try {
-      const correlationList = await this.getProcessInstacesForProcessModel();
+      const correlationList = await this.getProcessInstancesForProcessModel();
 
       this.totalCount = correlationList.totalCount;
       this.correlations = correlationList.processInstances;
@@ -147,7 +147,7 @@ export class InspectCorrelation {
     }
   }
 
-  private getProcessInstacesForProcessModel(): Promise<DataModels.Correlations.ProcessInstanceList> {
+  private getProcessInstancesForProcessModel(): Promise<DataModels.Correlations.ProcessInstanceList> {
     if (this.updatePromise) {
       this.updatePromise.cancel();
     }
@@ -163,13 +163,13 @@ export class InspectCorrelation {
           );
 
           if (this.processInstanceToSelect) {
-            const processInstanceAlreadyExist = processInstances.processInstances.some(
+            const processInstanceAlreadyExists = processInstances.processInstances.some(
               (instance: DataModels.Correlations.ProcessInstance) => {
                 return instance.processInstanceId === this.processInstanceToSelect;
               },
             );
 
-            if (!processInstanceAlreadyExist) {
+            if (!processInstanceAlreadyExists) {
               const processInstance = await this.inspectCorrelationService.getProcessInstanceById(
                 this.activeSolutionEntry.identity,
                 this.processInstanceToSelect,
