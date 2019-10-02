@@ -16,6 +16,7 @@ import {InspectPanel} from './components/inspect-panel/inspect-panel';
 @inject('InspectCorrelationService', EventAggregator)
 export class InspectCorrelation {
   @bindable public processInstanceIdToSelect: string;
+  @bindable public processInstanceToSelect: DataModels.Correlations.ProcessInstance;
   @bindable public flowNodeToSelect: string;
   @bindable public activeDiagram: IDiagram;
   @bindable public activeSolutionEntry: ISolutionEntry;
@@ -162,23 +163,12 @@ export class InspectCorrelation {
             this.limit,
           );
 
-          if (this.processInstanceToSelect) {
-            const processInstanceAlreadyExists = processInstances.processInstances.some(
-              (instance: DataModels.Correlations.ProcessInstance) => {
-                return instance.processInstanceId === this.processInstanceToSelect;
-              },
+          if (this.processInstanceIdToSelect) {
+            this.processInstanceToSelect = await this.inspectCorrelationService.getProcessInstanceById(
+              this.activeSolutionEntry.identity,
+              this.processInstanceIdToSelect,
+              this.activeDiagram.id,
             );
-
-            if (!processInstanceAlreadyExists) {
-              const processInstance = await this.inspectCorrelationService.getProcessInstanceById(
-                this.activeSolutionEntry.identity,
-                this.processInstanceToSelect,
-                this.activeDiagram.id,
-              );
-
-              processInstances.processInstances.shift();
-              processInstances.processInstances.push(processInstance);
-            }
           }
 
           resolve(processInstances);

@@ -21,7 +21,7 @@ export enum PageSize {
 
 @inject(EventAggregator)
 export class CorrelationList {
-  @bindable public processInstanceToSelect: string;
+  @bindable public processInstanceToSelect: DataModels.Correlations.ProcessInstance;
   @bindable public selectedProcessInstance: DataModels.Correlations.ProcessInstance;
   @bindable @observable public correlations: Array<DataModels.Correlations.ProcessInstance>;
   @bindable public activeDiagram: IDiagram;
