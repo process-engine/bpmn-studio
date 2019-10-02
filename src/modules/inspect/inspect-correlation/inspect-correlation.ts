@@ -52,7 +52,13 @@ export class InspectCorrelation {
         this.activeSolutionEntry.identity,
       );
 
-      this.correlations = correlationList.correlations;
+      // https://github.com/process-engine/process_engine_runtime/issues/432
+      if (correlationList.totalCount === 0) {
+        this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
+        this.correlations = [];
+      } else {
+        this.correlations = correlationList.correlations;
+      }
     } catch (error) {
       this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
       this.correlations = [];
@@ -145,7 +151,13 @@ export class InspectCorrelation {
           this.activeSolutionEntry.identity,
         );
 
-        this.correlations = correlationList.correlations;
+        // https://github.com/process-engine/process_engine_runtime/issues/432
+        if (correlationList.totalCount === 0) {
+          this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
+          this.correlations = [];
+        } else {
+          this.correlations = correlationList.correlations;
+        }
       } catch (error) {
         this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
         this.correlations = [];
