@@ -60,6 +60,8 @@ export class CorrelationList {
 
   public activeDiagramChanged(): void {
     this.currentPage = 0;
+    this.processInstanceToSelect = undefined;
+    this.processInstanceToSelectTableEntry = undefined;
   }
 
   public correlationsChanged(): void {

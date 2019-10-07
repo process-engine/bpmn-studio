@@ -50,6 +50,7 @@ export class InspectPanel {
 
   public activeDiagramChanged(): void {
     this.selectedProcessInstance = undefined;
+    this.processInstanceToSelect = undefined;
 
     this.showLogViewer = false;
     this.showCorrelationList = true;
