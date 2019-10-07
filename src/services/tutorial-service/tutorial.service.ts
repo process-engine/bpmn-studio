@@ -10,8 +10,6 @@ import {NotificationService} from '../notification-service/notification.service'
 import environment from '../../environment';
 import {Chapter, NotificationType} from '../../contracts/index';
 
-Bluebird.Promise.config({cancellation: true});
-
 @inject(EventAggregator, 'NotificationService', Router)
 export class TutorialService {
   private driver: Driver;

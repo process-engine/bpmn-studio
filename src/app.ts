@@ -9,12 +9,17 @@ import 'bootstrap';
 
 import {OpenIdConnect} from 'aurelia-open-id-connect';
 
+import * as Bluebird from 'bluebird';
+
 import {NotificationType} from './contracts/index';
 import environment from './environment';
 import {NotificationService} from './services/notification-service/notification.service';
 
 import {oidcConfig} from './open-id-connect-configuration';
 import {TutorialService} from './services/tutorial-service/tutorial.service';
+
+Bluebird.Promise.config({cancellation: true});
+
 @inject(OpenIdConnect, 'NotificationService', EventAggregator, TutorialService)
 export class App {
   public showSolutionExplorer: boolean = false;
