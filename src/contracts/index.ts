@@ -21,3 +21,4 @@ export * from './solution-explorer';
 export * from './navigation';
 export * from './diagram/index';
 export * from './constants';
+export * from './tutorial/index';

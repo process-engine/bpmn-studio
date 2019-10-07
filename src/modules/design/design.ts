@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/adjacent-overload-signatures */
 /**
  * We are disabling this rule here because we need this kind of statement in the
  * functions used in the promise of the modal.
@@ -199,6 +200,13 @@ export class Design {
       this.eventAggregator.subscribe(environment.events.bpmnio.propertyPanelActive, (showPanel: boolean) => {
         this.propertyPanelShown = showPanel;
       }),
+      this.eventAggregator.subscribe(environment.events.hideAllModals, () => {
+        this.showRemoteSolutionOnDeployModal = false;
+        this.showSaveForStartModal = false;
+        this.showSelectDiagramModal = false;
+        this.showStartEventModal = false;
+        this.showStartWithOptionsModal = false;
+      }),
     ];
 
     const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
@@ -343,8 +351,20 @@ export class Design {
     return this.diagramDetail.showStartEventModal;
   }
 
-  public get diagramHasChanged(): boolean {
-    return this.diagramDetail.diagramHasChanged;
+  public set showRemoteSolutionOnDeployModal(value: boolean) {
+    this.diagramDetail.showRemoteSolutionOnDeployModal = value;
+  }
+
+  public set showSaveForStartModal(value: boolean) {
+    this.diagramDetail.showSaveForStartModal = value;
+  }
+
+  public set showStartWithOptionsModal(value: boolean) {
+    this.diagramDetail.showStartWithOptionsModal = value;
+  }
+
+  public set showStartEventModal(value: boolean) {
+    this.diagramDetail.showStartEventModal = value;
   }
 
   private async setActiveDiagram(diagramName: string, diagramUri: string): Promise<void> {

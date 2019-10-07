@@ -14,8 +14,6 @@ import {NotificationService} from '../../../services/notification-service/notifi
 import environment from '../../../environment';
 import {IDashboardService} from '../dashboard/contracts';
 
-Bluebird.Promise.config({cancellation: true});
-
 type ProcessInstanceWithCorrelation = {
   processInstance: DataModels.Correlations.ProcessInstance;
   correlation: DataModels.Correlations.Correlation;

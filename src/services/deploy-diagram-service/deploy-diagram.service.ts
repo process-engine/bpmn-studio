@@ -47,7 +47,7 @@ export class DeployDiagramService {
     this.moddle = this.modeler.get('moddle');
   }
 
-  public async deployDiagram(solution: ISolutionEntry, diagram: IDiagram, xml?: string): Promise<void> {
+  public async deployDiagram(diagram: IDiagram, xml?: string): Promise<void> {
     const diagramHasChanges: boolean = xml !== undefined;
     if (diagramHasChanges) {
       diagram.xml = xml;
@@ -103,10 +103,21 @@ export class DeployDiagramService {
         'Diagram was successfully uploaded to the connected ProcessEngine.',
       );
 
+      await this.waitForNavigation();
+
       this.eventAggregator.publish(environment.events.diagramDetail.onDiagramDeployed, processModelId);
+      this.eventAggregator.publish(environment.events.tutorial.diagramDeployed);
     } catch (error) {
       this.notificationService.showNotification(NotificationType.ERROR, `Unable to update diagram: ${error}.`);
     }
+  }
+
+  private waitForNavigation(): Promise<void> {
+    return new Promise((resolve: Function): void => {
+      this.eventAggregator.subscribeOnce(environment.events.updatingNavbarDone, () => {
+        resolve();
+      });
+    });
   }
 
   private async getProcessModelIdForXml(xml: string): Promise<string> {
