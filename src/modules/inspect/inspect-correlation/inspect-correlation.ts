@@ -139,8 +139,14 @@ export class InspectCorrelation {
     try {
       const correlationList = await this.getProcessInstancesForProcessModel();
 
+      // https://github.com/process-engine/process_engine_runtime/issues/432
+      if (correlationList.totalCount === 0) {
+        this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
+        this.correlations = [];
+      } else {
+        this.correlations = correlationList.processInstances;
+      }
       this.totalCount = correlationList.totalCount;
-      this.correlations = correlationList.processInstances;
     } catch (error) {
       this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
       this.correlations = [];
