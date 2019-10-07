@@ -51,6 +51,10 @@
   cursor: pointer;
 }
 
+.correlation-table__table-row--instance-to-select {
+  border: 4px double
+}
+
 .correlation-table__table-entry {
   width: 30%;
   padding: 8px;

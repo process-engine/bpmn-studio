@@ -23,7 +23,7 @@
         </tr>
       </thead>
       <tbody class="correlation-table__body">
-        <tr if.bind="processInstanceToSelectTableEntry" dblclick.delegate="showLogViewer()" class="correlation-table__table-row" class.bind="processInstanceToSelectTableEntry.processInstanceId === selectedTableEntry.processInstanceId ? 'correlation-table__selected-entry': ''" click.delegate="selectCorrelation(processInstanceToSelectTableEntry)">
+        <tr if.bind="processInstanceToSelectTableEntry" dblclick.delegate="showLogViewer()" class="correlation-table__table-row correlation-table__table-row--instance-to-select" class.bind="processInstanceToSelectTableEntry.processInstanceId === selectedTableEntry.processInstanceId ? 'correlation-table__selected-entry': ''" click.delegate="selectCorrelation(processInstanceToSelectTableEntry)">
           <td class="correlation-table__table-entry">${processInstanceToSelectTableEntry.correlationId}</td>
           <td class="correlation-table__table-entry">${processInstanceToSelectTableEntry.startedAt}</td>
           <td class="correlation-table__table-entry correlation-table__table-entry--state">${processInstanceToSelectTableEntry.state}</td>
