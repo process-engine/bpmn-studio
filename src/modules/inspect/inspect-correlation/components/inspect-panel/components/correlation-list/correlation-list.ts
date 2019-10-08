@@ -17,6 +17,7 @@ const MIN_PAGESIZE = PAGE_SIZES[0];
 export const DEFAULT_PAGESIZE = PAGE_SIZES[1];
 
 const PAGINATION_SIZE = 10;
+
 @inject(EventAggregator)
 export class CorrelationList {
   @bindable public processInstanceToSelect: DataModels.Correlations.ProcessInstance;
