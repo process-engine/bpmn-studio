@@ -1,4 +1,3 @@
-import {PageSize} from './components/inspect-panel/components/correlation-list/correlation-list';
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {bindable, inject, observable} from 'aurelia-framework';
 
@@ -13,6 +12,7 @@ import environment from '../../../environment';
 import {IInspectCorrelationService} from './contracts';
 import {DiagramViewer} from './components/diagram-viewer/diagram-viewer';
 import {InspectPanel} from './components/inspect-panel/inspect-panel';
+import {DEFAULT_PAGESIZE} from './components/inspect-panel/components/correlation-list/correlation-list';
 
 @inject('InspectCorrelationService', EventAggregator)
 export class InspectCorrelation {
@@ -31,7 +31,7 @@ export class InspectCorrelation {
   @bindable public totalCount: number;
 
   public offset: number = 0;
-  public limit: number = PageSize.fifty;
+  public limit: number = DEFAULT_PAGESIZE;
 
   public correlations: Array<DataModels.Correlations.ProcessInstance>;
   public token: string;
@@ -200,7 +200,7 @@ export class InspectCorrelation {
   public async activeDiagramChanged(): Promise<void> {
     if (this.viewIsAttached) {
       this.offset = 0;
-      this.limit = PageSize.fifty;
+      this.limit = DEFAULT_PAGESIZE;
       this.processInstanceIdToSelect = undefined;
       this.processInstanceToSelect = undefined;
 
