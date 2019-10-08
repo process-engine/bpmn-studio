@@ -17,7 +17,7 @@ export function configure(aurelia: Aurelia): void {
   if ((window as any).nodeRequire) {
     const ipcRenderer: any = (window as any).nodeRequire('electron').ipcRenderer;
     const newHost: string = ipcRenderer.sendSync('get_host');
-    const ProcessEngineVersion: string = ipcRenderer.sendSync('get_version');
+    const processEngineVersion: string = ipcRenderer.sendSync('get_version');
     /**
      * Currently the internal PE is always connected via http.
      * This will be subject to change.
@@ -25,7 +25,7 @@ export function configure(aurelia: Aurelia): void {
     const processEngineBaseRouteWithProtocol: string = `http://${newHost}`;
 
     localStorage.setItem('InternalProcessEngineRoute', processEngineBaseRouteWithProtocol);
-    localStorage.setItem('InternalProcessEngineVersion', ProcessEngineVersion);
+    localStorage.setItem('InternalProcessEngineVersion', processEngineVersion);
 
     aurelia.container.registerInstance('InternalProcessEngineBaseRoute', processEngineBaseRouteWithProtocol);
   } else {
