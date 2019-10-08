@@ -180,7 +180,6 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
               const change: DiagramStateChange = diagramState.metadata.change;
 
               const diagramWasChangedByStudio: boolean = change !== undefined && change.change === 'rename';
-
               if (diagramWasChangedByStudio) {
                 isSaving = false;
 
