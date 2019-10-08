@@ -262,7 +262,6 @@ export class DiagramDetail {
     }
 
     this.clickedOnCustomStart = false;
-    this.eventAggregator.publish(environment.events.tutorial.diagramStarted);
   }
 
   public async saveChangesBeforeStart(): Promise<void> {
@@ -454,7 +453,7 @@ export class DiagramDetail {
   private async deployDiagram(): Promise<void> {
     const xml: string | undefined = this.diagramHasChanged ? await this.bpmnio.getXML() : undefined;
 
-    await this.deployDiagramService.deployDiagram(this.activeDiagram, xml);
+    this.deployDiagramService.deployDiagram(this.activeSolutionEntry, this.activeDiagram, xml);
   }
 
   /**

@@ -157,9 +157,6 @@ export class SolutionExplorerSolution {
       this.eventAggregator.subscribe('router:navigation:success', () => {
         this.updateSolutionExplorer();
       }),
-      this.eventAggregator.subscribe(environment.events.hideAllModals, () => {
-        this.showCloseModal = false;
-      }),
     ];
 
     if (this.displayedSolutionEntry.isOpenDiagramService) {
@@ -449,7 +446,7 @@ export class SolutionExplorerSolution {
 
     const xml: string | undefined = diagramHasState ? diagramState.data.xml : undefined;
 
-    await this.deployDiagramService.deployDiagram(this.diagramInContextMenu, xml);
+    await this.deployDiagramService.deployDiagram(this.displayedSolutionEntry, this.diagramInContextMenu, xml);
   }
 
   /*

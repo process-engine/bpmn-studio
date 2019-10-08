@@ -1,4 +1,4 @@
-import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
+import {EventAggregator} from 'aurelia-event-aggregator';
 import {bindable, inject} from 'aurelia-framework';
 import {ValidateEvent, ValidationController, ValidationRules} from 'aurelia-validation';
 
@@ -21,7 +21,6 @@ export class PoolSection implements ISection {
   private modeler: IBpmnModeler;
   private previousProcessRefId: string;
   private eventAggregator: EventAggregator;
-  private subscriptions: Array<Subscription>;
 
   constructor(controller?: ValidationController, eventAggregator?: EventAggregator) {
     this.validationController = controller;
@@ -53,22 +52,10 @@ export class PoolSection implements ISection {
     this.showProcessIdWarningModal = Boolean(window.localStorage.getItem('showProcessIdWarningModal'));
   }
 
-  public attached(): void {
-    this.subscriptions = [
-      this.eventAggregator.subscribe(environment.events.hideAllModals, () => {
-        this.showModal = false;
-      }),
-    ];
-  }
-
   public detached(): void {
     if (this.validationError) {
       this.businessObjInPanel.processRef.id = this.previousProcessRefId;
       this.validationController.validate();
-    }
-
-    for (const subscription of this.subscriptions) {
-      subscription.dispose();
     }
   }
 

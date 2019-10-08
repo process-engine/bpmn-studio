@@ -28,7 +28,6 @@ import oidcConfig from './oidc-config';
 import ReleaseChannel from '../src/services/release-channel-service/release-channel-service';
 import {version as CurrentStudioVersion} from '../package.json';
 import {getPortListByVersion} from '../src/services/default-ports-module/default-ports-module';
-import {Chapter} from '../src/contracts';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import electron = require('electron');
@@ -50,9 +49,6 @@ let isInitialized: boolean = false;
  * openend via double click.
  */
 let fileOpenMainEvent: IpcMainEvent;
-
-let showDiagramRelatedMenuEntries: boolean = false;
-let tutorialChapters: Array<Chapter> = [];
 
 function execute(): void {
   /**
@@ -288,24 +284,6 @@ function initializeFileOpenFeature(): void {
     isInitialized = true;
   });
 
-  ipcMain.on('update-tutorial-chapters', (mainEvent: IpcMainEvent, newTutorialChapterList: Array<Chapter>) => {
-    tutorialChapters = newTutorialChapterList;
-
-    setElectronMenubar();
-  });
-
-  ipcMain.on('menu_hide-diagram-entries', () => {
-    showDiagramRelatedMenuEntries = false;
-
-    setElectronMenubar();
-  });
-
-  ipcMain.on('menu_show-all-menu-entries', () => {
-    showDiagramRelatedMenuEntries = true;
-
-    setElectronMenubar();
-  });
-
   ipcMain.on('get_opened_file', (event) => {
     const filePathExists: boolean = fileAssociationFilePath === undefined;
     if (filePathExists) {
@@ -475,14 +453,32 @@ function setOpenSolutionsListener(): void {
 }
 
 function setElectronMenubar(): void {
-  const fileMenu: MenuItem = showDiagramRelatedMenuEntries ? getFileMenu() : getFileMenuWithoutDiagramRelatedEntries();
+  showMenuEntriesWithoutDiagramEntries();
 
-  const template = [getApplicationMenu(), fileMenu, getEditMenu(), getWindowMenu(), getHelpMenu()];
+  ipcMain.on('menu_hide-diagram-entries', () => {
+    showMenuEntriesWithoutDiagramEntries();
+  });
+
+  ipcMain.on('menu_show-all-menu-entries', () => {
+    showAllMenuEntries();
+  });
+}
+
+function showAllMenuEntries(): void {
+  const template = [getApplicationMenu(), getFileMenu(), getEditMenu(), getWindowMenu(), getHelpMenu()];
 
   electron.Menu.setApplicationMenu(electron.Menu.buildFromTemplate(template));
 }
 
-function getFileMenuWithoutDiagramRelatedEntries(): MenuItem {
+function showMenuEntriesWithoutDiagramEntries(): void {
+  const filteredFileMenu: MenuItem = getFilteredFileMenu();
+
+  const template = [getApplicationMenu(), filteredFileMenu, getEditMenu(), getWindowMenu(), getHelpMenu()];
+
+  electron.Menu.setApplicationMenu(electron.Menu.buildFromTemplate(template));
+}
+
+function getFilteredFileMenu(): MenuItem {
   let previousEntryIsSeparator = false;
 
   const unfilteredFileMenu = getFileMenu();
@@ -712,13 +708,6 @@ function getHelpMenu(): MenuItem {
       },
     },
     {
-      label: 'Tutorial',
-      submenu: getTutorialMenu(),
-    },
-    {
-      type: 'separator',
-    },
-    {
       label: 'Release Notes',
       click: (): void => {
         const currentVersion = app.getVersion();
@@ -766,21 +755,6 @@ function getHelpMenu(): MenuItem {
   };
 
   return new MenuItem(menuOptions);
-}
-
-function getTutorialMenu(): Menu {
-  const submenuOptions: Array<MenuItemConstructorOptions> = tutorialChapters.map((chapter: Chapter) => {
-    return {
-      label: `Chapter ${chapter.index + 1}: ${chapter.name}`,
-      click: (): void => {
-        browserWindow.webContents.send('menubar__start_tutorial', chapter.index);
-      },
-    };
-  });
-
-  const submenu: Menu = electron.Menu.buildFromTemplate(submenuOptions);
-
-  return submenu;
 }
 
 function getAboutWindowInfo(): AboutWindowInfo {

@@ -66,7 +66,6 @@
     "bpmn-js-differ": "2.0.2",
     "clipboard-polyfill": "2.8.1",
     "dom-event-dispatch": "1.0.0",
-    "driver.js": "0.9.7",
     "electron-is-dev": "1.1.0",
     "electron-notifications": "1.0.0",
     "get-port": "^5.0.0",

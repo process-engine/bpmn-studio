@@ -1,4 +1,4 @@
-import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
+import {EventAggregator} from 'aurelia-event-aggregator';
 import {inject} from 'aurelia-framework';
 
 import {IScriptTaskElement, IShape} from '@process-engine/bpmn-elements_contracts';
@@ -17,7 +17,6 @@ export class ScriptTaskSection implements ISection {
   public scriptInput: HTMLElement;
 
   private eventAggregator: EventAggregator;
-  private subscriptions: Array<Subscription>;
 
   constructor(eventAggregator?: EventAggregator) {
     this.eventAggregator = eventAggregator;
@@ -31,20 +30,10 @@ export class ScriptTaskSection implements ISection {
     this.recoverInputHeight();
 
     this.saveInputHeightOnChange();
-
-    this.subscriptions = [
-      this.eventAggregator.subscribe(environment.events.hideAllModals, () => {
-        this.showModal = false;
-      }),
-    ];
   }
 
   public detached(): void {
     this.scriptInput.removeEventListener('mousedown', this.saveInputHeightOnMouseUp);
-
-    for (const subscription of this.subscriptions) {
-      subscription.dispose();
-    }
   }
 
   public isSuitableForElement(element: IShape): boolean {

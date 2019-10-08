@@ -1,4 +1,4 @@
-import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
+import {EventAggregator} from 'aurelia-event-aggregator';
 import {bindable, inject} from 'aurelia-framework';
 
 import {IProperty, IServiceTaskElement} from '@process-engine/bpmn-elements_contracts';
@@ -19,7 +19,6 @@ export class ExternalTask {
 
   private eventAggregator: EventAggregator;
   private serviceTaskService: ServiceTaskService;
-  private subscriptions: Array<Subscription>;
 
   constructor(eventAggregator?: EventAggregator) {
     this.eventAggregator = eventAggregator;
@@ -29,20 +28,10 @@ export class ExternalTask {
     this.recoverInputHeight();
 
     this.saveInputHeightOnChange();
-
-    this.subscriptions = [
-      this.eventAggregator.subscribe(environment.events.hideAllModals, () => {
-        this.showModal = false;
-      }),
-    ];
   }
 
   public detached(): void {
     this.payloadInput.removeEventListener('mousedown', this.saveInputHeightOnMouseUp);
-
-    for (const subscription of this.subscriptions) {
-      subscription.dispose();
-    }
   }
 
   public modelChanged(): void {

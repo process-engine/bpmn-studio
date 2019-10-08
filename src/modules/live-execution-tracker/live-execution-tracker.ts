@@ -2,13 +2,12 @@
 /* eslint-disable 6river/new-cap */
 import {computedFrom, inject, observable} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
-import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 
 import * as bundle from '@process-engine/bpmn-js-custom-bundle';
 
 import {DataModels} from '@process-engine/management_api_contracts';
 
-import {Subscription as RuntimeSubscription} from '@essential-projects/event_aggregator_contracts';
+import {Subscription} from '@essential-projects/event_aggregator_contracts';
 import {IShape} from '@process-engine/bpmn-elements_contracts';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 
@@ -45,7 +44,7 @@ type RouteParameters = {
 const versionRegex: RegExp = /(\d+)\.(\d+).(\d+)/;
 
 // tslint:disable: no-magic-numbers
-@inject(Router, 'NotificationService', 'SolutionService', 'LiveExecutionTrackerService', EventAggregator)
+@inject(Router, 'NotificationService', 'SolutionService', 'LiveExecutionTrackerService')
 export class LiveExecutionTracker {
   public canvasModel: HTMLElement;
   public previewCanvasModel: HTMLElement;
@@ -93,26 +92,21 @@ export class LiveExecutionTracker {
   private isColorizing: boolean = false;
   private colorizeAgain: boolean = false;
 
-  private eventListenerSubscriptions: Array<RuntimeSubscription> = [];
+  private eventListenerSubscriptions: Array<Subscription> = [];
   private overlaysWithEventListeners: Array<string> = [];
 
   private liveExecutionTrackerService: ILiveExecutionTrackerService;
-
-  private eventAggregator: EventAggregator;
-  private subscriptions: Array<Subscription>;
 
   constructor(
     router: Router,
     notificationService: NotificationService,
     solutionService: ISolutionService,
     liveExecutionTrackerService: ILiveExecutionTrackerService,
-    eventAggregator: EventAggregator,
   ) {
     this.router = router;
     this.notificationService = notificationService;
     this.solutionService = solutionService;
     this.liveExecutionTrackerService = liveExecutionTrackerService;
-    this.eventAggregator = eventAggregator;
   }
 
   public async activate(routeParameters: RouteParameters): Promise<void> {
@@ -247,13 +241,6 @@ export class LiveExecutionTracker {
 
     const previousTokenViewerState: boolean = JSON.parse(window.localStorage.getItem('tokenViewerLETCollapseState'));
     this.showTokenViewer = previousTokenViewerState || false;
-
-    this.subscriptions = [
-      this.eventAggregator.subscribe(environment.events.hideAllModals, () => {
-        this.showDiagramPreviewViewer = false;
-        this.showDynamicUiModal = false;
-      }),
-    ];
   }
 
   public async detached(): Promise<void> {
@@ -268,7 +255,7 @@ export class LiveExecutionTracker {
     this.diagramPreviewViewer.destroy();
 
     const removeSubscriptionPromises: Array<Promise<void>> = [];
-    this.eventListenerSubscriptions.forEach((subscription: RuntimeSubscription) => {
+    this.eventListenerSubscriptions.forEach((subscription: Subscription) => {
       const removingPromise: Promise<void> = this.liveExecutionTrackerService.removeSubscription(
         this.activeSolutionEntry.identity,
         subscription,
@@ -279,10 +266,6 @@ export class LiveExecutionTracker {
 
     await Promise.all(removeSubscriptionPromises);
     this.eventListenerSubscriptions = [];
-
-    for (const subscription of this.subscriptions) {
-      subscription.dispose();
-    }
   }
 
   public determineActivationStrategy(): string {
@@ -983,7 +966,7 @@ export class LiveExecutionTracker {
     return parentProcessInstanceId;
   }
 
-  private createBackendEventListeners(): Promise<Array<RuntimeSubscription>> {
+  private createBackendEventListeners(): Promise<Array<Subscription>> {
     const processEndedCallback: Function = (): void => {
       this.handleElementColorization();
 
@@ -995,14 +978,14 @@ export class LiveExecutionTracker {
     };
 
     const processEndedSubscriptionPromise: Promise<
-      RuntimeSubscription
+      Subscription
     > = this.liveExecutionTrackerService.createProcessEndedEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       processEndedCallback,
     );
     const processTerminatedSubscriptionPromise: Promise<
-      RuntimeSubscription
+      Subscription
     > = this.liveExecutionTrackerService.createProcessTerminatedEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
@@ -1010,91 +993,91 @@ export class LiveExecutionTracker {
     );
 
     const userTaskWaitingSubscriptionPromise: Promise<
-      RuntimeSubscription
+      Subscription
     > = this.liveExecutionTrackerService.createUserTaskWaitingEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       colorizationCallback,
     );
     const userTaskFinishedSubscriptionPromise: Promise<
-      RuntimeSubscription
+      Subscription
     > = this.liveExecutionTrackerService.createUserTaskFinishedEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       colorizationCallback,
     );
     const manualTaskWaitingSubscriptionPromise: Promise<
-      RuntimeSubscription
+      Subscription
     > = this.liveExecutionTrackerService.createManualTaskWaitingEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       colorizationCallback,
     );
     const manualTaskFinishedSubscriptionPromise: Promise<
-      RuntimeSubscription
+      Subscription
     > = this.liveExecutionTrackerService.createManualTaskFinishedEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       colorizationCallback,
     );
     const emptyActivityWaitingSubscriptionPromise: Promise<
-      RuntimeSubscription
+      Subscription
     > = this.liveExecutionTrackerService.createEmptyActivityWaitingEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       colorizationCallback,
     );
     const emptyActivityFinishedSubscriptionPromise: Promise<
-      RuntimeSubscription
+      Subscription
     > = this.liveExecutionTrackerService.createEmptyActivityFinishedEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       colorizationCallback,
     );
     const activityReachedSubscriptionPromise: Promise<
-      RuntimeSubscription
+      Subscription
     > = this.liveExecutionTrackerService.createActivityReachedEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       colorizationCallback,
     );
     const activityFinishedSubscriptionPromise: Promise<
-      RuntimeSubscription
+      Subscription
     > = this.liveExecutionTrackerService.createActivityFinishedEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       colorizationCallback,
     );
     const boundaryEventTriggeredSubscriptionPromise: Promise<
-      RuntimeSubscription
+      Subscription
     > = this.liveExecutionTrackerService.createBoundaryEventTriggeredEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       colorizationCallback,
     );
     const intermediateThrowEventTriggeredSubscriptionPromise: Promise<
-      RuntimeSubscription
+      Subscription
     > = this.liveExecutionTrackerService.createIntermediateThrowEventTriggeredEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       colorizationCallback,
     );
     const intermediateCatchEventReachedSubscriptionPromise: Promise<
-      RuntimeSubscription
+      Subscription
     > = this.liveExecutionTrackerService.createIntermediateCatchEventReachedEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       colorizationCallback,
     );
     const intermediateCatchEventFinishedSubscriptionPromise: Promise<
-      RuntimeSubscription
+      Subscription
     > = this.liveExecutionTrackerService.createIntermediateCatchEventFinishedEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       colorizationCallback,
     );
 
-    const subscriptionPromises: Array<Promise<RuntimeSubscription>> = [
+    const subscriptionPromises: Array<Promise<Subscription>> = [
       processEndedSubscriptionPromise,
       processTerminatedSubscriptionPromise,
       userTaskWaitingSubscriptionPromise,

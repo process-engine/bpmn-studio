@@ -9,18 +9,12 @@ import 'bootstrap';
 
 import {OpenIdConnect} from 'aurelia-open-id-connect';
 
-import * as Bluebird from 'bluebird';
-
 import {NotificationType} from './contracts/index';
 import environment from './environment';
 import {NotificationService} from './services/notification-service/notification.service';
 
 import {oidcConfig} from './open-id-connect-configuration';
-import {TutorialService} from './services/tutorial-service/tutorial.service';
-
-Bluebird.Promise.config({cancellation: true});
-
-@inject(OpenIdConnect, 'NotificationService', EventAggregator, TutorialService)
+@inject(OpenIdConnect, 'NotificationService', EventAggregator)
 export class App {
   public showSolutionExplorer: boolean = false;
 
@@ -33,18 +27,14 @@ export class App {
   private ipcRenderer: any | null = null;
   private router: Router;
 
-  private tutorialService: TutorialService;
-
   constructor(
     openIdConnect: OpenIdConnect,
     notificationService: NotificationService,
     eventAggregator: EventAggregator,
-    tutorialService: TutorialService,
   ) {
     this.openIdConnect = openIdConnect;
     this.notificationService = notificationService;
     this.eventAggregator = eventAggregator;
-    this.tutorialService = tutorialService;
 
     if (this.isRunningInElectron) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
@@ -52,8 +42,6 @@ export class App {
       this.ipcRenderer.on('database-export-error', (event: Event, errorMessage: string) => {
         this.notificationService.showNotification(NotificationType.ERROR, errorMessage);
       });
-
-      this.ipcRenderer.send('update-tutorial-chapters', this.tutorialService.getAllChapters());
     }
   }
 
@@ -123,12 +111,6 @@ export class App {
 
     if (this.isRunningInElectron) {
       this.ipcRenderer.on('menubar__open_preferences', this.openPreferences);
-
-      this.ipcRenderer.on('menubar__start_tutorial', (event: Event, chapterIndex: number) => {
-        const selectedChapter = this.tutorialService.getChapter(chapterIndex);
-
-        selectedChapter.start();
-      });
     }
   }
 
