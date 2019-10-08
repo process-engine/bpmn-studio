@@ -114,7 +114,8 @@ export class LoadDeployStartTutorial extends Tutorial {
       element: startDiagramElementId,
       popover: {
         title: 'Start the diagram',
-        description: 'As soon as the diagram is deployed to the remote solution, it can be started.',
+        description:
+          'As soon as the diagram is deployed to the remote solution, it can be started. Click on this button to start the diagram.',
         position: 'left',
       },
     });
