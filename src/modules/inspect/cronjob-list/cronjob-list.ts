@@ -5,10 +5,13 @@ import * as Bluebird from 'bluebird';
 import {DataModels} from '@process-engine/management_api_contracts';
 
 import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
+
+import {Subscription} from '@essential-projects/event_aggregator_contracts';
 import {ISolutionEntry} from '../../../contracts/index';
 import environment from '../../../environment';
 import {getBeautifiedDate} from '../../../services/date-service/date.service';
 import {IDashboardService} from '../dashboard/contracts';
+import {processEngineSupportsCronjobEvents} from '../../../services/process-engine-version-module/process-engine-version-module';
 
 @inject('DashboardService')
 export class CronjobList {
@@ -26,6 +29,7 @@ export class CronjobList {
   private dashboardService: IDashboardService;
 
   private updatePromise: any;
+  private subscriptions: Array<Subscription> = [];
 
   constructor(dashboardService: IDashboardService) {
     this.dashboardService = dashboardService;
@@ -38,6 +42,17 @@ export class CronjobList {
 
     if (this.updatePromise) {
       this.updatePromise.cancel();
+      await this.updateCronjobs();
+
+      if (processEngineSupportsCronjobEvents(this.activeSolutionEntry.processEngineVersion)) {
+        clearTimeout(this.pollingTimeout);
+        this.subscribeToEvents();
+      } else {
+        for (const subscription of this.subscriptions) {
+          await this.dashboardService.removeSubscription(this.activeSolutionEntry.identity, subscription);
+        }
+        this.startPolling();
+      }
     }
 
     this.cronjobsToDisplay = [];
@@ -53,12 +68,20 @@ export class CronjobList {
     this.isAttached = true;
 
     await this.updateCronjobs();
-    this.startPolling();
+
+    if (processEngineSupportsCronjobEvents(this.activeSolutionEntry.processEngineVersion)) {
+      this.subscribeToEvents();
+    } else {
+      this.startPolling();
+    }
   }
 
-  public detached(): void {
+  public async detached(): Promise<void> {
     this.isAttached = false;
-    this.stopPolling();
+    clearTimeout(this.pollingTimeout);
+    for (const subscription of this.subscriptions) {
+      await this.dashboardService.removeSubscription(this.activeSolutionEntry.identity, subscription);
+    }
   }
 
   public currentPageChanged(): void {
@@ -127,6 +150,17 @@ export class CronjobList {
     );
   }
 
+  private stopPolling(): void {
+    clearTimeout(this.pollingTimeout);
+  }
+
+  private sortCronjobs(
+    firstCronjob: DataModels.Cronjobs.CronjobConfiguration,
+    secondCronjob: DataModels.Cronjobs.CronjobConfiguration,
+  ): number {
+    return firstCronjob.nextExecution.getTime() - secondCronjob.nextExecution.getTime();
+  }
+
   private startPolling(): void {
     this.pollingTimeout = setTimeout(async () => {
       await this.updateCronjobs();
@@ -137,14 +171,27 @@ export class CronjobList {
     }, environment.processengine.dashboardPollingIntervalInMs);
   }
 
-  private stopPolling(): void {
-    clearTimeout(this.pollingTimeout);
-  }
+  private async subscribeToEvents(): Promise<void> {
+    this.subscriptions = [
+      await this.dashboardService.onCronjobCreated(this.activeSolutionEntry.identity, async (message) => {
+        await this.updateCronjobs();
+      }),
 
-  private sortCronjobs(
-    firstCronjob: DataModels.Cronjobs.CronjobConfiguration,
-    secondCronjob: DataModels.Cronjobs.CronjobConfiguration,
-  ): number {
-    return firstCronjob.nextExecution.getTime() - secondCronjob.nextExecution.getTime();
+      await this.dashboardService.onCronjobExecuted(this.activeSolutionEntry.identity, async (message) => {
+        await this.updateCronjobs();
+      }),
+
+      await this.dashboardService.onCronjobStopped(this.activeSolutionEntry.identity, async (message) => {
+        await this.updateCronjobs();
+      }),
+
+      await this.dashboardService.onCronjobUpdated(this.activeSolutionEntry.identity, async (message) => {
+        await this.updateCronjobs();
+      }),
+
+      await this.dashboardService.onCronjobRemoved(this.activeSolutionEntry.identity, async (message) => {
+        await this.updateCronjobs();
+      }),
+    ];
   }
 }

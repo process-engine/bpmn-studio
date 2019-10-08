@@ -216,4 +216,24 @@ export class DashboardService implements IDashboardService {
   public removeSubscription(identity: IIdentity, subscription: Subscription): Promise<void> {
     return this.dashboardRepository.removeSubscription(identity, subscription);
   }
+
+  public onCronjobCreated(identity: IIdentity, callback: Function): Promise<Subscription> {
+    return this.dashboardRepository.onCronjobCreated(identity, callback);
+  }
+
+  public onCronjobUpdated(identity: IIdentity, callback: Function): Promise<Subscription> {
+    return this.dashboardRepository.onCronjobUpdated(identity, callback);
+  }
+
+  public onCronjobStopped(identity: IIdentity, callback: Function): Promise<Subscription> {
+    return this.dashboardRepository.onCronjobStopped(identity, callback);
+  }
+
+  public onCronjobRemoved(identity: IIdentity, callback: Function): Promise<Subscription> {
+    return this.dashboardRepository.onCronjobRemoved(identity, callback);
+  }
+
+  public onCronjobExecuted(identity: IIdentity, callback: Function): Promise<Subscription> {
+    return this.dashboardRepository.onCronjobExecuted(identity, callback);
+  }
 }

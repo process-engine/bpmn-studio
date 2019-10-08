@@ -116,5 +116,10 @@ export interface IDashboardRepository {
   onUserTaskWaiting(identity: IIdentity, callback: Function): Promise<Subscription>;
   onManualTaskFinished(identity: IIdentity, callback: Function): Promise<Subscription>;
   onManualTaskWaiting(identity: IIdentity, callback: Function): Promise<Subscription>;
+  onCronjobCreated(identity: IIdentity, callback: Function): Promise<Subscription>;
+  onCronjobUpdated(identity: IIdentity, callback: Function): Promise<Subscription>;
+  onCronjobStopped(identity: IIdentity, callback: Function): Promise<Subscription>;
+  onCronjobExecuted(identity: IIdentity, callback: Function): Promise<Subscription>;
+  onCronjobRemoved(identity: IIdentity, callback: Function): Promise<Subscription>;
   removeSubscription(identity: IIdentity, subscription: Subscription): Promise<void>;
 }
