@@ -8,8 +8,8 @@ import {IDiagramDetailRepository} from '../contracts';
 export class DiagramDetailRepository implements IDiagramDetailRepository {
   protected managementApiClient: IManagementApiClient;
 
-  constructor(managementApi: IManagementApiClient) {
-    this.managementApiClient = managementApi;
+  constructor(managementApiClient: IManagementApiClient) {
+    this.managementApiClient = managementApiClient;
   }
 
   public async getStartEventsForProcessModel(
