@@ -17,6 +17,7 @@ import {NotificationService} from './services/notification-service/notification.
 import {oidcConfig} from './open-id-connect-configuration';
 import {isRunningInElectron} from './services/is-running-in-electron-module/is-running-in-electron.module';
 import {TutorialService} from './services/tutorial-service/tutorial.service';
+import {Tutorial} from './modules/tutorials/tutorial';
 
 Bluebird.Promise.config({cancellation: true});
 
@@ -54,7 +55,7 @@ export class App {
         this.notificationService.showNotification(NotificationType.ERROR, errorMessage);
       });
 
-      this.ipcRenderer.send('update-tutorial-chapters', this.tutorialService.getAllChapters());
+      this.ipcRenderer.send('update-tutorial-chapters', this.tutorialService.getAllTutorials());
     }
   }
 
@@ -125,10 +126,10 @@ export class App {
     if (isRunningInElectron()) {
       this.ipcRenderer.on('menubar__open_preferences', this.openPreferences);
 
-      this.ipcRenderer.on('menubar__start_tutorial', (event: Event, chapterIndex: number) => {
-        const selectedChapter = this.tutorialService.getChapter(chapterIndex);
+      this.ipcRenderer.on('menubar__start_tutorial', (event: Event, tutorialIndex: number) => {
+        const selectedTutorial: Tutorial = this.tutorialService.getTutorial(tutorialIndex);
 
-        selectedChapter.start();
+        selectedTutorial.start();
       });
     }
   }

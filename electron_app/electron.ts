@@ -30,7 +30,8 @@ import ReleaseChannel from '../src/services/release-channel-service/release-chan
 import {solutionIsRemoteSolution} from '../src/services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 import {version as CurrentStudioVersion} from '../package.json';
 import {getPortListByVersion} from '../src/services/default-ports-module/default-ports.module';
-import {Chapter, FeedbackData, ITokenObject} from '../src/contracts';
+import {FeedbackData, ITokenObject} from '../src/contracts';
+import {Tutorial} from '../src/modules/tutorials/tutorial';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import electron = require('electron');
@@ -56,7 +57,7 @@ let peErrors: string = '';
 let fileOpenMainEvent: IpcMainEvent;
 
 let showDiagramRelatedMenuEntries: boolean = false;
-let tutorialChapters: Array<Chapter> = [];
+let tutorials: Array<Tutorial> = [];
 
 let runtimeProcess: ChildProcess;
 
@@ -318,8 +319,8 @@ function initializeFileOpenFeature(): void {
     isInitialized = true;
   });
 
-  ipcMain.on('update-tutorial-chapters', (mainEvent: IpcMainEvent, newTutorialChapterList: Array<Chapter>) => {
-    tutorialChapters = newTutorialChapterList;
+  ipcMain.on('update-tutorial-chapters', (mainEvent: IpcMainEvent, newTutorialList: Array<Tutorial>) => {
+    tutorials = newTutorialList;
 
     setElectronMenubar();
   });
@@ -889,11 +890,11 @@ function getHelpMenu(): MenuItem {
 }
 
 function getTutorialMenu(): Menu {
-  const submenuOptions: Array<MenuItemConstructorOptions> = tutorialChapters.map((chapter: Chapter) => {
+  const submenuOptions: Array<MenuItemConstructorOptions> = tutorials.map((tutorial: Tutorial, index: number) => {
     return {
-      label: `Chapter ${chapter.index + 1}: ${chapter.name}`,
+      label: tutorial.name,
       click: (): void => {
-        browserWindow.webContents.send('menubar__start_tutorial', chapter.index);
+        browserWindow.webContents.send('menubar__start_tutorial', index);
       },
     };
   });
