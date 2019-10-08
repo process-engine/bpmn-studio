@@ -202,6 +202,16 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
 
                 return;
               }
+
+              const diagramIsUnchangedInStudio: boolean = !diagramState.metadata.isChanged;
+              const diagramWasChangedOutsideOfTheStudio: boolean = !diagramWasNotChangedOutsideOfTheStudio;
+              if (diagramWasChangedOutsideOfTheStudio && diagramIsUnchangedInStudio) {
+                // TODO: Update XML of Diagram
+
+                isSaving = false;
+
+                return;
+              }
             }
 
             diagramState.metadata.isChanged = true;
