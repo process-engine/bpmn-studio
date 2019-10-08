@@ -243,6 +243,11 @@ export class SolutionExplorerList {
         processEngineVersion = responseJSON.version;
       }
 
+      const uriIsInternalProcessEngine = !uriIsNotInternalProcessEngine;
+      if (uriIsInternalProcessEngine) {
+        processEngineVersion = this.internalProcessEngineVersion;
+      }
+
       if (this.solutionsWhoseOpeningShouldGetAborted.includes(uri)) {
         this.openingSolutionWasCanceled(uri);
 
@@ -267,8 +272,6 @@ export class SolutionExplorerList {
       const openSolutionFailedWithFailedToFetch: boolean = error.message === 'Failed to fetch';
       if (openSolutionFailedWithFailedToFetch) {
         if (!uriIsNotInternalProcessEngine) {
-          await this.getProcessEngineVersionFromInternalPE(uri);
-
           this.openSolution(uri, insertAtBeginning, identityToUse);
 
           return;
@@ -290,10 +293,6 @@ export class SolutionExplorerList {
 
     if (arrayAlreadyContainedURI) {
       throw new Error('Solution is already opened.');
-    }
-
-    if (!processEngineVersion && !uriIsNotInternalProcessEngine) {
-      processEngineVersion = await this.getProcessEngineVersionFromInternalPE(uri);
     }
 
     this.addSolutionEntry(uri, solutionExplorer, identityToUse, insertAtBeginning, processEngineVersion);
@@ -474,26 +473,6 @@ export class SolutionExplorerList {
       1,
     );
     this.solutionsToOpen.splice(this.solutionsToOpen.indexOf(solutionUri), 1);
-  }
-
-  private getProcessEngineVersionFromInternalPE(uri: string): Promise<string> {
-    return new Promise((resolve: Function): void => {
-      const makeRequest: Function = (): void => {
-        setTimeout(async () => {
-          try {
-            const response: Response = await fetch(uri);
-            const responseJSON: any = await response.json();
-
-            resolve(responseJSON.version);
-          } catch (error) {
-            makeRequest();
-          }
-          // tslint:disable-next-line: no-magic-numbers
-        }, 100);
-      };
-
-      makeRequest();
-    });
   }
 
   private cleanupSolution(uri: string): void {
