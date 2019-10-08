@@ -31,7 +31,7 @@ import {solutionIsRemoteSolution} from '../src/services/solution-is-remote-solut
 import {version as CurrentStudioVersion} from '../package.json';
 import {getPortListByVersion} from '../src/services/default-ports-module/default-ports.module';
 import {FeedbackData, ITokenObject} from '../src/contracts';
-import {Tutorial} from '../src/modules/tutorials/tutorial';
+import {Tutorial} from '../src/contracts/index';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import electron = require('electron');

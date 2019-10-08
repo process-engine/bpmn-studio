@@ -30,7 +30,7 @@ export abstract class Tutorial {
     this.driver = driver;
   }
 
-  public abstract start(): void;
+  public abstract async start(): Promise<void>;
   public abstract cancel(): void;
 
   protected cancelTutorialIfClickWasOutsideOfHighlightedArea: (mouseEvent: MouseEvent) => void = (
