@@ -81,9 +81,9 @@ export class InspectCorrelation {
       ),
 
       this.eventAggregator.subscribe(environment.events.inspectCorrelation.updateProcessInstances, async (payload) => {
-        const {pageSize, currentPage} = payload;
-        this.offset = (currentPage - 1) * pageSize;
-        this.limit = pageSize;
+        const {offset, limit} = payload;
+        this.offset = offset;
+        this.limit = limit;
 
         await this.updateProcessInstances();
       }),

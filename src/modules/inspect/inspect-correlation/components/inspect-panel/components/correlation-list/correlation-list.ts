@@ -118,16 +118,21 @@ export class CorrelationList {
     }
 
     if (newValue < oldValue) {
-      this.sortedTableData = this.sortedTableData.slice(0, newValue);
+      const newOffset = this.currentPage * oldValue - oldValue;
+      this.currentPage = Math.floor(newOffset / this.pageSize);
       return;
     }
 
-    const payload = {
-      pageSize: this.pageSize,
-      currentPage: this.currentPage,
-    };
-
-    this.eventAggregator.publish(environment.events.inspectCorrelation.updateProcessInstances, payload);
+    const newOffset = this.currentPage * oldValue + newValue;
+    if (this.currentPage === 1) {
+      const payload = {
+        offset: 0,
+        limit: this.pageSize,
+      };
+      this.eventAggregator.publish(environment.events.inspectCorrelation.updateProcessInstances, payload);
+    } else {
+      this.currentPage = Math.floor(newOffset / newValue);
+    }
   }
 
   public currentPageChanged(newValue: number, oldValue: number): void {
@@ -137,8 +142,8 @@ export class CorrelationList {
     }
 
     const payload = {
-      pageSize: this.pageSize,
-      currentPage: this.currentPage,
+      offset: this.currentPage === 1 || this.currentPage === 0 ? 0 : (this.currentPage - 1) * this.pageSize,
+      limit: this.pageSize,
     };
 
     this.eventAggregator.publish(environment.events.inspectCorrelation.updateProcessInstances, payload);
@@ -175,7 +180,7 @@ export class CorrelationList {
       ? this.sortListByStartDate()
       : this.sortListByProperty(property);
 
-    return ascending ? sortedTableData : sortedTableData.reverse();
+    return sortedTableData;
   }
 
   private sortListByProperty(property: CorrelationListSortProperty): Array<ICorrelationTableEntry> {
