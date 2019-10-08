@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import {TestClient} from '../TestClient';
-import {callExposedFunction} from '../../../src/services/expose-functionality-module/expose-functionality-module';
+import {callExposedFunction} from '../../../src/services/expose-functionality-module/expose-functionality.module';
 
 export class DesignViewClient {
   private testClient: TestClient;

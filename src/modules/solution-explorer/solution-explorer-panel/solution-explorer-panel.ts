@@ -18,7 +18,7 @@ import environment from '../../../environment';
 import {NotificationService} from '../../../services/notification-service/notification.service';
 import {SolutionExplorerList} from '../solution-explorer-list/solution-explorer-list';
 
-import {getPortListByVersion} from '../../../services/default-ports-module/default-ports-module';
+import {getPortListByVersion} from '../../../services/default-ports-module/default-ports.module';
 
 type RemoteSolutionListEntry = {
   uri: string;

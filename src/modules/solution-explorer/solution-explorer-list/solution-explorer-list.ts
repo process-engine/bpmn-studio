@@ -16,10 +16,10 @@ import {
   ISolutionService,
   IUserIdentity,
 } from '../../../contracts';
-import {OpenDiagramsSolutionExplorerService} from '../../../services/solution-explorer-services/OpenDiagramsSolutionExplorerService';
-import {SolutionExplorerServiceFactory} from '../../../services/solution-explorer-services/SolutionExplorerServiceFactory';
+import {OpenDiagramsSolutionExplorerService} from '../../../services/solution-explorer-services/open-diagrams-solution-explorer.service';
+import {SolutionExplorerServiceFactory} from '../../../services/solution-explorer-services/solution-explorer-service-factory';
 import {SolutionExplorerSolution} from '../solution-explorer-solution/solution-explorer-solution';
-import {exposeFunctionForTesting} from '../../../services/expose-functionality-module/expose-functionality-module';
+import {exposeFunctionForTesting} from '../../../services/expose-functionality-module/expose-functionality.module';
 
 interface IUriToViewModelMap {
   [key: string]: SolutionExplorerSolution;

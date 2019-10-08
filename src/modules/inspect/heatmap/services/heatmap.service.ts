@@ -21,8 +21,8 @@ import {
   defaultOverlayPositions,
 } from '../contracts/index';
 import environment from '../../../../environment';
-import {processEngineSupportsPagination} from '../../../../services/process-engine-version-module/process-engine-version-module';
-import {HeatmapPaginationRepository} from '../repositories/heatmap.pagination.repository';
+import {processEngineSupportsPagination} from '../../../../services/process-engine-version-module/process-engine-version.module';
+import {HeatmapPaginationRepository} from '../repositories/heatmap.pagination-repository';
 import {HeatmapRepository} from '../repositories/heatmap.repository';
 
 // maximalTokenCount is used to sanitise the displayed number to "99+"

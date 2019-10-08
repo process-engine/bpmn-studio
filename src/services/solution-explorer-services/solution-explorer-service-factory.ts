@@ -5,7 +5,7 @@ import {SolutionExplorerFileSystemRepository} from '@process-engine/solutionexpl
 import {SolutionExplorerManagementApiRepository} from '@process-engine/solutionexplorer.repository.management_api';
 import {SolutionExplorerService} from '@process-engine/solutionexplorer.service';
 import {ISolutionExplorerService} from '@process-engine/solutionexplorer.service.contracts';
-import {DiagramTrashFolderService} from './DiagramTrashFolderService';
+import {DiagramTrashFolderService} from './diagram-trash-folder.service';
 
 /**
  * This factory provides new instances of different solution explorer services.

@@ -1,7 +1,7 @@
 import {DataModels} from '@process-engine/management_api_contracts';
 
 import {IIdentity} from '@essential-projects/iam_contracts';
-import {IHeatmapRepository} from '../contracts/IHeatmap.Repository';
+import {IHeatmapRepository} from '../contracts/IHeatmapRepository';
 import {HeatmapRepository} from './heatmap.repository';
 
 export class HeatmapPaginationRepository extends HeatmapRepository implements IHeatmapRepository {

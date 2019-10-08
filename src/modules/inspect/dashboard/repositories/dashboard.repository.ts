@@ -5,7 +5,7 @@ import {NotFoundError} from '@essential-projects/errors_ts';
 
 import {IDashboardRepository} from '../contracts/IDashboardRepository';
 import {TaskList, TaskListEntry, TaskSource, TaskType} from '../contracts/index';
-import {applyPagination} from '../../../../services/pagination-module/pagination-module';
+import {applyPagination} from '../../../../services/pagination-module/pagination.module';
 
 export class DashboardRepository implements IDashboardRepository {
   protected managementApiService: IManagementApiClient;

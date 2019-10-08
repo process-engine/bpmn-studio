@@ -4,7 +4,7 @@ import {EventAggregator} from 'aurelia-event-aggregator';
 import {IManagementApiClient} from '@process-engine/management_api_contracts';
 
 import {IDashboardService} from './contracts';
-import {DashboardService} from './dashboard-service/dashboard-service';
+import {DashboardService} from './services/dashboard.service';
 
 export function configure(config: FrameworkConfiguration): void {
   const eventAggregator: EventAggregator = config.container.get(EventAggregator);
