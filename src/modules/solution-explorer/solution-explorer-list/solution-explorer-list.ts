@@ -88,6 +88,7 @@ export class SolutionExplorerList {
     });
 
     this.internalSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
+    this.internalProcessEngineVersion = window.localStorage.getItem('InternalProcessEngineVersion');
   }
 
   /**
@@ -182,7 +183,6 @@ export class SolutionExplorerList {
   public async openSolution(uri: string, insertAtBeginning: boolean = false, identity?: IIdentity): Promise<void> {
     this.solutionsToOpen.push(uri);
 
-    this.internalProcessEngineVersion = await this.getProcessEngineVersionFromInternalPE(this.internalSolutionUri);
     const uriIsRemote: boolean = uri.startsWith('http');
 
     let solutionExplorer: ISolutionExplorerService;
