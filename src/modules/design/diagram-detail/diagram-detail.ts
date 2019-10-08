@@ -233,8 +233,12 @@ export class DiagramDetail {
 
     this.dropInvalidFormData();
 
+    this.getTokenFromStartEventAnnotation();
+    const defaultToken: any = this.getInitialTokenValues(this.initialToken);
+    const startToken = defaultToken === '' ? undefined : defaultToken;
+
     const startRequestPayload: DataModels.ProcessModels.ProcessStartRequestPayload = {
-      inputValues: parsedInitialToken,
+      inputValues: parsedInitialToken || startToken,
       correlationId: this.customCorrelationId,
     };
 
