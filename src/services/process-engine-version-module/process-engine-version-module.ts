@@ -23,9 +23,15 @@ export function processEngineSupportsCronjobEvents(processEngineVersion): boolea
     return undefined;
   }
 
-  const solutionEntryPEVersion = new SemVer(processEngineVersion);
+  const processEngineIsNoStable: boolean = processEngineVersion.indexOf('-') !== -1;
+
+  const processEngineVersionWithoutReleaseChannel: string = processEngineIsNoStable
+    ? processEngineVersion.slice(0, processEngineVersion.indexOf('-'))
+    : processEngineVersion;
+
+  const processEngineSemverVersion = new SemVer(processEngineVersionWithoutReleaseChannel);
 
   const stableVersionWithEvents = new SemVer('9.0.0');
 
-  return solutionEntryPEVersion.compare(stableVersionWithEvents) >= 0;
+  return processEngineSemverVersion.compare(stableVersionWithEvents) >= 0;
 }

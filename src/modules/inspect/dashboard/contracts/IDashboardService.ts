@@ -94,4 +94,9 @@ export interface IDashboardService {
     userTaskResult: DataModels.UserTasks.UserTaskResult,
   ): Promise<void>;
   removeSubscription(identity: IIdentity, subscription: Subscription): Promise<void>;
+  onCronjobCreated(identity: IIdentity, callback: Function): Promise<Subscription>;
+  onCronjobExecuted(identity: IIdentity, callback: Function): Promise<Subscription>;
+  onCronjobStopped(identity: IIdentity, callback: Function): Promise<Subscription>;
+  onCronjobUpdated(identity: IIdentity, callback: Function): Promise<Subscription>;
+  onCronjobRemoved(identity: IIdentity, callback: Function): Promise<Subscription>;
 }
