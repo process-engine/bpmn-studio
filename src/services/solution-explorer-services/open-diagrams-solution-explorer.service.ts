@@ -163,6 +163,7 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
 
           if (this.savingPromise !== undefined) {
             await this.savingPromise;
+
             this.savingPromise = undefined;
           }
 
@@ -182,6 +183,7 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
 
               if (diagramWasChangedByStudio) {
                 isSaving = false;
+
                 return;
               }
             }
