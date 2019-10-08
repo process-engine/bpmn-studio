@@ -1,13 +1,14 @@
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {inject} from 'aurelia-framework';
 import {Router, RouterConfiguration} from 'aurelia-router';
+import {OpenIdConnect} from 'aurelia-open-id-connect';
+
 /**
  * This import statement loads bootstrap. Its required because otherwise
  * its not executed.
  */
 import 'bootstrap';
-
-import {OpenIdConnect} from 'aurelia-open-id-connect';
+import * as Bluebird from 'bluebird';
 
 import {NotificationType} from './contracts/index';
 import environment from './environment';

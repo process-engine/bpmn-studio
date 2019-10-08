@@ -1,4 +1,6 @@
-import {bindable, computedFrom, inject} from 'aurelia-framework';
+import {bindable, computedFrom, inject, observable} from 'aurelia-framework';
+
+import * as Bluebird from 'bluebird';
 
 import {DataModels} from '@process-engine/management_api_contracts';
 
@@ -12,29 +14,39 @@ import {IDashboardService} from '../dashboard/contracts';
 export class CronjobList {
   @bindable public activeSolutionEntry: ISolutionEntry;
   public initialLoadingFinished: boolean = false;
-  public currentPage: number = 1;
+  @observable public currentPage: number = 0;
   public pageSize: number = 10;
   public paginationSize: number = 10;
+  public totalItems: number;
   public showError: boolean;
 
-  private cronjobs: Array<DataModels.Cronjobs.CronjobConfiguration> = [];
+  private cronjobsToDisplay: Array<DataModels.Cronjobs.CronjobConfiguration> = [];
   private pollingTimeout: NodeJS.Timeout;
   private isAttached: boolean;
   private dashboardService: IDashboardService;
+
+  private updatePromise: any;
 
   constructor(dashboardService: IDashboardService) {
     this.dashboardService = dashboardService;
   }
 
-  public async activeSolutionEntryChanged(newValue): Promise<void> {
-    if (this.isAttached) {
-      this.cronjobs = [];
-      this.initialLoadingFinished = false;
-      this.showError = false;
-      this.dashboardService.eventAggregator.publish(environment.events.configPanel.solutionEntryChanged, newValue);
-
-      await this.updateCronjobs();
+  public async activeSolutionEntryChanged(newSolutionEntry: ISolutionEntry): Promise<void> {
+    if (!this.isAttached) {
+      return;
     }
+
+    if (this.updatePromise) {
+      this.updatePromise.cancel();
+    }
+
+    this.cronjobsToDisplay = [];
+    this.initialLoadingFinished = false;
+    this.showError = false;
+    this.dashboardService.eventAggregator.publish(
+      environment.events.configPanel.solutionEntryChanged,
+      newSolutionEntry,
+    );
   }
 
   public async attached(): Promise<void> {
@@ -49,26 +61,17 @@ export class CronjobList {
     this.stopPolling();
   }
 
-  @computedFrom('cronjobs.length')
-  public get totalItems(): number {
-    return this.cronjobs.length;
+  public currentPageChanged(): void {
+    if (this.updatePromise) {
+      this.updatePromise.cancel();
+    }
+
+    this.updateCronjobs();
   }
 
   @computedFrom('cronjobsToDisplay.length')
   public get showCronjobList(): boolean {
     return this.cronjobsToDisplay !== undefined && this.cronjobsToDisplay.length > 0;
-  }
-
-  @computedFrom('cronjobs.length')
-  public get cronjobsToDisplay(): Array<DataModels.Cronjobs.CronjobConfiguration> {
-    const firstCronjobIndex: number = (this.currentPage - 1) * this.pageSize;
-    const lastCronjobIndex: number = this.pageSize * this.currentPage;
-
-    const cronjobsToDisplay: Array<DataModels.Cronjobs.CronjobConfiguration> = [...this.cronjobs]
-      .sort(this.sortCronjobs)
-      .slice(firstCronjobIndex, lastCronjobIndex);
-
-    return cronjobsToDisplay;
   }
 
   public getBeautifiedDate(date: Date): string {
@@ -77,10 +80,14 @@ export class CronjobList {
     return beautifiedDate;
   }
 
-  public async updateCronjobs(): Promise<void> {
+  private async updateCronjobs(): Promise<void> {
     try {
-      const cronjobList = await this.dashboardService.getAllActiveCronjobs(this.activeSolutionEntry.identity);
-      this.cronjobs = cronjobList.cronjobs;
+      this.updatePromise = this.getCronjobList();
+
+      const cronjobList = await this.updatePromise;
+
+      this.cronjobsToDisplay = cronjobList.cronjobs.sort(this.sortCronjobs);
+      this.totalItems = cronjobList.totalCount;
       this.initialLoadingFinished = true;
     } catch (error) {
       this.initialLoadingFinished = true;
@@ -90,10 +97,34 @@ export class CronjobList {
       const errorIsAuthenticationRelated: boolean = errorIsForbiddenError || errorIsUnauthorizedError;
 
       if (!errorIsAuthenticationRelated) {
-        this.cronjobs = [];
+        this.cronjobsToDisplay = [];
+        this.totalItems = 0;
         this.showError = true;
       }
     }
+  }
+
+  private getCronjobList(): Promise<DataModels.Cronjobs.CronjobList> {
+    return new Bluebird.Promise(
+      async (resolve: Function, reject: Function): Promise<void> => {
+        const paginationGetsDisplayed: boolean = this.currentPage > 0;
+        const pageIndex: number = paginationGetsDisplayed ? this.currentPage - 1 : 0;
+
+        const cronjobOffset: number = pageIndex * this.pageSize;
+
+        try {
+          const cronjobList = await this.dashboardService.getAllActiveCronjobs(
+            this.activeSolutionEntry.identity,
+            cronjobOffset,
+            this.pageSize,
+          );
+
+          resolve(cronjobList);
+        } catch (error) {
+          reject(error);
+        }
+      },
+    );
   }
 
   private startPolling(): void {

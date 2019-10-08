@@ -1,12 +1,14 @@
 import {Subscription} from 'aurelia-event-aggregator';
-import {bindable, inject} from 'aurelia-framework';
+import {bindable, inject, observable} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
+
+import * as Bluebird from 'bluebird';
 
 import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
 
 import {AuthenticationStateEvent, ISolutionEntry, ISolutionService} from '../../../contracts/index';
 import environment from '../../../environment';
-import {IDashboardService, TaskListEntry} from '../dashboard/contracts/index';
+import {IDashboardService, TaskList as SuspendedTaskList, TaskListEntry} from '../dashboard/contracts/index';
 
 interface ITaskListRouteParameters {
   processInstanceId?: string;
@@ -18,7 +20,7 @@ interface ITaskListRouteParameters {
 export class TaskList {
   @bindable() public activeSolutionEntry: ISolutionEntry;
 
-  public currentPage: number = 0;
+  @observable public currentPage: number = 0;
   public pageSize: number = 10;
   public totalItems: number;
   public paginationSize: number = 10;
@@ -31,10 +33,13 @@ export class TaskList {
   private router: Router;
   private solutionService: ISolutionService;
 
+  private dashboardServiceSubscriptions: Array<any> = [];
   private subscriptions: Array<Subscription>;
   private tasks: Array<TaskListEntry> = [];
-  private getTasks: () => Promise<Array<TaskListEntry>>;
+  private getTasks: (offset?: number, limit?: number) => Promise<SuspendedTaskList>;
   private isAttached: boolean = false;
+
+  private updatePromise: any;
 
   constructor(dashboardService: IDashboardService, router: Router, solutionService: ISolutionService) {
     this.dashboardService = dashboardService;
@@ -43,7 +48,7 @@ export class TaskList {
   }
 
   public get shownTasks(): Array<TaskListEntry> {
-    return this.tasks.slice((this.currentPage - 1) * this.pageSize, this.pageSize * this.currentPage);
+    return this.tasks;
   }
 
   public initializeTaskList(routeParameters: ITaskListRouteParameters): void {
@@ -56,31 +61,71 @@ export class TaskList {
     const hasProcessInstanceId: boolean = processInstanceId !== undefined;
 
     if (hasDiagramName) {
-      this.getTasks = (): Promise<Array<TaskListEntry>> => {
-        return this.getTasksForProcessModel(diagramName);
+      this.getTasks = (offset?: number, limit?: number): Promise<SuspendedTaskList> => {
+        return this.getTasksForProcessModel(diagramName, offset, limit);
       };
     } else if (hasCorrelationId) {
-      this.getTasks = (): Promise<Array<TaskListEntry>> => {
-        return this.getTasksForCorrelation(correlationId);
+      this.getTasks = (offset?: number, limit?: number): Promise<SuspendedTaskList> => {
+        return this.getTasksForCorrelation(correlationId, offset, limit);
       };
     } else if (hasProcessInstanceId) {
-      this.getTasks = (): Promise<Array<TaskListEntry>> => {
-        return this.getTasksForProcessInstanceId(processInstanceId);
+      this.getTasks = (offset?: number, limit?: number): Promise<SuspendedTaskList> => {
+        return this.getTasksForProcessInstanceId(processInstanceId, offset, limit);
       };
     } else {
       this.getTasks = this.getAllTasks;
     }
   }
 
-  public async activeSolutionEntryChanged(newValue): Promise<void> {
-    if (this.isAttached) {
-      this.tasks = [];
-      this.initialLoadingFinished = false;
-      this.showError = false;
-      this.dashboardService.eventAggregator.publish(environment.events.configPanel.solutionEntryChanged, newValue);
-
-      await this.updateTasks();
+  public async activeSolutionEntryChanged(
+    newActiveSolutionEntry: ISolutionEntry,
+    previousActiveSolutioEntry: ISolutionEntry,
+  ): Promise<void> {
+    if (!this.isAttached) {
+      return;
     }
+
+    if (this.updatePromise) {
+      this.updatePromise.cancel();
+    }
+
+    for (const subscription of this.dashboardServiceSubscriptions) {
+      this.dashboardService.removeSubscription(previousActiveSolutioEntry.identity, subscription);
+    }
+
+    this.tasks = [];
+    this.initialLoadingFinished = false;
+    this.showError = false;
+    this.dashboardService.eventAggregator.publish(
+      environment.events.configPanel.solutionEntryChanged,
+      newActiveSolutionEntry,
+    );
+
+    await this.updateTasks();
+
+    this.dashboardServiceSubscriptions = [
+      this.dashboardService.onEmptyActivityFinished(this.activeSolutionEntry.identity, async () => {
+        await this.updateTasks();
+      }),
+      this.dashboardService.onEmptyActivityWaiting(this.activeSolutionEntry.identity, async () => {
+        await this.updateTasks();
+      }),
+      this.dashboardService.onUserTaskFinished(this.activeSolutionEntry.identity, async () => {
+        await this.updateTasks();
+      }),
+      this.dashboardService.onUserTaskWaiting(this.activeSolutionEntry.identity, async () => {
+        await this.updateTasks();
+      }),
+      this.dashboardService.onManualTaskFinished(this.activeSolutionEntry.identity, async () => {
+        await this.updateTasks();
+      }),
+      this.dashboardService.onManualTaskWaiting(this.activeSolutionEntry.identity, async () => {
+        await this.updateTasks();
+      }),
+      this.dashboardService.onProcessError(this.activeSolutionEntry.identity, async () => {
+        await this.updateTasks();
+      }),
+    ];
   }
 
   public async attached(): Promise<void> {
@@ -111,34 +156,6 @@ export class TaskList {
 
     await this.updateTasks();
 
-    this.dashboardService.onEmptyActivityFinished(this.activeSolutionEntry.identity, async () => {
-      await this.updateTasks();
-    });
-
-    this.dashboardService.onEmptyActivityWaiting(this.activeSolutionEntry.identity, async () => {
-      await this.updateTasks();
-    });
-
-    this.dashboardService.onUserTaskFinished(this.activeSolutionEntry.identity, async () => {
-      await this.updateTasks();
-    });
-
-    this.dashboardService.onUserTaskWaiting(this.activeSolutionEntry.identity, async () => {
-      await this.updateTasks();
-    });
-
-    this.dashboardService.onManualTaskFinished(this.activeSolutionEntry.identity, async () => {
-      await this.updateTasks();
-    });
-
-    this.dashboardService.onManualTaskWaiting(this.activeSolutionEntry.identity, async () => {
-      await this.updateTasks();
-    });
-
-    this.dashboardService.onProcessError(this.activeSolutionEntry.identity, async () => {
-      await this.updateTasks();
-    });
-
     this.isAttached = true;
   }
 
@@ -166,31 +183,108 @@ export class TaskList {
     });
   }
 
-  private getAllTasks(): Promise<Array<TaskListEntry>> {
-    return this.dashboardService.getAllSuspendedTasks(this.activeSolutionEntry.identity);
+  public currentPageChanged(): void {
+    if (this.updatePromise) {
+      this.updatePromise.cancel();
+    }
+
+    this.updateTasks();
   }
 
-  private async getTasksForProcessModel(processModelId: string): Promise<Array<TaskListEntry>> {
-    return this.dashboardService.getSuspendedTasksForProcessModel(this.activeSolutionEntry.identity, processModelId);
+  private getAllTasks(offset?: number, limit?: number): Promise<SuspendedTaskList> {
+    return new Bluebird.Promise(
+      async (resolve: Function, reject: Function, onCancel): Promise<void> => {
+        try {
+          const taskList: SuspendedTaskList = await this.dashboardService.getAllSuspendedTasks(
+            this.activeSolutionEntry.identity,
+            offset,
+            limit,
+          );
+
+          resolve(taskList);
+        } catch (error) {
+          reject(error);
+        }
+      },
+    );
   }
 
-  private async getTasksForCorrelation(correlationId: string): Promise<Array<TaskListEntry>> {
-    return this.dashboardService.getSuspendedTasksForCorrelation(this.activeSolutionEntry.identity, correlationId);
+  private async getTasksForProcessModel(
+    processModelId: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<SuspendedTaskList> {
+    return new Bluebird.Promise(
+      async (resolve: Function, reject: Function): Promise<void> => {
+        try {
+          const taskList: SuspendedTaskList = await this.dashboardService.getSuspendedTasksForProcessModel(
+            this.activeSolutionEntry.identity,
+            processModelId,
+            offset,
+            limit,
+          );
+
+          resolve(taskList);
+        } catch (error) {
+          reject(error);
+        }
+      },
+    );
   }
 
-  private async getTasksForProcessInstanceId(processInstanceId: string): Promise<Array<TaskListEntry>> {
+  private async getTasksForCorrelation(
+    correlationId: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<SuspendedTaskList> {
+    return new Bluebird.Promise(
+      async (resolve: Function, reject: Function): Promise<void> => {
+        try {
+          const taskList: SuspendedTaskList = await this.dashboardService.getSuspendedTasksForCorrelation(
+            this.activeSolutionEntry.identity,
+            correlationId,
+            offset,
+            limit,
+          );
+
+          resolve(taskList);
+        } catch (error) {
+          reject(error);
+        }
+      },
+    );
+  }
+
+  private async getTasksForProcessInstanceId(
+    processInstanceId: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<SuspendedTaskList> {
     return this.dashboardService.getSuspendedTasksForProcessInstance(
       this.activeSolutionEntry.identity,
       processInstanceId,
+      offset,
+      limit,
     );
   }
 
   private async updateTasks(): Promise<void> {
     try {
-      this.tasks = await this.getTasks();
+      const paginationGetsDisplayed: boolean = this.currentPage > 0;
+      const pageIndex: number = paginationGetsDisplayed ? this.currentPage - 1 : 0;
+
+      const taskOffset: number = pageIndex * this.pageSize;
+
+      this.updatePromise = this.getTasks(taskOffset, this.pageSize);
+
+      const suspendedTaskList: SuspendedTaskList = await this.updatePromise;
+
+      this.tasks = suspendedTaskList.taskListEntries;
+      this.totalItems = suspendedTaskList.totalCount;
       this.initialLoadingFinished = true;
     } catch (error) {
       this.tasks = [];
+      this.totalItems = 0;
       this.initialLoadingFinished = true;
 
       const errorIsForbiddenError: boolean = isError(error, ForbiddenError);
@@ -201,7 +295,5 @@ export class TaskList {
         this.showError = true;
       }
     }
-
-    this.totalItems = this.tasks.length;
   }
 }

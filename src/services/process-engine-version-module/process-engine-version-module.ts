@@ -5,21 +5,15 @@ export function processEngineSupportsPagination(processEngineVersion: string): b
     return undefined;
   }
 
-  const solutionEntryPEVersion = new SemVer(processEngineVersion);
+  const processEngineIsNoStable: boolean = processEngineVersion.indexOf('-') !== -1;
 
-  const alphaVersionWithEvents = new SemVer('8.6.0-alpha.24');
-  const betaVersionWithEvents = new SemVer('9.0.0-beta.1');
-  const stableVersionWithEvents = new SemVer('8.6.0');
+  const processEngineVersionWithoutReleaseChannel: string = processEngineIsNoStable
+    ? processEngineVersion.slice(0, processEngineVersion.indexOf('-'))
+    : processEngineVersion;
 
-  const solutionEntryIsAlpha: boolean = solutionEntryPEVersion.prerelease[0] === 'alpha';
-  const solutionEntryIsBeta: boolean = solutionEntryPEVersion.prerelease[0] === 'beta';
+  const processEngineSemverVersion = new SemVer(processEngineVersionWithoutReleaseChannel);
 
-  if (solutionEntryIsAlpha) {
-    return solutionEntryPEVersion.compare(alphaVersionWithEvents) >= 0;
-  }
-  if (solutionEntryIsBeta) {
-    return solutionEntryPEVersion.compare(betaVersionWithEvents) >= 0;
-  }
+  const firstVersionWithPagination = new SemVer('9.0.0');
 
-  return solutionEntryPEVersion.compare(stableVersionWithEvents) >= 0;
+  return processEngineSemverVersion.compare(firstVersionWithPagination) >= 0;
 }

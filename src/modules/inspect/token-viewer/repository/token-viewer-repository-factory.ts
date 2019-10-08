@@ -5,7 +5,7 @@ import {processEngineSupportsPagination} from '../../../../services/process-engi
 import {TokenViewerPaginationRepository} from './token-viewer.pagination-repository';
 import {TokenViewerRepository} from './token-viewer.repository';
 
-export function createRepository(managementApiClient, runtimeVersion: string): ITokenViewerRepository {
+export function createTokenViewerRepository(managementApiClient, runtimeVersion: string): ITokenViewerRepository {
   if (processEngineSupportsPagination(runtimeVersion)) {
     return new TokenViewerPaginationRepository(managementApiClient);
   }
