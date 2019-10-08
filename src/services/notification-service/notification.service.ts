@@ -64,6 +64,7 @@ export class NotificationService {
 
     this.toastrInstance.options = {
       positionClass: 'toast-bottom-left',
+      closeDuration: 100,
     };
 
     this.initializeToastr();
