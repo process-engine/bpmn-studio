@@ -74,6 +74,7 @@ export class SolutionExplorerList {
   private pollingTimeout: NodeJS.Timeout;
 
   private httpFetchClient: HttpFetchClient;
+  private subscriptions: Array<Subscription> = [];
 
   constructor(
     router: Router,
@@ -103,6 +104,21 @@ export class SolutionExplorerList {
 
     this.internalSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
     this.internalProcessEngineVersion = window.localStorage.getItem('InternalProcessEngineVersion');
+  }
+
+  public attached(): void {
+    this.subscriptions = [
+      this.eventAggregator.subscribe(environment.events.hideAllModals, () => {
+        this.processEngineIsNewerModal = false;
+        this.processEngineIsOlderModal = false;
+      }),
+    ];
+  }
+
+  public detached(): void {
+    for (const subscription of this.subscriptions) {
+      subscription.dispose();
+    }
   }
 
   /**

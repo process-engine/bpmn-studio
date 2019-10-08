@@ -44,6 +44,11 @@ export class DeployModals {
           this.handleOverwriting(callback);
         },
       ),
+
+      this.eventAggregator.subscribe(environment.events.hideAllModals, (callback: Function) => {
+        this.showOverwriteDiagramModal = false;
+        this.showRemoteSolutionOnDeployModal = false;
+      }),
     ];
   }
 
@@ -57,14 +62,20 @@ export class DeployModals {
     this.updateRemoteSolutions();
     this.showRemoteSolutionOnDeployModal = true;
 
+    this.eventAggregator.publish(environment.events.tutorial.multipleConnectedProcessEnginesModalStarted);
+
     this.cancelMultipleRemoteSolutionModal = (): void => {
       this.showRemoteSolutionOnDeployModal = false;
+
+      this.eventAggregator.publish(environment.events.tutorial.multipleConnectedProcessEnginesModalFinished, false);
 
       callback();
     };
 
     this.selectRemoteSolution = (remoteSolution: ISolutionEntry): void => {
       this.showRemoteSolutionOnDeployModal = false;
+
+      this.eventAggregator.publish(environment.events.tutorial.multipleConnectedProcessEnginesModalFinished, true);
 
       callback(remoteSolution);
     };
@@ -73,14 +84,20 @@ export class DeployModals {
   public handleOverwriting(callback: Function): void {
     this.showOverwriteDiagramModal = true;
 
+    this.eventAggregator.publish(environment.events.tutorial.diagramAlreadyExistsModalStarted);
+
     this.cancelOverwriteModal = (): void => {
       this.showOverwriteDiagramModal = false;
+
+      this.eventAggregator.publish(environment.events.tutorial.diagramAlreadyExistsModalStarted, false);
 
       callback(false);
     };
 
     this.overwriteDiagram = (): void => {
       this.showOverwriteDiagramModal = false;
+
+      this.eventAggregator.publish(environment.events.tutorial.diagramAlreadyExistsModalFinished, true);
 
       callback(true);
     };

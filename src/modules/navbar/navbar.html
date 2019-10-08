@@ -51,11 +51,11 @@
         <button class="button menu-bar__menu-center--action-button"  click.delegate="printDiagram()" dblclick.trigger="$event.stopPropagation()" title="Print Diagram">
           <i class="fas fa-print"></i>
         </button>
-        <button class="button menu-bar__menu-center--action-button" class.bind="validationError || disableDiagramUploadButton ? 'button--disabled' : ''" click.delegate="uploadProcess()" dblclick.trigger="$event.stopPropagation()" title.bind="diagramUploadButtonTitle" data-test-deploy-diagram-button>
+        <button class="button menu-bar__menu-center--action-button" class.bind="validationError || disableDiagramUploadButton ? 'button--disabled' : ''" click.delegate="uploadProcess($event)" title.bind="diagramUploadButtonTitle" id="deploy-diagram-button" data-test-deploy-diagram-button>
           <i class="fas fa-dolly-flatbed"></i>
         </button>
         <div class="btn-group">
-          <button class="button menu-bar__menu-center--action-button" class.bind="validationError || disableStartButton ? 'button--disabled' : ''" click.delegate="startProcess()" dblclick.trigger="$event.stopPropagation()" disabled.bind="validationError || disableStartButton" title.bind="startButtonTitle" data-test-start-diagram-button>
+          <button class="button menu-bar__menu-center--action-button" class.bind="validationError || disableStartButton ? 'button--disabled' : ''" click.delegate="startProcess()" dblclick.trigger="$event.stopPropagation()" disabled.bind="validationError || disableStartButton"  id="start-diagram-button" title.bind="startButtonTitle" data-test-start-diagram-button>
             <i class="fas fa-play"></i>
           </button>
           <button type="button" class="button menu-bar__menu-center--action-button dropdown-toggle dropdown-toggle-split dropdown__start-button" class.bind="validationError || disableStartButton ? 'button--disabled' : ''" dblclick.trigger="$event.stopPropagation()" disabled.bind="validationError || disableStartButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

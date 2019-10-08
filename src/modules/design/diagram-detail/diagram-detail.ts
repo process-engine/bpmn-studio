@@ -279,6 +279,7 @@ export class DiagramDetail {
     }
 
     this.clickedOnCustomStart = false;
+    this.eventAggregator.publish(environment.events.tutorial.diagramStarted);
   }
 
   public async saveChangesBeforeStart(): Promise<void> {

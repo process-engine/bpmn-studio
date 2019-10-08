@@ -30,7 +30,7 @@ import ReleaseChannel from '../src/services/release-channel-service/release-chan
 import {solutionIsRemoteSolution} from '../src/services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 import {version as CurrentStudioVersion} from '../package.json';
 import {getPortListByVersion} from '../src/services/default-ports-module/default-ports.module';
-import {FeedbackData, ITokenObject} from '../src/contracts';
+import {Chapter, FeedbackData, ITokenObject} from '../src/contracts';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import electron = require('electron');
@@ -54,6 +54,9 @@ let peErrors: string = '';
  * openend via double click.
  */
 let fileOpenMainEvent: IpcMainEvent;
+
+let showDiagramRelatedMenuEntries: boolean = false;
+let tutorialChapters: Array<Chapter> = [];
 
 let runtimeProcess: ChildProcess;
 
@@ -313,6 +316,24 @@ function initializeFileOpenFeature(): void {
   ipcMain.on('waiting-for-double-file-click', (mainEvent: IpcMainEvent) => {
     fileOpenMainEvent = mainEvent;
     isInitialized = true;
+  });
+
+  ipcMain.on('update-tutorial-chapters', (mainEvent: IpcMainEvent, newTutorialChapterList: Array<Chapter>) => {
+    tutorialChapters = newTutorialChapterList;
+
+    setElectronMenubar();
+  });
+
+  ipcMain.on('menu_hide-diagram-entries', () => {
+    showDiagramRelatedMenuEntries = false;
+
+    setElectronMenubar();
+  });
+
+  ipcMain.on('menu_show-all-menu-entries', () => {
+    showDiagramRelatedMenuEntries = true;
+
+    setElectronMenubar();
   });
 
   ipcMain.on('get_opened_file', (event) => {
@@ -802,6 +823,13 @@ function getHelpMenu(): MenuItem {
       },
     },
     {
+      label: 'Tutorial',
+      submenu: getTutorialMenu(),
+    },
+    {
+      type: 'separator',
+    },
+    {
       label: 'Release Notes',
       click: (): void => {
         const currentVersion = app.getVersion();
@@ -858,6 +886,21 @@ function getHelpMenu(): MenuItem {
   };
 
   return new MenuItem(menuOptions);
+}
+
+function getTutorialMenu(): Menu {
+  const submenuOptions: Array<MenuItemConstructorOptions> = tutorialChapters.map((chapter: Chapter) => {
+    return {
+      label: `Chapter ${chapter.index + 1}: ${chapter.name}`,
+      click: (): void => {
+        browserWindow.webContents.send('menubar__start_tutorial', chapter.index);
+      },
+    };
+  });
+
+  const submenu: Menu = electron.Menu.buildFromTemplate(submenuOptions);
+
+  return submenu;
 }
 
 function getAboutWindowInfo(): AboutWindowInfo {

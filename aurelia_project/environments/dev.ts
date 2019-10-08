@@ -33,6 +33,8 @@ export default {
     diagramNeedsToBeUpdated: 'diagramNeedsToBeUpdated',
     xmlChanged: 'xmlChanged',
     diagramWasSaved: 'diagramWasSaved',
+    updatingNavbarDone: 'updatingNavbarDone',
+    hideAllModals: 'hideAllModals',
     deployModals: {
       showRemoteSolutionSelectionModal: 'deployModals:remoteSolutionSelectionModal:show',
       showOverwriteDiagramModal: 'deployModals:overwriteDiagramModal:show',
@@ -110,6 +112,15 @@ export default {
     solutionExplorer: {
       closeAllOpenDiagrams: 'solutionExplorer:openDiagrams:closeAll',
       updateOpenDiagrams: 'solutioneExplorer:openDiagrams:update',
+    },
+    tutorial: {
+      diagramOpened: 'tutorial:diagram:opened',
+      diagramDeployed: 'tutorial:diagram:deployed',
+      diagramStarted: 'tutorial:diagram:started',
+      multipleConnectedProcessEnginesModalStarted: 'tutorial:multipleConnectedProcessEnginesModal:started',
+      multipleConnectedProcessEnginesModalFinished: 'tutorial:multipleConnectedProcessEnginesModal:finished',
+      diagramAlreadyExistsModalStarted: 'tutorial:diagramAlreadyExistsModal:started',
+      diagramAlreadyExistsModalFinished: 'tutorial:diagramAlreadyExistsModal:finished',
     },
   },
   baseRoute: processEngineRoute,
