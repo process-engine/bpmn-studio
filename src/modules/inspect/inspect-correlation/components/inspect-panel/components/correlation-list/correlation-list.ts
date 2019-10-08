@@ -12,13 +12,11 @@ import {
 import environment from '../../../../../../../environment';
 import {getBeautifiedDate} from '../../../../../../../services/date-service/date.service';
 
-export enum PageSize {
-  twenty = 20,
-  fifty = 50,
-  hundred = 100,
-  twohundred = 200,
-}
+const PAGE_SIZES = [20, 50, 100, 200];
+const MIN_PAGESIZE = PAGE_SIZES[0];
+export const DEFAULT_PAGESIZE = PAGE_SIZES[1];
 
+const PAGINATION_SIZE = 10;
 @inject(EventAggregator)
 export class CorrelationList {
   @bindable public processInstanceToSelect: DataModels.Correlations.ProcessInstance;
@@ -27,13 +25,14 @@ export class CorrelationList {
   @bindable @observable public correlations: Array<DataModels.Correlations.ProcessInstance>;
   @bindable public activeDiagram: IDiagram;
   @bindable public sortedTableData: Array<ICorrelationTableEntry>;
+
   @bindable public totalCount: number;
   @bindable public currentPage: number = 0;
-  @observable public pageSize: number = 50;
-  public paginationSize: number = 10;
+  @observable public pageSize: number = DEFAULT_PAGESIZE;
+  public minPageSize: number = MIN_PAGESIZE;
+  public paginationSize: number = PAGINATION_SIZE;
+  public pageSizes: Array<number> = PAGE_SIZES;
 
-  // eslint-disable-next-line @typescript-eslint/member-naming
-  public PageSize: typeof PageSize = PageSize;
   public correlationListSortProperty: typeof CorrelationListSortProperty = CorrelationListSortProperty;
   public sortSettings: ICorrelationSortSettings = {
     ascending: false,
@@ -96,15 +95,15 @@ export class CorrelationList {
         },
       );
 
-      if (!instanceAlreadyExistInList) {
+      if (instanceAlreadyExistInList) {
+        this.processInstanceToSelectTableEntry = undefined;
+      } else {
         const processInstanceToSelectTableEntry: Array<
           ICorrelationTableEntry
         > = this.convertProcessInstancesIntoTableData([this.processInstanceToSelect]);
 
         this.processInstanceToSelectTableEntry = processInstanceToSelectTableEntry[0];
         this.selectCorrelation(this.processInstanceToSelectTableEntry);
-      } else {
-        this.processInstanceToSelectTableEntry = undefined;
       }
 
       this.processInstanceToSelect = undefined;

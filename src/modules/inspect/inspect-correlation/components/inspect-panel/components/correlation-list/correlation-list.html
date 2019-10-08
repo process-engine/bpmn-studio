@@ -37,16 +37,13 @@
           <td if.bind="false" class="correlation-table__table-entry">${tableEntry.user}</td>
           <td class="correlation-table__table-entry">${tableEntry.processInstanceId}</td>
         </tr>
-        <tr if.bind="totalCount > 20" class="correlation-table__table-row">
+        <tr if.bind="totalCount > minPageSize" class="correlation-table__table-row">
           <td>
             <div class="correlation-table__pagesize-entry">
               PageSize: 
             </div>
             <select class="form-control correlation-table__pagesize-entry--select" value.bind="pageSize">
-              <option model.bind="PageSize.twenty">${PageSize.twenty}</option>
-              <option model.bind="PageSize.fifty">${PageSize.fifty}</option>
-              <option model.bind="PageSize.hundred">${PageSize.hundred}</option>
-              <option model.bind="PageSize.twohundred">${PageSize.twohundred}</option>
+              <option model.bind="size" repeat.for="size of pageSizes">${size}</option>
               <option model.bind="totalCount">${totalCount}</option>
             </select>
           </td>
