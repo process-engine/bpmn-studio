@@ -23,7 +23,7 @@ export class CorrelationList {
   @bindable public processInstanceToSelect: DataModels.Correlations.ProcessInstance;
   @bindable public processInstanceToSelectTableEntry: ICorrelationTableEntry;
   @bindable public selectedProcessInstance: DataModels.Correlations.ProcessInstance;
-  @bindable @observable public correlations: Array<DataModels.Correlations.ProcessInstance>;
+  @bindable @observable public processInstances: Array<DataModels.Correlations.ProcessInstance>;
   @bindable public activeDiagram: IDiagram;
   @bindable public sortedTableData: Array<ICorrelationTableEntry>;
 
@@ -64,12 +64,12 @@ export class CorrelationList {
     this.processInstanceToSelectTableEntry = undefined;
   }
 
-  public correlationsChanged(): void {
+  public processInstancesChanged(): void {
     if (!this.activeDiagram) {
       return;
     }
 
-    this.tableData = this.convertProcessInstancesIntoTableData(this.correlations);
+    this.tableData = this.convertProcessInstancesIntoTableData(this.processInstances);
 
     const tableDataIsExisiting: boolean = this.tableData.length > 0;
 
@@ -112,7 +112,8 @@ export class CorrelationList {
   }
 
   public pageSizeChanged(newValue, oldValue): void {
-    if (oldValue === undefined) {
+    const isNotInitializedYet = oldValue === undefined;
+    if (isNotInitializedYet) {
       return;
     }
 
@@ -130,7 +131,8 @@ export class CorrelationList {
   }
 
   public currentPageChanged(newValue: number, oldValue: number): void {
-    if (oldValue === undefined) {
+    const isNotInitializedYet = oldValue === undefined;
+    if (isNotInitializedYet) {
       return;
     }
 
@@ -220,7 +222,7 @@ export class CorrelationList {
   }
 
   private getProcessInstanceForTableEntry(tableEntry: ICorrelationTableEntry): DataModels.Correlations.ProcessInstance {
-    const processInstanceForTableEntry: DataModels.Correlations.ProcessInstance = this.correlations.find(
+    const processInstanceForTableEntry: DataModels.Correlations.ProcessInstance = this.processInstances.find(
       (processInstance: DataModels.Correlations.ProcessInstance) => {
         return processInstance.processInstanceId === tableEntry.processInstanceId;
       },

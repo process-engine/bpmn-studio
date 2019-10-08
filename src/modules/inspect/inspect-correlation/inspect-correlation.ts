@@ -7,14 +7,15 @@ import {IShape} from '@process-engine/bpmn-elements_contracts';
 import {DataModels} from '@process-engine/management_api_contracts';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 
-import {IEventFunction, ISolutionEntry, InspectPanelTab} from '../../../contracts/index';
+import {IEventFunction, ISolutionEntry, InspectPanelTab, NotificationType} from '../../../contracts/index';
 import environment from '../../../environment';
 import {IInspectCorrelationService} from './contracts';
 import {DiagramViewer} from './components/diagram-viewer/diagram-viewer';
 import {InspectPanel} from './components/inspect-panel/inspect-panel';
 import {DEFAULT_PAGESIZE} from './components/inspect-panel/components/correlation-list/correlation-list';
+import {NotificationService} from '../../../services/notification-service/notification.service';
 
-@inject('InspectCorrelationService', EventAggregator)
+@inject('InspectCorrelationService', EventAggregator, 'NotificationService')
 export class InspectCorrelation {
   @bindable public processInstanceIdToSelect: string;
   @bindable public processInstanceToSelect: DataModels.Correlations.ProcessInstance;
@@ -33,7 +34,7 @@ export class InspectCorrelation {
   public offset: number = 0;
   public limit: number = DEFAULT_PAGESIZE;
 
-  public correlations: Array<DataModels.Correlations.ProcessInstance>;
+  public processInstances: Array<DataModels.Correlations.ProcessInstance>;
   public token: string;
   public showInspectPanel: boolean = true;
   public showTokenViewer: boolean = false;
@@ -45,13 +46,19 @@ export class InspectCorrelation {
 
   private inspectCorrelationService: IInspectCorrelationService;
   private eventAggregator: EventAggregator;
+  private notificationService: NotificationService;
   private subscriptions: Array<Subscription>;
 
   private updatePromise: any;
 
-  constructor(inspectCorrelationService: IInspectCorrelationService, eventAggregator: EventAggregator) {
+  constructor(
+    inspectCorrelationService: IInspectCorrelationService,
+    eventAggregator: EventAggregator,
+    notificationService: NotificationService,
+  ) {
     this.inspectCorrelationService = inspectCorrelationService;
     this.eventAggregator = eventAggregator;
+    this.notificationService = notificationService;
   }
 
   public async attached(): Promise<void> {
@@ -137,30 +144,38 @@ export class InspectCorrelation {
   }
 
   private async updateProcessInstances(): Promise<void> {
-    let correlationList;
-
-    try {
-      correlationList = await this.getProcessInstancesForProcessModel();
-      if (this.processInstanceIdToSelect) {
+    if (this.processInstanceIdToSelect) {
+      try {
         this.processInstanceToSelect = await this.inspectCorrelationService.getProcessInstanceById(
           this.activeSolutionEntry.identity,
           this.processInstanceIdToSelect,
           this.activeDiagram.id,
         );
+      } catch (error) {
+        this.notificationService.showNotification(
+          NotificationType.ERROR,
+          'The requested ProcessInstance to select could not be found.',
+        );
       }
+    }
+
+    let processInstanceList;
+
+    try {
+      processInstanceList = await this.getProcessInstancesForProcessModel();
     } catch (error) {
       this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
-      this.correlations = [];
+      this.processInstances = [];
       this.totalCount = 0;
     }
 
     // https://github.com/process-engine/process_engine_runtime/issues/432
-    if (correlationList && correlationList.totalCount === 0) {
+    if (processInstanceList && processInstanceList.totalCount === 0) {
       this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
-      this.correlations = [];
+      this.processInstances = [];
     } else {
-      this.correlations = correlationList.processInstances;
-      this.totalCount = correlationList.totalCount;
+      this.processInstances = processInstanceList.processInstances;
+      this.totalCount = processInstanceList.totalCount;
     }
   }
 

@@ -10,7 +10,7 @@ import environment from '../../../../../environment';
 @inject(EventAggregator)
 export class InspectPanel {
   @bindable public processInstanceToSelect: DataModels.Correlations.ProcessInstance;
-  @bindable public correlations: Array<DataModels.Correlations.Correlation>;
+  @bindable public processInstances: Array<DataModels.Correlations.ProcessInstance>;
   @bindable public selectedProcessInstance: DataModels.Correlations.ProcessInstance;
   @bindable public fullscreen: boolean = false;
   @bindable public activeDiagram: IDiagram;
@@ -64,7 +64,7 @@ export class InspectPanel {
     this.showLogViewer = shouldShowLogViewer;
   }
 
-  public correlationsChanged(
+  public processInstancesChanged(
     newCorrelation: DataModels.Correlations.Correlation,
     oldCorrelation: DataModels.Correlations.Correlation,
   ): void {

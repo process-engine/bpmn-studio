@@ -8,8 +8,8 @@
         <button class="inspect-panel__tab"
                 class.bind="showCorrelationList ? 'inspect-panel__active-tab' : ''"
                 click.delegate="changeTab(inspectPanelTab.CorrelationList)"
-                title="Show a list of all correlations for this process model">
-          Correlation List (${totalCount})
+                title="Show a list of all ProcessInstances for this process model">
+          ProcessInstance List (${totalCount})
         </button>
         <button class="inspect-panel__tab ${showLogViewer ? 'inspect-panel__active-tab' : ''}"
                 class.bind="selectedProcessInstance === undefined ? 'inspect-panel__disabled-tab' : ''"
@@ -24,7 +24,7 @@
       </div>
     </div>
     <div class="inspect-panel__body">
-      <correlation-list show.bind="showCorrelationList" active-diagram.bind="activeDiagram" correlations.to-view="correlations" selected-process-instance.from-view="selectedProcessInstance" process-instance-to-select.to-view="processInstanceToSelect" total-count.bind="totalCount"></correlation-list>
+      <correlation-list show.bind="showCorrelationList" active-diagram.bind="activeDiagram" process-instances.to-view="processInstances" selected-process-instance.from-view="selectedProcessInstance" process-instance-to-select.to-view="processInstanceToSelect" total-count.bind="totalCount"></correlation-list>
       <log-viewer if.bind="showLogViewer" active-solution-entry.bind="activeSolutionEntry" process-instance.to-view="selectedProcessInstance"></log-viewer>
     </div>
   </div>
