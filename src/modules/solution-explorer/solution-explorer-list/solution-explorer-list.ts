@@ -62,6 +62,7 @@ export class SolutionExplorerList {
   private openedSolutions: Array<ISolutionEntry> = [];
   private solutionsToOpen: Array<string> = [];
   private solutionsWhoseOpeningShouldGetAborted: Array<string> = [];
+  private pollingTimeout: NodeJS.Timeout;
 
   constructor(
     router: Router,
@@ -88,6 +89,7 @@ export class SolutionExplorerList {
     });
 
     this.internalSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
+    this.internalProcessEngineVersion = window.localStorage.getItem('InternalProcessEngineVersion');
   }
 
   /**
@@ -182,7 +184,6 @@ export class SolutionExplorerList {
   public async openSolution(uri: string, insertAtBeginning: boolean = false, identity?: IIdentity): Promise<void> {
     this.solutionsToOpen.push(uri);
 
-    this.internalProcessEngineVersion = await this.getProcessEngineVersionFromInternalPE(this.internalSolutionUri);
     const uriIsRemote: boolean = uri.startsWith('http');
 
     let solutionExplorer: ISolutionExplorerService;
@@ -243,6 +244,11 @@ export class SolutionExplorerList {
         processEngineVersion = responseJSON.version;
       }
 
+      const uriIsInternalProcessEngine = !uriIsNotInternalProcessEngine;
+      if (uriIsInternalProcessEngine) {
+        processEngineVersion = this.internalProcessEngineVersion;
+      }
+
       if (this.solutionsWhoseOpeningShouldGetAborted.includes(uri)) {
         this.openingSolutionWasCanceled(uri);
 
@@ -267,9 +273,7 @@ export class SolutionExplorerList {
       const openSolutionFailedWithFailedToFetch: boolean = error.message === 'Failed to fetch';
       if (openSolutionFailedWithFailedToFetch) {
         if (!uriIsNotInternalProcessEngine) {
-          await this.getProcessEngineVersionFromInternalPE(uri);
-
-          this.openSolution(uri, insertAtBeginning, identityToUse);
+          this.startPollingForInternalEngine(uri, insertAtBeginning, identityToUse);
 
           return;
         }
@@ -292,11 +296,18 @@ export class SolutionExplorerList {
       throw new Error('Solution is already opened.');
     }
 
-    if (!processEngineVersion && !uriIsNotInternalProcessEngine) {
-      processEngineVersion = await this.getProcessEngineVersionFromInternalPE(uri);
-    }
-
     this.addSolutionEntry(uri, solutionExplorer, identityToUse, insertAtBeginning, processEngineVersion);
+  }
+
+  private startPollingForInternalEngine(uri, insertAtBeginning, identityToUse): void {
+    this.pollingTimeout = setTimeout(() => {
+      if (this.openedSolutions.some((solution: ISolutionEntry) => solution.uri === uri)) {
+        clearTimeout(this.pollingTimeout);
+        return;
+      }
+
+      this.openSolution(uri, insertAtBeginning, identityToUse);
+    }, 400);
   }
 
   /**
@@ -474,26 +485,6 @@ export class SolutionExplorerList {
       1,
     );
     this.solutionsToOpen.splice(this.solutionsToOpen.indexOf(solutionUri), 1);
-  }
-
-  private getProcessEngineVersionFromInternalPE(uri: string): Promise<string> {
-    return new Promise((resolve: Function): void => {
-      const makeRequest: Function = (): void => {
-        setTimeout(async () => {
-          try {
-            const response: Response = await fetch(uri);
-            const responseJSON: any = await response.json();
-
-            resolve(responseJSON.version);
-          } catch (error) {
-            makeRequest();
-          }
-          // tslint:disable-next-line: no-magic-numbers
-        }, 100);
-      };
-
-      makeRequest();
-    });
   }
 
   private cleanupSolution(uri: string): void {
@@ -677,10 +668,14 @@ export class SolutionExplorerList {
       },
     });
 
-    const response: Response = await fetch(request);
-    const authority: string = (await response.json()).authority;
+    try {
+      const response: Response = await fetch(request);
+      const authority: string = (await response.json()).authority;
 
-    return authority;
+      return authority;
+    } catch (error) {
+      return undefined;
+    }
   }
 
   private createDummyAccessToken(): string {

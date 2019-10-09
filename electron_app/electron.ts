@@ -22,6 +22,7 @@ import open from 'open';
 
 import {CancellationToken, autoUpdater} from '@process-engine/electron-updater';
 import * as pe from '@process-engine/process_engine_runtime';
+import {version as ProcessEngineVersion} from '@process-engine/process_engine_runtime/package.json';
 
 import electronOidc from './electron-oidc';
 import oidcConfig from './oidc-config';
@@ -866,6 +867,10 @@ async function startInternalProcessEngine(): Promise<any> {
   // will be running; this 'get_host' request ist emitted in src/main.ts.
   ipcMain.on('get_host', (event: IpcMainEvent) => {
     event.returnValue = `localhost:${port}`;
+  });
+
+  ipcMain.on('get_version', (event: IpcMainEvent) => {
+    event.returnValue = ProcessEngineVersion;
   });
 
   // TODO: Check if the ProcessEngine instance is now run on the UI thread.
