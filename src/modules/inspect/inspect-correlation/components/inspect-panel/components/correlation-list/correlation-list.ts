@@ -85,7 +85,7 @@ export class CorrelationList {
 
       this.sortedTableData = this.sortList(this.sortSettings.sortProperty);
     } else {
-      this.sortedTableData = this.tableData.reverse();
+      this.sortedTableData = this.tableData;
     }
 
     const processInstanceToSelectExists: boolean = this.processInstanceToSelect !== undefined;
@@ -180,7 +180,7 @@ export class CorrelationList {
       ? this.sortListByStartDate()
       : this.sortListByProperty(property);
 
-    return sortedTableData;
+    return ascending ? sortedTableData : sortedTableData.reverse();
   }
 
   private sortListByProperty(property: CorrelationListSortProperty): Array<ICorrelationTableEntry> {
