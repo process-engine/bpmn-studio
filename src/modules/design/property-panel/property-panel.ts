@@ -35,8 +35,6 @@ export class PropertyPanel {
   private eventBus: IEventBus;
   private openDiagramStateService: OpenDiagramStateService;
 
-  private diagramChanged: boolean = false;
-
   constructor(openDiagramStateService: OpenDiagramStateService) {
     this.openDiagramStateService = openDiagramStateService;
   }
@@ -152,29 +150,5 @@ export class PropertyPanel {
     for (const indextab of this.indextabs) {
       indextab.canHandleElement = indextab.isSuitableForElement(this.elementInPanel);
     }
-  }
-
-  public diagramUriChanged(newUri: string, previousUri: string): void {
-    const previousUriDoesNotExist: boolean = previousUri === undefined;
-    if (previousUriDoesNotExist) {
-      return;
-    }
-
-    this.diagramChanged = true;
-  }
-
-  public xmlChanged(newXml: string, previousXml: string): void {
-    const previousXmlDoesNotExist: boolean = previousXml === undefined;
-    const diagramDidNotChange: boolean = !this.diagramChanged;
-    if (previousXmlDoesNotExist || diagramDidNotChange) {
-      return;
-    }
-
-    // This is needed to make sure the xml was already imported into the modeler
-    setTimeout(() => {
-      this.selectPreviouslySelectedOrFirstElement();
-    }, 0);
-
-    this.diagramChanged = false;
   }
 }
