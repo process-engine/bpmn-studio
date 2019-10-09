@@ -454,6 +454,8 @@ export class BpmnIo {
         await this.importXmlIntoModeler(this.xml);
       }
 
+      this.propertyPanelViewModel.xmlWasChanged();
+
       const diagramState: IDiagramState = this.loadDiagramState(this.diagramUri);
       const diagramContainsChanges: boolean = diagramState !== null && diagramState.metadata.isChanged;
 

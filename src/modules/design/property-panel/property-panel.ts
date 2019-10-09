@@ -73,6 +73,10 @@ export class PropertyPanel {
     }, 0);
   }
 
+  public xmlWasChanged(): void {
+    this.selectPreviouslySelectedOrFirstElement();
+  }
+
   public selectPreviouslySelectedOrFirstElement(): void {
     const diagramState: IDiagramState = this.openDiagramStateService.loadDiagramState(this.diagramUri);
 
