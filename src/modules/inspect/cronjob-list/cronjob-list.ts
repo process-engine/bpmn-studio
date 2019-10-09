@@ -84,7 +84,12 @@ export class CronjobList {
     }
   }
 
-  public currentPageChanged(): void {
+  public currentPageChanged(newValue, oldValue): void {
+    const paginationIsInitialized: boolean = oldValue === undefined;
+    if (paginationIsInitialized) {
+      return;
+    }
+
     if (this.updatePromise) {
       this.updatePromise.cancel();
     }

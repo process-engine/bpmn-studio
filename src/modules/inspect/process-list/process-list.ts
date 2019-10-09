@@ -213,7 +213,10 @@ export class ProcessList {
       if (!errorIsAuthenticationRelated) {
         this.processInstancesToDisplay = [];
         this.processInstances = [];
-        this.showError = true;
+
+        const errorIsNotNoProcessInstancesFound: boolean = error.code !== 404;
+
+        this.showError = errorIsNotNoProcessInstancesFound;
       }
     }
 
