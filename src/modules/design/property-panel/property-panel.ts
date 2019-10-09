@@ -21,6 +21,7 @@ import {OpenDiagramStateService} from '../../../services/solution-explorer-servi
 @inject('OpenDiagramStateService')
 export class PropertyPanel {
   @bindable() public modeler: IBpmnModeler;
+  @bindable() public viewer: IBpmnModeler;
   @bindable() public xml: string;
   @bindable() public diagramUri: string;
   @bindable() public isEditable: boolean;
@@ -124,7 +125,11 @@ export class PropertyPanel {
     const elementRegistry: IElementRegistry = this.modeler.get('elementRegistry');
     const element: IShape = elementRegistry.get(elementId);
 
-    this.modeler.get('selection').select(element);
+    if (this.viewer !== undefined) {
+      this.viewer.get('selection').select(element);
+    } else {
+      this.modeler.get('selection').select(element);
+    }
   }
 
   private processHasLanes(process: IModdleElement): boolean {
