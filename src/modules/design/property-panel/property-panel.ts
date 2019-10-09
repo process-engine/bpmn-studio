@@ -80,6 +80,7 @@ export class PropertyPanel {
       diagramState === null ||
       diagramState.metadata.selectedElements === undefined ||
       diagramState.metadata.selectedElements.length === 0;
+
     if (noSelectedElementState) {
       this.setFirstElement();
 
