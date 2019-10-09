@@ -13,7 +13,8 @@
           active-diagram.bind="activeDiagram"
           flow-node.bind="selectedFlowNode"
           active-solution-entry.bind="activeSolutionEntry"
-          process-instance.bind="selectedProcessInstance"
+          process-instance-id.bind="selectedProcessInstance.processInstanceId"
+          correlation-id.bind="selectedProcessInstance.correlationId"
           show.bind="showTokenViewer"></token-viewer>
       </div>
       <div class="inspect-correlation__bottom-resize-div" ref="bottomPanelResizeDiv" if.bind="!inspectPanelFullscreen"></div>

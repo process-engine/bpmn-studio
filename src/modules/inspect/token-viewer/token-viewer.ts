@@ -13,7 +13,6 @@ const versionRegex: RegExp = /(\d+)\.(\d+).(\d+)/;
 
 @inject('TokenViewerService')
 export class TokenViewer {
-  @bindable({changeHandler: 'processInstanceIdOrCorrelationChanged'})
   @bindable()
   public activeDiagram: IDiagram;
 
@@ -21,8 +20,11 @@ export class TokenViewer {
   @bindable() public flowNode: IShape;
   @bindable() public token: string;
   @bindable() public showBeautifiedToken: boolean = true;
-  @bindable({changeHandler: 'processInstanceIdOrCorrelationChanged'})
-  public processInstance: DataModels.Correlations.ProcessInstance;
+  @bindable({changeHandler: 'processInstanceIdOrCorrelationIdChanged'})
+  public processInstanceId: string;
+
+  @bindable({changeHandler: 'processInstanceIdOrCorrelationIdChanged'})
+  public correlationId: string;
 
   public tokenEntries: Array<ITokenEntry> = [];
   public showTokenEntries: boolean = false;
@@ -37,7 +39,7 @@ export class TokenViewer {
     this.tokenViewerService = tokenViewerService;
   }
 
-  public processInstanceIdOrCorrelationChanged(): void {
+  public processInstanceIdOrCorrelationIdChanged(): void {
     const noFlowNodeSelected: boolean = this.flowNode === undefined;
     if (noFlowNodeSelected) {
       return;
@@ -81,20 +83,21 @@ export class TokenViewer {
     this.tokenEntries = [];
 
     if (this.processEngineSupportsFetchingTokensByProcessInstanceId()) {
-      const noProcessInstance: boolean = this.processInstance === undefined;
-      if (noProcessInstance) {
+      const noProcessInstanceId: boolean = this.processInstanceId === undefined;
+      const noCorrelationId: boolean = this.correlationId === undefined;
+      if (noProcessInstanceId || noCorrelationId) {
         this.clearTokenViewer();
 
         return;
       }
 
       this.getTokenHistoryGroup = this.tokenViewerService.getTokenForFlowNodeByProcessInstanceId(
-        this.processInstance.processInstanceId,
+        this.processInstanceId,
         this.flowNode.id,
         this.activeSolutionEntry.identity,
       );
     } else {
-      const noCorrelationId: boolean = this.processInstance.correlationId === undefined;
+      const noCorrelationId: boolean = this.correlationId === undefined;
       if (noCorrelationId) {
         this.clearTokenViewer();
 
@@ -103,7 +106,7 @@ export class TokenViewer {
 
       this.getTokenHistoryGroup = this.tokenViewerService.getTokenForFlowNodeInstance(
         this.activeDiagram.id,
-        this.processInstance.correlationId,
+        this.correlationId,
         this.flowNode.id,
         this.activeSolutionEntry.identity,
       );
