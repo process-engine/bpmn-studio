@@ -228,7 +228,7 @@ export class BpmnIo {
     }, 0);
 
     if (this.solutionIsRemote) {
-      this.viewer.importXML(this.xml);
+      await this.importXmlIntoViewer(this.xml);
       this.viewer.attachTo(this.canvasModel);
     } else {
       this.modeler.attachTo(this.canvasModel);
@@ -445,13 +445,13 @@ export class BpmnIo {
       this.savedXml = await this.convertXml(newValue);
 
       if (this.solutionIsRemote) {
-        this.viewer.importXML(this.xml);
+        this.importXmlIntoViewer(this.xml);
       }
 
       if (this.diagramHasState(this.diagramUri)) {
-        this.recoverDiagramState();
+        await this.recoverDiagramState();
       } else {
-        this.importXmlIntoModeler(this.xml);
+        await this.importXmlIntoModeler(this.xml);
       }
 
       const diagramState: IDiagramState = this.loadDiagramState(this.diagramUri);
@@ -536,7 +536,7 @@ export class BpmnIo {
 
         const xmlIsNotEmpty: boolean = this.xml !== undefined && this.xml !== null;
         if (xmlIsNotEmpty) {
-          this.viewer.importXML(this.xml);
+          this.importXmlIntoViewer(this.xml);
         }
 
         this.linting.deactivateLinting();
@@ -766,6 +766,21 @@ export class BpmnIo {
   private importXmlIntoModeler(xml: string): Promise<void> {
     return new Promise((resolve: Function, reject: Function): void => {
       this.modeler.importXML(xml, (error: Error) => {
+        const errorOccured: boolean = error !== undefined;
+        if (errorOccured) {
+          reject();
+
+          return;
+        }
+
+        resolve();
+      });
+    });
+  }
+
+  private importXmlIntoViewer(xml: string): Promise<void> {
+    return new Promise((resolve: Function, reject: Function): void => {
+      this.viewer.importXML(xml, (error: Error) => {
         const errorOccured: boolean = error !== undefined;
         if (errorOccured) {
           reject();
