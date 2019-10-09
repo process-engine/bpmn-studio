@@ -1,7 +1,12 @@
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {DataModels, IManagementApiClient} from '@process-engine/management_api_contracts';
 
+import {
+  ProcessInstance,
+  ProcessInstanceList,
+} from '@process-engine/management_api_contracts/dist/data_models/correlation';
 import {IInspectCorrelationRepository} from '../contracts';
+import {applyPagination} from '../../../../services/pagination-module/pagination-module';
 
 export class InspectCorrelationRepository implements IInspectCorrelationRepository {
   protected managementApiService: IManagementApiClient;
@@ -13,10 +18,16 @@ export class InspectCorrelationRepository implements IInspectCorrelationReposito
   public async getAllCorrelationsForProcessModelId(
     processModelId: string,
     identity: IIdentity,
+    offset?: number,
+    limit?: number,
   ): Promise<DataModels.Correlations.CorrelationList> {
-    const result = (await this.managementApiService.getCorrelationsByProcessModelId(identity, processModelId)) as any;
+    const result: Array<
+      DataModels.Correlations.Correlation
+    > = (await this.managementApiService.getCorrelationsByProcessModelId(identity, processModelId)) as any;
 
-    return {correlations: result, totalCount: result.length};
+    const paginizedCorrelations = applyPagination(result, offset, limit);
+
+    return {correlations: paginizedCorrelations, totalCount: result.length};
   }
 
   public async getLogsForCorrelation(
@@ -78,5 +89,57 @@ export class InspectCorrelationRepository implements IInspectCorrelationReposito
     identity: IIdentity,
   ): Promise<DataModels.TokenHistory.TokenHistoryGroup> {
     return this.managementApiService.getTokensForFlowNodeByProcessInstanceId(identity, processInstanceId, flowNodeId);
+  }
+
+  public async getProcessInstancesForProcessModel(
+    identity: IIdentity,
+    processModelId: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<ProcessInstanceList> {
+    const processInstances = await this.getMappedProcessInstances(identity, processModelId);
+
+    const paginizedProcessInstances = applyPagination(processInstances, offset, limit);
+
+    return {processInstances: paginizedProcessInstances, totalCount: processInstances.length};
+  }
+
+  public async getProcessInstancesById(
+    identity: IIdentity,
+    processInstanceId: string,
+    processModelId: string,
+  ): Promise<ProcessInstance> {
+    const processInstances = await this.getMappedProcessInstances(identity, processModelId);
+
+    const processInstance = processInstances.find((instance: DataModels.Correlations.ProcessInstance) => {
+      return instance.processInstanceId === processInstanceId;
+    });
+
+    return processInstance;
+  }
+
+  private async getMappedProcessInstances(
+    identity: IIdentity,
+    processModelId: string,
+  ): Promise<Array<ProcessInstance>> {
+    const result: Array<
+      DataModels.Correlations.Correlation
+    > = (await this.managementApiService.getCorrelationsByProcessModelId(identity, processModelId)) as any;
+
+    const processInstances: Array<ProcessInstance> = [];
+
+    result.forEach((correlation: DataModels.Correlations.Correlation) => {
+      const processInstancesForCorrelation = correlation.processInstances.map(
+        (instance: DataModels.Correlations.ProcessInstance) => {
+          instance.correlationId = correlation.id;
+
+          return instance;
+        },
+      );
+
+      processInstances.push(...processInstancesForCorrelation);
+    });
+
+    return processInstances;
   }
 }

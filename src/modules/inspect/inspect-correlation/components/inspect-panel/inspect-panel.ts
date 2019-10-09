@@ -4,19 +4,19 @@ import {bindable, inject} from 'aurelia-framework';
 import {DataModels} from '@process-engine/management_api_contracts';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 
-import {ICorrelationTableEntry, ISolutionEntry, InspectPanelTab} from '../../../../../contracts/index';
+import {ISolutionEntry, InspectPanelTab} from '../../../../../contracts/index';
 import environment from '../../../../../environment';
 
 @inject(EventAggregator)
 export class InspectPanel {
-  @bindable public processInstanceToSelect: string;
-  @bindable public correlations: Array<DataModels.Correlations.Correlation>;
-  @bindable public sortedTableData: Array<ICorrelationTableEntry>;
+  @bindable public processInstanceToSelect: DataModels.Correlations.ProcessInstance;
+  @bindable public processInstances: Array<DataModels.Correlations.ProcessInstance>;
   @bindable public selectedProcessInstance: DataModels.Correlations.ProcessInstance;
-  @bindable public selectedCorrelation: DataModels.Correlations.Correlation;
   @bindable public fullscreen: boolean = false;
   @bindable public activeDiagram: IDiagram;
   @bindable public activeSolutionEntry: ISolutionEntry;
+  @bindable public totalCount: number;
+
   public inspectPanelTab: typeof InspectPanelTab = InspectPanelTab;
   public showCorrelationList: boolean = true;
   public showLogViewer: boolean = false;
@@ -50,6 +50,7 @@ export class InspectPanel {
 
   public activeDiagramChanged(): void {
     this.selectedProcessInstance = undefined;
+    this.processInstanceToSelect = undefined;
 
     this.showLogViewer = false;
     this.showCorrelationList = true;
@@ -63,7 +64,7 @@ export class InspectPanel {
     this.showLogViewer = shouldShowLogViewer;
   }
 
-  public correlationChanged(
+  public processInstancesChanged(
     newCorrelation: DataModels.Correlations.Correlation,
     oldCorrelation: DataModels.Correlations.Correlation,
   ): void {

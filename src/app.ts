@@ -15,6 +15,9 @@ import environment from './environment';
 import {NotificationService} from './services/notification-service/notification.service';
 
 import {oidcConfig} from './open-id-connect-configuration';
+
+Bluebird.Promise.config({cancellation: true});
+
 @inject(OpenIdConnect, 'NotificationService', EventAggregator)
 export class App {
   public showSolutionExplorer: boolean = false;

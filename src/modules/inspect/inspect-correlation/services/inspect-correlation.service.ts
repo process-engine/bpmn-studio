@@ -4,6 +4,10 @@ import {IIdentity} from '@essential-projects/iam_contracts';
 import {DataModels, IManagementApiClient} from '@process-engine/management_api_contracts';
 
 import {EventAggregator} from 'aurelia-event-aggregator';
+import {
+  ProcessInstance,
+  ProcessInstanceList,
+} from '@process-engine/management_api_contracts/dist/data_models/correlation';
 import {IInspectCorrelationRepository, IInspectCorrelationService} from '../contracts';
 import {InspectCorrelationPaginationRepository} from '../repositories/inspect-correlation.pagination.repository';
 import environment from '../../../../environment';
@@ -91,5 +95,27 @@ export class InspectCorrelationService implements IInspectCorrelationService {
     } catch (error) {
       return undefined;
     }
+  }
+
+  public getProcessInstancesForProcessModel(
+    identity: IIdentity,
+    processModelId: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<ProcessInstanceList> {
+    return this.inspectCorrelationRepository.getProcessInstancesForProcessModel(
+      identity,
+      processModelId,
+      offset,
+      limit,
+    );
+  }
+
+  public getProcessInstanceById(
+    identity: IIdentity,
+    processInstanceId: string,
+    processModelId: string,
+  ): Promise<ProcessInstance> {
+    return this.inspectCorrelationRepository.getProcessInstancesById(identity, processInstanceId, processModelId);
   }
 }

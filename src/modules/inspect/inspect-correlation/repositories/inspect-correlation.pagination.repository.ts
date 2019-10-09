@@ -1,6 +1,10 @@
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {DataModels} from '@process-engine/management_api_contracts';
 
+import {
+  ProcessInstance,
+  ProcessInstanceList,
+} from '@process-engine/management_api_contracts/dist/data_models/correlation';
 import {IInspectCorrelationRepository} from '../contracts';
 import {InspectCorrelationRepository} from './inspect-correlation.repository';
 
@@ -76,5 +80,18 @@ export class InspectCorrelationPaginationRepository extends InspectCorrelationRe
       offset,
       limit,
     );
+  }
+
+  public getProcessInstancesForProcessModel(
+    identity: IIdentity,
+    processModelId: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<ProcessInstanceList> {
+    return this.managementApiService.getProcessInstancesForProcessModel(identity, processModelId, offset, limit);
+  }
+
+  public getProcessInstancesById(identity: IIdentity, processInstanceId: string): Promise<ProcessInstance> {
+    return this.managementApiService.getProcessInstanceById(identity, processInstanceId);
   }
 }

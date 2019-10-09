@@ -3,7 +3,6 @@ import {IIdentity} from '@essential-projects/iam_contracts';
 
 import {DashboardRepository} from './dashboard-repository';
 import {IDashboardRepository, TaskList, TaskListEntry, TaskType} from '../contracts/index';
-import {applyPagination} from '../../../../services/pagination-module/pagination-module';
 
 export class DashboardPaginationRepository extends DashboardRepository implements IDashboardRepository {
   public getAllActiveProcessInstances(

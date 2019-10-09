@@ -14,14 +14,15 @@ const versionRegex: RegExp = /(\d+)\.(\d+).(\d+)/;
 @inject('TokenViewerService')
 export class TokenViewer {
   @bindable({changeHandler: 'processInstanceIdOrCorrelationChanged'})
-  public correlation: DataModels.Correlations.Correlation;
+  @bindable()
+  public activeDiagram: IDiagram;
 
-  @bindable() public activeDiagram: IDiagram;
   @bindable() public activeSolutionEntry: ISolutionEntry;
   @bindable() public flowNode: IShape;
   @bindable() public token: string;
   @bindable() public showBeautifiedToken: boolean = true;
-  @bindable({changeHandler: 'processInstanceIdOrCorrelationChanged'}) public processInstanceId: string;
+  @bindable({changeHandler: 'processInstanceIdOrCorrelationChanged'})
+  public processInstance: DataModels.Correlations.ProcessInstance;
 
   public tokenEntries: Array<ITokenEntry> = [];
   public showTokenEntries: boolean = false;
@@ -80,21 +81,21 @@ export class TokenViewer {
     this.tokenEntries = [];
 
     if (this.processEngineSupportsFetchingTokensByProcessInstanceId()) {
-      const processInstanceIdIsUndefined: boolean = this.processInstanceId === undefined;
-      if (processInstanceIdIsUndefined) {
+      const noProcessInstance: boolean = this.processInstance === undefined;
+      if (noProcessInstance) {
         this.clearTokenViewer();
 
         return;
       }
 
       this.getTokenHistoryGroup = this.tokenViewerService.getTokenForFlowNodeByProcessInstanceId(
-        this.processInstanceId,
+        this.processInstance.processInstanceId,
         this.flowNode.id,
         this.activeSolutionEntry.identity,
       );
     } else {
-      const correlationIsUndefined: boolean = this.correlation === undefined;
-      if (correlationIsUndefined) {
+      const noCorrelationId: boolean = this.processInstance.correlationId === undefined;
+      if (noCorrelationId) {
         this.clearTokenViewer();
 
         return;
@@ -102,7 +103,7 @@ export class TokenViewer {
 
       this.getTokenHistoryGroup = this.tokenViewerService.getTokenForFlowNodeInstance(
         this.activeDiagram.id,
-        this.correlation.id,
+        this.processInstance.correlationId,
         this.flowNode.id,
         this.activeSolutionEntry.identity,
       );
