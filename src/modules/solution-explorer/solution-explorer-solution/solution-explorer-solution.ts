@@ -1,8 +1,9 @@
 /* eslint-disable max-lines */
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
-import {NewInstance, bindable, computedFrom, inject} from 'aurelia-framework';
+import {NewInstance, bindable, computedFrom, inject, observable} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 import {ControllerValidateResult, ValidateResult, ValidationController, ValidationRules} from 'aurelia-validation';
+import {BindingSignaler} from 'aurelia-templating-resources';
 
 import {join} from 'path';
 
@@ -57,6 +58,7 @@ interface IDiagramCreationState extends IDiagramNameInputState {
   'OpenDiagramStateService',
   DeployDiagramService,
   SaveDiagramService,
+  BindingSignaler,
 )
 export class SolutionExplorerSolution {
   public activeDiagram: IDiagram;
@@ -66,7 +68,7 @@ export class SolutionExplorerSolution {
   // Fields below are bound from the html view.
   @bindable public solutionService: ISolutionExplorerService;
   @bindable public openDiagramService: OpenDiagramsSolutionExplorerService;
-  @bindable public displayedSolutionEntry: ISolutionEntry;
+  @bindable @observable public displayedSolutionEntry: ISolutionEntry;
   @bindable public fontAwesomeIconClass: string;
   public createNewDiagramInput: HTMLInputElement;
   public diagramContextMenu: HTMLElement;
@@ -116,6 +118,7 @@ export class SolutionExplorerSolution {
 
   private sortedDiagramsOfSolutions: Array<IDiagram> = [];
   private diagramStatesChangedCallbackId: string;
+  private signaler: BindingSignaler;
 
   constructor(
     router: Router,
@@ -127,6 +130,7 @@ export class SolutionExplorerSolution {
     openDiagramStateService: OpenDiagramStateService,
     deployDiagramService: DeployDiagramService,
     saveDiagramService: SaveDiagramService,
+    bindingSignaler: BindingSignaler,
   ) {
     this.router = router;
     this.eventAggregator = eventAggregator;
@@ -137,6 +141,7 @@ export class SolutionExplorerSolution {
     this.openDiagramStateService = openDiagramStateService;
     this.deployDiagramService = deployDiagramService;
     this.saveDiagramService = saveDiagramService;
+    this.signaler = bindingSignaler;
 
     this.updateDiagramStateList();
     this.diagramStatesChangedCallbackId = this.openDiagramStateService.onDiagramStatesChanged(() => {
@@ -277,6 +282,7 @@ export class SolutionExplorerSolution {
     try {
       this.openedSolution = await this.solutionService.loadSolution();
 
+      await this.updateSolutionEntry();
       const updatedDiagramList: Array<IDiagram> = this.displayedSolutionEntry.isOpenDiagramService
         ? this.openedSolution.diagrams
         : this.openedSolution.diagrams.sort(this.diagramSorter);
@@ -304,6 +310,24 @@ export class SolutionExplorerSolution {
         this.processEngineRunning = false;
       }
     }
+  }
+
+  private async updateSolutionEntry(): Promise<void> {
+    const solutionIsNotRemote: boolean = !this.displayedSolutionEntry.uri.startsWith('http');
+    if (solutionIsNotRemote) {
+      return;
+    }
+
+    const response = await fetch(this.displayedSolutionEntry.uri);
+    const responseJsonBody = await response.json();
+
+    const authorityResponse = await fetch(`${this.displayedSolutionEntry.uri}/security/authority`);
+    const authorityJsonBody = await authorityResponse.json();
+
+    this.displayedSolutionEntry.authority = authorityJsonBody.authority;
+    this.displayedSolutionEntry.processEngineVersion = responseJsonBody.version;
+    this.globalSolutionService.addSolutionEntry(this.displayedSolutionEntry);
+    this.signaler.signal('update-version-icon');
   }
 
   /*
