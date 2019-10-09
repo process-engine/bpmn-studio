@@ -62,6 +62,7 @@ export class SolutionExplorerList {
   private openedSolutions: Array<ISolutionEntry> = [];
   private solutionsToOpen: Array<string> = [];
   private solutionsWhoseOpeningShouldGetAborted: Array<string> = [];
+  private pollingTimeout: NodeJS.Timeout;
 
   constructor(
     router: Router,
@@ -272,7 +273,7 @@ export class SolutionExplorerList {
       const openSolutionFailedWithFailedToFetch: boolean = error.message === 'Failed to fetch';
       if (openSolutionFailedWithFailedToFetch) {
         if (!uriIsNotInternalProcessEngine) {
-          this.openSolution(uri, insertAtBeginning, identityToUse);
+          this.startPollingForInternalEngine(uri, insertAtBeginning, identityToUse);
 
           return;
         }
@@ -296,6 +297,17 @@ export class SolutionExplorerList {
     }
 
     this.addSolutionEntry(uri, solutionExplorer, identityToUse, insertAtBeginning, processEngineVersion);
+  }
+
+  private startPollingForInternalEngine(uri, insertAtBeginning, identityToUse): void {
+    this.pollingTimeout = setTimeout(() => {
+      if (this.openedSolutions.some((solution: ISolutionEntry) => solution.uri === uri)) {
+        clearTimeout(this.pollingTimeout);
+        return;
+      }
+
+      this.openSolution(uri, insertAtBeginning, identityToUse);
+    }, 400);
   }
 
   /**
@@ -656,10 +668,14 @@ export class SolutionExplorerList {
       },
     });
 
-    const response: Response = await fetch(request);
-    const authority: string = (await response.json()).authority;
+    try {
+      const response: Response = await fetch(request);
+      const authority: string = (await response.json()).authority;
 
-    return authority;
+      return authority;
+    } catch (error) {
+      return undefined;
+    }
   }
 
   private createDummyAccessToken(): string {
