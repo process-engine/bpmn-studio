@@ -318,20 +318,16 @@ export class SolutionExplorerSolution {
       return;
     }
 
-    try {
-      const response = await fetch(this.displayedSolutionEntry.uri);
-      const responseJsonBody = await response.json();
+    const response = await fetch(this.displayedSolutionEntry.uri);
+    const responseJsonBody = await response.json();
 
-      const authorityResponse = await fetch(`${this.displayedSolutionEntry.uri}/security/authority`);
-      const authorityJsonBody = await authorityResponse.json();
+    const authorityResponse = await fetch(`${this.displayedSolutionEntry.uri}/security/authority`);
+    const authorityJsonBody = await authorityResponse.json();
 
-      this.displayedSolutionEntry.authority = authorityJsonBody.authority;
-      this.displayedSolutionEntry.processEngineVersion = responseJsonBody.version;
-      this.globalSolutionService.addSolutionEntry(this.displayedSolutionEntry);
-      this.signaler.signal('update-version-icon');
-    } catch (error) {
-      throw error;
-    }
+    this.displayedSolutionEntry.authority = authorityJsonBody.authority;
+    this.displayedSolutionEntry.processEngineVersion = responseJsonBody.version;
+    this.globalSolutionService.addSolutionEntry(this.displayedSolutionEntry);
+    this.signaler.signal('update-version-icon');
   }
 
   /*
