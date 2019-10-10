@@ -199,6 +199,16 @@ export class Design {
       this.eventAggregator.subscribe(environment.events.bpmnio.propertyPanelActive, (showPanel: boolean) => {
         this.propertyPanelShown = showPanel;
       }),
+      this.eventAggregator.subscribe(environment.events.diagramNeedsToBeUpdated, () => {
+        const diagramState: IDiagramState | null = this.openDiagramStateService.loadDiagramState(
+          this.activeDiagram.uri,
+        );
+
+        const newXml = diagramState === null ? fs.readFileSync(this.activeDiagram.uri, 'utf8') : diagramState.data.xml;
+
+        this.xmlForDiff = newXml;
+        this.activeDiagram.xml = newXml;
+      }),
     ];
 
     const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
@@ -356,25 +366,13 @@ export class Design {
         return diagram.name === diagramName && (diagram.uri === diagramUri || diagramUri === undefined);
       });
 
-      let savedXml: string;
-      const diagramIsSavedLocally: boolean = !persistedActiveDiagram.uri.startsWith('about:open-diagrams');
-      if (diagramIsSavedLocally) {
-        try {
-          const uri = persistedActiveDiagram.uri.substring(0, persistedActiveDiagram.uri.lastIndexOf('/'));
-
-          const solutionEntry: ISolutionEntry = this.solutionService.getSolutionEntryForUri(uri);
-          const diagramFromSolution: IDiagram = await solutionEntry.service.loadDiagram(diagramName);
-          savedXml = diagramFromSolution.xml;
-        } catch {
-          savedXml = fs.readFileSync(persistedActiveDiagram.uri, 'utf8');
-        }
-      }
-
-      persistedActiveDiagram.xml = savedXml !== undefined ? savedXml : persistedActiveDiagram.xml;
-
+      persistedActiveDiagram.xml = fs.readFileSync(diagramUri, 'utf8');
       this.activeDiagram = persistedActiveDiagram;
     } else {
-      this.activeDiagram = await this.activeSolutionEntry.service.loadDiagram(diagramName);
+      const diagram: IDiagram = await this.activeSolutionEntry.service.loadDiagram(diagramName);
+      diagram.xml = fs.readFileSync(diagramUri, 'utf8');
+
+      this.activeDiagram = diagram;
     }
   }
 

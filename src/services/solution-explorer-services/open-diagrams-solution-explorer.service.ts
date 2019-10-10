@@ -206,9 +206,10 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
               const diagramIsUnchangedInStudio: boolean = !diagramState.metadata.isChanged;
               const diagramWasChangedOutsideOfTheStudio: boolean = !diagramWasNotChangedOutsideOfTheStudio;
               if (diagramWasChangedOutsideOfTheStudio && diagramIsUnchangedInStudio) {
-                // TODO: Update displayed diagram if changed diagram is active diagram
                 diagramState.data.xml = xml;
                 this.openDiagramStateService.updateDiagramState(diagram.uri, diagramState);
+
+                this.eventAggregator.publish(environment.events.diagramNeedsToBeUpdated);
 
                 isSaving = false;
 
