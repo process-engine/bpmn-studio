@@ -197,7 +197,21 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
                 (change !== undefined && change.change === 'create');
 
               const diagramWasNotChangedOutsideOfTheStudio: boolean = diagram.xml === xml;
-              if (diagramWasChangedByStudio || diagramWasNotChangedOutsideOfTheStudio) {
+              if (diagramWasChangedByStudio) {
+                isSaving = false;
+
+                return;
+              }
+
+              if (diagramWasNotChangedOutsideOfTheStudio) {
+                const diagramWasRecoveredToTheStateWhenItWasInitiallyOpened: boolean = diagramState.data.xml !== xml;
+                if (diagramWasRecoveredToTheStateWhenItWasInitiallyOpened) {
+                  diagramState.data.xml = xml;
+                  this.openDiagramStateService.updateDiagramState(diagram.uri, diagramState);
+
+                  this.eventAggregator.publish(environment.events.diagramNeedsToBeUpdated);
+                }
+
                 isSaving = false;
 
                 return;
