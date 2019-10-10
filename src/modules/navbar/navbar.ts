@@ -369,7 +369,9 @@ export class NavBar {
       ? window.localStorage.getItem('InternalProcessEngineRoute')
       : solutionUriFromNavigation;
 
-    this.activeSolutionEntry = this.solutionService.getSolutionEntryForUri(solutionUri);
+    if (this.router.currentInstruction.config.name !== 'preferences') {
+      this.activeSolutionEntry = this.solutionService.getSolutionEntryForUri(solutionUri);
+    }
 
     const activeSolutionIsUndefined: boolean = this.activeSolutionEntry === undefined;
     if (activeSolutionIsUndefined) {
