@@ -168,15 +168,12 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
           }
 
           isSaving = true;
-          const eventIsRename: boolean = event === 'rename';
-          const eventIsChange: boolean = event === 'change';
-          const eventIsRestore: boolean = event === 'restore';
 
           const diagramState: IDiagramState = this.openDiagramStateService.loadDiagramState(diagram.uri);
 
           const diagramHasState: boolean = diagramState !== null;
           if (diagramHasState) {
-            if (eventIsRename) {
+            if (event === 'rename') {
               const change: DiagramStateChange = diagramState.metadata.change;
 
               const diagramWasChangedByStudio: boolean = change !== undefined && change.change === 'rename';
@@ -187,7 +184,7 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
               }
             }
 
-            if (eventIsChange || eventIsRestore) {
+            if (event === 'change' || event === 'restore') {
               const change: DiagramStateChange = diagramState.metadata.change;
 
               const xml: string = fs.readFileSync(diagram.uri, 'utf8');
@@ -238,16 +235,12 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
 
           this.eventAggregator.publish(environment.events.diagramChangedOutsideTheStudio, previousFilepath);
 
-          const basename = previousFilepath.split('/').reverse()[0];
+          const diagramBaseName: string = previousFilepath.split('/').reverse()[0];
 
-          let notificationMessage: string;
-          if (eventIsRename) {
-            notificationMessage = `The diagram "${basename}" was moved/renamed on disk.`;
-          } else if (eventIsChange) {
-            notificationMessage = `The diagram "${basename}" was changed on disk.`;
-          } else if (eventIsRestore) {
-            notificationMessage = `The diagram "${basename}" was restored on disk.`;
-          }
+          const notificationMessage: string = this.getDiagramChangedOutsideOfTheStudioMessageByEvent(
+            diagramBaseName,
+            event,
+          );
 
           this.notificationService.showNonDisappearingNotification(NotificationType.WARNING, notificationMessage);
 
@@ -327,6 +320,22 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
     });
 
     return index;
+  }
+
+  private getDiagramChangedOutsideOfTheStudioMessageByEvent(diagramName: string, event: string): string {
+    if (event === 'rename') {
+      return `The diagram "${diagramName}" was moved/renamed on disk.`;
+    }
+
+    if (event === 'change') {
+      return `The diagram "${diagramName}" was changed on disk.`;
+    }
+
+    if (event === 'restore') {
+      return `The diagram "${diagramName}" was restored on disk.`;
+    }
+
+    return undefined;
   }
 
   private async setSolutionExplorer(serviceFactory: SolutionExplorerServiceFactory): Promise<void> {
