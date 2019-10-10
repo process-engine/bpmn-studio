@@ -17,6 +17,18 @@
             </div>
           </td>
         </tr>
+
+        <tr>
+          <th>StartEvent</th>
+          <td>
+            <div class="called-process-selection">
+              <select class="called-process-selection__select" value.bind="selectedStartEvent" disabled.bind="!isEditable"}>
+                <option model.bind="undefined">-Choose StartEvent-</option>
+                <option repeat.for="startEvent of startEvents" model.bind="startEvent.id" value="${startEvent.id}">${startEvent.id}</option>
+              </select>
+            </div>
+          </td>
+        </tr>
       </table>
       <button class="navigation-button" disabled.bind="!selectedDiagramName || !isPartOfAllDiagrams(selectedDiagramName)" click.delegate="navigateToCalledDiagram()">Navigate to called process</button>
     </div>
