@@ -132,7 +132,7 @@ function initializeAutoUpdater(): void {
 
     const currentVersionIsPrerelease = currentReleaseChannel.isAlpha() || currentReleaseChannel.isBeta();
     autoUpdater.allowPrerelease = currentVersionIsPrerelease;
-    autoUpdater.channel = currentReleaseChannel.isStable() ? null : currentReleaseChannel.getName();
+    autoUpdater.channel = currentReleaseChannel.getName();
 
     const updateCheckResult = await autoUpdater.checkForUpdates();
 
