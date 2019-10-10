@@ -366,16 +366,29 @@ export class Design {
         return diagram.name === diagramName && (diagram.uri === diagramUri || diagramUri === undefined);
       });
 
-      const diagramIsSavedLocally: boolean = !persistedActiveDiagram.uri.startsWith('about:open-diagrams');
+      const diagramIsSavedOnRemoteSolution: boolean = persistedActiveDiagram.uri.startsWith('http');
+      const diagramIsSavedOnLocalSolution: boolean =
+        !persistedActiveDiagram.uri.startsWith('about:open-diagrams') && !diagramIsSavedOnRemoteSolution;
 
-      persistedActiveDiagram.xml = diagramIsSavedLocally
-        ? fs.readFileSync(persistedActiveDiagram.uri, 'utf8')
-        : persistedActiveDiagram.xml;
+      if (diagramIsSavedOnLocalSolution) {
+        persistedActiveDiagram.xml = fs.readFileSync(persistedActiveDiagram.uri, 'utf8');
+      } else if (diagramIsSavedOnRemoteSolution) {
+        const uri = persistedActiveDiagram.uri.substring(0, persistedActiveDiagram.uri.lastIndexOf('/'));
+
+        const solutionEntry: ISolutionEntry = this.solutionService.getSolutionEntryForUri(uri);
+        const diagramFromSolution: IDiagram = await solutionEntry.service.loadDiagram(diagramName);
+        persistedActiveDiagram.xml = diagramFromSolution.xml;
+      }
 
       this.activeDiagram = persistedActiveDiagram;
     } else {
       const diagram: IDiagram = await this.activeSolutionEntry.service.loadDiagram(diagramName);
-      diagram.xml = fs.readFileSync(diagramUri, 'utf8');
+      const diagramIsSavedOnLocalSolution: boolean =
+        !diagram.uri.startsWith('about:open-diagrams') && !diagram.uri.startsWith('http');
+
+      if (diagramIsSavedOnLocalSolution) {
+        diagram.xml = fs.readFileSync(diagramUri, 'utf8');
+      }
 
       this.activeDiagram = diagram;
     }
