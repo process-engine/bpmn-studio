@@ -366,7 +366,12 @@ export class Design {
         return diagram.name === diagramName && (diagram.uri === diagramUri || diagramUri === undefined);
       });
 
-      persistedActiveDiagram.xml = fs.readFileSync(diagramUri, 'utf8');
+      const diagramIsSavedLocally: boolean = !persistedActiveDiagram.uri.startsWith('about:open-diagrams');
+
+      persistedActiveDiagram.xml = diagramIsSavedLocally
+        ? fs.readFileSync(persistedActiveDiagram.uri, 'utf8')
+        : persistedActiveDiagram.xml;
+
       this.activeDiagram = persistedActiveDiagram;
     } else {
       const diagram: IDiagram = await this.activeSolutionEntry.service.loadDiagram(diagramName);
