@@ -23,10 +23,11 @@ export class CallActivitySection implements ISection {
   public allDiagrams: Array<IDiagram>;
   public startEvents: Array<IShape>;
   public selectValue: string;
-  @observable public selectedStartEvent: string;
-  public selectedDiagramName: string;
-
   public previouslySelectedDiagram: string;
+  public selectedDiagramName: string;
+  @observable public selectedStartEvent: string;
+  @observable public payload: string;
+  public payloadInput: HTMLTextAreaElement;
 
   private businessObjInPanel: ICallActivityElement;
   private generalService: GeneralService;
@@ -46,7 +47,6 @@ export class CallActivitySection implements ISection {
     this.activeSolutionUri = this.router.currentInstruction.queryParams.solutionUri;
     this.businessObjInPanel = model.elementInPanel.businessObject;
 
-    console.log(this.businessObjInPanel);
     await this.getAllDiagrams();
 
     this.previouslySelectedDiagram = this.businessObjInPanel.calledElement;
@@ -59,7 +59,20 @@ export class CallActivitySection implements ISection {
       const previousSelectedStartEvent = this.getSelectedStartEvent();
 
       this.selectedStartEvent = previousSelectedStartEvent || this.startEvents[0].id;
+
+      const previousPayload = this.getPayload();
+      this.payload = previousPayload;
     }
+  }
+
+  public attached(): void {
+    this.recoverInputHeight();
+
+    this.saveInputHeightOnChange();
+  }
+
+  public detached(): void {
+    this.payloadInput.removeEventListener('mousedown', this.saveInputHeightOnMouseUp);
   }
 
   public isSuitableForElement(element: IShape): boolean {
@@ -86,11 +99,10 @@ export class CallActivitySection implements ISection {
   }
 
   public selectedStartEventChanged(newValue, oldValue): void {
-    console.log(newValue, oldValue);
+    this.publishDiagramChange();
 
     if (newValue === undefined) {
       delete this.businessObjInPanel.extensionElements;
-      console.log(this.businessObjInPanel);
 
       return;
     }
@@ -119,9 +131,34 @@ export class CallActivitySection implements ISection {
     }
 
     propertiesElement.values.push(bpmnProperty);
+  }
 
-    console.log(this.businessObjInPanel);
+  public async payloadChanged(newValue, oldValue): Promise<void> {
+    if (!newValue.trim() && !oldValue.trim()) {
+      return;
+    }
     this.publishDiagramChange();
+
+    const propertiesElement = this.getPropertiesElement();
+    const payloadProperty = propertiesElement.values.findIndex((value: IProperty) => value.name === 'payload');
+
+    if (!newValue.trim()) {
+      propertiesElement.values.splice(payloadProperty, 1);
+
+      return;
+    }
+
+    const bpmnPropertyProperties: object = {
+      name: 'payload',
+      value: newValue,
+    };
+    const bpmnProperty: IProperty = this.moddle.create('camunda:Property', bpmnPropertyProperties);
+
+    if (payloadProperty >= 0) {
+      propertiesElement.values.splice(payloadProperty, 1);
+    }
+
+    propertiesElement.values.push(bpmnProperty);
   }
 
   public async updateCalledDiagram(): Promise<void> {
@@ -183,6 +220,22 @@ export class CallActivitySection implements ISection {
     return propertiesElement.values.find((value: IPropertiesElement) => value.name === 'startEventId').value;
   }
 
+  private getPayload(): string | undefined {
+    const extensionElementAndPropertiesExist =
+      this.businessObjInPanel.extensionElements !== undefined &&
+      this.businessObjInPanel.extensionElements.values !== undefined &&
+      this.businessObjInPanel.extensionElements.values.length !== 0;
+
+    if (!extensionElementAndPropertiesExist) {
+      return undefined;
+    }
+
+    const propertiesElement = this.getPropertiesElement();
+
+    const payloadProperty = propertiesElement.values.find((value: IPropertiesElement) => value.name === 'payload');
+    return payloadProperty ? payloadProperty.value : undefined;
+  }
+
   private async getAllDiagrams(): Promise<void> {
     const allDiagramsInSolution: Array<IDiagram> = await this.generalService.getAllDiagrams();
 
@@ -197,4 +250,20 @@ export class CallActivitySection implements ISection {
   private publishDiagramChange(): void {
     this.eventAggregator.publish(environment.events.diagramChange);
   }
+
+  private saveInputHeightOnChange(): void {
+    this.payloadInput.addEventListener('mousedown', this.saveInputHeightOnMouseUp);
+  }
+
+  private recoverInputHeight(): void {
+    this.payloadInput.style.height = `${localStorage.getItem('scriptTaskInputHeight')}px`;
+  }
+
+  private saveInputHeightOnMouseUp: EventListenerOrEventListenerObject = () => {
+    const resizeListenerFunction: EventListenerOrEventListenerObject = (): void => {
+      localStorage.setItem('scriptTaskInputHeight', this.payloadInput.clientHeight.toString());
+      window.removeEventListener('mouseup', resizeListenerFunction);
+    };
+    window.addEventListener('mouseup', resizeListenerFunction);
+  };
 }

@@ -36,3 +36,13 @@
   height: 21px;
   border: 1px solid #A9A9A9;
 }
+
+.payload-enlarge-link {
+  display: block;
+  cursor: pointer;
+  color: #007bff !important;
+}
+
+.payload-enlarge-text:hover {
+  text-decoration: underline;
+}
