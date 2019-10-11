@@ -508,7 +508,17 @@ export class SolutionExplorerPanel {
 
   private async isRemoteSolutionActive(remoteSolutionUri: string): Promise<boolean> {
     try {
-      const response: Response = await fetch(remoteSolutionUri);
+      const request: Request = new Request(remoteSolutionUri, {
+        method: 'GET',
+        mode: 'cors',
+        referrer: 'no-referrer',
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const response = await fetch(request);
 
       const data: JSON = await response.json();
 

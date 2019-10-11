@@ -204,7 +204,17 @@ export class SolutionExplorerSolution {
       const makeRequest: Function = (): void => {
         setTimeout(async () => {
           try {
-            await fetch(this.displayedSolutionEntry.uri);
+            const request: Request = new Request(this.displayedSolutionEntry.uri, {
+              method: 'GET',
+              mode: 'cors',
+              referrer: 'no-referrer',
+              headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Content-Type': 'application/json',
+              },
+            });
+
+            await fetch(request);
 
             this.processEngineRunning = true;
 
@@ -318,7 +328,17 @@ export class SolutionExplorerSolution {
       return;
     }
 
-    const response = await fetch(this.displayedSolutionEntry.uri);
+    const request: Request = new Request(this.displayedSolutionEntry.uri, {
+      method: 'GET',
+      mode: 'cors',
+      referrer: 'no-referrer',
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const response = await fetch(request);
     const responseJsonBody = await response.json();
 
     const authorityResponse = await fetch(`${this.displayedSolutionEntry.uri}/security/authority`);

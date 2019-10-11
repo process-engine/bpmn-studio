@@ -224,7 +224,17 @@ export class SolutionExplorerList {
             }, 3000);
 
             try {
-              const fetchResponse: Response = await fetch(uri);
+              const request: Request = new Request(uri, {
+                method: 'GET',
+                mode: 'cors',
+                referrer: 'no-referrer',
+                headers: {
+                  'Access-Control-Allow-Origin': '*',
+                  'Content-Type': 'application/json',
+                },
+              });
+
+              const fetchResponse = await fetch(request);
               clearTimeout(timeout);
 
               resolve(fetchResponse);
