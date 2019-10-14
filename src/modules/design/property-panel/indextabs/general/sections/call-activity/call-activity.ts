@@ -58,10 +58,10 @@ export class CallActivitySection implements ISection {
         this.startEvents = [];
       }
 
-      if (this.startEvents.length > 0) {
-        const previousSelectedStartEvent = this.getSelectedStartEvent();
+      this.selectedStartEvent = this.getSelectedStartEvent();
 
-        this.selectedStartEvent = previousSelectedStartEvent || this.startEvents[0].id;
+      if (this.selectedStartEvent === undefined && this.startEvents.length > 0) {
+        this.selectedStartEvent = this.startEvents[0].id;
       }
 
       this.payload = this.getPayload();
