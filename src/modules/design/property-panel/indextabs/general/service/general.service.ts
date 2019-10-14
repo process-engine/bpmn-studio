@@ -33,6 +33,10 @@ export class GeneralService {
 
     const diagramForStartEvents = allDiagrams.find((diagram: IDiagram) => diagram.name === diagramName);
 
+    if (!diagramForStartEvents) {
+      throw new Error(`Diagram with name '${diagramName}' not found.`);
+    }
+
     return this.generalRepository.getAllStartEventsForDiagram(diagramForStartEvents);
   }
 }
