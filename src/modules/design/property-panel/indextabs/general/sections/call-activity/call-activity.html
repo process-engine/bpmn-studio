@@ -21,7 +21,7 @@
           <th>StartEvent</th>
           <td>
             <div class="called-process-selection">
-            <input type="text" list="start-events" value.bind="selectedStartEvent" disabled.bind="!isEditable">
+            <input type="text" list="start-events" value.bind="selectedStartEvent" change.delegate="selectedStartEventChanged" disabled.bind="!isEditable">
               <datalist id="start-events">
                 <option repeat.for="startEvent of startEvents" value="${startEvent.id}">
               </datalist>
