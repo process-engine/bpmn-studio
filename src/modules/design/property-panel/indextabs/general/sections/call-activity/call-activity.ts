@@ -125,7 +125,15 @@ export class CallActivitySection implements ISection {
     };
     const bpmnProperty: IProperty = this.moddle.create('camunda:Property', bpmnPropertyProperties);
 
-    const propertiesElement = this.getPropertiesElement();
+    let propertiesElement = this.getPropertiesElement();
+
+    const propertiesElementDoesNotExist: boolean = propertiesElement === undefined;
+
+    if (propertiesElementDoesNotExist) {
+      this.createPropertiesElement();
+
+      propertiesElement = this.getPropertiesElement();
+    }
 
     const startEventProperty = propertiesElement.values.findIndex((value: IProperty) => value.name === 'startEventId');
 
@@ -207,6 +215,19 @@ export class CallActivitySection implements ISection {
     this.businessObjInPanel.extensionElements = extensionElements;
   }
 
+  private createPropertiesElement(): void {
+    const properties: Array<IProperty> = [];
+    const propertiesElement: IPropertiesElement = this.moddle.create('camunda:Properties', {values: properties});
+
+    const extensionElementValuesExists: boolean = this.businessObjInPanel.extensionElements.values !== undefined;
+
+    if (extensionElementValuesExists) {
+      this.businessObjInPanel.extensionElements.values.push(propertiesElement);
+    } else {
+      this.businessObjInPanel.extensionElements.values = [propertiesElement];
+    }
+  }
+
   private getSelectedStartEvent(): string | undefined {
     const extensionElementAndPropertiesExist =
       this.businessObjInPanel.extensionElements !== undefined &&
@@ -218,6 +239,12 @@ export class CallActivitySection implements ISection {
     }
 
     const propertiesElement = this.getPropertiesElement();
+
+    const propertiesElementExists: boolean = propertiesElement !== undefined;
+
+    if (!propertiesElementExists) {
+      return undefined;
+    }
 
     return propertiesElement.values.find((value: IPropertiesElement) => value.name === 'startEventId').value;
   }
