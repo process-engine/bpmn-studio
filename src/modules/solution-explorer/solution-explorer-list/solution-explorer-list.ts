@@ -20,6 +20,7 @@ import {OpenDiagramsSolutionExplorerService} from '../../../services/solution-ex
 import {SolutionExplorerServiceFactory} from '../../../services/solution-explorer-services/solution-explorer-service-factory';
 import {SolutionExplorerSolution} from '../solution-explorer-solution/solution-explorer-solution';
 import {exposeFunctionForTesting} from '../../../services/expose-functionality-module/expose-functionality.module';
+import {HttpFetchClient} from '../../fetch-http-client/http-fetch-client';
 
 interface IUriToViewModelMap {
   [key: string]: SolutionExplorerSolution;
@@ -32,6 +33,7 @@ interface IUriToViewModelMap {
   'AuthenticationService',
   'SolutionService',
   'OpenDiagramService',
+  'HttpFetchClient',
 )
 export class SolutionExplorerList {
   public internalProcessEngineVersion: string;
@@ -64,6 +66,8 @@ export class SolutionExplorerList {
   private solutionsWhoseOpeningShouldGetAborted: Array<string> = [];
   private pollingTimeout: NodeJS.Timeout;
 
+  private httpFetchClient: HttpFetchClient;
+
   constructor(
     router: Router,
     eventAggregator: EventAggregator,
@@ -71,6 +75,7 @@ export class SolutionExplorerList {
     authenticationService: IAuthenticationService,
     solutionService: ISolutionService,
     openDiagramService: OpenDiagramsSolutionExplorerService,
+    httpFetchClient: HttpFetchClient,
   ) {
     this.router = router;
     this.eventAggregator = eventAggregator;
@@ -78,6 +83,7 @@ export class SolutionExplorerList {
     this.authenticationService = authenticationService;
     this.solutionService = solutionService;
     this.openDiagramService = openDiagramService;
+    this.httpFetchClient = httpFetchClient;
 
     const canReadFromFileSystem: boolean = (window as any).nodeRequire;
     if (canReadFromFileSystem) {
@@ -211,7 +217,7 @@ export class SolutionExplorerList {
 
     try {
       if (uriIsRemote && uriIsNotInternalProcessEngine) {
-        const response: Response = await new Promise(
+        const response: IResponse<JSON & {version: string}> = await new Promise(
           async (resolve, reject): Promise<void> => {
             const timeout: NodeJS.Timeout = setTimeout(() => {
               if (this.solutionsWhoseOpeningShouldGetAborted.includes(uri)) {
@@ -224,17 +230,7 @@ export class SolutionExplorerList {
             }, 3000);
 
             try {
-              const request: Request = new Request(uri, {
-                method: 'GET',
-                mode: 'cors',
-                referrer: 'no-referrer',
-                headers: {
-                  'Access-Control-Allow-Origin': '*',
-                  'Content-Type': 'application/json',
-                },
-              });
-
-              const fetchResponse = await fetch(request);
+              const fetchResponse: any = await this.httpFetchClient.get(uri);
               clearTimeout(timeout);
 
               resolve(fetchResponse);
@@ -246,20 +242,19 @@ export class SolutionExplorerList {
           },
         );
 
-        const responseJSON: object & {version: string} = await response.json();
-
         if (this.solutionsWhoseOpeningShouldGetAborted.includes(uri)) {
           this.openingSolutionWasCanceled(uri);
 
           return;
         }
 
-        const isResponseFromProcessEngine: boolean = responseJSON['name'] === '@process-engine/process_engine_runtime';
+        const isResponseFromProcessEngine: boolean =
+          response.result['name'] === '@process-engine/process_engine_runtime';
         if (!isResponseFromProcessEngine) {
           throw new Error('The response was not send by a ProcessEngine.');
         }
 
-        processEngineVersion = responseJSON.version;
+        processEngineVersion = response.result.version;
       }
 
       const uriIsInternalProcessEngine = !uriIsNotInternalProcessEngine;
