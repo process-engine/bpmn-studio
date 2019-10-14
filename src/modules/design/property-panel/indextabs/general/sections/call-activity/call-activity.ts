@@ -22,7 +22,6 @@ export class CallActivitySection implements ISection {
   public canHandleElement: boolean = false;
   public allDiagrams: Array<IDiagram>;
   public startEvents: Array<IShape>;
-  public selectValue: string;
   public previouslySelectedDiagram: string;
   public selectedDiagramName: string;
   @observable public selectedStartEvent: string;
@@ -51,11 +50,10 @@ export class CallActivitySection implements ISection {
 
     this.previouslySelectedDiagram = this.businessObjInPanel.calledElement;
     this.selectedDiagramName = this.businessObjInPanel.calledElement;
-    this.selectValue = this.selectedDiagramName;
 
-    if (this.selectValue) {
+    if (this.selectedDiagramName) {
       try {
-        this.startEvents = await this.generalService.getAllStartEventsForDiagram(this.selectValue);
+        this.startEvents = await this.generalService.getAllStartEventsForDiagram(this.selectedDiagramName);
       } catch (error) {
         this.startEvents = [];
       }
@@ -167,16 +165,10 @@ export class CallActivitySection implements ISection {
   }
 
   public async updateCalledDiagram(): Promise<void> {
-    const diagramSelectedViaSelect: boolean = this.selectValue !== undefined;
-    if (diagramSelectedViaSelect) {
-      this.selectedDiagramName = this.selectValue;
-      this.selectValue = undefined;
-
-      try {
-        this.startEvents = await this.generalService.getAllStartEventsForDiagram(this.selectedDiagramName);
-      } catch (error) {
-        this.startEvents = [];
-      }
+    try {
+      this.startEvents = await this.generalService.getAllStartEventsForDiagram(this.selectedDiagramName);
+    } catch (error) {
+      this.startEvents = [];
     }
 
     this.businessObjInPanel.calledElement = this.selectedDiagramName;
