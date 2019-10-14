@@ -266,7 +266,11 @@ export class CallActivitySection implements ISection {
   }
 
   private recoverInputHeight(): void {
-    this.payloadInput.style.height = `${localStorage.getItem('scriptTaskInputHeight')}px`;
+    const persistedInputHeight: string = localStorage.getItem('scriptTaskInputHeight');
+
+    if (persistedInputHeight) {
+      this.payloadInput.style.height = `${persistedInputHeight}px`;
+    }
   }
 
   private saveInputHeightOnMouseUp: EventListenerOrEventListenerObject = () => {
