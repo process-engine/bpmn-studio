@@ -60,8 +60,7 @@ export class CallActivitySection implements ISection {
 
       this.selectedStartEvent = previousSelectedStartEvent || this.startEvents[0].id;
 
-      const previousPayload = this.getPayload();
-      this.payload = previousPayload;
+      this.payload = this.getPayload();
     }
   }
 
