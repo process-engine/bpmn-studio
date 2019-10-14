@@ -9,10 +9,10 @@ import {IInspectCorrelationRepository} from '../contracts';
 import {applyPagination} from '../../../../services/pagination-module/pagination.module';
 
 export class InspectCorrelationRepository implements IInspectCorrelationRepository {
-  protected managementApiService: IManagementApiClient;
+  protected managementApiClient: IManagementApiClient;
 
   constructor(managementApi: IManagementApiClient) {
-    this.managementApiService = managementApi;
+    this.managementApiClient = managementApi;
   }
 
   public async getAllCorrelationsForProcessModelId(
@@ -23,7 +23,7 @@ export class InspectCorrelationRepository implements IInspectCorrelationReposito
   ): Promise<DataModels.Correlations.CorrelationList> {
     const result: Array<
       DataModels.Correlations.Correlation
-    > = (await this.managementApiService.getCorrelationsByProcessModelId(identity, processModelId)) as any;
+    > = (await this.managementApiClient.getCorrelationsByProcessModelId(identity, processModelId)) as any;
 
     const paginizedCorrelations = applyPagination(result, offset, limit);
 
@@ -37,7 +37,7 @@ export class InspectCorrelationRepository implements IInspectCorrelationReposito
     const logsForAllProcessModelsOfCorrelation: Array<DataModels.Logging.LogEntry> = [];
 
     for (const processModel of correlation.processInstances) {
-      const logsForProcessModel: DataModels.Logging.LogEntry = (await this.managementApiService.getProcessModelLog(
+      const logsForProcessModel: DataModels.Logging.LogEntry = (await this.managementApiClient.getProcessModelLog(
         identity,
         processModel.processModelId,
         correlation.id,
@@ -56,7 +56,7 @@ export class InspectCorrelationRepository implements IInspectCorrelationReposito
     processInstanceId: string,
     identity: IIdentity,
   ): Promise<DataModels.Logging.LogEntryList> {
-    const logs: Array<DataModels.Logging.LogEntry> = (await this.managementApiService.getProcessInstanceLog(
+    const logs: Array<DataModels.Logging.LogEntry> = (await this.managementApiClient.getProcessInstanceLog(
       identity,
       processModelId,
       processInstanceId,
@@ -73,7 +73,7 @@ export class InspectCorrelationRepository implements IInspectCorrelationReposito
   ): Promise<DataModels.TokenHistory.TokenHistoryEntryList> {
     const result: Array<
       DataModels.TokenHistory.TokenHistoryEntry
-    > = (await this.managementApiService.getTokensForFlowNode(
+    > = (await this.managementApiClient.getTokensForFlowNode(
       identity,
       correlationId,
       processModelId,
@@ -88,7 +88,7 @@ export class InspectCorrelationRepository implements IInspectCorrelationReposito
     flowNodeId: string,
     identity: IIdentity,
   ): Promise<DataModels.TokenHistory.TokenHistoryGroup> {
-    return this.managementApiService.getTokensForFlowNodeByProcessInstanceId(identity, processInstanceId, flowNodeId);
+    return this.managementApiClient.getTokensForFlowNodeByProcessInstanceId(identity, processInstanceId, flowNodeId);
   }
 
   public async getProcessInstancesForProcessModel(
@@ -124,7 +124,7 @@ export class InspectCorrelationRepository implements IInspectCorrelationReposito
   ): Promise<Array<ProcessInstance>> {
     const result: Array<
       DataModels.Correlations.Correlation
-    > = (await this.managementApiService.getCorrelationsByProcessModelId(identity, processModelId)) as any;
+    > = (await this.managementApiClient.getCorrelationsByProcessModelId(identity, processModelId)) as any;
 
     const processInstances: Array<ProcessInstance> = [];
 
