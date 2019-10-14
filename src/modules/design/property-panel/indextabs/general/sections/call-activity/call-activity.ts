@@ -54,11 +54,17 @@ export class CallActivitySection implements ISection {
     this.selectValue = this.selectedDiagramName;
 
     if (this.selectValue) {
-      this.startEvents = await this.generalService.getAllStartEventsForDiagram(this.selectValue);
+      try {
+        this.startEvents = await this.generalService.getAllStartEventsForDiagram(this.selectValue);
+      } catch (error) {
+        this.startEvents = [];
+      }
 
-      const previousSelectedStartEvent = this.getSelectedStartEvent();
+      if (this.startEvents.length > 0) {
+        const previousSelectedStartEvent = this.getSelectedStartEvent();
 
-      this.selectedStartEvent = previousSelectedStartEvent || this.startEvents[0].id;
+        this.selectedStartEvent = previousSelectedStartEvent || this.startEvents[0].id;
+      }
 
       this.payload = this.getPayload();
     }
@@ -165,7 +171,12 @@ export class CallActivitySection implements ISection {
     if (diagramSelectedViaSelect) {
       this.selectedDiagramName = this.selectValue;
       this.selectValue = undefined;
-      this.startEvents = await this.generalService.getAllStartEventsForDiagram(this.selectedDiagramName);
+
+      try {
+        this.startEvents = await this.generalService.getAllStartEventsForDiagram(this.selectedDiagramName);
+      } catch (error) {
+        this.startEvents = [];
+      }
     }
 
     this.businessObjInPanel.calledElement = this.selectedDiagramName;
