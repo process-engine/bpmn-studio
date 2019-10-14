@@ -13,8 +13,8 @@ import {
   ISolutionService,
   NotificationType,
 } from '../../contracts/index';
-import {OpenDiagramStateService} from './OpenDiagramStateService';
-import {SolutionExplorerServiceFactory} from './SolutionExplorerServiceFactory';
+import {OpenDiagramStateService} from './open-diagram-state.service';
+import {SolutionExplorerServiceFactory} from './solution-explorer-service-factory';
 import {NotificationService} from '../notification-service/notification.service';
 import environment from '../../environment';
 

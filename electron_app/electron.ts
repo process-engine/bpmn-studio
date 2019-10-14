@@ -26,9 +26,9 @@ import {version as ProcessEngineVersion} from '@process-engine/process_engine_ru
 
 import electronOidc from './electron-oidc';
 import oidcConfig from './oidc-config';
-import ReleaseChannel from '../src/services/release-channel-service/release-channel-service';
+import ReleaseChannel from '../src/services/release-channel-service/release-channel.service';
 import {version as CurrentStudioVersion} from '../package.json';
-import {getPortListByVersion} from '../src/services/default-ports-module/default-ports-module';
+import {getPortListByVersion} from '../src/services/default-ports-module/default-ports.module';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import electron = require('electron');

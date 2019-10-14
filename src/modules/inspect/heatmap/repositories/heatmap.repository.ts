@@ -1,7 +1,7 @@
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {DataModels, IManagementApiClient} from '@process-engine/management_api_contracts';
 
-import {IHeatmapRepository} from '../contracts/IHeatmap.Repository';
+import {IHeatmapRepository} from '../contracts/IHeatmapRepository';
 
 export class HeatmapRepository implements IHeatmapRepository {
   protected managementApiClientService: IManagementApiClient;

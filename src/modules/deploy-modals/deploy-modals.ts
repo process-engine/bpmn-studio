@@ -3,7 +3,7 @@ import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 
 import environment from '../../environment';
 import {ISolutionEntry} from '../../contracts';
-import {SolutionService} from '../../services/solution-service/SolutionService';
+import {SolutionService} from '../../services/solution-service/solution.service';
 
 @inject(EventAggregator, 'SolutionService')
 export class DeployModals {

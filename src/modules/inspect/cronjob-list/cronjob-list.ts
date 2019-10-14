@@ -11,7 +11,7 @@ import {ISolutionEntry} from '../../../contracts/index';
 import environment from '../../../environment';
 import {getBeautifiedDate} from '../../../services/date-service/date.service';
 import {IDashboardService} from '../dashboard/contracts';
-import {processEngineSupportsCronjobEvents} from '../../../services/process-engine-version-module/process-engine-version-module';
+import {processEngineSupportsCronjobEvents} from '../../../services/process-engine-version-module/process-engine-version.module';
 
 @inject('DashboardService')
 export class CronjobList {

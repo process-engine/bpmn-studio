@@ -5,7 +5,7 @@ import {IProperty, IServiceTaskElement} from '@process-engine/bpmn-elements_cont
 
 import {IPageModel} from '../../../../../../../../../contracts';
 import environment from '../../../../../../../../../environment';
-import {ServiceTaskService} from '../service-task-service/service-task-service';
+import {ServiceTaskService} from '../service-task-service/service-task.service';
 
 interface IAuthParameters {
   headers: {

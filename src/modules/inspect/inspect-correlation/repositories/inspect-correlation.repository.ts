@@ -6,7 +6,7 @@ import {
   ProcessInstanceList,
 } from '@process-engine/management_api_contracts/dist/data_models/correlation';
 import {IInspectCorrelationRepository} from '../contracts';
-import {applyPagination} from '../../../../services/pagination-module/pagination-module';
+import {applyPagination} from '../../../../services/pagination-module/pagination.module';
 
 export class InspectCorrelationRepository implements IInspectCorrelationRepository {
   protected managementApiService: IManagementApiClient;

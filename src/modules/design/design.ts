@@ -15,7 +15,7 @@ import {IDiagramState, ISolutionEntry, ISolutionService, NotificationType} from 
 import environment from '../../environment';
 import {NotificationService} from '../../services/notification-service/notification.service';
 import {DiagramDetail} from './diagram-detail/diagram-detail';
-import {OpenDiagramStateService} from '../../services/solution-explorer-services/OpenDiagramStateService';
+import {OpenDiagramStateService} from '../../services/solution-explorer-services/open-diagram-state.service';
 
 export interface IDesignRouteParameters {
   view?: string;

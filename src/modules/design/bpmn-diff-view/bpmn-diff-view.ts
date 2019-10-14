@@ -34,7 +34,7 @@ import {
 import environment from '../../../environment';
 import {ElementNameService} from '../../../services/elementname-service/elementname.service';
 import {NotificationService} from '../../../services/notification-service/notification.service';
-import {SolutionService} from '../../../services/solution-service/SolutionService';
+import {SolutionService} from '../../../services/solution-service/solution.service';
 
 @inject('NotificationService', EventAggregator, 'SolutionService')
 export class BpmnDiffView {

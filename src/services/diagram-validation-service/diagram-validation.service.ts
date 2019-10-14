@@ -1,5 +1,5 @@
 import {IDiagramValidationRules, IDiagramValidationService, IDiagramValidator} from '../../contracts';
-import {DiagramValidator} from './DiagramValidator';
+import {DiagramValidator} from './diagram-validator';
 
 /**
  * This service provides a fluent API to validate BPMN diagrams.

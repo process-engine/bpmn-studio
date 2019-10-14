@@ -9,11 +9,11 @@ import {
   ProcessInstanceList,
 } from '@process-engine/management_api_contracts/dist/data_models/correlation';
 import {IInspectCorrelationRepository, IInspectCorrelationService} from '../contracts';
-import {InspectCorrelationPaginationRepository} from '../repositories/inspect-correlation.pagination.repository';
+import {InspectCorrelationPaginationRepository} from '../repositories/inspect-correlation.pagination-repository';
 import environment from '../../../../environment';
 import {InspectCorrelationRepository} from '../repositories/inspect-correlation.repository';
 import {ISolutionEntry} from '../../../../contracts';
-import {processEngineSupportsPagination} from '../../../../services/process-engine-version-module/process-engine-version-module';
+import {processEngineSupportsPagination} from '../../../../services/process-engine-version-module/process-engine-version.module';
 
 @inject(EventAggregator, 'ManagementApiClientService')
 export class InspectCorrelationService implements IInspectCorrelationService {

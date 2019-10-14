@@ -32,10 +32,10 @@ import {
 } from '../../../contracts/index';
 import environment from '../../../environment';
 import {NotificationService} from '../../../services/notification-service/notification.service';
-import {OpenDiagramStateService} from '../../../services/solution-explorer-services/OpenDiagramStateService';
+import {OpenDiagramStateService} from '../../../services/solution-explorer-services/open-diagram-state.service';
 import {PropertyPanel} from '../property-panel/property-panel';
 import {DiagramExportService, DiagramPrintService} from './services/index';
-import {UserConfigService} from '../../../services/user-config-service/userconfig.service';
+import {UserConfigService} from '../../../services/user-config-service/user-config.service';
 
 const sideBarRightSize: number = 35;
 

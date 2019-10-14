@@ -16,7 +16,7 @@ import {Extensions} from './indextabs/extensions/extensions';
 import {Forms} from './indextabs/forms/forms';
 import {General} from './indextabs/general/general';
 
-import {OpenDiagramStateService} from '../../../services/solution-explorer-services/OpenDiagramStateService';
+import {OpenDiagramStateService} from '../../../services/solution-explorer-services/open-diagram-state.service';
 
 @inject('OpenDiagramStateService')
 export class PropertyPanel {

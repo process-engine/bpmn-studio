@@ -1,7 +1,7 @@
 import {DataModels} from '@process-engine/management_api_contracts';
 import {IIdentity} from '@essential-projects/iam_contracts';
 
-import {DashboardRepository} from './dashboard-repository';
+import {DashboardRepository} from './dashboard.repository';
 import {IDashboardRepository, TaskList, TaskListEntry, TaskType} from '../contracts/index';
 
 export class DashboardPaginationRepository extends DashboardRepository implements IDashboardRepository {

@@ -7,7 +7,7 @@ import {IManagementApiClient} from '@process-engine/management_api_contracts';
 
 import {ISolutionEntry} from '../../contracts';
 import environment from '../../environment';
-import {HttpClientProxy} from './HttpClientProxy';
+import {HttpClientProxy} from './http-client-proxy';
 
 export async function configure(config: FrameworkConfiguration): Promise<void> {
   const httpClient: IHttpClient = config.container.get('HttpFetchClient');

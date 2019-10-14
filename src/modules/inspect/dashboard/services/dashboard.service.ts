@@ -9,7 +9,7 @@ import environment from '../../../../environment';
 import {ISolutionEntry} from '../../../../contracts';
 import {IDashboardRepository} from '../contracts/IDashboardRepository';
 import {IDashboardService, TaskList} from '../contracts/index';
-import {createDashboardRepository} from '../dashboard-repositories/dashboard-repository-factory';
+import {createDashboardRepository} from '../repositories/dashboard-repository-factory';
 
 @inject(EventAggregator, 'ManagementApiClientService')
 export class DashboardService implements IDashboardService {
