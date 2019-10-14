@@ -19,19 +19,19 @@ import {processEngineSupportsPagination} from '../../../../services/process-engi
 export class InspectCorrelationService implements IInspectCorrelationService {
   private inspectCorrelationRepository: IInspectCorrelationRepository;
   private eventAggregator: EventAggregator;
-  private managementApiService: IManagementApiClient;
+  private managementApiClient: IManagementApiClient;
 
-  constructor(eventAggregator: EventAggregator, managementApiService: IManagementApiClient) {
+  constructor(eventAggregator: EventAggregator, managementApiClient: IManagementApiClient) {
     this.eventAggregator = eventAggregator;
-    this.managementApiService = managementApiService;
+    this.managementApiClient = managementApiClient;
 
     this.eventAggregator.subscribe(
       environment.events.configPanel.solutionEntryChanged,
       (solutionEntry: ISolutionEntry) => {
         if (processEngineSupportsPagination(solutionEntry.processEngineVersion)) {
-          this.inspectCorrelationRepository = new InspectCorrelationPaginationRepository(this.managementApiService);
+          this.inspectCorrelationRepository = new InspectCorrelationPaginationRepository(this.managementApiClient);
         } else {
-          this.inspectCorrelationRepository = new InspectCorrelationRepository(this.managementApiService);
+          this.inspectCorrelationRepository = new InspectCorrelationRepository(this.managementApiClient);
         }
       },
     );

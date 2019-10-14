@@ -274,6 +274,17 @@ export class BpmnIo {
         },
       ),
 
+      this.eventAggregator.subscribe(environment.events.diagramNeedsToBeUpdated, async () => {
+        const diagramState: IDiagramState | null = this.openDiagramStateService.loadDiagramState(this.diagramUri);
+
+        const newXml = diagramState.data.xml;
+
+        await this.importXmlIntoModeler(newXml);
+
+        this.savedXml = newXml;
+        this.xml = newXml;
+      }),
+
       this.eventAggregator.subscribe(`${environment.events.diagramDetail.exportDiagramAs}:BPMN`, async () => {
         try {
           const exportName: string = `${this.name}.bpmn`;

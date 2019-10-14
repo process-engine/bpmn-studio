@@ -31,19 +31,19 @@ const maximalTokenCount: number = 100;
 export class HeatmapService implements IHeatmapService {
   private heatmapRepository: IHeatmapRepository;
   private eventAggregator: EventAggregator;
-  private managementApiService: IManagementApiClient;
+  private managementApiClient: IManagementApiClient;
 
-  constructor(eventAggregator: EventAggregator, managementApiService: IManagementApiClient) {
+  constructor(eventAggregator: EventAggregator, managementApiClient: IManagementApiClient) {
     this.eventAggregator = eventAggregator;
-    this.managementApiService = managementApiService;
+    this.managementApiClient = managementApiClient;
 
     this.eventAggregator.subscribe(
       environment.events.configPanel.solutionEntryChanged,
       (solutionEntry: ISolutionEntry) => {
         if (processEngineSupportsPagination(solutionEntry.processEngineVersion)) {
-          this.heatmapRepository = new HeatmapPaginationRepository(this.managementApiService);
+          this.heatmapRepository = new HeatmapPaginationRepository(this.managementApiClient);
         } else {
-          this.heatmapRepository = new HeatmapRepository(this.managementApiService);
+          this.heatmapRepository = new HeatmapRepository(this.managementApiClient);
         }
       },
     );

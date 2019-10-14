@@ -31,6 +31,7 @@ export default {
   events: {
     differsFromOriginal: 'differsFromOriginal',
     diagramChangedOutsideTheStudio: 'diagramChangedOutsideTheStudio',
+    diagramNeedsToBeUpdated: 'diagramNeedsToBeUpdated',
     xmlChanged: 'xmlChanged',
     diagramWasSaved: 'diagramWasSaved',
     deployModals: {
