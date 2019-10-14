@@ -22,7 +22,9 @@ export class TokenViewer {
   @bindable() public token: string;
   @bindable() public showBeautifiedToken: boolean = true;
   @bindable({changeHandler: 'processInstanceIdOrCorrelationChanged'})
-  public processInstance: DataModels.Correlations.ProcessInstance;
+  public processInstanceId: string;
+
+  public correlationId: string;
 
   public tokenEntries: Array<ITokenEntry> = [];
   public showTokenEntries: boolean = false;
@@ -81,7 +83,7 @@ export class TokenViewer {
     this.tokenEntries = [];
 
     if (this.processEngineSupportsFetchingTokensByProcessInstanceId()) {
-      const noProcessInstance: boolean = this.processInstance === undefined;
+      const noProcessInstance: boolean = this.processInstanceId === undefined;
       if (noProcessInstance) {
         this.clearTokenViewer();
 
@@ -89,12 +91,12 @@ export class TokenViewer {
       }
 
       this.getTokenHistoryGroup = this.tokenViewerService.getTokenForFlowNodeByProcessInstanceId(
-        this.processInstance.processInstanceId,
+        this.processInstanceId,
         this.flowNode.id,
         this.activeSolutionEntry.identity,
       );
     } else {
-      const noCorrelationId: boolean = this.processInstance.correlationId === undefined;
+      const noCorrelationId: boolean = this.correlationId === undefined;
       if (noCorrelationId) {
         this.clearTokenViewer();
 
@@ -103,7 +105,7 @@ export class TokenViewer {
 
       this.getTokenHistoryGroup = this.tokenViewerService.getTokenForFlowNodeInstance(
         this.activeDiagram.id,
-        this.processInstance.correlationId,
+        this.correlationId,
         this.flowNode.id,
         this.activeSolutionEntry.identity,
       );
