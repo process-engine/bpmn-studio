@@ -42,7 +42,6 @@ export class GeneralRepository {
 
     const startEvents = elementRegistry.filter((element: IShape) => element.type === 'bpmn:StartEvent');
 
-    console.log(startEvents);
     return startEvents;
   }
 
