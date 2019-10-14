@@ -104,12 +104,6 @@ export class CallActivitySection implements ISection {
   public selectedStartEventChanged(newValue, oldValue): void {
     this.publishDiagramChange();
 
-    if (newValue === undefined) {
-      delete this.businessObjInPanel.extensionElements;
-
-      return;
-    }
-
     const noExtensionsElements =
       this.businessObjInPanel.extensionElements === undefined ||
       this.businessObjInPanel.extensionElements.values === undefined ||
@@ -139,6 +133,10 @@ export class CallActivitySection implements ISection {
 
     if (startEventProperty >= 0) {
       propertiesElement.values.splice(startEventProperty, 1);
+    }
+
+    if (newValue === undefined || newValue.trim() === '') {
+      return;
     }
 
     propertiesElement.values.push(bpmnProperty);
