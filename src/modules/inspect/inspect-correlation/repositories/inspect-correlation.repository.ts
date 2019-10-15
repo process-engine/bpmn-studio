@@ -11,8 +11,8 @@ import {applyPagination} from '../../../../services/pagination-module/pagination
 export class InspectCorrelationRepository implements IInspectCorrelationRepository {
   protected managementApiClient: IManagementApiClient;
 
-  constructor(managementApi: IManagementApiClient) {
-    this.managementApiClient = managementApi;
+  constructor(managementApiClient: IManagementApiClient) {
+    this.managementApiClient = managementApiClient;
   }
 
   public async getAllCorrelationsForProcessModelId(
