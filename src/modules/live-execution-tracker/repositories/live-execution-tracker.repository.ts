@@ -225,6 +225,24 @@ export class LiveExecutionTrackerRepository implements ILiveExecutionTrackerRepo
     );
   }
 
+  public createProcessErrorEventListener(
+    identity: IIdentity,
+    processInstanceId: string,
+    callback: Function,
+  ): Promise<Subscription> {
+    return this.managementApiClient.onProcessError(
+      identity,
+      (message: Messages.BpmnEvents.TerminateEndEventReachedMessage): void => {
+        const eventIsForAnotherProcessInstance: boolean = message.processInstanceId !== processInstanceId;
+        if (eventIsForAnotherProcessInstance) {
+          return;
+        }
+
+        callback();
+      },
+    );
+  }
+
   public createProcessTerminatedEventListener(
     identity: IIdentity,
     processInstanceId: string,
