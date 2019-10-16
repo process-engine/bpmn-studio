@@ -79,7 +79,7 @@ export class CronjobList {
 
   public async detached(): Promise<void> {
     this.isAttached = false;
-    clearTimeout(this.pollingTimeout);
+    this.stopPolling();
     for (const subscription of this.subscriptions) {
       await this.dashboardService.removeSubscription(this.activeSolutionEntry.identity, subscription);
     }
