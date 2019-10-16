@@ -86,6 +86,10 @@ export class CronjobList {
   }
 
   public currentPageChanged(): void {
+    if (!this.isAttached) {
+      return;
+    }
+
     if (this.updatePromise) {
       this.updatePromise.cancel();
     }
