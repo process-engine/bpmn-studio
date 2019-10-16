@@ -42,6 +42,7 @@ export class CronjobList {
 
     if (this.updatePromise) {
       this.updatePromise.cancel();
+
       await this.updateCronjobs();
 
       if (processEngineSupportsCronjobEvents(this.activeSolutionEntry.processEngineVersion)) {
