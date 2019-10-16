@@ -29,7 +29,7 @@ import {OpenDiagramStateService} from '../../../services/solution-explorer-servi
 import {DeleteDiagramModal} from './delete-diagram-modal/delete-diagram-modal';
 import {DeployDiagramService} from '../../../services/deploy-diagram-service/deploy-diagram.service';
 import {SaveDiagramService} from '../../../services/save-diagram-service/save-diagram.service';
-import {HttpFetchClient} from '../../fetch-http-client/HttpFetchClient';
+import {HttpFetchClient} from '../../fetch-http-client/http-fetch-client';
 
 const ENTER_KEY: string = 'Enter';
 const ESCAPE_KEY: string = 'Escape';
