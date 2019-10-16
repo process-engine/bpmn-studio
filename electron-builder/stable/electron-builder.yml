@@ -8,7 +8,6 @@ extraFiles:
 extraResources:
   - filter:
       - node_modules/@process-engine/process_engine_runtime/config/**/*
-      - node_modules/@process-engine/process_engine_runtime/scripts/**/*
       - node_modules/@process-engine/process_engine_runtime/sequelize/migrations/**/*
 nsis:
   perMachine: false
