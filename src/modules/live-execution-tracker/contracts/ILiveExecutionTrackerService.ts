@@ -83,6 +83,11 @@ export interface ILiveExecutionTrackerService {
     processInstanceId: string,
     callback: Function,
   ): Promise<Subscription>;
+  createProcessErrorEventListener(
+    identity: IIdentity,
+    processInstanceId: string,
+    callback: Function,
+  ): Promise<Subscription>;
   createProcessTerminatedEventListener(
     identity: IIdentity,
     processInstanceId: string,
