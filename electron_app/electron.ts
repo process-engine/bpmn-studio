@@ -2,6 +2,7 @@
 import fs from 'fs';
 import path from 'path';
 import {homedir} from 'os';
+import windowStateKeeper from 'electron-window-state';
 
 import JSZip from 'jszip';
 
@@ -326,9 +327,16 @@ function createMainWindow(): void {
 
   setElectronMenubar();
 
+  const mainWindowState = windowStateKeeper({
+    defaultWidth: 1300,
+    defaultHeight: 800,
+  });
+
   browserWindow = new BrowserWindow({
-    width: 1300,
-    height: 800,
+    width: mainWindowState.width,
+    height: mainWindowState.height,
+    x: mainWindowState.x,
+    y: mainWindowState.y,
     title: getProductName(),
     minWidth: 1300,
     minHeight: 800,
@@ -338,6 +346,8 @@ function createMainWindow(): void {
       nodeIntegration: true,
     },
   });
+
+  mainWindowState.manage(browserWindow);
 
   browserWindow.loadURL(`file://${__dirname}/../../../index.html`);
   // We need to navigate to "/" because something in the push state seems to be
