@@ -81,7 +81,7 @@ export class TaskList {
     newActiveSolutionEntry: ISolutionEntry,
     previousActiveSolutioEntry: ISolutionEntry,
   ): Promise<void> {
-    if (!this.isAttached) {
+    if (!newActiveSolutionEntry.uri.includes('http')) {
       return;
     }
 
@@ -139,6 +139,11 @@ export class TaskList {
       this.activeSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
     }
 
+    const activeSolutionUriIsNotRemote: boolean = !this.activeSolutionUri.startsWith('http');
+    if (activeSolutionUriIsNotRemote) {
+      this.activeSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
+    }
+
     this.activeSolutionEntry = this.solutionService.getSolutionEntryForUri(this.activeSolutionUri);
 
     if (getTasksIsUndefined) {
@@ -184,6 +189,10 @@ export class TaskList {
   }
 
   public currentPageChanged(): void {
+    if (!this.isAttached) {
+      return;
+    }
+
     if (this.updatePromise) {
       this.updatePromise.cancel();
     }
@@ -282,6 +291,7 @@ export class TaskList {
       this.tasks = suspendedTaskList.taskListEntries;
       this.totalItems = suspendedTaskList.totalCount;
       this.initialLoadingFinished = true;
+      this.showError = false;
     } catch (error) {
       this.tasks = [];
       this.totalItems = 0;
