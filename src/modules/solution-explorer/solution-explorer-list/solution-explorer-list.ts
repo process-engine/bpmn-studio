@@ -6,6 +6,7 @@ import {Router} from 'aurelia-router';
 import {SemVer} from 'semver';
 
 import {IIdentity} from '@essential-projects/iam_contracts';
+import {IResponse} from '@essential-projects/http_contracts';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 import {ISolutionExplorerService} from '@process-engine/solutionexplorer.service.contracts';
 
