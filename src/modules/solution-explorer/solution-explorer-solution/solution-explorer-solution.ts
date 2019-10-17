@@ -1089,6 +1089,7 @@ export class SolutionExplorerSolution {
 
     await this.updateSolution();
     this.resetDiagramCreation();
+    this.activeDiagram = createdDiagram;
     this.navigateToDetailView(createdDiagram);
   }
 

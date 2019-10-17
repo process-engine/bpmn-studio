@@ -42,6 +42,7 @@ export class CronjobList {
 
     if (this.updatePromise) {
       this.updatePromise.cancel();
+
       await this.updateCronjobs();
 
       if (processEngineSupportsCronjobEvents(this.activeSolutionEntry.processEngineVersion)) {
@@ -78,13 +79,18 @@ export class CronjobList {
 
   public async detached(): Promise<void> {
     this.isAttached = false;
-    clearTimeout(this.pollingTimeout);
+    this.stopPolling();
     for (const subscription of this.subscriptions) {
       await this.dashboardService.removeSubscription(this.activeSolutionEntry.identity, subscription);
     }
   }
 
-  public currentPageChanged(): void {
+  public currentPageChanged(newValue, oldValue): void {
+    const paginationIsInitialized: boolean = oldValue === undefined;
+    if (!this.isAttached || paginationIsInitialized) {
+      return;
+    }
+
     if (this.updatePromise) {
       this.updatePromise.cancel();
     }

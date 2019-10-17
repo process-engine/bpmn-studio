@@ -137,11 +137,11 @@ export class ProcessList {
       await this.updateProcessInstanceList();
     });
 
-    /**
-     * This notification gets also triggered when the processinstance has been terminated.
-     * Currently the onProcessTerminated notification does not work.
-     */
     this.dashboardService.onProcessError(this.activeSolutionEntry.identity, async () => {
+      await this.updateProcessInstanceList();
+    });
+
+    this.dashboardService.onProcessTerminated(this.activeSolutionEntry.identity, async () => {
       await this.updateProcessInstanceList();
     });
   }
@@ -203,6 +203,7 @@ export class ProcessList {
       }
 
       this.initialLoadingFinished = true;
+      this.showError = false;
     } catch (error) {
       this.initialLoadingFinished = true;
 
@@ -213,7 +214,10 @@ export class ProcessList {
       if (!errorIsAuthenticationRelated) {
         this.processInstancesToDisplay = [];
         this.processInstances = [];
-        this.showError = true;
+
+        const errorIsNotNoProcessInstancesFound: boolean = error.code !== 404;
+
+        this.showError = errorIsNotNoProcessInstancesFound;
       }
     }
 
