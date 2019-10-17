@@ -4,7 +4,7 @@ import {inject} from 'aurelia-framework';
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {DataModels, IManagementApiClient} from '@process-engine/management_api_contracts';
 
-import {IHeatmapRepository} from '../contracts/IHeatmap.Repository';
+import {IHeatmapRepository} from '../contracts/IHeatmapRepository';
 
 @inject('ManagementApiClientService')
 export class HeatmapMockRepository implements IHeatmapRepository {

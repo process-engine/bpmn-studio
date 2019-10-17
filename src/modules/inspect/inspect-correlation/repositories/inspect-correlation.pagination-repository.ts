@@ -16,7 +16,7 @@ export class InspectCorrelationPaginationRepository extends InspectCorrelationRe
     offset?: number,
     limit?: number,
   ): Promise<DataModels.Correlations.CorrelationList> {
-    return this.managementApiService.getCorrelationsByProcessModelId(identity, processModelId, offset, limit);
+    return this.managementApiClient.getCorrelationsByProcessModelId(identity, processModelId, offset, limit);
   }
 
   public async getLogsForCorrelation(
@@ -28,7 +28,7 @@ export class InspectCorrelationPaginationRepository extends InspectCorrelationRe
     const logsForAllProcessModelsOfCorrelation: Array<DataModels.Logging.LogEntryList> = [];
 
     for (const processModel of correlation.processInstances) {
-      const logsForProcessModel: DataModels.Logging.LogEntryList = await this.managementApiService.getProcessModelLog(
+      const logsForProcessModel: DataModels.Logging.LogEntryList = await this.managementApiClient.getProcessModelLog(
         identity,
         processModel.processModelId,
         correlation.id,
@@ -53,7 +53,7 @@ export class InspectCorrelationPaginationRepository extends InspectCorrelationRe
     offset?: number,
     limit?: number,
   ): Promise<DataModels.Logging.LogEntryList> {
-    const logs: DataModels.Logging.LogEntryList = await this.managementApiService.getProcessInstanceLog(
+    const logs: DataModels.Logging.LogEntryList = await this.managementApiClient.getProcessInstanceLog(
       identity,
       processModelId,
       processInstanceId,
@@ -72,7 +72,7 @@ export class InspectCorrelationPaginationRepository extends InspectCorrelationRe
     offset?: number,
     limit?: number,
   ): Promise<DataModels.TokenHistory.TokenHistoryEntryList> {
-    return this.managementApiService.getTokensForFlowNode(
+    return this.managementApiClient.getTokensForFlowNode(
       identity,
       correlationId,
       processModelId,
@@ -88,10 +88,10 @@ export class InspectCorrelationPaginationRepository extends InspectCorrelationRe
     offset?: number,
     limit?: number,
   ): Promise<ProcessInstanceList> {
-    return this.managementApiService.getProcessInstancesForProcessModel(identity, processModelId, offset, limit);
+    return this.managementApiClient.getProcessInstancesForProcessModel(identity, processModelId, offset, limit);
   }
 
   public getProcessInstancesById(identity: IIdentity, processInstanceId: string): Promise<ProcessInstance> {
-    return this.managementApiService.getProcessInstanceById(identity, processInstanceId);
+    return this.managementApiClient.getProcessInstanceById(identity, processInstanceId);
   }
 }

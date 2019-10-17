@@ -5,10 +5,10 @@ import {SolutionExplorerFileSystemRepository} from '@process-engine/solutionexpl
 import {SolutionExplorerManagementApiRepository} from '@process-engine/solutionexplorer.repository.management_api';
 import {SolutionExplorerService} from '@process-engine/solutionexplorer.service';
 
-import {DiagramTrashFolderService} from './DiagramTrashFolderService';
-import {OpenDiagramsSolutionExplorerService} from './OpenDiagramsSolutionExplorerService';
-import {OpenDiagramStateService} from './OpenDiagramStateService';
-import {SolutionExplorerServiceFactory} from './SolutionExplorerServiceFactory';
+import {DiagramTrashFolderService} from './diagram-trash-folder.service';
+import {OpenDiagramsSolutionExplorerService} from './open-diagrams-solution-explorer.service';
+import {OpenDiagramStateService} from './open-diagram-state.service';
+import {SolutionExplorerServiceFactory} from './solution-explorer-service-factory';
 
 export async function configure(config: FrameworkConfiguration): Promise<void> {
   registerManagementApi(config.container);

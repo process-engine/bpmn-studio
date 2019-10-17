@@ -983,6 +983,13 @@ export class LiveExecutionTracker {
       this.processInstanceId,
       processEndedCallback,
     );
+    const processErrorSubscriptionPromise: Promise<
+      Subscription
+    > = this.liveExecutionTrackerService.createProcessErrorEventListener(
+      this.activeSolutionEntry.identity,
+      this.processInstanceId,
+      processEndedCallback,
+    );
     const processTerminatedSubscriptionPromise: Promise<
       Subscription
     > = this.liveExecutionTrackerService.createProcessTerminatedEventListener(
@@ -1078,6 +1085,7 @@ export class LiveExecutionTracker {
 
     const subscriptionPromises: Array<Promise<Subscription>> = [
       processEndedSubscriptionPromise,
+      processErrorSubscriptionPromise,
       processTerminatedSubscriptionPromise,
       userTaskWaitingSubscriptionPromise,
       userTaskFinishedSubscriptionPromise,

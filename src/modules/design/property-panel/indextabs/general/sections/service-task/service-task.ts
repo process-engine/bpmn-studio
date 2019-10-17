@@ -5,7 +5,7 @@ import {IPropertiesElement, IProperty, IServiceTaskElement, IShape} from '@proce
 
 import {IBpmnModdle, IPageModel, ISection} from '../../../../../../../contracts';
 import environment from '../../../../../../../environment';
-import {ServiceTaskService} from './components/service-task-service/service-task-service';
+import {ServiceTaskService} from './components/service-task-service/service-task.service';
 
 enum ServiceKind {
   None = 'null',

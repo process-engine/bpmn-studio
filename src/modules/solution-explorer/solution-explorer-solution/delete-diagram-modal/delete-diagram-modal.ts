@@ -11,8 +11,8 @@ import {ISolutionExplorerService} from '@process-engine/solutionexplorer.service
 
 import {IEventFunction, ISolutionService, NotificationType} from '../../../../contracts/index';
 import {NotificationService} from '../../../../services/notification-service/notification.service';
-import {OpenDiagramsSolutionExplorerService} from '../../../../services/solution-explorer-services/OpenDiagramsSolutionExplorerService';
-import {OpenDiagramStateService} from '../../../../services/solution-explorer-services/OpenDiagramStateService';
+import {OpenDiagramsSolutionExplorerService} from '../../../../services/solution-explorer-services/open-diagrams-solution-explorer.service';
+import {OpenDiagramStateService} from '../../../../services/solution-explorer-services/open-diagram-state.service';
 
 @inject('NotificationService', 'OpenDiagramStateService', Router, 'OpenDiagramService', 'SolutionService')
 export class DeleteDiagramModal {

@@ -11,7 +11,7 @@ import {ISolutionEntry} from '../../../contracts/index';
 import environment from '../../../environment';
 import {getBeautifiedDate} from '../../../services/date-service/date.service';
 import {IDashboardService} from '../dashboard/contracts';
-import {processEngineSupportsCronjobEvents} from '../../../services/process-engine-version-module/process-engine-version-module';
+import {processEngineSupportsCronjobEvents} from '../../../services/process-engine-version-module/process-engine-version.module';
 
 @inject('DashboardService')
 export class CronjobList {
@@ -42,6 +42,7 @@ export class CronjobList {
 
     if (this.updatePromise) {
       this.updatePromise.cancel();
+
       await this.updateCronjobs();
 
       if (processEngineSupportsCronjobEvents(this.activeSolutionEntry.processEngineVersion)) {
@@ -78,7 +79,7 @@ export class CronjobList {
 
   public async detached(): Promise<void> {
     this.isAttached = false;
-    clearTimeout(this.pollingTimeout);
+    this.stopPolling();
     for (const subscription of this.subscriptions) {
       await this.dashboardService.removeSubscription(this.activeSolutionEntry.identity, subscription);
     }
@@ -86,7 +87,7 @@ export class CronjobList {
 
   public currentPageChanged(newValue, oldValue): void {
     const paginationIsInitialized: boolean = oldValue === undefined;
-    if (paginationIsInitialized) {
+    if (!this.isAttached || paginationIsInitialized) {
       return;
     }
 

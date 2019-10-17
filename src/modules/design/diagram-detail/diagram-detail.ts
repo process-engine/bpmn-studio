@@ -21,7 +21,7 @@ import {NotificationService} from '../../../services/notification-service/notifi
 import {BpmnIo} from '../bpmn-io/bpmn-io';
 import {DeployDiagramService} from '../../../services/deploy-diagram-service/deploy-diagram.service';
 import {SaveDiagramService} from '../../../services/save-diagram-service/save-diagram.service';
-import {exposeFunctionForTesting} from '../../../services/expose-functionality-module/expose-functionality-module';
+import {exposeFunctionForTesting} from '../../../services/expose-functionality-module/expose-functionality.module';
 import {DiagramDetailService} from './service/diagram-detail.service';
 
 @inject(

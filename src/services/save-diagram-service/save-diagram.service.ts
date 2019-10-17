@@ -7,9 +7,9 @@ import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 import {DiagramStateChange, IDiagramState, ISolutionEntry, NotificationType} from '../../contracts/index';
 import environment from '../../environment';
 import {NotificationService} from '../notification-service/notification.service';
-import {OpenDiagramsSolutionExplorerService} from '../solution-explorer-services/OpenDiagramsSolutionExplorerService';
-import {SolutionService} from '../solution-service/SolutionService';
-import {OpenDiagramStateService} from '../solution-explorer-services/OpenDiagramStateService';
+import {OpenDiagramsSolutionExplorerService} from '../solution-explorer-services/open-diagrams-solution-explorer.service';
+import {SolutionService} from '../solution-service/solution.service';
+import {OpenDiagramStateService} from '../solution-explorer-services/open-diagram-state.service';
 
 @inject(EventAggregator, NotificationService, 'OpenDiagramService', 'SolutionService', Router, OpenDiagramStateService)
 export class SaveDiagramService {
