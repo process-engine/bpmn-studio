@@ -203,6 +203,7 @@ export class ProcessList {
       }
 
       this.initialLoadingFinished = true;
+      this.showError = false;
     } catch (error) {
       this.initialLoadingFinished = true;
 
