@@ -186,6 +186,15 @@ export class DashboardRepository implements IDashboardRepository {
     );
   }
 
+  public onProcessTerminated(identity: IIdentity, callback: Function): Promise<Subscription> {
+    return this.managementApiClient.onProcessTerminated(
+      identity,
+      (processErrorMessage: Messages.SystemEvents.ProcessErrorMessage): void => {
+        callback(processErrorMessage);
+      },
+    );
+  }
+
   public onEmptyActivityFinished(identity: IIdentity, callback: Function): Promise<Subscription> {
     return this.managementApiClient.onEmptyActivityFinished(
       identity,

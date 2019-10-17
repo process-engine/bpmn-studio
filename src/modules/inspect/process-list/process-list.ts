@@ -137,11 +137,11 @@ export class ProcessList {
       await this.updateProcessInstanceList();
     });
 
-    /**
-     * This notification gets also triggered when the processinstance has been terminated.
-     * Currently the onProcessTerminated notification does not work.
-     */
     this.dashboardService.onProcessError(this.activeSolutionEntry.identity, async () => {
+      await this.updateProcessInstanceList();
+    });
+
+    this.dashboardService.onProcessTerminated(this.activeSolutionEntry.identity, async () => {
       await this.updateProcessInstanceList();
     });
   }

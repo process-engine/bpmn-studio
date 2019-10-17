@@ -110,6 +110,7 @@ export interface IDashboardRepository {
   onProcessEnded(identity: IIdentity, callback: Function): Promise<Subscription>;
   onProcessStarted(identity: IIdentity, callback: Function): Promise<Subscription>;
   onProcessError(identity: IIdentity, callback: Function): Promise<Subscription>;
+  onProcessTerminated(identity: IIdentity, callback: Function): Promise<Subscription>;
   onEmptyActivityFinished(identity: IIdentity, callback: Function): Promise<Subscription>;
   onEmptyActivityWaiting(identity: IIdentity, callback: Function): Promise<Subscription>;
   onUserTaskFinished(identity: IIdentity, callback: Function): Promise<Subscription>;

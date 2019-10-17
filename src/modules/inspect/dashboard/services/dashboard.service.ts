@@ -164,6 +164,10 @@ export class DashboardService implements IDashboardService {
     return this.dashboardRepository.onProcessError(identity, callback);
   }
 
+  public onProcessTerminated(identity: IIdentity, callback: Function): Promise<Subscription> {
+    return this.dashboardRepository.onProcessTerminated(identity, callback);
+  }
+
   public onEmptyActivityFinished(identity: IIdentity, callback: Function): Promise<Subscription> {
     return this.dashboardRepository.onEmptyActivityFinished(identity, callback);
   }
