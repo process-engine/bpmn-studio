@@ -877,9 +877,14 @@ async function startInternalProcessEngine(): Promise<any> {
   // See issue https://github.com/process-engine/bpmn-studio/issues/312
   try {
     const sqlitePath = getDatabaseFolder();
+    const logFilepath = getLogFolder();
 
-    // eslint-disable-next-line global-require
-    pe.startRuntime(sqlitePath);
+    const startupArgs = {
+      sqlitePath: sqlitePath,
+      logFilePath: logFilepath,
+    };
+
+    pe.startRuntime(startupArgs);
 
     console.log('Internal ProcessEngine started successfully.');
     internalProcessEngineStatus = 'success';
@@ -900,6 +905,14 @@ async function startInternalProcessEngine(): Promise<any> {
       internalProcessEngineStartupError,
     );
   }
+}
+
+function getLogFolder(): string {
+  return path.join(getConfigFolder(), getProcessEngineLogFolderName());
+}
+
+function getProcessEngineLogFolderName(): string {
+  return 'process_engine_logs';
 }
 
 function getDatabaseFolder(): string {
