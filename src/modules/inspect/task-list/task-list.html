@@ -1,5 +1,7 @@
 <template>
   <require from="./task-list.css"></require>
+  <require from="../../pagination/pagination"></require>
+
   <div class="task-list-container" id="taskListContainer">
     <h4 class="task-list-header">Tasks</h4>
     <template if.bind="initialLoadingFinished && tasks && tasks.length > 0">
@@ -43,5 +45,6 @@
     <div if.bind="!initialLoadingFinished" class="container">
       <img src="src/resources/images/gears.svg" class="loading-spinner">
     </div>
+    <pagination if.bind="totalItems > pageSize" per-page.bind="pageSize" items.bind="totalItems" max-pages-to-display.bind="paginationSize"></pagination>
   </div>
 </template>
