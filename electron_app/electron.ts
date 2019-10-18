@@ -884,7 +884,6 @@ async function startInternalProcessEngine(): Promise<any> {
       logFilePath: logFilepath,
     };
 
-    // eslint-disable-next-line global-require
     pe.startRuntime(startupArgs);
 
     console.log('Internal ProcessEngine started successfully.');
