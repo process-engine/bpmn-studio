@@ -194,10 +194,10 @@ export class ProcessList {
       const processInstanceListWasUpdated: boolean =
         JSON.stringify(sortedProcessInstances) !== JSON.stringify(this.processInstances);
 
+      this.totalItems = processInstanceList.totalCount + this.stoppedProcessInstances.length;
+
       if (processInstanceListWasUpdated) {
         this.processInstances = sortedProcessInstances;
-
-        this.totalItems = processInstanceList.totalCount + this.stoppedProcessInstances.length;
 
         this.updateProcessInstancesToDisplay();
       }
