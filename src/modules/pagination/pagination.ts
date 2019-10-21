@@ -1,20 +1,68 @@
 import {bindable, computedFrom} from 'aurelia-framework';
 
 export class Pagination {
-  @bindable public perPage: number;
-  @bindable public items: number;
+  @bindable public perPage: number = 0;
+  @bindable public items: number = 0;
   @bindable public maxPagesToDisplay: number = -1;
-  @bindable public currentPage;
+  @bindable public currentPage = 1;
 
   public pageStartValue: number = 1;
+
+  public setCurrentPage(page: number): void {
+    this.currentPage = page;
+  }
+
+  public showPreviousPage(): void {
+    if (this.currentPageIsFirstPage) {
+      return;
+    }
+
+    this.currentPage--;
+
+    if (this.currentPage < this.pageStartValue) {
+      this.showPagesBeforeCurrentLimit();
+    }
+  }
+
+  public showNextPage(): void {
+    if (this.currentPageIsLastPage) {
+      return;
+    }
+
+    this.currentPage++;
+
+    if (this.currentPage > this.pageStartValue + this.maxPagesToDisplay - 1) {
+      this.showPagesAfterCurrentLimit();
+    }
+  }
+
+  public showFirstPage(): void {
+    this.currentPage = 1;
+    this.pageStartValue = 1;
+  }
+
+  public showLastPage(): void {
+    this.currentPage = this.amountOfPages;
+
+    const amountOfPagesToDisplayWhenShowingLastPage: number = (this.amountOfPages % this.maxPagesToDisplay) - 1;
+    this.pageStartValue = this.amountOfPages - amountOfPagesToDisplayWhenShowingLastPage;
+  }
+
+  public showPagesBeforeCurrentLimit(): void {
+    this.pageStartValue -= this.maxPagesToDisplay;
+    this.currentPage = this.pageStartValue + this.maxPagesToDisplay - 1;
+
+    console.log(this.currentPage);
+  }
+
+  public showPagesAfterCurrentLimit(): void {
+    this.pageStartValue += this.maxPagesToDisplay;
+    this.currentPage = this.pageStartValue;
+  }
 
   @computedFrom('items', 'perPage')
   public get amountOfPages(): number {
     return Math.ceil(this.items / this.perPage);
-  }
-
-  public setCurrentPage(page: number): void {
-    this.currentPage = page;
   }
 
   @computedFrom('amountOfPages', 'maxPagesToDisplay')
@@ -29,15 +77,16 @@ export class Pagination {
 
   @computedFrom('pageStartValue', 'maxPagesToDisplay', 'amountOfPages')
   public get lastPagesGetDisplayed(): boolean {
-    return this.pageStartValue + this.maxPagesToDisplay >= this.amountOfPages;
+    return this.pageStartValue + this.maxPagesToDisplay > this.amountOfPages;
   }
 
   @computedFrom('maxPagesToDisplay', 'pageStartValue', 'amountOfPages')
   public get amountOfPagesToDisplay(): number {
     if (this.showLimitedAmountOfPages) {
-      if (this.lastPagesGetDisplayed && this.pageStartValue + this.maxPagesToDisplay > this.amountOfPages) {
-        // WARUM +1???
-        return this.maxPagesToDisplay - (this.pageStartValue + this.maxPagesToDisplay - this.amountOfPages) + 1;
+      const lessPagesThanMaxPagesToDisplayAvailable: boolean =
+        this.pageStartValue + this.maxPagesToDisplay > this.amountOfPages;
+      if (lessPagesThanMaxPagesToDisplayAvailable) {
+        return this.amountOfPages - this.pageStartValue + 1;
       }
 
       return this.maxPagesToDisplay;
@@ -46,47 +95,13 @@ export class Pagination {
     return this.amountOfPages;
   }
 
+  @computedFrom('currentPage', 'amountOfPages')
   public get currentPageIsLastPage(): boolean {
     return this.currentPage === this.amountOfPages;
   }
 
+  @computedFrom('currentPage')
   public get currentPageIsFirstPage(): boolean {
     return this.currentPage === 1;
-  }
-
-  public showPreviousPage(): void {
-    if (this.currentPageIsFirstPage) {
-      return;
-    }
-
-    this.currentPage--;
-  }
-
-  public showNextPage(): void {
-    if (this.currentPageIsLastPage) {
-      return;
-    }
-
-    this.currentPage++;
-  }
-
-  public showFirstPage(): void {
-    this.currentPage = 1;
-    this.pageStartValue = 1;
-  }
-
-  public showLastPage(): void {
-    this.currentPage = this.amountOfPages;
-    this.pageStartValue = this.amountOfPages - this.maxPagesToDisplay;
-  }
-
-  public showPagesBeforeCurrentLimit(): void {
-    this.pageStartValue -= this.maxPagesToDisplay;
-    this.currentPage = this.pageStartValue * this.maxPagesToDisplay;
-  }
-
-  public showPagesAfterCurrentLimit(): void {
-    this.pageStartValue += this.maxPagesToDisplay;
-    this.currentPage = this.pageStartValue;
   }
 }
