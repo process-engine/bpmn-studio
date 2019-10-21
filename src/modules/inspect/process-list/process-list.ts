@@ -156,7 +156,7 @@ export class ProcessList {
 
   public async stopProcessInstance(processInstance: DataModels.Correlations.ProcessInstance): Promise<void> {
     try {
-      this.dashboardService.onProcessError(this.activeSolutionEntry.identity, () => {
+      this.dashboardService.onProcessTerminated(this.activeSolutionEntry.identity, () => {
         processInstance.state = DataModels.Correlations.CorrelationState.error;
       });
 
