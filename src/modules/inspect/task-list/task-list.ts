@@ -104,7 +104,9 @@ export class TaskList {
       newActiveSolutionEntry,
     );
 
-    await this.updateTasks();
+    if (this.isAttached) {
+      await this.updateTasks();
+    }
 
     this.dashboardServiceSubscriptions = [
       this.dashboardService.onEmptyActivityFinished(this.activeSolutionEntry.identity, async () => {
