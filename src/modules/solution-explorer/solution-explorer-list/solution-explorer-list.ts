@@ -649,6 +649,8 @@ export class SolutionExplorerList {
       ? false
       : await this.authenticationService.isLoggedIn(authority, identity);
 
+    const state: string = authorityIsUndefined ? 'disconnected' : 'connected';
+
     let userName: string;
 
     if (isLoggedIn) {
@@ -671,6 +673,7 @@ export class SolutionExplorerList {
       userName,
       processEngineVersion,
       hidden,
+      state,
     };
 
     this.solutionService.addSolutionEntry(entry);

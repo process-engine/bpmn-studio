@@ -22,4 +22,5 @@ export interface ISolutionEntry {
   userName?: string;
   processEngineVersion?: string;
   hidden: boolean;
+  state?: string;
 }
