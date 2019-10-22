@@ -282,6 +282,8 @@ export class ProcessList {
 
     this.processInstancesToDisplay.sort(this.sortProcessInstances);
 
-    this.pagination.loadingDone();
+    setTimeout(() => {
+      this.pagination.loadingDone();
+    }, 0);
   }
 }
