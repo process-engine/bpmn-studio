@@ -63,8 +63,6 @@ export class Pagination {
   public showPagesBeforeCurrentLimit(): void {
     this.pageStartValue -= this.maxPagesToDisplay;
     this.currentPage = this.pageStartValue + this.maxPagesToDisplay - 1;
-
-    console.log(this.currentPage);
   }
 
   public showPagesAfterCurrentLimit(): void {
