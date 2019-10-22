@@ -649,7 +649,7 @@ export class SolutionExplorerList {
       ? false
       : await this.authenticationService.isLoggedIn(authority, identity);
 
-    const state: string = authorityIsUndefined ? 'disconnected' : 'connected';
+    const state: string = 'disconnected';
 
     let userName: string;
 
