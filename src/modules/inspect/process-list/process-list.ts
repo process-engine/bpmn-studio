@@ -13,10 +13,11 @@ import {getBeautifiedDate} from '../../../services/date-service/date.service';
 import {NotificationService} from '../../../services/notification-service/notification.service';
 import environment from '../../../environment';
 import {IDashboardService} from '../dashboard/contracts';
+import {Pagination} from '../../pagination/pagination';
 
 @inject('DashboardService', 'NotificationService', 'SolutionService', Router)
 export class ProcessList {
-  @observable public currentPage: number = 0;
+  @observable public currentPage: number = 1;
   @bindable() public activeSolutionEntry: ISolutionEntry;
   public pageSize: number = 10;
   public totalItems: number;
@@ -24,6 +25,7 @@ export class ProcessList {
   public initialLoadingFinished: boolean = false;
   public processInstancesToDisplay: Array<DataModels.Correlations.ProcessInstance> = [];
   public showError: boolean;
+  public pagination: Pagination;
 
   private dashboardService: IDashboardService;
   private notificationService: NotificationService;
@@ -91,7 +93,7 @@ export class ProcessList {
       this.amountOfActiveProcessInstancesToSkip +=
         this.amountOfActiveProcessInstancesToDisplay + skippedPages * this.pageSize;
     } else {
-      const paginationGetsDisplayed: boolean = this.currentPage > 0;
+      const paginationGetsDisplayed: boolean = this.totalItems > this.pageSize;
       const pageIndex: number = paginationGetsDisplayed ? this.currentPage - 1 : 0;
 
       this.amountOfActiveProcessInstancesToSkip = pageIndex * this.pageSize;
@@ -279,5 +281,7 @@ export class ProcessList {
     });
 
     this.processInstancesToDisplay.sort(this.sortProcessInstances);
+
+    this.pagination.loadingDone();
   }
 }

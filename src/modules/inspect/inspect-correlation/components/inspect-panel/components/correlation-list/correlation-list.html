@@ -49,7 +49,7 @@
             </select>
           </td>
           <td class="correlation-table__pagination-entry">
-            <pagination current-page.two-way="currentPage" per-page.to-view="pageSize" items.to-view="totalCount" max-pages-to-display.to-view="paginationSize"></pagination>
+            <pagination show.bind="pageSize < totalCount" view-model.ref="pagination" current-page.two-way="currentPage" per-page.to-view="pageSize" items.to-view="totalCount" max-pages-to-display.to-view="paginationSize" content-is-async="true"></pagination>
           </td>
         </tr>
       </tbody>
