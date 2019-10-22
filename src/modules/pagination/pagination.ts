@@ -17,6 +17,14 @@ export class Pagination {
   }
 
   public currentPageChanged(currentPage: number, previousPage: number): void {
+    const currentPageDoesNotGetDisplyed: boolean =
+      this.currentPage < this.pageStartValue || this.currentPage > this.pageStartValue + this.maxPagesToDisplay - 1;
+
+    if (currentPageDoesNotGetDisplyed) {
+      const pageIndex = this.currentPage % this.maxPagesToDisplay;
+      this.pageStartValue = this.currentPage - pageIndex + 1;
+    }
+
     this.signaler.signal('update-page-class');
   }
 
