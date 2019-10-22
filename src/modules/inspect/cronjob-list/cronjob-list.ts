@@ -33,6 +33,7 @@ export class CronjobList {
 
   private updatePromise: any;
   private subscriptions: Array<Subscription> = [];
+  private paginationShowsLoading: boolean;
 
   constructor(dashboardService: IDashboardService) {
     this.dashboardService = dashboardService;
@@ -122,9 +123,7 @@ export class CronjobList {
       this.totalItems = cronjobList.totalCount;
       this.initialLoadingFinished = true;
 
-      setTimeout(() => {
-        this.pagination.loadingDone();
-      }, 0);
+      this.paginationShowsLoading = false;
     } catch (error) {
       this.initialLoadingFinished = true;
 

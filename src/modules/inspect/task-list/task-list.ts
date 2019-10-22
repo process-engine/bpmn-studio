@@ -30,6 +30,7 @@ export class TaskList {
   public showError: boolean = false;
 
   public pagination: Pagination;
+  public paginationShowsLoading: boolean;
 
   private activeSolutionUri: string;
   private dashboardService: IDashboardService;
@@ -298,9 +299,7 @@ export class TaskList {
       this.initialLoadingFinished = true;
       this.showError = false;
 
-      setTimeout(() => {
-        this.pagination.loadingDone();
-      }, 0);
+      this.paginationShowsLoading = false;
     } catch (error) {
       this.tasks = [];
       this.totalItems = 0;

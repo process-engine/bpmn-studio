@@ -27,6 +27,7 @@ export class CorrelationList {
   @bindable @observable public processInstances: Array<DataModels.Correlations.ProcessInstance>;
   @bindable public activeDiagram: IDiagram;
   @bindable public sortedTableData: Array<ICorrelationTableEntry>;
+  @bindable public paginationShowsLoading: boolean;
 
   public pagination: Pagination;
 
@@ -113,9 +114,7 @@ export class CorrelationList {
       this.processInstanceToSelect = undefined;
     }
 
-    setTimeout(() => {
-      this.pagination.loadingDone();
-    }, 0);
+    this.paginationShowsLoading = false;
   }
 
   public pageSizeChanged(newValue, oldValue): void {

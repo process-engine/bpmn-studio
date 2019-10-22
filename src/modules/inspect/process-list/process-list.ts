@@ -26,6 +26,7 @@ export class ProcessList {
   public processInstancesToDisplay: Array<DataModels.Correlations.ProcessInstance> = [];
   public showError: boolean;
   public pagination: Pagination;
+  public paginationShowsLoading: boolean;
 
   private dashboardService: IDashboardService;
   private notificationService: NotificationService;
@@ -282,8 +283,6 @@ export class ProcessList {
 
     this.processInstancesToDisplay.sort(this.sortProcessInstances);
 
-    setTimeout(() => {
-      this.pagination.loadingDone();
-    }, 0);
+    this.paginationShowsLoading = false;
   }
 }

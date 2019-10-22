@@ -8,9 +8,9 @@ export class Pagination {
   @bindable public maxPagesToDisplay: number = -1;
   @bindable public currentPage: number = 1;
   @bindable public contentIsAsync: boolean;
+  @bindable public isLoading: boolean = false;
 
   public previousPage: number = 0;
-  public pageIsLoaded: boolean = true;
   public pageStartValue: number = 1;
 
   public signaler: BindingSignaler;
@@ -19,8 +19,12 @@ export class Pagination {
     this.signaler = signaler;
   }
 
-  public contentIsAsyncChanged(): void {
-    this.pageIsLoaded = !this.contentIsAsync;
+  public isLoadingChanged(): void {
+    if (!this.contentIsAsync) {
+      return;
+    }
+
+    this.signaler.signal('update-page-class');
   }
 
   public currentPageChanged(currentPage: number, previousPage: number): void {
@@ -33,23 +37,12 @@ export class Pagination {
     }
 
     if (this.contentIsAsync) {
-      if (this.pageIsLoaded) {
+      if (!this.isLoading) {
         this.previousPage = previousPage;
       }
 
-      this.pageIsLoaded = false;
+      this.isLoading = true;
     }
-
-    this.signaler.signal('update-page-class');
-  }
-
-  public loadingDone(): void {
-    if (!this.contentIsAsync) {
-      return;
-    }
-
-    this.pageIsLoaded = true;
-    this.previousPage = 0;
 
     this.signaler.signal('update-page-class');
   }
@@ -109,12 +102,12 @@ export class Pagination {
 
     const isCurrentPage: boolean = this.currentPage === pageNumber;
     if (isCurrentPage) {
-      return this.pageIsLoaded ? 'active' : 'pagination-button--loading';
+      return this.isLoading ? 'pagination-button--loading' : 'active';
     }
 
     const isPreviousPage: boolean = this.previousPage === pageNumber;
     if (isPreviousPage) {
-      return !this.pageIsLoaded ? 'active' : '';
+      return this.isLoading ? 'active' : '';
     }
 
     return '';
