@@ -1,5 +1,7 @@
-import {bindable, computedFrom} from 'aurelia-framework';
+import {bindable, computedFrom, inject} from 'aurelia-framework';
+import {BindingSignaler} from 'aurelia-templating-resources';
 
+@inject(BindingSignaler)
 export class Pagination {
   @bindable public perPage: number = 0;
   @bindable public items: number = 0;
@@ -7,6 +9,16 @@ export class Pagination {
   @bindable public currentPage = 1;
 
   public pageStartValue: number = 1;
+
+  public signaler: BindingSignaler;
+
+  constructor(signaler: BindingSignaler) {
+    this.signaler = signaler;
+  }
+
+  public currentPageChanged(currentPage: number, previousPage: number): void {
+    this.signaler.signal('update-page-class');
+  }
 
   public setCurrentPage(page: number): void {
     this.currentPage = page;
@@ -58,6 +70,14 @@ export class Pagination {
   public showPagesAfterCurrentLimit(): void {
     this.pageStartValue += this.maxPagesToDisplay;
     this.currentPage = this.pageStartValue;
+  }
+
+  public getClassForPageIndex(pageIndex: number): string {
+    const pageNumber: number = pageIndex + this.pageStartValue;
+
+    const isCurrentPage: boolean = this.currentPage === pageNumber;
+
+    return isCurrentPage ? 'active' : '';
   }
 
   @computedFrom('items', 'perPage')
