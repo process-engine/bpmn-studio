@@ -47,8 +47,6 @@ export class CronjobList {
     if (this.updatePromise) {
       this.updatePromise.cancel();
 
-      await this.updateCronjobs();
-
       if (processEngineSupportsCronjobEvents(this.activeSolutionEntry.processEngineVersion)) {
         clearTimeout(this.pollingTimeout);
         this.subscribeToEvents();
@@ -67,6 +65,8 @@ export class CronjobList {
       environment.events.configPanel.solutionEntryChanged,
       newSolutionEntry,
     );
+
+    await this.updateCronjobs();
   }
 
   public async attached(): Promise<void> {
