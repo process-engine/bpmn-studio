@@ -2,8 +2,8 @@ import {EventAggregator} from 'aurelia-event-aggregator';
 import {bindable, inject, observable} from 'aurelia-framework';
 
 import {DataModels} from '@process-engine/management_api_contracts';
-
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
+
 import {
   CorrelationListSortProperty,
   ICorrelationSortSettings,
