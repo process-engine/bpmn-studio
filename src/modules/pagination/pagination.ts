@@ -6,7 +6,7 @@ export class Pagination {
   @bindable public perPage: number = 0;
   @bindable public items: number = 0;
   @bindable public maxPagesToDisplay: number = -1;
-  @bindable public currentPage = 1;
+  @bindable public currentPage: number = 1;
 
   public pageStartValue: number = 1;
 
