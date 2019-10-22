@@ -7,13 +7,20 @@ export class Pagination {
   @bindable public items: number = 0;
   @bindable public maxPagesToDisplay: number = -1;
   @bindable public currentPage: number = 1;
+  @bindable public contentIsAsync: boolean;
 
+  public previousPage: number = 0;
+  public pageIsLoaded: boolean = true;
   public pageStartValue: number = 1;
 
   public signaler: BindingSignaler;
 
   constructor(signaler: BindingSignaler) {
     this.signaler = signaler;
+  }
+
+  public contentIsAsyncChanged(): void {
+    this.pageIsLoaded = !this.contentIsAsync;
   }
 
   public currentPageChanged(currentPage: number, previousPage: number): void {
@@ -24,6 +31,25 @@ export class Pagination {
       const pageIndex = this.currentPage % this.maxPagesToDisplay;
       this.pageStartValue = this.currentPage - pageIndex + 1;
     }
+
+    if (this.contentIsAsync) {
+      if (this.pageIsLoaded) {
+        this.previousPage = previousPage;
+      }
+
+      this.pageIsLoaded = false;
+    }
+
+    this.signaler.signal('update-page-class');
+  }
+
+  public loadingDone(): void {
+    if (!this.contentIsAsync) {
+      return;
+    }
+
+    this.pageIsLoaded = true;
+    this.previousPage = 0;
 
     this.signaler.signal('update-page-class');
   }
@@ -82,8 +108,16 @@ export class Pagination {
     const pageNumber: number = pageIndex + this.pageStartValue;
 
     const isCurrentPage: boolean = this.currentPage === pageNumber;
+    if (isCurrentPage) {
+      return this.pageIsLoaded ? 'active' : 'pagination-button--loading';
+    }
 
-    return isCurrentPage ? 'active' : '';
+    const isPreviousPage: boolean = this.previousPage === pageNumber;
+    if (isPreviousPage) {
+      return !this.pageIsLoaded ? 'active' : '';
+    }
+
+    return '';
   }
 
   @computedFrom('items', 'perPage')
