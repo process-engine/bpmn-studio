@@ -1,7 +1,7 @@
 <template>
   <require from="./pagination.css"></require>
 
-  <nav class="bpmn-studio-pagination" aria-label="Page navigation example">
+  <nav class="bpmn-studio-pagination">
     <ul class="pagination">
       <li class="page-item" class.bind="currentPageIsFirstPage ? 'pagination-button--disabled' : ''" click.delegate="showFirstPage()"><a class="page-link">First</a></li>
       <li class="page-item" class.bind="currentPageIsFirstPage ? 'pagination-button--disabled' : ''" click.delegate="showPreviousPage()"><a class="page-link"><</a></li>
