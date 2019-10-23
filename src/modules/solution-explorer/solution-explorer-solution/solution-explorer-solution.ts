@@ -1222,7 +1222,11 @@ export class SolutionExplorerSolution {
         this.diagramRenamingState.currentDiagramInputValue,
       );
 
-      this.openDiagramStateService.setDiagramChange(this.currentlyRenamingDiagram.uri, {change: 'rename'});
+      const diagramHasState: boolean =
+        this.openDiagramStateService.loadDiagramState(this.currentlyRenamingDiagram.uri) !== null;
+      if (diagramHasState) {
+        this.openDiagramStateService.setDiagramChange(this.currentlyRenamingDiagram.uri, {change: 'rename'});
+      }
     } catch (error) {
       this.notificationService.showNotification(NotificationType.WARNING, error.message);
 
