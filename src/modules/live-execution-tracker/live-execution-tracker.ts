@@ -497,7 +497,7 @@ export class LiveExecutionTracker {
     );
 
     for (const element of elementsWithMultipleOverlays) {
-      const elementOverlays: Array<IOverlay> = this.elementOverlays(element);
+      const elementOverlays: Array<IOverlay> = this.getOverlaysForElement(element);
 
       elementOverlays.forEach((overlay: IOverlay, index: number) => {
         const overlayHtmlId: string = /id="(.*?)"/g.exec(overlay.html)[1];
@@ -527,7 +527,7 @@ export class LiveExecutionTracker {
     return elementTopPosition;
   }
 
-  private elementOverlays(elementId: string): Array<IOverlay> {
+  private getOverlaysForElement(elementId: string): Array<IOverlay> {
     const overlaysForElement: Array<IOverlay> = [];
 
     // eslint-disable-next-line no-underscore-dangle
