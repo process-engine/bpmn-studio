@@ -12,16 +12,19 @@ import environment from '../../../environment';
 import {getBeautifiedDate} from '../../../services/date-service/date.service';
 import {IDashboardService} from '../dashboard/contracts';
 import {processEngineSupportsCronjobEvents} from '../../../services/process-engine-version-module/process-engine-version.module';
+import {Pagination} from '../../pagination/pagination';
 
 @inject('DashboardService')
 export class CronjobList {
   @bindable public activeSolutionEntry: ISolutionEntry;
   public initialLoadingFinished: boolean = false;
-  @observable public currentPage: number = 0;
+  @observable public currentPage: number = 1;
   public pageSize: number = 10;
   public paginationSize: number = 10;
   public totalItems: number;
   public showError: boolean;
+
+  public pagination: Pagination;
 
   private cronjobsToDisplay: Array<DataModels.Cronjobs.CronjobConfiguration> = [];
   private pollingTimeout: NodeJS.Timeout;
@@ -30,6 +33,7 @@ export class CronjobList {
 
   private updatePromise: any;
   private subscriptions: Array<Subscription> = [];
+  private paginationShowsLoading: boolean;
 
   constructor(dashboardService: IDashboardService) {
     this.dashboardService = dashboardService;
@@ -42,8 +46,6 @@ export class CronjobList {
 
     if (this.updatePromise) {
       this.updatePromise.cancel();
-
-      await this.updateCronjobs();
 
       if (processEngineSupportsCronjobEvents(this.activeSolutionEntry.processEngineVersion)) {
         clearTimeout(this.pollingTimeout);
@@ -63,6 +65,8 @@ export class CronjobList {
       environment.events.configPanel.solutionEntryChanged,
       newSolutionEntry,
     );
+
+    await this.updateCronjobs();
   }
 
   public async attached(): Promise<void> {
@@ -118,6 +122,8 @@ export class CronjobList {
       this.cronjobsToDisplay = cronjobList.cronjobs.sort(this.sortCronjobs);
       this.totalItems = cronjobList.totalCount;
       this.initialLoadingFinished = true;
+
+      this.paginationShowsLoading = false;
     } catch (error) {
       this.initialLoadingFinished = true;
 
@@ -136,7 +142,7 @@ export class CronjobList {
   private getCronjobList(): Promise<DataModels.Cronjobs.CronjobList> {
     return new Bluebird.Promise(
       async (resolve: Function, reject: Function): Promise<void> => {
-        const paginationGetsDisplayed: boolean = this.currentPage > 0;
+        const paginationGetsDisplayed: boolean = this.totalItems > this.pageSize;
         const pageIndex: number = paginationGetsDisplayed ? this.currentPage - 1 : 0;
 
         const cronjobOffset: number = pageIndex * this.pageSize;

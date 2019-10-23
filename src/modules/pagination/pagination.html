@@ -1,0 +1,15 @@
+<template>
+  <require from="./pagination.css"></require>
+
+  <nav class="bpmn-studio-pagination">
+    <ul class="pagination">
+      <li class="page-item" class.bind="currentPageIsFirstPage ? 'pagination-button--disabled' : ''" click.delegate="showFirstPage()"><a class="page-link">First</a></li>
+      <li class="page-item" class.bind="currentPageIsFirstPage ? 'pagination-button--disabled' : ''" click.delegate="showPreviousPage()"><a class="page-link"><</a></li>
+      <li if.bind="pageStartValue > 1" class="page-item" click.delegate="showPagesBeforeCurrentLimit()"><a class="page-link">...</a></li>
+      <li repeat.for="pageIndex of amountOfPagesToDisplay" class="page-item" class.bind="getClassForPageIndex(pageIndex) & signal:'update-page-class'" click.delegate="setCurrentPage(pageIndex + pageStartValue)"><a class="page-link">${pageIndex + pageStartValue}</a></li>
+      <li if.bind="showLimitedAmountOfPages && !lastPagesGetDisplayed" class="page-item" click.delegate="showPagesAfterCurrentLimit()"><a class="page-link">...</a></li>
+      <li class="page-item" class.bind="currentPageIsLastPage ? 'pagination-button--disabled' : ''" class="page-item" click.delegate="showNextPage()"><a class="page-link">></a></li>
+      <li class="page-item" class.bind="currentPageIsLastPage ? 'pagination-button--disabled' : ''" class="page-item" click.delegate="showLastPage()"><a class="page-link">Last</a></li>
+    </ul>
+  </nav>
+</template>
