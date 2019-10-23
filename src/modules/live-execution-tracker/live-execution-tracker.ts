@@ -392,20 +392,24 @@ export class LiveExecutionTracker {
     this.removeEventListenerFromOverlays();
     this.overlays.clear();
 
-    const userAndManualTaskOverlays: Array<string> = this.addOverlaysToUserAndManualTasks(elementsWithActiveToken);
-    const emptyActivityOverlays: Array<string> = this.addOverlaysToEmptyActivities(elementsWithActiveToken);
-    const activeCallActivityOverlays: Array<string> = this.addOverlaysToActiveCallActivities(elementsWithActiveToken);
-    const inactiveCallActivityOverlays: Array<string> = this.addOverlaysToInactiveCallActivities(
+    const userAndManualTaskWithOverlays: Array<IShape> = this.addOverlaysToUserAndManualTasks(elementsWithActiveToken);
+    const emptyActivityWithOverlays: Array<IShape> = this.addOverlaysToEmptyActivities(elementsWithActiveToken);
+    const activeCallActivityWithOverlays: Array<IShape> = this.addOverlaysToActiveCallActivities(
+      elementsWithActiveToken,
+    );
+    const inactiveCallActivityWithOverlays: Array<IShape> = this.addOverlaysToInactiveCallActivities(
       inactiveCallActivities,
     );
-    const errorElementOverlays: Array<string> = this.addOverlaysToElementsWithError(elementsWithError);
+    const errorElementWithOverlays: Array<IShape> = this.addOverlaysToElementsWithError(elementsWithError);
+    const elementsWithfakeOverlays: Array<IShape> = this.addOverlaysToUserAndManualTasks(elementsWithError);
 
-    const elementsWithOverlays: Array<string> = [
-      ...userAndManualTaskOverlays,
-      ...emptyActivityOverlays,
-      ...activeCallActivityOverlays,
-      ...inactiveCallActivityOverlays,
-      ...errorElementOverlays,
+    const elementsWithOverlays: Array<IShape> = [
+      ...userAndManualTaskWithOverlays,
+      ...emptyActivityWithOverlays,
+      ...activeCallActivityWithOverlays,
+      ...inactiveCallActivityWithOverlays,
+      ...errorElementWithOverlays,
+      ...elementsWithfakeOverlays,
     ];
 
     this.rearrangeOverlaysForElementWithMultipleOverlays(elementsWithOverlays);
@@ -464,13 +468,11 @@ export class LiveExecutionTracker {
     return undefined;
   }
 
-  private addOverlaysToElementsWithError(elementsWithError: Array<IShape>): Array<string> {
+  private addOverlaysToElementsWithError(elementsWithError: Array<IShape>): Array<IShape> {
     const liveExecutionTrackerIsNotAttached: boolean = !this.isAttached;
     if (liveExecutionTrackerIsNotAttached) {
       return [];
     }
-
-    const errorElementIds: Array<string> = elementsWithError.map((element: IShape) => element.id).sort();
 
     for (const element of elementsWithError) {
       const overlayHtmlId: string = `${element.id}#error-element`;
@@ -486,18 +488,20 @@ export class LiveExecutionTracker {
       this.addEventListenerToOverlay(overlayHtmlId);
     }
 
-    return errorElementIds;
+    return elementsWithError;
   }
 
-  private rearrangeOverlaysForElementWithMultipleOverlays(elementsWithOverlays: Array<string>): void {
-    const elementsWithMultipleOverlays: Array<string> = elementsWithOverlays.filter(
-      (element, index, elementArray: Array<string>) => {
-        return elementArray.indexOf(element) === index && elementArray.lastIndexOf(element) !== index;
-      },
-    );
+  private rearrangeOverlaysForElementWithMultipleOverlays(elementsWithOverlays: Array<IShape>): void {
+    for (const element of elementsWithOverlays) {
+      const elementOverlays: Array<IOverlay> = this.getOverlaysForElement(element.id);
 
-    for (const element of elementsWithMultipleOverlays) {
-      const elementOverlays: Array<IOverlay> = this.getOverlaysForElement(element);
+      const elementHasMultipleOverlays: boolean = elementOverlays.length > 1;
+      if (!elementHasMultipleOverlays) {
+        continue;
+      }
+
+      const neededOverlayWidth: number = OVERLAY_WIDTH * elementOverlays.length;
+      const leftSpacing: number = (element.width - neededOverlayWidth) / 2;
 
       elementOverlays.forEach((overlay: IOverlay, index: number) => {
         const overlayHtmlId: string = /id="(.*?)"/g.exec(overlay.html)[1];
@@ -505,7 +509,7 @@ export class LiveExecutionTracker {
         this.removeEventListenerFromOverlay(overlayHtmlId);
         this.overlays.remove(overlay.id);
 
-        overlay.position.left = 10 + 40 * index;
+        overlay.position.left = leftSpacing + OVERLAY_WIDTH * index;
 
         this.overlays.add(element, overlay);
         this.addEventListenerToOverlay(overlayHtmlId);
@@ -560,7 +564,7 @@ export class LiveExecutionTracker {
     });
   };
 
-  private addOverlaysToEmptyActivities(elements: Array<IShape>): Array<string> {
+  private addOverlaysToEmptyActivities(elements: Array<IShape>): Array<IShape> {
     const liveExecutionTrackerIsNotAttached: boolean = !this.isAttached;
     if (liveExecutionTrackerIsNotAttached) {
       return [];
@@ -571,8 +575,6 @@ export class LiveExecutionTracker {
 
       return elementIsEmptyActivity;
     });
-
-    const activeEmptyActivitiesIds: Array<string> = activeEmptyActivities.map((element: IShape) => element.id).sort();
 
     for (const element of activeEmptyActivities) {
       const overlayHtmlId: string = `${element.id}#empty-activity`;
@@ -588,10 +590,10 @@ export class LiveExecutionTracker {
       this.addEventListenerToOverlay(overlayHtmlId);
     }
 
-    return activeEmptyActivitiesIds;
+    return activeEmptyActivities;
   }
 
-  private addOverlaysToUserAndManualTasks(elements: Array<IShape>): Array<string> {
+  private addOverlaysToUserAndManualTasks(elements: Array<IShape>): Array<IShape> {
     const liveExecutionTrackerIsNotAttached: boolean = !this.isAttached;
     if (liveExecutionTrackerIsNotAttached) {
       return [];
@@ -603,10 +605,6 @@ export class LiveExecutionTracker {
 
       return elementIsAUserOrManualTask;
     });
-
-    const activeManualAndUserTaskIds: Array<string> = activeManualAndUserTasks
-      .map((element: IShape) => element.id)
-      .sort();
 
     for (const element of activeManualAndUserTasks) {
       const overlayHtmlId: string = `${element.id}#manual-user-task`;
@@ -622,16 +620,14 @@ export class LiveExecutionTracker {
       this.addEventListenerToOverlay(overlayHtmlId);
     }
 
-    return activeManualAndUserTaskIds;
+    return activeManualAndUserTasks;
   }
 
-  private addOverlaysToInactiveCallActivities(inactiveCallActivities: Array<IShape>): Array<string> {
+  private addOverlaysToInactiveCallActivities(inactiveCallActivities: Array<IShape>): Array<IShape> {
     const liveExecutionTrackerIsNotAttached: boolean = !this.isAttached;
     if (liveExecutionTrackerIsNotAttached) {
       return [];
     }
-
-    const callActivityIds: Array<string> = inactiveCallActivities.map((element: IShape) => element.id).sort();
 
     for (const element of inactiveCallActivities) {
       const overlayHtmlId: string = `${element.id}#inactive-call-activity`;
@@ -647,10 +643,10 @@ export class LiveExecutionTracker {
       this.addEventListenerToOverlay(overlayHtmlId);
     }
 
-    return callActivityIds;
+    return inactiveCallActivities;
   }
 
-  private addOverlaysToActiveCallActivities(activeElements: Array<IShape>): Array<string> {
+  private addOverlaysToActiveCallActivities(activeElements: Array<IShape>): Array<IShape> {
     const liveExecutionTrackerIsNotAttached: boolean = !this.isAttached;
     if (liveExecutionTrackerIsNotAttached) {
       return [];
@@ -661,8 +657,6 @@ export class LiveExecutionTracker {
 
       return elementIsCallActivity;
     });
-
-    const activeCallActivityIds: Array<string> = activeCallActivities.map((element: IShape) => element.id).sort();
 
     this.activeCallActivities = activeCallActivities;
 
@@ -680,7 +674,7 @@ export class LiveExecutionTracker {
       this.addEventListenerToOverlay(overlayHtmlId);
     }
 
-    return activeCallActivityIds;
+    return activeCallActivities;
   }
 
   private handleTaskClick: (event: MouseEvent) => void = (event: MouseEvent): void => {
