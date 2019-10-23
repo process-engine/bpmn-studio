@@ -28,10 +28,10 @@ export class Pagination {
   }
 
   public currentPageChanged(currentPage: number, previousPage: number): void {
-    const currentPageDoesNotGetDisplyed: boolean =
+    const currentPageDoesNotGetDisplayed: boolean =
       this.currentPage < this.pageStartValue || this.currentPage > this.pageStartValue + this.maxPagesToDisplay - 1;
 
-    if (currentPageDoesNotGetDisplyed) {
+    if (currentPageDoesNotGetDisplayed) {
       const pageIndex = this.currentPage % this.maxPagesToDisplay;
       this.pageStartValue = this.currentPage - pageIndex + 1;
     }
