@@ -40,6 +40,8 @@ type RouteParameters = {
   taskId?: string;
 };
 
+const OVERLAY_WIDTH: number = 40;
+const OVERLAY_HEIGHT: number = 30;
 const versionRegex: RegExp = /(\d+)\.(\d+).(\d+)/;
 
 // tslint:disable: no-magic-numbers
@@ -475,10 +477,10 @@ export class LiveExecutionTracker {
 
       this.overlays.add(element, {
         position: {
-          left: 30,
-          top: 25,
+          left: this.getOverlayLeftPositionForElement(element.width),
+          top: this.getOverlayTopPositionForElement(element.height),
         },
-        html: `<div class="let__overlay-button" id="${overlayHtmlId}" title="Open process instance in Inspect Correlation."><i class="fas fa-bug let__overlay-button-icon overlay__error-element"></i></div>`,
+        html: `<div class="let__overlay-button" id="${overlayHtmlId}" style="width: ${OVERLAY_WIDTH}px; height: ${OVERLAY_HEIGHT}px;" title="Open process instance in Inspect Correlation."><i class="fas fa-bug let__overlay-button-icon overlay__error-element"></i></div>`,
       });
 
       this.addEventListenerToOverlay(overlayHtmlId);
@@ -509,6 +511,20 @@ export class LiveExecutionTracker {
         this.addEventListenerToOverlay(overlayHtmlId);
       });
     }
+  }
+
+  private getOverlayLeftPositionForElement(elementWidth: number): number {
+    const elementCenterX: number = elementWidth / 2;
+    const elementLeftPosition: number = elementCenterX - OVERLAY_WIDTH / 2;
+
+    return elementLeftPosition;
+  }
+
+  private getOverlayTopPositionForElement(elementHeight: number): number {
+    const elementCenterY: number = elementHeight / 2;
+    const elementTopPosition: number = elementCenterY - OVERLAY_HEIGHT / 2;
+
+    return elementTopPosition;
   }
 
   private elementOverlays(elementId: string): Array<IOverlay> {
@@ -563,10 +579,10 @@ export class LiveExecutionTracker {
 
       this.overlays.add(element, {
         position: {
-          left: 30,
-          top: 25,
+          left: this.getOverlayLeftPositionForElement(element.width),
+          top: this.getOverlayTopPositionForElement(element.height),
         },
-        html: `<div class="let__overlay-button" id="${overlayHtmlId}" title="Continue empty activity."><i class="fas fa-play let__overlay-button-icon overlay__empty-task"></i></div>`,
+        html: `<div class="let__overlay-button" id="${overlayHtmlId}" style="width: ${OVERLAY_WIDTH}px; height: ${OVERLAY_HEIGHT}px;" title="Continue empty activity."><i class="fas fa-play let__overlay-button-icon overlay__empty-task"></i></div>`,
       });
 
       this.addEventListenerToOverlay(overlayHtmlId);
@@ -597,10 +613,10 @@ export class LiveExecutionTracker {
 
       this.overlays.add(element, {
         position: {
-          left: 30,
-          top: 25,
+          left: this.getOverlayLeftPositionForElement(element.width),
+          top: this.getOverlayTopPositionForElement(element.height),
         },
-        html: `<div class="let__overlay-button" id="${overlayHtmlId}" title="Continue task."><i class="fas fa-play let__overlay-button-icon"></i></div>`,
+        html: `<div class="let__overlay-button" id="${overlayHtmlId}" style="width: ${OVERLAY_WIDTH}px; height: ${OVERLAY_HEIGHT}px;" title="Continue task."><i class="fas fa-play let__overlay-button-icon"></i></div>`,
       });
 
       this.addEventListenerToOverlay(overlayHtmlId);
@@ -622,10 +638,10 @@ export class LiveExecutionTracker {
 
       this.overlays.add(element, {
         position: {
-          left: 30,
-          top: 25,
+          left: this.getOverlayLeftPositionForElement(element.width),
+          top: this.getOverlayTopPositionForElement(element.height),
         },
-        html: `<div class="let__overlay-button" id="${overlayHtmlId}" title="Show target process."><i class="fas fa-search let__overlay-button-icon"></i></div>`,
+        html: `<div class="let__overlay-button" id="${overlayHtmlId}" style="width: ${OVERLAY_WIDTH}px; height: ${OVERLAY_HEIGHT}px;" title="Show target process."><i class="fas fa-search let__overlay-button-icon"></i></div>`,
       });
 
       this.addEventListenerToOverlay(overlayHtmlId);
@@ -655,10 +671,10 @@ export class LiveExecutionTracker {
 
       this.overlays.add(element, {
         position: {
-          left: 30,
-          top: 25,
+          left: this.getOverlayLeftPositionForElement(element.width),
+          top: this.getOverlayTopPositionForElement(element.height),
         },
-        html: `<div class="let__overlay-button" id="${overlayHtmlId}" title="Show target process."><i class="fas fa-external-link-square-alt let__overlay-button-icon"></i></div>`,
+        html: `<div class="let__overlay-button" id="${overlayHtmlId}" style="width: ${OVERLAY_WIDTH}px; height: ${OVERLAY_HEIGHT}px;" title="Show target process."><i class="fas fa-external-link-square-alt let__overlay-button-icon"></i></div>`,
       });
 
       this.addEventListenerToOverlay(overlayHtmlId);
