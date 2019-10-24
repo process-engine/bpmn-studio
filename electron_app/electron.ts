@@ -2,6 +2,7 @@
 import fs from 'fs';
 import path from 'path';
 import {homedir} from 'os';
+import windowStateKeeper from 'electron-window-state';
 
 import JSZip from 'jszip';
 
@@ -326,9 +327,16 @@ function createMainWindow(): void {
 
   setElectronMenubar();
 
+  const mainWindowState = windowStateKeeper({
+    defaultWidth: 1300,
+    defaultHeight: 800,
+  });
+
   browserWindow = new BrowserWindow({
-    width: 1300,
-    height: 800,
+    width: mainWindowState.width,
+    height: mainWindowState.height,
+    x: mainWindowState.x,
+    y: mainWindowState.y,
     title: getProductName(),
     minWidth: 1300,
     minHeight: 800,
@@ -338,6 +346,8 @@ function createMainWindow(): void {
       nodeIntegration: true,
     },
   });
+
+  mainWindowState.manage(browserWindow);
 
   browserWindow.loadURL(`file://${__dirname}/../../../index.html`);
   // We need to navigate to "/" because something in the push state seems to be
@@ -877,9 +887,14 @@ async function startInternalProcessEngine(): Promise<any> {
   // See issue https://github.com/process-engine/bpmn-studio/issues/312
   try {
     const sqlitePath = getDatabaseFolder();
+    const logFilepath = getLogFolder();
 
-    // eslint-disable-next-line global-require
-    pe.startRuntime(sqlitePath);
+    const startupArgs = {
+      sqlitePath: sqlitePath,
+      logFilePath: logFilepath,
+    };
+
+    pe.startRuntime(startupArgs);
 
     console.log('Internal ProcessEngine started successfully.');
     internalProcessEngineStatus = 'success';
@@ -900,6 +915,14 @@ async function startInternalProcessEngine(): Promise<any> {
       internalProcessEngineStartupError,
     );
   }
+}
+
+function getLogFolder(): string {
+  return path.join(getConfigFolder(), getProcessEngineLogFolderName());
+}
+
+function getProcessEngineLogFolderName(): string {
+  return 'process_engine_logs';
 }
 
 function getDatabaseFolder(): string {

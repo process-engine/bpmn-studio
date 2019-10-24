@@ -2,8 +2,8 @@ import {EventAggregator} from 'aurelia-event-aggregator';
 import {bindable, inject, observable} from 'aurelia-framework';
 
 import {DataModels} from '@process-engine/management_api_contracts';
-
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
+
 import {
   CorrelationListSortProperty,
   ICorrelationSortSettings,
@@ -11,6 +11,7 @@ import {
 } from '../../../../../../../contracts/index';
 import environment from '../../../../../../../environment';
 import {getBeautifiedDate} from '../../../../../../../services/date-service/date.service';
+import {Pagination} from '../../../../../../pagination/pagination';
 
 const PAGE_SIZES = [20, 50, 100, 200];
 const MIN_PAGESIZE = PAGE_SIZES[0];
@@ -26,9 +27,12 @@ export class CorrelationList {
   @bindable @observable public processInstances: Array<DataModels.Correlations.ProcessInstance>;
   @bindable public activeDiagram: IDiagram;
   @bindable public sortedTableData: Array<ICorrelationTableEntry>;
+  @bindable public paginationShowsLoading: boolean;
+
+  public pagination: Pagination;
 
   @bindable public totalCount: number;
-  @bindable public currentPage: number = 0;
+  @bindable public currentPage: number = 1;
   @observable public pageSize: number = DEFAULT_PAGESIZE;
   public minPageSize: number = MIN_PAGESIZE;
   public paginationSize: number = PAGINATION_SIZE;
@@ -59,7 +63,7 @@ export class CorrelationList {
   }
 
   public activeDiagramChanged(): void {
-    this.currentPage = 0;
+    this.currentPage = 1;
     this.processInstanceToSelect = undefined;
     this.processInstanceToSelectTableEntry = undefined;
   }
@@ -109,6 +113,8 @@ export class CorrelationList {
 
       this.processInstanceToSelect = undefined;
     }
+
+    this.paginationShowsLoading = false;
   }
 
   public pageSizeChanged(newValue, oldValue): void {

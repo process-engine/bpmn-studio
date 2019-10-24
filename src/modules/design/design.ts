@@ -387,7 +387,7 @@ export class Design {
         !diagram.uri.startsWith('about:open-diagrams') && !diagram.uri.startsWith('http');
 
       if (diagramIsSavedOnLocalSolution) {
-        diagram.xml = fs.readFileSync(diagramUri, 'utf8');
+        diagram.xml = fs.readFileSync(diagram.uri, 'utf8');
       }
 
       this.activeDiagram = diagram;

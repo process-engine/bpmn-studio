@@ -9,6 +9,7 @@ import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/er
 import {AuthenticationStateEvent, ISolutionEntry, ISolutionService} from '../../../contracts/index';
 import environment from '../../../environment';
 import {IDashboardService, TaskList as SuspendedTaskList, TaskListEntry} from '../dashboard/contracts/index';
+import {Pagination} from '../../pagination/pagination';
 
 interface ITaskListRouteParameters {
   processInstanceId?: string;
@@ -20,13 +21,16 @@ interface ITaskListRouteParameters {
 export class TaskList {
   @bindable() public activeSolutionEntry: ISolutionEntry;
 
-  @observable public currentPage: number = 0;
+  @observable public currentPage: number = 1;
   public pageSize: number = 10;
   public totalItems: number;
   public paginationSize: number = 10;
 
   public initialLoadingFinished: boolean = false;
   public showError: boolean = false;
+
+  public pagination: Pagination;
+  public paginationShowsLoading: boolean;
 
   private activeSolutionUri: string;
   private dashboardService: IDashboardService;
@@ -101,7 +105,9 @@ export class TaskList {
       newActiveSolutionEntry,
     );
 
-    await this.updateTasks();
+    if (this.isAttached) {
+      await this.updateTasks();
+    }
 
     this.dashboardServiceSubscriptions = [
       this.dashboardService.onEmptyActivityFinished(this.activeSolutionEntry.identity, async () => {
@@ -279,7 +285,7 @@ export class TaskList {
 
   private async updateTasks(): Promise<void> {
     try {
-      const paginationGetsDisplayed: boolean = this.currentPage > 0;
+      const paginationGetsDisplayed: boolean = this.totalItems > this.pageSize;
       const pageIndex: number = paginationGetsDisplayed ? this.currentPage - 1 : 0;
 
       const taskOffset: number = pageIndex * this.pageSize;
@@ -292,6 +298,8 @@ export class TaskList {
       this.totalItems = suspendedTaskList.totalCount;
       this.initialLoadingFinished = true;
       this.showError = false;
+
+      this.paginationShowsLoading = false;
     } catch (error) {
       this.tasks = [];
       this.totalItems = 0;

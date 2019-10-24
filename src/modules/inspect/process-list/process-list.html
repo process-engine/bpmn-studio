@@ -1,5 +1,6 @@
 <template>
   <require from="./process-list.css"></require>
+  <require from="../../pagination/pagination"></require>
   <div class="process-list">
     <div class="process-list-container" id="processListContainer">
       <h4 class="process-list-header">Processes</h4>
@@ -31,8 +32,7 @@
         <span else class="process-list__no-processes-text">No process instances found for this user.</span>
       </template>
       <div class="col-md-12 col-xs-12 pagination" show.bind="processInstancesToDisplay && processInstancesToDisplay.length > 0">
-        <aubs-pagination page-size.bind="pageSize" total-items.bind="totalItems" current-page.bind="currentPage" boundary-links.bind="true" pagination-size.bind="paginationSize">
-        </aubs-pagination>
+        <pagination if.bind="totalItems > pageSize" view-model.ref="pagination" current-page.two-way="currentPage" per-page.to-view="pageSize" items.to-view="totalItems" max-pages-to-display.to-view="paginationSize" content-is-async.bind="true" is-loading.two-way="paginationShowsLoading"></pagination>
       </div>
       <div if.bind="!initialLoadingFinished" class="container">
         <img src="src/resources/images/gears.svg" class="loading-spinner">
