@@ -148,6 +148,10 @@ export class SolutionExplorerList {
   }
 
   public isProcessEngineNewerThanInternal(solutionEntry: ISolutionEntry): boolean {
+    if (this.internalProcessEngineVersion === 'null') {
+      return false;
+    }
+
     const internalPEVersion = new SemVer(this.internalProcessEngineVersion);
     const solutionEntryPEVersion = new SemVer(solutionEntry.processEngineVersion);
 
@@ -155,6 +159,10 @@ export class SolutionExplorerList {
   }
 
   public isProcessEngineOlderThanInternal(solutionEntry: ISolutionEntry): boolean {
+    if (this.internalProcessEngineVersion === 'null') {
+      return false;
+    }
+
     const internalPEVersion = new SemVer(this.internalProcessEngineVersion);
     const solutionEntryPEVersion = new SemVer(solutionEntry.processEngineVersion);
 
