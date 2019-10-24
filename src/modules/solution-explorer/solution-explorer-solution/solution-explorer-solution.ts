@@ -12,6 +12,7 @@ import {IDiagram, ISolution} from '@process-engine/solutionexplorer.contracts';
 import {ISolutionExplorerService} from '@process-engine/solutionexplorer.service.contracts';
 
 import {IIdentity} from '@essential-projects/iam_contracts';
+import {IResponse} from '@essential-projects/http_contracts';
 import {
   IDiagramCreationService,
   IDiagramState,
@@ -28,6 +29,7 @@ import {OpenDiagramStateService} from '../../../services/solution-explorer-servi
 import {DeleteDiagramModal} from './delete-diagram-modal/delete-diagram-modal';
 import {DeployDiagramService} from '../../../services/deploy-diagram-service/deploy-diagram.service';
 import {SaveDiagramService} from '../../../services/save-diagram-service/save-diagram.service';
+import {HttpFetchClient} from '../../fetch-http-client/http-fetch-client';
 
 const ENTER_KEY: string = 'Enter';
 const ESCAPE_KEY: string = 'Escape';
@@ -59,6 +61,7 @@ interface IDiagramCreationState extends IDiagramNameInputState {
   DeployDiagramService,
   SaveDiagramService,
   BindingSignaler,
+  'HttpFetchClient',
 )
 export class SolutionExplorerSolution {
   public activeDiagram: IDiagram;
@@ -119,6 +122,7 @@ export class SolutionExplorerSolution {
   private sortedDiagramsOfSolutions: Array<IDiagram> = [];
   private diagramStatesChangedCallbackId: string;
   private signaler: BindingSignaler;
+  private httpFetchClient: HttpFetchClient;
 
   constructor(
     router: Router,
@@ -131,6 +135,7 @@ export class SolutionExplorerSolution {
     deployDiagramService: DeployDiagramService,
     saveDiagramService: SaveDiagramService,
     bindingSignaler: BindingSignaler,
+    httpFetchClient: HttpFetchClient,
   ) {
     this.router = router;
     this.eventAggregator = eventAggregator;
@@ -142,6 +147,7 @@ export class SolutionExplorerSolution {
     this.deployDiagramService = deployDiagramService;
     this.saveDiagramService = saveDiagramService;
     this.signaler = bindingSignaler;
+    this.httpFetchClient = httpFetchClient;
 
     this.updateDiagramStateList();
     this.diagramStatesChangedCallbackId = this.openDiagramStateService.onDiagramStatesChanged(() => {
@@ -204,7 +210,7 @@ export class SolutionExplorerSolution {
       const makeRequest: Function = (): void => {
         setTimeout(async () => {
           try {
-            await fetch(this.displayedSolutionEntry.uri);
+            await this.httpFetchClient.get(this.displayedSolutionEntry.uri);
 
             this.processEngineRunning = true;
 
@@ -318,14 +324,15 @@ export class SolutionExplorerSolution {
       return;
     }
 
-    const response = await fetch(this.displayedSolutionEntry.uri);
-    const responseJsonBody = await response.json();
+    const response: IResponse<JSON & {version: string}> = await this.httpFetchClient.get(
+      this.displayedSolutionEntry.uri,
+    );
 
     const authorityResponse = await fetch(`${this.displayedSolutionEntry.uri}/security/authority`);
     const authorityJsonBody = await authorityResponse.json();
 
     this.displayedSolutionEntry.authority = authorityJsonBody.authority;
-    this.displayedSolutionEntry.processEngineVersion = responseJsonBody.version;
+    this.displayedSolutionEntry.processEngineVersion = response.result.version;
     this.globalSolutionService.addSolutionEntry(this.displayedSolutionEntry);
     this.signaler.signal('update-version-icon');
   }

@@ -4,6 +4,7 @@ import {Router} from 'aurelia-router';
 
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 
+import {IResponse} from '@essential-projects/http_contracts';
 import {
   AuthenticationStateEvent,
   IFile,
@@ -19,6 +20,7 @@ import {NotificationService} from '../../../services/notification-service/notifi
 import {SolutionExplorerList} from '../solution-explorer-list/solution-explorer-list';
 
 import {getPortListByVersion} from '../../../services/default-ports-module/default-ports.module';
+import {HttpFetchClient} from '../../fetch-http-client/http-fetch-client';
 
 type RemoteSolutionListEntry = {
   uri: string;
@@ -35,7 +37,7 @@ type RemoteSolutionListEntry = {
  *  - Refreshing on login/logout
  *  - Updating the remote processengine uri if needed
  */
-@inject(EventAggregator, 'NotificationService', Router, 'SolutionService')
+@inject(EventAggregator, 'NotificationService', Router, 'SolutionService', 'HttpFetchClient')
 export class SolutionExplorerPanel {
   @observable public selectedProtocol: string = 'http://';
 
@@ -61,16 +63,20 @@ export class SolutionExplorerPanel {
   private remoteSolutionHistoryStatusPollingTimer: NodeJS.Timer;
   private remoteSolutionHistoryStatusIsPolling: boolean;
 
+  private httpFetchClient: HttpFetchClient;
+
   constructor(
     eventAggregator: EventAggregator,
     notificationService: NotificationService,
     router: Router,
     solutionService: ISolutionService,
+    httpFetchClient: HttpFetchClient,
   ) {
     this.eventAggregator = eventAggregator;
     this.notificationService = notificationService;
     this.router = router;
     this.solutionService = solutionService;
+    this.httpFetchClient = httpFetchClient;
 
     if (this.canReadFromFileSystem()) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
@@ -508,11 +514,9 @@ export class SolutionExplorerPanel {
 
   private async isRemoteSolutionActive(remoteSolutionUri: string): Promise<boolean> {
     try {
-      const response: Response = await fetch(remoteSolutionUri);
+      const response: IResponse<JSON> = await this.httpFetchClient.get(remoteSolutionUri);
 
-      const data: JSON = await response.json();
-
-      const isResponseFromProcessEngine: boolean = data['name'] === '@process-engine/process_engine_runtime';
+      const isResponseFromProcessEngine: boolean = response.result['name'] === '@process-engine/process_engine_runtime';
       if (!isResponseFromProcessEngine) {
         throw new Error('The response was not send by a ProcessEngine.');
       }
