@@ -231,10 +231,22 @@ export class SolutionExplorerList {
             }, 3000);
 
             try {
-              const fetchResponse: any = await this.httpFetchClient.get(uri);
-              clearTimeout(timeout);
+              try {
+                const fetchResponse: any = await this.httpFetchClient.get(`${uri}/process_engine`);
 
-              resolve(fetchResponse);
+                resolve(fetchResponse);
+              } catch (error) {
+                const errorIsNotFoundError: boolean = error.code === 404;
+                if (errorIsNotFoundError) {
+                  const fetchResponse: any = await this.httpFetchClient.get(`${uri}`);
+
+                  resolve(fetchResponse);
+                } else {
+                  reject(error);
+                }
+              }
+
+              clearTimeout(timeout);
             } catch (error) {
               clearTimeout(timeout);
 
