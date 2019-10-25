@@ -162,6 +162,9 @@ export class ProcessList {
       this.dashboardService.onProcessTerminated(this.activeSolutionEntry.identity, () => {
         processInstance.state = DataModels.Correlations.CorrelationState.error;
       });
+      this.dashboardService.onProcessError(this.activeSolutionEntry.identity, () => {
+        processInstance.state = DataModels.Correlations.CorrelationState.error;
+      });
 
       await this.dashboardService.terminateProcessInstance(
         this.activeSolutionEntry.identity,
