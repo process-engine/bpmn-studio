@@ -210,7 +210,16 @@ export class SolutionExplorerSolution {
       const makeRequest: Function = (): void => {
         setTimeout(async () => {
           try {
-            await this.httpFetchClient.get(this.displayedSolutionEntry.uri);
+            try {
+              await this.httpFetchClient.get(`${this.displayedSolutionEntry.uri}/process_engine`);
+            } catch (error) {
+              const errorIsNotFoundError: boolean = error.code === 404;
+              if (errorIsNotFoundError) {
+                await this.httpFetchClient.get(`${this.displayedSolutionEntry.uri}`);
+              } else {
+                throw error;
+              }
+            }
 
             this.processEngineRunning = true;
 
@@ -324,9 +333,17 @@ export class SolutionExplorerSolution {
       return;
     }
 
-    const response: IResponse<JSON & {version: string}> = await this.httpFetchClient.get(
-      this.displayedSolutionEntry.uri,
-    );
+    let response: IResponse<JSON & {version: string}>;
+    try {
+      response = await this.httpFetchClient.get(`${this.displayedSolutionEntry.uri}/process_engine`);
+    } catch (error) {
+      const errorIsNotFoundError: boolean = error.code === 404;
+      if (errorIsNotFoundError) {
+        response = await this.httpFetchClient.get(`${this.displayedSolutionEntry.uri}`);
+      } else {
+        throw error;
+      }
+    }
 
     const authorityResponse = await fetch(`${this.displayedSolutionEntry.uri}/security/authority`);
     const authorityJsonBody = await authorityResponse.json();
