@@ -4,6 +4,7 @@ import {Router} from 'aurelia-router';
 
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {DataModels} from '@process-engine/management_api_contracts';
+import {Subscription as RuntimeSubscription} from '@essential-projects/event_aggregator_contracts';
 
 import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
 import * as Bluebird from 'bluebird';
@@ -159,12 +160,24 @@ export class ProcessList {
 
   public async stopProcessInstance(processInstance: DataModels.Correlations.ProcessInstance): Promise<void> {
     try {
-      this.dashboardService.onProcessTerminated(this.activeSolutionEntry.identity, () => {
-        processInstance.state = DataModels.Correlations.CorrelationState.error;
-      });
-      this.dashboardService.onProcessError(this.activeSolutionEntry.identity, () => {
-        processInstance.state = DataModels.Correlations.CorrelationState.error;
-      });
+      const onProcessTerminatedSubscription: RuntimeSubscription = await this.dashboardService.onProcessTerminated(
+        this.activeSolutionEntry.identity,
+        () => {
+          processInstance.state = DataModels.Correlations.CorrelationState.error;
+
+          this.dashboardService.removeSubscription(this.activeSolutionEntry.identity, onProcessTerminatedSubscription);
+          this.dashboardService.removeSubscription(this.activeSolutionEntry.identity, onProcessErrorSubscription);
+        },
+      );
+      const onProcessErrorSubscription: RuntimeSubscription = await this.dashboardService.onProcessError(
+        this.activeSolutionEntry.identity,
+        () => {
+          processInstance.state = DataModels.Correlations.CorrelationState.error;
+
+          this.dashboardService.removeSubscription(this.activeSolutionEntry.identity, onProcessTerminatedSubscription);
+          this.dashboardService.removeSubscription(this.activeSolutionEntry.identity, onProcessErrorSubscription);
+        },
+      );
 
       await this.dashboardService.terminateProcessInstance(
         this.activeSolutionEntry.identity,
