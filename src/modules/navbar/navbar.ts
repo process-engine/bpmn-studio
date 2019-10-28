@@ -440,6 +440,8 @@ export class NavBar {
     const currentPlatform: string = navigator.platform;
     const currentPlatformIsMac: boolean = macRegex.test(currentPlatform);
 
-    return currentPlatformIsMac;
+    const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
+
+    return currentPlatformIsMac && isRunningInElectron;
   }
 }
