@@ -684,22 +684,18 @@ export class SolutionExplorerList {
       return undefined;
     }
 
-    const request: Request = new Request(`${solutionUri}/security/authority`, {
-      method: 'GET',
-      mode: 'cors',
-      referrer: 'no-referrer',
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json',
-      },
-    });
-
     try {
-      const response: Response = await fetch(request);
-      const authority: string = (await response.json()).authority;
+      const fetchResponse: any = await this.httpFetchClient.get(`${solutionUri}/process_engine/security/authority`);
 
-      return authority;
+      return fetchResponse.authority;
     } catch (error) {
+      const errorIsNotFoundError: boolean = error.code === 404;
+      if (errorIsNotFoundError) {
+        const fetchResponse: any = await this.httpFetchClient.get(`${solutionUri}/security/authority`);
+
+        return fetchResponse.authority;
+      }
+
       return undefined;
     }
   }
