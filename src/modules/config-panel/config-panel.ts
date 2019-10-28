@@ -85,13 +85,13 @@ export class ConfigPanel {
         `${this.internalSolution.uri}/process_engine/security/authority`,
       );
 
-      return fetchResponse.authority;
+      return fetchResponse.result.authority;
     } catch (error) {
       const errorIsNotFoundError: boolean = error.code === 404;
       if (errorIsNotFoundError) {
         const fetchResponse: any = await this.httpFetchClient.get(`${this.internalSolution.uri}/security/authority`);
 
-        return fetchResponse.authority;
+        return fetchResponse.result.authority;
       }
 
       return undefined;

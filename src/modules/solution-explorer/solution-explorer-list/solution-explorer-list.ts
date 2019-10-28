@@ -687,13 +687,13 @@ export class SolutionExplorerList {
     try {
       const fetchResponse: any = await this.httpFetchClient.get(`${solutionUri}/process_engine/security/authority`);
 
-      return fetchResponse.authority;
+      return fetchResponse.result.authority;
     } catch (error) {
       const errorIsNotFoundError: boolean = error.code === 404;
       if (errorIsNotFoundError) {
         const fetchResponse: any = await this.httpFetchClient.get(`${solutionUri}/security/authority`);
 
-        return fetchResponse.authority;
+        return fetchResponse.result.authority;
       }
 
       return undefined;
