@@ -43,6 +43,7 @@ export class NavBar {
   private subscriptions: Array<Subscription>;
   private notificationService: NotificationService;
   private solutionService: ISolutionService;
+  private ipcRenderer: any;
 
   constructor(
     router: Router,
@@ -54,14 +55,26 @@ export class NavBar {
     this.eventAggregator = eventAggregator;
     this.notificationService = notificationService;
     this.solutionService = solutionService;
+
+    const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
+    if (isRunningInElectron) {
+      this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
+    }
   }
 
   public attached(): void {
     this.solutionExplorerIsActive = window.localStorage.getItem('SolutionExplorerVisibility') === 'true';
 
-    window.addEventListener('resize', this.resizeEventHandler);
+    const isMac: boolean = this.checkIfCurrentPlatformIsMac();
+    if (this.ipcRenderer && isMac) {
+      this.ipcRenderer.on('toggle-fullscreen', (uselessEvent, showFullscreen) => {
+        this.showLeftMarginInNavbar = !showFullscreen;
+      });
+    }
 
-    this.resizeEventHandler();
+    const isFullscreen: boolean = !window.screenTop && !window.screenY;
+
+    this.showLeftMarginInNavbar = isMac && !isFullscreen;
 
     this.updateNavbar();
 
@@ -429,11 +442,4 @@ export class NavBar {
 
     return currentPlatformIsMac;
   }
-
-  private resizeEventHandler = (event: Event = null): void => {
-    const isMac: boolean = this.checkIfCurrentPlatformIsMac();
-    const isFullscreen: boolean = !window.screenTop && !window.screenY;
-
-    this.showLeftMarginInNavbar = isMac && !isFullscreen;
-  };
 }
