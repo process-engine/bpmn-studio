@@ -514,7 +514,17 @@ export class SolutionExplorerPanel {
 
   private async isRemoteSolutionActive(remoteSolutionUri: string): Promise<boolean> {
     try {
-      const response: IResponse<JSON> = await this.httpFetchClient.get(remoteSolutionUri);
+      let response: IResponse<JSON>;
+      try {
+        response = await this.httpFetchClient.get(`${remoteSolutionUri}/process_engine`);
+      } catch (error) {
+        const errorIsNotFoundError: boolean = error.code === 404;
+        if (errorIsNotFoundError) {
+          response = await this.httpFetchClient.get(`${remoteSolutionUri}`);
+        } else {
+          throw error;
+        }
+      }
 
       const isResponseFromProcessEngine: boolean = response.result['name'] === '@process-engine/process_engine_runtime';
       if (!isResponseFromProcessEngine) {
