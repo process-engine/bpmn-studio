@@ -93,8 +93,8 @@ export class ProcessList {
     }
   }
 
-  public async currentPageChanged(newValue: number, oldValue: number): Promise<void> {
-    const isInitialEvent: boolean = oldValue === undefined || oldValue === null;
+  public async currentPageChanged(currentPage: number, previousPage: number): Promise<void> {
+    const isInitialEvent: boolean = previousPage === undefined || previousPage === null;
     if (isInitialEvent) {
       return;
     }
@@ -105,10 +105,10 @@ export class ProcessList {
 
     this.stoppedProcessInstances = [];
 
-    const paginationWasUsed: boolean = oldValue > 0;
-    const showNewerProcessInstances: boolean = newValue > oldValue;
+    const paginationWasUsed: boolean = previousPage > 0;
+    const showNewerProcessInstances: boolean = currentPage > previousPage;
     if (paginationWasUsed && showNewerProcessInstances) {
-      const skippedPages: number = Math.abs(newValue - oldValue) - 1;
+      const skippedPages: number = Math.abs(currentPage - previousPage) - 1;
 
       this.amountOfActiveProcessInstancesToSkip +=
         this.amountOfActiveProcessInstancesToDisplay + skippedPages * this.pageSize;
