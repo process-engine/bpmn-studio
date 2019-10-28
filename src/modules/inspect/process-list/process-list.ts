@@ -42,6 +42,8 @@ export class ProcessList {
   private amountOfActiveProcessInstancesToDisplay: number = this.pageSize;
   private amountOfActiveProcessInstancesToSkip: number = 0;
 
+  private dashboardServiceSubscriptions: Array<RuntimeSubscription> = [];
+
   private updatePromise: any;
 
   constructor(
@@ -56,8 +58,11 @@ export class ProcessList {
     this.router = router;
   }
 
-  public async activeSolutionEntryChanged(newValue: ISolutionEntry): Promise<void> {
-    if (!newValue.uri.includes('http')) {
+  public async activeSolutionEntryChanged(
+    newActiveSolutionEntry: ISolutionEntry,
+    previousActiveSolutionEntry: ISolutionEntry,
+  ): Promise<void> {
+    if (!newActiveSolutionEntry.uri.includes('http')) {
       return;
     }
 
@@ -65,14 +70,27 @@ export class ProcessList {
       this.updatePromise.cancel();
     }
 
+    const previousActiveSolutionEntryExists: boolean = previousActiveSolutionEntry !== undefined;
+    if (previousActiveSolutionEntryExists) {
+      this.removeRuntimeSubscriptions(previousActiveSolutionEntry);
+    }
+
     this.processInstances = [];
     this.processInstancesToDisplay = [];
     this.stoppedProcessInstances = [];
     this.initialLoadingFinished = false;
 
-    this.dashboardService.eventAggregator.publish(environment.events.configPanel.solutionEntryChanged, newValue);
+    this.dashboardService.eventAggregator.publish(
+      environment.events.configPanel.solutionEntryChanged,
+      newActiveSolutionEntry,
+    );
 
     await this.updateProcessInstanceList();
+
+    const subscriptionNeedsToBeSet: boolean = this.dashboardServiceSubscriptions.length === 0;
+    if (subscriptionNeedsToBeSet) {
+      this.setRuntimeSubscriptions();
+    }
   }
 
   public async currentPageChanged(newValue: number, oldValue: number): Promise<void> {
@@ -133,21 +151,7 @@ export class ProcessList {
       }),
     ];
 
-    this.dashboardService.onProcessStarted(this.activeSolutionEntry.identity, async () => {
-      await this.updateProcessInstanceList();
-    });
-
-    this.dashboardService.onProcessEnded(this.activeSolutionEntry.identity, async () => {
-      await this.updateProcessInstanceList();
-    });
-
-    this.dashboardService.onProcessError(this.activeSolutionEntry.identity, async () => {
-      await this.updateProcessInstanceList();
-    });
-
-    this.dashboardService.onProcessTerminated(this.activeSolutionEntry.identity, async () => {
-      await this.updateProcessInstanceList();
-    });
+    this.setRuntimeSubscriptions();
   }
 
   public detached(): void {
@@ -196,6 +200,31 @@ export class ProcessList {
 
   public formatDate(date: string): string {
     return getBeautifiedDate(date);
+  }
+
+  private async setRuntimeSubscriptions(): Promise<void> {
+    this.dashboardServiceSubscriptions = await Promise.all([
+      this.dashboardService.onProcessStarted(this.activeSolutionEntry.identity, async () => {
+        await this.updateProcessInstanceList();
+      }),
+      this.dashboardService.onProcessEnded(this.activeSolutionEntry.identity, async () => {
+        await this.updateProcessInstanceList();
+      }),
+      this.dashboardService.onProcessError(this.activeSolutionEntry.identity, async () => {
+        await this.updateProcessInstanceList();
+      }),
+      this.dashboardService.onProcessTerminated(this.activeSolutionEntry.identity, async () => {
+        await this.updateProcessInstanceList();
+      }),
+    ]);
+  }
+
+  private removeRuntimeSubscriptions(solutionEntry: ISolutionEntry): void {
+    for (const subscription of this.dashboardServiceSubscriptions) {
+      this.dashboardService.removeSubscription(solutionEntry.identity, subscription);
+    }
+
+    this.dashboardServiceSubscriptions = [];
   }
 
   private async updateProcessInstanceList(): Promise<void> {
