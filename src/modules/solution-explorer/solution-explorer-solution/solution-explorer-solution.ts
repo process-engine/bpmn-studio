@@ -351,7 +351,7 @@ export class SolutionExplorerSolution {
         `${this.displayedSolutionEntry.uri}/process_engine/security/authority`,
       );
 
-      authority = fetchResponse.authority;
+      authority = fetchResponse.result.authority;
     } catch (error) {
       const errorIsNotFoundError: boolean = error.code === 404;
       if (errorIsNotFoundError) {
@@ -359,7 +359,7 @@ export class SolutionExplorerSolution {
           `${this.displayedSolutionEntry.uri}/security/authority`,
         );
 
-        authority = fetchResponse.authority;
+        authority = fetchResponse.result.authority;
       } else {
         throw error;
       }
