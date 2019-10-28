@@ -345,10 +345,27 @@ export class SolutionExplorerSolution {
       }
     }
 
-    const authorityResponse = await fetch(`${this.displayedSolutionEntry.uri}/security/authority`);
-    const authorityJsonBody = await authorityResponse.json();
+    let authority;
+    try {
+      const fetchResponse: any = await this.httpFetchClient.get(
+        `${this.displayedSolutionEntry.uri}/process_engine/security/authority`,
+      );
 
-    this.displayedSolutionEntry.authority = authorityJsonBody.authority;
+      authority = fetchResponse.authority;
+    } catch (error) {
+      const errorIsNotFoundError: boolean = error.code === 404;
+      if (errorIsNotFoundError) {
+        const fetchResponse: any = await this.httpFetchClient.get(
+          `${this.displayedSolutionEntry.uri}/security/authority`,
+        );
+
+        authority = fetchResponse.authority;
+      } else {
+        throw error;
+      }
+    }
+
+    this.displayedSolutionEntry.authority = authority;
     this.displayedSolutionEntry.processEngineVersion = response.result.version;
     this.globalSolutionService.addSolutionEntry(this.displayedSolutionEntry);
     this.signaler.signal('update-version-icon');
