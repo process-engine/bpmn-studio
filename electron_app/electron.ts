@@ -363,6 +363,13 @@ function createMainWindow(): void {
     browserWindow = null;
   });
 
+  browserWindow.on('enter-full-screen', () => {
+    browserWindow.webContents.send('toggle-fullscreen', true);
+  });
+  browserWindow.on('leave-full-screen', () => {
+    browserWindow.webContents.send('toggle-fullscreen', false);
+  });
+
   browserWindow.webContents.on('new-window', (event: any, url: string) => {
     if (url !== browserWindow.webContents.getURL()) {
       event.preventDefault();
