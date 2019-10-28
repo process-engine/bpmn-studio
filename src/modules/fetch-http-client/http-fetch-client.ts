@@ -7,7 +7,7 @@ export class HttpFetchClient implements IHttpClient {
   private httpRedirectResponseCode: number = 300;
 
   public async get<T>(url: string, options?: IRequestOptions): Promise<IResponse<T>> {
-    const headers: HeadersInit = {
+    const headers: any = {
       'Access-Control-Allow-Origin': '*',
       'Content-Type': 'application/json',
     };
@@ -16,7 +16,7 @@ export class HttpFetchClient implements IHttpClient {
       const optionHeaders: Array<string> = Object.keys(options.headers);
 
       for (const header of optionHeaders) {
-        headers[header] = JSON.stringify(options.headers[header]);
+        headers[header] = options.headers[header];
       }
     }
 
@@ -35,7 +35,7 @@ export class HttpFetchClient implements IHttpClient {
   }
 
   public async post<D, T>(url: string, data: D, options?: IRequestOptions): Promise<IResponse<T>> {
-    const headers: HeadersInit = {
+    const headers: any = {
       'Access-Control-Allow-Origin': '*',
       'Content-Type': 'application/json',
     };
@@ -44,7 +44,7 @@ export class HttpFetchClient implements IHttpClient {
       const optionHeaders: Array<string> = Object.keys(options.headers);
 
       for (const header of optionHeaders) {
-        headers[header] = JSON.stringify(options.headers[header]);
+        headers[header] = options.headers[header];
       }
     }
 
@@ -64,7 +64,7 @@ export class HttpFetchClient implements IHttpClient {
   }
 
   public async put<T>(url: string, data: T, options?: IRequestOptions): Promise<IResponse<T>> {
-    const headers: HeadersInit = {
+    const headers: any = {
       'Access-Control-Allow-Origin': '*',
       'Content-Type': 'application/json',
     };
@@ -73,7 +73,7 @@ export class HttpFetchClient implements IHttpClient {
       const optionHeaders: Array<string> = Object.keys(options.headers);
 
       for (const header of optionHeaders) {
-        headers[header] = JSON.stringify(options.headers[header]);
+        headers[header] = options.headers[header];
       }
     }
 
@@ -93,7 +93,7 @@ export class HttpFetchClient implements IHttpClient {
   }
 
   public async delete<T>(url: string, options?: IRequestOptions): Promise<IResponse<T>> {
-    const headers: HeadersInit = {
+    const headers: any = {
       'Access-Control-Allow-Origin': '*',
       'Content-Type': 'application/json',
     };
@@ -102,7 +102,7 @@ export class HttpFetchClient implements IHttpClient {
       const optionHeaders: Array<string> = Object.keys(options.headers);
 
       for (const header of optionHeaders) {
-        headers[header] = JSON.stringify(options.headers[header]);
+        headers[header] = options.headers[header];
       }
     }
 
