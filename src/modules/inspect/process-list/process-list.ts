@@ -166,7 +166,11 @@ export class ProcessList {
     try {
       const onProcessTerminatedSubscription: RuntimeSubscription = await this.dashboardService.onProcessTerminated(
         this.activeSolutionEntry.identity,
-        () => {
+        (message) => {
+          if (message.processInstanceId !== processInstance.processInstanceId) {
+            return;
+          }
+
           processInstance.state = DataModels.Correlations.CorrelationState.error;
 
           this.dashboardService.removeSubscription(this.activeSolutionEntry.identity, onProcessTerminatedSubscription);
@@ -175,7 +179,11 @@ export class ProcessList {
       );
       const onProcessErrorSubscription: RuntimeSubscription = await this.dashboardService.onProcessError(
         this.activeSolutionEntry.identity,
-        () => {
+        (message) => {
+          if (message.processInstanceId !== processInstance.processInstanceId) {
+            return;
+          }
+
           processInstance.state = DataModels.Correlations.CorrelationState.error;
 
           this.dashboardService.removeSubscription(this.activeSolutionEntry.identity, onProcessTerminatedSubscription);
