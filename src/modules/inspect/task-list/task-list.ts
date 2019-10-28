@@ -5,6 +5,7 @@ import {Router} from 'aurelia-router';
 import * as Bluebird from 'bluebird';
 
 import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
+import {Subscription as RuntimeSubscription} from '@essential-projects/event_aggregator_contracts';
 
 import {AuthenticationStateEvent, ISolutionEntry, ISolutionService} from '../../../contracts/index';
 import environment from '../../../environment';
@@ -37,7 +38,7 @@ export class TaskList {
   private router: Router;
   private solutionService: ISolutionService;
 
-  private dashboardServiceSubscriptions: Array<any> = [];
+  private dashboardServiceSubscriptions: Array<RuntimeSubscription> = [];
   private subscriptions: Array<Subscription>;
   private tasks: Array<TaskListEntry> = [];
   private getTasks: (offset?: number, limit?: number) => Promise<SuspendedTaskList>;
@@ -49,89 +50,6 @@ export class TaskList {
     this.dashboardService = dashboardService;
     this.router = router;
     this.solutionService = solutionService;
-  }
-
-  public get shownTasks(): Array<TaskListEntry> {
-    return this.tasks;
-  }
-
-  public initializeTaskList(routeParameters: ITaskListRouteParameters): void {
-    const diagramName: string = routeParameters.diagramName;
-    const correlationId: string = routeParameters.correlationId;
-    const processInstanceId: string = routeParameters.processInstanceId;
-
-    const hasDiagramName: boolean = diagramName !== undefined;
-    const hasCorrelationId: boolean = correlationId !== undefined;
-    const hasProcessInstanceId: boolean = processInstanceId !== undefined;
-
-    if (hasDiagramName) {
-      this.getTasks = (offset?: number, limit?: number): Promise<SuspendedTaskList> => {
-        return this.getTasksForProcessModel(diagramName, offset, limit);
-      };
-    } else if (hasCorrelationId) {
-      this.getTasks = (offset?: number, limit?: number): Promise<SuspendedTaskList> => {
-        return this.getTasksForCorrelation(correlationId, offset, limit);
-      };
-    } else if (hasProcessInstanceId) {
-      this.getTasks = (offset?: number, limit?: number): Promise<SuspendedTaskList> => {
-        return this.getTasksForProcessInstanceId(processInstanceId, offset, limit);
-      };
-    } else {
-      this.getTasks = this.getAllTasks;
-    }
-  }
-
-  public async activeSolutionEntryChanged(
-    newActiveSolutionEntry: ISolutionEntry,
-    previousActiveSolutioEntry: ISolutionEntry,
-  ): Promise<void> {
-    if (!newActiveSolutionEntry.uri.includes('http')) {
-      return;
-    }
-
-    if (this.updatePromise) {
-      this.updatePromise.cancel();
-    }
-
-    for (const subscription of this.dashboardServiceSubscriptions) {
-      this.dashboardService.removeSubscription(previousActiveSolutioEntry.identity, subscription);
-    }
-
-    this.tasks = [];
-    this.initialLoadingFinished = false;
-    this.showError = false;
-    this.dashboardService.eventAggregator.publish(
-      environment.events.configPanel.solutionEntryChanged,
-      newActiveSolutionEntry,
-    );
-
-    if (this.isAttached) {
-      await this.updateTasks();
-    }
-
-    this.dashboardServiceSubscriptions = [
-      this.dashboardService.onEmptyActivityFinished(this.activeSolutionEntry.identity, async () => {
-        await this.updateTasks();
-      }),
-      this.dashboardService.onEmptyActivityWaiting(this.activeSolutionEntry.identity, async () => {
-        await this.updateTasks();
-      }),
-      this.dashboardService.onUserTaskFinished(this.activeSolutionEntry.identity, async () => {
-        await this.updateTasks();
-      }),
-      this.dashboardService.onUserTaskWaiting(this.activeSolutionEntry.identity, async () => {
-        await this.updateTasks();
-      }),
-      this.dashboardService.onManualTaskFinished(this.activeSolutionEntry.identity, async () => {
-        await this.updateTasks();
-      }),
-      this.dashboardService.onManualTaskWaiting(this.activeSolutionEntry.identity, async () => {
-        await this.updateTasks();
-      }),
-      this.dashboardService.onProcessError(this.activeSolutionEntry.identity, async () => {
-        await this.updateTasks();
-      }),
-    ];
   }
 
   public async attached(): Promise<void> {
@@ -168,6 +86,8 @@ export class TaskList {
     await this.updateTasks();
 
     this.isAttached = true;
+
+    this.setRuntimeSubscriptions();
   }
 
   public detached(): void {
@@ -176,6 +96,8 @@ export class TaskList {
     }
 
     this.isAttached = false;
+
+    this.removeRuntimeSubscriptions(this.activeSolutionEntry);
   }
 
   public goBack(): void {
@@ -194,6 +116,40 @@ export class TaskList {
     });
   }
 
+  public async activeSolutionEntryChanged(
+    newActiveSolutionEntry: ISolutionEntry,
+    previousActiveSolutioEntry: ISolutionEntry,
+  ): Promise<void> {
+    if (!newActiveSolutionEntry.uri.includes('http')) {
+      return;
+    }
+
+    if (this.updatePromise) {
+      this.updatePromise.cancel();
+    }
+
+    if (previousActiveSolutioEntry) {
+      this.removeRuntimeSubscriptions(previousActiveSolutioEntry);
+    }
+
+    this.tasks = [];
+    this.initialLoadingFinished = false;
+    this.showError = false;
+    this.dashboardService.eventAggregator.publish(
+      environment.events.configPanel.solutionEntryChanged,
+      newActiveSolutionEntry,
+    );
+
+    if (this.isAttached) {
+      await this.updateTasks();
+    }
+
+    const subscriptionNeedsToBeSet: boolean = this.dashboardServiceSubscriptions.length === 0;
+    if (subscriptionNeedsToBeSet) {
+      this.setRuntimeSubscriptions();
+    }
+  }
+
   public currentPageChanged(): void {
     if (!this.isAttached) {
       return;
@@ -204,6 +160,70 @@ export class TaskList {
     }
 
     this.updateTasks();
+  }
+
+  public get shownTasks(): Array<TaskListEntry> {
+    return this.tasks;
+  }
+
+  public initializeTaskList(routeParameters: ITaskListRouteParameters): void {
+    const diagramName: string = routeParameters.diagramName;
+    const correlationId: string = routeParameters.correlationId;
+    const processInstanceId: string = routeParameters.processInstanceId;
+
+    const hasDiagramName: boolean = diagramName !== undefined;
+    const hasCorrelationId: boolean = correlationId !== undefined;
+    const hasProcessInstanceId: boolean = processInstanceId !== undefined;
+
+    if (hasDiagramName) {
+      this.getTasks = (offset?: number, limit?: number): Promise<SuspendedTaskList> => {
+        return this.getTasksForProcessModel(diagramName, offset, limit);
+      };
+    } else if (hasCorrelationId) {
+      this.getTasks = (offset?: number, limit?: number): Promise<SuspendedTaskList> => {
+        return this.getTasksForCorrelation(correlationId, offset, limit);
+      };
+    } else if (hasProcessInstanceId) {
+      this.getTasks = (offset?: number, limit?: number): Promise<SuspendedTaskList> => {
+        return this.getTasksForProcessInstanceId(processInstanceId, offset, limit);
+      };
+    } else {
+      this.getTasks = this.getAllTasks;
+    }
+  }
+
+  private async setRuntimeSubscriptions(): Promise<void> {
+    this.dashboardServiceSubscriptions = await Promise.all([
+      this.dashboardService.onEmptyActivityFinished(this.activeSolutionEntry.identity, async () => {
+        await this.updateTasks();
+      }),
+      this.dashboardService.onEmptyActivityWaiting(this.activeSolutionEntry.identity, async () => {
+        await this.updateTasks();
+      }),
+      this.dashboardService.onUserTaskFinished(this.activeSolutionEntry.identity, async () => {
+        await this.updateTasks();
+      }),
+      this.dashboardService.onUserTaskWaiting(this.activeSolutionEntry.identity, async () => {
+        await this.updateTasks();
+      }),
+      this.dashboardService.onManualTaskFinished(this.activeSolutionEntry.identity, async () => {
+        await this.updateTasks();
+      }),
+      this.dashboardService.onManualTaskWaiting(this.activeSolutionEntry.identity, async () => {
+        await this.updateTasks();
+      }),
+      this.dashboardService.onProcessError(this.activeSolutionEntry.identity, async () => {
+        await this.updateTasks();
+      }),
+    ]);
+  }
+
+  private removeRuntimeSubscriptions(solutionEntry: ISolutionEntry): void {
+    for (const subscription of this.dashboardServiceSubscriptions) {
+      this.dashboardService.removeSubscription(solutionEntry.identity, subscription);
+    }
+
+    this.dashboardServiceSubscriptions = [];
   }
 
   private getAllTasks(offset?: number, limit?: number): Promise<SuspendedTaskList> {
