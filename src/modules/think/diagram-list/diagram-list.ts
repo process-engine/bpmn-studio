@@ -33,9 +33,6 @@ export class DiagramList {
       this.eventAggregator.subscribe(AuthenticationStateEvent.LOGIN, () => {
         this.updateDiagramList();
       }),
-      this.eventAggregator.subscribe(AuthenticationStateEvent.LOGOUT, () => {
-        this.updateDiagramList();
-      }),
     ];
   }
 
