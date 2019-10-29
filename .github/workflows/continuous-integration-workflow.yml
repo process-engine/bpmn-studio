@@ -181,9 +181,9 @@ jobs:
         echo ${GITHUB_REF##*/}
         ./node_modules/.bin/ci_tools commit-and-tag-version --only-on-primary-branches
         ./node_modules/.bin/ci_tools update-github-release --only-on-primary-branches --use-title-and-text-from-git-tag
-      #env: 
+      env: 
         GH_USER: ${{ github.actor }}
-        #GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         #GIT_BRANCH: ${GITHUB_REF##*/}
 
   publish_npm:
