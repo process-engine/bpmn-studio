@@ -15,7 +15,7 @@ export class DiagramList {
   private eventAggregator: EventAggregator;
   private router: Router;
   private subscriptions: Array<Subscription>;
-  private pollingTimeout: NodeJS.Timer | number;
+  private pollingTimeout: NodeJS.Timer;
   private isAttached: boolean = false;
 
   constructor(eventAggregator: EventAggregator, router: Router) {
