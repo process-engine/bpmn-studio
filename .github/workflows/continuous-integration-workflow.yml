@@ -25,22 +25,22 @@ jobs:
         name: package_json
         path: package.json
 
-  lint_linux:
-    name: "Lint sources"
-    needs: prepare_version
-    runs-on: ubuntu-18.04
-    steps:
-    - uses: actions/checkout@master
-    - uses: actions/download-artifact@master
-      with:
-        name: package_json
-        path: "."
-    - name: Install NPM dependencies
-      run: |
-        cat package.json
-        npm ci
-        ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
-    - run: npm run lint
+  #lint_linux:
+  #  name: "Lint sources"
+  #  needs: prepare_version
+  #  runs-on: ubuntu-18.04
+  #  steps:
+  #  - uses: actions/checkout@master
+  #  - uses: actions/download-artifact@master
+  #    with:
+  #      name: package_json
+  #      path: "."
+  #  - name: Install NPM dependencies
+  #    run: |
+  #      cat package.json
+  #      npm ci
+  #      ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+  #  - run: npm run lint
 
   build_and_test_linux:
     name: "Build & Test (Linux)"
@@ -159,7 +159,7 @@ jobs:
 
   prepare_and_tag_version:
     name: "Commit & Tag Version"
-    needs: [lint_linux, build_and_test_linux, build_and_test_macos, build_and_test_windows]
+    needs: [build_and_test_linux, build_and_test_macos, build_and_test_windows]
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@master
