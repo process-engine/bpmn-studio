@@ -148,7 +148,7 @@ stages:
     - script: |
         node ./node_modules/.bin/ci_tools commit-and-tag-version --only-on-primary-branches
         node ./node_modules/.bin/ci_tools update-github-release --only-on-primary-branches --use-title-and-text-from-git-tag
-      displayName: 'Prepare version'
+      displayName: 'Commit and Tag'
       env:
         # User has to have 'admin' privileges on the repo (to be able to push to protected branches).
         GH_USER: $(GH_USER)
@@ -169,7 +169,7 @@ stages:
     - script: |
         npm ci
       displayName: 'npm ci'
-      
+
     - download: current
       artifact: package_json
 
