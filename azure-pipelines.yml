@@ -28,8 +28,8 @@ stages:
     - script: |
         node ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir
       displayName: 'ci_tools prepare-version --allow-dirty-workdir'
-      # env:
-      #  GIT_BRANCH: $(Build.SourceBranch)
+      env:
+        GIT_BRANCH: $(Build.SourceBranch)
 
     - publish: './package.json'
       artifact: package_json
@@ -153,7 +153,7 @@ stages:
         # User has to have 'admin' privileges on the repo (to be able to push to protected branches).
         GH_USER: $(GH_USER)
         GH_TOKEN: $(GH_TOKEN)
-        # GIT_BRANCH: $(Build.SourceBranch)
+        GIT_BRANCH: $(Build.SourceBranch)
 
 - stage: Publish
   jobs:
@@ -182,3 +182,4 @@ stages:
         GH_TOKEN: $(GH_TOKEN)
         # User has to have 'push' privileges on the org (to be able to, well, push to the registry).
         NPM_TOKEN: $(NPM_TOKEN)
+        GIT_BRANCH: $(Build.SourceBranch)
