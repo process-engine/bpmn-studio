@@ -45,6 +45,7 @@ export class ProcessList {
   private dashboardServiceSubscriptions: Array<RuntimeSubscription> = [];
 
   private updatePromise: any;
+  private identitiyUsedForSubscriptions: IIdentity;
 
   constructor(
     dashboardService: IDashboardService,
@@ -72,7 +73,7 @@ export class ProcessList {
 
     const previousActiveSolutionEntryExists: boolean = previousActiveSolutionEntry !== undefined;
     if (previousActiveSolutionEntryExists) {
-      this.removeRuntimeSubscriptions(previousActiveSolutionEntry);
+      this.removeRuntimeSubscriptions();
     }
 
     this.processInstances = [];
@@ -144,6 +145,8 @@ export class ProcessList {
 
     this.subscriptions = [
       this.dashboardService.eventAggregator.subscribe(AuthenticationStateEvent.LOGIN, async () => {
+        this.removeRuntimeSubscriptions();
+
         await this.updateProcessInstanceList();
       }),
       this.dashboardService.eventAggregator.subscribe(AuthenticationStateEvent.LOGOUT, async () => {
@@ -160,6 +163,8 @@ export class ProcessList {
         subscription.dispose();
       }
     }
+
+    this.removeRuntimeSubscriptions();
   }
 
   public async stopProcessInstance(processInstance: DataModels.Correlations.ProcessInstance): Promise<void> {
@@ -211,6 +216,13 @@ export class ProcessList {
   }
 
   private async setRuntimeSubscriptions(): Promise<void> {
+    const subscriptionsExist: boolean = this.dashboardServiceSubscriptions.length > 0;
+    if (subscriptionsExist) {
+      this.removeRuntimeSubscriptions();
+    }
+
+    this.identitiyUsedForSubscriptions = this.activeSolutionEntry.identity;
+
     this.dashboardServiceSubscriptions = await Promise.all([
       this.dashboardService.onProcessStarted(this.activeSolutionEntry.identity, async () => {
         await this.updateProcessInstanceList();
@@ -227,9 +239,9 @@ export class ProcessList {
     ]);
   }
 
-  private removeRuntimeSubscriptions(solutionEntry: ISolutionEntry): void {
+  private removeRuntimeSubscriptions(): void {
     for (const subscription of this.dashboardServiceSubscriptions) {
-      this.dashboardService.removeSubscription(solutionEntry.identity, subscription);
+      this.dashboardService.removeSubscription(this.identitiyUsedForSubscriptions, subscription);
     }
 
     this.dashboardServiceSubscriptions = [];
