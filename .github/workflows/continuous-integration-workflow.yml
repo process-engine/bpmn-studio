@@ -156,3 +156,32 @@ jobs:
       with:
         name: dist_electron_windows
         path: dist_electron_windows
+
+  prepare_and_tag_version:
+    name: "Commit & Tag Version"
+    needs: [lint_linux, build_and_test_linux, build_and_test_macos, build_and_test_windows]
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@master
+    - name: Use Node.js 10.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 10.x
+    - uses: actions/download-artifact@master
+      with:
+        name: package_json
+        path: "."
+    - name: Install NPM dependencies
+      run: |
+        npm ci
+        ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+      
+    - name: Commit and Tag
+      run: |
+        echo ${GITHUB_REF##*/}
+        ./node_modules/.bin/ci_tools commit-and-tag-version --only-on-primary-branches
+        ./node_modules/.bin/ci_tools update-github-release --only-on-primary-branches --use-title-and-text-from-git-tag
+      #env: 
+        #GH_USER: ${{ github.actor }}
+        #GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        #GIT_BRANCH: ${GITHUB_REF##*/}
