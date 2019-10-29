@@ -28,8 +28,8 @@ stages:
     - script: |
         node ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir
       displayName: 'ci_tools prepare-version --allow-dirty-workdir'
-      env:
-        GIT_BRANCH: $(Build.SourceBranch)
+      # env:
+      #  GIT_BRANCH: $(Build.SourceBranch)
 
     - publish: './package.json'
       artifact: package_json
