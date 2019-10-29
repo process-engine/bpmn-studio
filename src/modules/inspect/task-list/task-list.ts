@@ -82,9 +82,6 @@ export class TaskList {
 
         await this.updateTasks();
       }),
-      this.dashboardService.eventAggregator.subscribe(AuthenticationStateEvent.LOGOUT, async () => {
-        await this.updateTasks();
-      }),
     ];
 
     await this.updateTasks();
