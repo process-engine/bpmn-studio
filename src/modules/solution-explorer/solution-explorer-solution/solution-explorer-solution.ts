@@ -107,7 +107,7 @@ export class SolutionExplorerSolution {
     currentDiagramInputValue: undefined,
   };
 
-  private refreshTimeoutTask: NodeJS.Timer | number;
+  private refreshTimeoutTask: NodeJS.Timer;
 
   private diagramValidationRegExpList: Array<RegExp> = [/^[a-z0-9]/i, /^[._ -]/i, /^[äöüß]/i];
 
