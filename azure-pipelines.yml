@@ -153,7 +153,7 @@ stages:
         # User has to have 'admin' privileges on the repo (to be able to push to protected branches).
         GH_USER: $(GH_USER)
         GH_TOKEN: $(GH_TOKEN)
-        GIT_BRANCH: $(Build.SourceBranch)
+        # GIT_BRANCH: $(Build.SourceBranch)
 
 - stage: Publish
   jobs:
