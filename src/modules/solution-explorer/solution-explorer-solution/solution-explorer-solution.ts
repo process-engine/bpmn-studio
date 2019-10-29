@@ -14,6 +14,7 @@ import {ISolutionExplorerService} from '@process-engine/solutionexplorer.service
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {IResponse} from '@essential-projects/http_contracts';
 import {
+  AuthenticationStateEvent,
   IDiagramCreationService,
   IDiagramState,
   IDiagramStateList,
@@ -314,11 +315,17 @@ export class SolutionExplorerSolution {
       // In the future we can maybe display a small icon indicating the error.
       if (isError(error, UnauthorizedError)) {
         this.notificationService.showNotification(NotificationType.ERROR, 'You need to login to list process models.');
+
+        this.sortedDiagramsOfSolutions = [];
+        this.openedSolution = undefined;
       } else if (isError(error, ForbiddenError)) {
         this.notificationService.showNotification(
           NotificationType.ERROR,
           "You don't have the required permissions to list process models.",
         );
+
+        this.sortedDiagramsOfSolutions = [];
+        this.openedSolution = undefined;
       } else {
         this.openedSolution.diagrams = undefined;
         this.fontAwesomeIconClass = 'fa-bolt';
