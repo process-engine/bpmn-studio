@@ -151,7 +151,10 @@ export class ProcessList {
       }),
     ];
 
-    this.setRuntimeSubscriptions();
+    const subscriptionNeedsToBeSet: boolean = this.dashboardServiceSubscriptions.length === 0;
+    if (subscriptionNeedsToBeSet) {
+      this.setRuntimeSubscriptions();
+    }
   }
 
   public detached(): void {
