@@ -148,6 +148,8 @@ export class ProcessList {
         this.removeRuntimeSubscriptions();
 
         await this.updateProcessInstanceList();
+
+        this.setRuntimeSubscriptions();
       }),
     ];
 
