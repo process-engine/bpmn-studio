@@ -180,6 +180,5 @@ stages:
         # User has to have 'admin' privileges on the repo (to be able to push to protected branches).
         GH_USER: $(GH_USER)
         GH_TOKEN: $(GH_TOKEN)
-        GIT_BRANCH: $(Build.SourceBranch)
         # User has to have 'push' privileges on the org (to be able to, well, push to the registry).
         NPM_TOKEN: $(NPM_TOKEN)
