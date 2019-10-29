@@ -133,7 +133,7 @@ jobs:
     - name: Install NPM dependencies
       run: |
         npm ci
-        node ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+        ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
       shell: powershell
 
     - name: Install Windows build tools
