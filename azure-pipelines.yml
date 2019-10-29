@@ -107,7 +107,7 @@ stages:
 
   - job: macOS
     pool:
-      vmImage: 'macOS-10.13'
+      vmImage: 'macOS-latest'
     steps:
     - task: NodeTool@0
       inputs:
