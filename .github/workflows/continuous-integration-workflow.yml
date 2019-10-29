@@ -15,11 +15,11 @@ jobs:
     - name: Install NPM dependencies
       run: |
         npm ci
-        # node ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+        # ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
     - name: Prepare version
       run: |
         # does prepare the version, but not commit it
-        node ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir
+        ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir
     - uses: actions/upload-artifact@master
       with:
         name: package_json
@@ -39,7 +39,7 @@ jobs:
       run: |
         cat package.json
         npm ci
-        node ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+        ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
     - run: npm run lint
 
   build_and_test_linux:
@@ -55,7 +55,7 @@ jobs:
     - name: Install NPM dependencies
       run: |
         npm ci
-        node ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+        ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
     - name: Build the web app 
       run: |
         head package.json
@@ -98,7 +98,7 @@ jobs:
         cat package.json
         npm install -g npm
         npm ci
-        node ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+        ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
 
     - name: Build the Electron app
       run: npm run electron-build-macos
