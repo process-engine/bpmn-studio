@@ -42,7 +42,7 @@ export class DiagramList {
   public detached(): void {
     this.isAttached = false;
 
-    clearTimeout(this.pollingTimeout as NodeJS.Timer);
+    this.stopPolling();
 
     for (const subscription of this.subscriptions) {
       subscription.dispose();
@@ -57,6 +57,10 @@ export class DiagramList {
         this.startPolling();
       }
     }, environment.processengine.processDefListPollingIntervalInMs);
+  }
+
+  private stopPolling(): void {
+    clearTimeout(this.pollingTimeout);
   }
 
   public showDetails(diagramName: string): void {
