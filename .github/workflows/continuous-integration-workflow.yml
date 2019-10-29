@@ -185,3 +185,23 @@ jobs:
         #GH_USER: ${{ github.actor }}
         #GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         #GIT_BRANCH: ${GITHUB_REF##*/}
+
+  publish_npm:
+    name: "Publish npm package"
+    needs: prepare_and_tag_version
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@master
+    - name: Use Node.js 10.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 10.x
+    - uses: actions/download-artifact@master
+      with:
+        name: package_json
+        path: "."
+    - name: Install NPM dependencies
+      run: npm ci
+
+    - name: Publish npm package
+      run: node ./node_modules/.bin/ci_tools publish-npm-package --create-tag-from-branch-name
