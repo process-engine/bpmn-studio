@@ -81,6 +81,8 @@ export class TaskList {
         this.removeRuntimeSubscriptions();
 
         await this.updateTasks();
+
+        this.setRuntimeSubscriptions();
       }),
     ];
 
