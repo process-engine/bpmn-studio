@@ -149,9 +149,6 @@ export class ProcessList {
 
         await this.updateProcessInstanceList();
       }),
-      this.dashboardService.eventAggregator.subscribe(AuthenticationStateEvent.LOGOUT, async () => {
-        await this.updateProcessInstanceList();
-      }),
     ];
 
     this.setRuntimeSubscriptions();
