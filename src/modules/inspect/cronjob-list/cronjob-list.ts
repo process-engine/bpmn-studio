@@ -1,13 +1,14 @@
 import {bindable, computedFrom, inject, observable} from 'aurelia-framework';
+import {Subscription} from 'aurelia-event-aggregator';
 
 import * as Bluebird from 'bluebird';
 
 import {DataModels} from '@process-engine/management_api_contracts';
-
 import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
+import {IIdentity} from '@essential-projects/iam_contracts';
+import {Subscription as RuntimeSubscription} from '@essential-projects/event_aggregator_contracts';
 
-import {Subscription} from '@essential-projects/event_aggregator_contracts';
-import {ISolutionEntry} from '../../../contracts/index';
+import {AuthenticationStateEvent, ISolutionEntry} from '../../../contracts/index';
 import environment from '../../../environment';
 import {getBeautifiedDate} from '../../../services/date-service/date.service';
 import {IDashboardService} from '../dashboard/contracts';
@@ -23,17 +24,19 @@ export class CronjobList {
   public paginationSize: number = 10;
   public totalItems: number;
   public showError: boolean;
+  public paginationShowsLoading: boolean;
 
   public pagination: Pagination;
 
+  private subscriptions: Array<Subscription>;
+  private dashboardServiceSubscriptions: Array<RuntimeSubscription> = [];
   private cronjobsToDisplay: Array<DataModels.Cronjobs.CronjobConfiguration> = [];
   private pollingTimeout: NodeJS.Timeout;
   private isAttached: boolean;
   private dashboardService: IDashboardService;
+  private identitiyUsedForSubscriptions: IIdentity;
 
   private updatePromise: any;
-  private subscriptions: Array<Subscription> = [];
-  private paginationShowsLoading: boolean;
 
   constructor(dashboardService: IDashboardService) {
     this.dashboardService = dashboardService;
@@ -46,16 +49,16 @@ export class CronjobList {
 
     if (this.updatePromise) {
       this.updatePromise.cancel();
+    }
 
-      if (processEngineSupportsCronjobEvents(this.activeSolutionEntry.processEngineVersion)) {
-        clearTimeout(this.pollingTimeout);
-        this.subscribeToEvents();
-      } else {
-        for (const subscription of this.subscriptions) {
-          await this.dashboardService.removeSubscription(this.activeSolutionEntry.identity, subscription);
-        }
-        this.startPolling();
-      }
+    this.removeRuntimeSubscriptions();
+
+    if (processEngineSupportsCronjobEvents(this.activeSolutionEntry.processEngineVersion)) {
+      clearTimeout(this.pollingTimeout);
+
+      this.setRuntimeSubscriptions();
+    } else {
+      this.startPolling();
     }
 
     this.cronjobsToDisplay = [];
@@ -75,18 +78,34 @@ export class CronjobList {
     await this.updateCronjobs();
 
     if (processEngineSupportsCronjobEvents(this.activeSolutionEntry.processEngineVersion)) {
-      this.subscribeToEvents();
+      const subscriptionNeedsToBeSet: boolean = this.dashboardServiceSubscriptions.length === 0;
+      if (subscriptionNeedsToBeSet) {
+        this.setRuntimeSubscriptions();
+      }
     } else {
       this.startPolling();
     }
+
+    this.subscriptions = [
+      this.dashboardService.eventAggregator.subscribe(AuthenticationStateEvent.LOGIN, async () => {
+        this.removeRuntimeSubscriptions();
+
+        await this.updateCronjobs();
+
+        this.setRuntimeSubscriptions();
+      }),
+    ];
   }
 
   public async detached(): Promise<void> {
+    for (const subscription of this.subscriptions) {
+      subscription.dispose();
+    }
+
     this.isAttached = false;
     this.stopPolling();
-    for (const subscription of this.subscriptions) {
-      await this.dashboardService.removeSubscription(this.activeSolutionEntry.identity, subscription);
-    }
+
+    this.removeRuntimeSubscriptions();
   }
 
   public currentPageChanged(newValue, oldValue): void {
@@ -183,8 +202,15 @@ export class CronjobList {
     }, environment.processengine.dashboardPollingIntervalInMs);
   }
 
-  private async subscribeToEvents(): Promise<void> {
-    this.subscriptions = [
+  private async setRuntimeSubscriptions(): Promise<void> {
+    const subscriptionsExist: boolean = this.dashboardServiceSubscriptions.length > 0;
+    if (subscriptionsExist) {
+      this.removeRuntimeSubscriptions();
+    }
+
+    this.identitiyUsedForSubscriptions = this.activeSolutionEntry.identity;
+
+    this.dashboardServiceSubscriptions = [
       await this.dashboardService.onCronjobCreated(this.activeSolutionEntry.identity, async (message) => {
         await this.updateCronjobs();
       }),
@@ -205,5 +231,13 @@ export class CronjobList {
         await this.updateCronjobs();
       }),
     ];
+  }
+
+  private removeRuntimeSubscriptions(): void {
+    for (const subscription of this.dashboardServiceSubscriptions) {
+      this.dashboardService.removeSubscription(this.identitiyUsedForSubscriptions, subscription);
+    }
+
+    this.dashboardServiceSubscriptions = [];
   }
 }
