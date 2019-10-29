@@ -68,7 +68,11 @@ export class DiagramList {
   }
 
   private async updateDiagramList(): Promise<void> {
-    const solution: ISolution = await this.activeSolutionEntry.service.loadSolution();
-    this.allDiagrams = solution.diagrams;
+    try {
+      const solution: ISolution = await this.activeSolutionEntry.service.loadSolution();
+      this.allDiagrams = solution.diagrams;
+    } catch (error) {
+      // Do nothing
+    }
   }
 }
