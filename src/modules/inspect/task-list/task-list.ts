@@ -90,7 +90,10 @@ export class TaskList {
 
     this.isAttached = true;
 
-    this.setRuntimeSubscriptions();
+    const subscriptionNeedsToBeSet: boolean = this.dashboardServiceSubscriptions.length === 0;
+    if (subscriptionNeedsToBeSet) {
+      this.setRuntimeSubscriptions();
+    }
   }
 
   public detached(): void {
