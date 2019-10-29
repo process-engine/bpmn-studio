@@ -11,12 +11,13 @@ import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 import {ISolutionExplorerService} from '@process-engine/solutionexplorer.service.contracts';
 
 import {
+  AuthenticationStateEvent,
   IAuthenticationService,
   ILoginResult,
   ISolutionEntry,
   ISolutionService,
   IUserIdentity,
-} from '../../../contracts';
+} from '../../../contracts/index';
 import {OpenDiagramsSolutionExplorerService} from '../../../services/solution-explorer-services/open-diagrams-solution-explorer.service';
 import {SolutionExplorerServiceFactory} from '../../../services/solution-explorer-services/solution-explorer-service-factory';
 import {SolutionExplorerSolution} from '../solution-explorer-solution/solution-explorer-solution';
@@ -390,6 +391,8 @@ export class SolutionExplorerList {
 
     await solutionEntry.service.openSolution(solutionEntry.uri, solutionEntry.identity);
     this.solutionService.persistSolutionsInLocalStorage();
+
+    this.eventAggregator.publish(AuthenticationStateEvent.LOGIN);
   }
 
   public async logout(solutionEntry: ISolutionEntry): Promise<void> {
