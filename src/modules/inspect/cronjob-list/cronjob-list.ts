@@ -88,11 +88,18 @@ export class CronjobList {
 
     this.subscriptions = [
       this.dashboardService.eventAggregator.subscribe(AuthenticationStateEvent.LOGIN, async () => {
-        this.removeRuntimeSubscriptions();
+        const needsToRenewSubscriptions: boolean = processEngineSupportsCronjobEvents(
+          this.activeSolutionEntry.processEngineVersion,
+        );
+        if (needsToRenewSubscriptions) {
+          this.removeRuntimeSubscriptions();
+        }
 
         await this.updateCronjobs();
 
-        this.setRuntimeSubscriptions();
+        if (needsToRenewSubscriptions) {
+          this.setRuntimeSubscriptions();
+        }
       }),
     ];
   }
