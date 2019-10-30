@@ -12,7 +12,7 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 10.x
-    - name: Install NPM dependencies
+    - name: Install npm dependencies
       run: |
         npm ci
         # ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
@@ -25,22 +25,22 @@ jobs:
         name: package_json
         path: package.json
 
-  #lint_linux:
-  #  name: "Lint sources"
-  #  needs: prepare_version
-  #  runs-on: ubuntu-18.04
-  #  steps:
-  #  - uses: actions/checkout@master
-  #  - uses: actions/download-artifact@master
-  #    with:
-  #      name: package_json
-  #      path: "."
-  #  - name: Install NPM dependencies
-  #    run: |
-  #      cat package.json
-  #      npm ci
-  #      ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
-  #  - run: npm run lint
+  lint_linux:
+    name: "Lint sources"
+    needs: prepare_version
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@master
+    - uses: actions/download-artifact@master
+      with:
+        name: package_json
+        path: "."
+    - name: Install npm dependencies
+      run: |
+        cat package.json
+        npm ci
+        ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+    - run: npm run lint
 
   build_and_test_linux:
     name: "Build & Test (Linux)"
@@ -52,7 +52,7 @@ jobs:
       with:
         name: package_json
         path: "."
-    - name: Install NPM dependencies
+    - name: Install npm dependencies
       run: |
         npm ci
         ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
