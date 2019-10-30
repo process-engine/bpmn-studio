@@ -90,14 +90,16 @@ export class SolutionExplorerPanel {
     const persistedInternalSolution: ISolutionEntry = this.solutionService.getSolutionEntryForUri(uriOfProcessEngine);
     const internalSolutionWasPersisted: boolean = persistedInternalSolution !== undefined;
 
-    try {
-      if (internalSolutionWasPersisted) {
-        this.solutionExplorerList.openSolution(uriOfProcessEngine, false, persistedInternalSolution.identity);
-      } else {
-        this.solutionExplorerList.openSolution(uriOfProcessEngine);
+    if ((window as any).nodeRequire) {
+      try {
+        if (internalSolutionWasPersisted) {
+          this.solutionExplorerList.openSolution(uriOfProcessEngine, false, persistedInternalSolution.identity);
+        } else {
+          this.solutionExplorerList.openSolution(uriOfProcessEngine);
+        }
+      } catch {
+        return;
       }
-    } catch {
-      return;
     }
 
     // Open the previously opened solutions.
