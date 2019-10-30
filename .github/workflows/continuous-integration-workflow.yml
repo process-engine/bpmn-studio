@@ -13,6 +13,12 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 10.x
+
+    - name: Log github context
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: echo "$GITHUB_CONTEXT"
+
     - name: Install ci tools
       run: npm i @process-engine/ci_tools
     - name: Prepare version
@@ -247,35 +253,44 @@ jobs:
         node-version: 10.x
 
     - name: Unstash package.json
-      if: success()
+      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
       uses: actions/download-artifact@master
       with:
         name: package_json
         path: "."
+
+    - name: Unstash macOS Electron app
+      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      uses: actions/download-artifact@master
+      with:
+        name: dist_electron_macos
+        path: ".dist/electron"
+
+    - name: Unstash Windows Electron app
+      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      uses: actions/download-artifact@master
+      with:
+        name: dist_electron_windows
+        path: ".dist/electron"
+
+    - name: Install ci tools
+      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      run: npm i @process-engine/ci_tools
+
+    - name: Upload to GitHub
+      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      run: |
+        ./node_modules/.bin/ci_tools update-github-release \
+                              --assets dist/electron/bpmn-studio-setup-*.exe \
+                              --assets dist/electron/bpmn-studio-setup-*.exe.blockmap \
+                              --assets dist/electron/bpmn-studio-setup-*.zip \
+                              --assets dist/electron/bpmn-studio-setup-*.dmg \
+                              --assets dist/electron/bpmn-studio-setup-*.dmg.blockmap \
+                              --assets dist/electron/latest-mac.yml \
+                              --assets dist/electron/latest.yml
+      env:
+        GH_USER: ${{ github.actor }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #
-    #- name: Unstash macOS Electron app
-    #  uses: actions/download-artifact@master
-    #  with:
-    #    name: dist_electron_macos
-    #    path: ".dist/electron"
-    #
-    #- name: Unstash Windows Electron app
-    #  uses: actions/download-artifact@master
-    #  with:
-    #    name: dist_electron_windows
-    #    path: ".dist/electron"
-#
-    #- name: Install ci tools
-    #  run: npm i @process-engine/ci_tools
-#
-    #- name: Upload to GitHub
-    #  run: |
-    #    ./node_modules/.bin/ci_tools update-github-release \
-    #                          --assets dist/electron/bpmn-studio-setup-*.exe \
-    #                          --assets dist/electron/bpmn-studio-setup-*.exe.blockmap \
-    #                          --assets dist/electron/bpmn-studio-setup-*.zip \
-    #                          --assets dist/electron/bpmn-studio-setup-*.dmg \
-    #                          --assets dist/electron/bpmn-studio-setup-*.dmg.blockmap \
-    #                          --assets dist/electron/latest-mac.yml \
-    #                          --assets dist/electron/latest.yml
-#
+# artefakte anpassen wenn master beta develop ist 
+
