@@ -41,8 +41,10 @@ export class DiagramList {
 
     this.stopPolling();
 
-    for (const subscription of this.subscriptions) {
-      subscription.dispose();
+    if (this.subscriptions !== undefined) {
+      for (const subscription of this.subscriptions) {
+        subscription.dispose();
+      }
     }
   }
 
