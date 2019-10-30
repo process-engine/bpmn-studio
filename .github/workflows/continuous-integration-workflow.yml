@@ -22,14 +22,14 @@ jobs:
         # does prepare the version, but not commit it
         ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir
     
-    - name: Stash package.json
+    #- name: Stash package.json
     - uses: actions/upload-artifact@master
       with:
         name: package_json
         path: package.json
 
-    #- uses: actions/upload-artifact@master
     #- name: Stash node modules
+    #- uses: actions/upload-artifact@master
     #  with:
     #    name: node_modules
     #    path: node_modules
@@ -41,16 +41,18 @@ jobs:
     steps:
     - uses: actions/checkout@master
     
-    - name: Unstash package.json
+    #- name: Unstash package.json
     - uses: actions/download-artifact@master
       with:
         name: package_json
         path: "."
-#    - uses: actions/download-artifact@master
+
 #    - name: Unstash node modules
+#    - uses: actions/download-artifact@master
 #      with:
 #        name: node_modules
 #        path: "."
+
     - name: Install npm dependencies
       run: |
         cat package.json
@@ -65,12 +67,12 @@ jobs:
     steps:
     - uses: actions/checkout@master
 
-    - name: Unstash package.json
+    #- name: Unstash package.json
     - uses: actions/download-artifact@master
       with:
         name: package_json
         path: "."
-        
+
     - name: Install npm dependencies
       run: |
         npm ci
@@ -109,7 +111,7 @@ jobs:
       with:
         node-version: 10.x
 
-    - name: Unstash package.json
+    #- name: Unstash package.json
     - uses: actions/download-artifact@master
       with:
         name: package_json
@@ -149,7 +151,7 @@ jobs:
       with:
         node-version: 10.x
 
-    - name: Unstash package.json
+    #- name: Unstash package.json
     - uses: actions/download-artifact@master
       with:
         name: package_json
@@ -193,16 +195,18 @@ jobs:
       with:
         node-version: 10.x
     
-    - name: Unstash package.json
+    #- name: Unstash package.json
     - uses: actions/download-artifact@master
       with:
         name: package_json
         path: "."
-   # - uses: actions/download-artifact@master
+
    # - name: Unstash node modules
+   # - uses: actions/download-artifact@master
    #   with:
    #     name: node_modules
    #     path: "."
+
     - name: Install npm dependencies
       run: |
         npm ci
@@ -229,16 +233,18 @@ jobs:
       with:
         node-version: 10.x
     
-    - name: Unstash package.json
+    #- name: Unstash package.json
     - uses: actions/download-artifact@master
       with:
         name: package_json
         path: "."
-    #- uses: actions/download-artifact@master
+   
     #- name: Unstash node modules
+    #- uses: actions/download-artifact@master
     #  with:
     #    name: node_modules
     #    path: "."
+   
     - name: Install npm dependencies
       run: npm ci
 
