@@ -43,6 +43,10 @@ export class CronjobList {
   }
 
   public async activeSolutionEntryChanged(newSolutionEntry: ISolutionEntry): Promise<void> {
+    if (!newSolutionEntry.uri.includes('http')) {
+      return;
+    }
+
     if (!this.isAttached) {
       return;
     }
