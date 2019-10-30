@@ -138,7 +138,10 @@ stages:
         versionSpec: '10.x'
       displayName: 'Install Node.js'
 
+    - checkout: self
+
     - script: |
+        git status
         npm ci
       displayName: 'npm ci'
 
@@ -166,6 +169,8 @@ stages:
         versionSpec: '10.x'
       displayName: 'Install Node.js'
 
+    - checkout: self
+    
     - script: |
         npm ci
       displayName: 'npm ci'
