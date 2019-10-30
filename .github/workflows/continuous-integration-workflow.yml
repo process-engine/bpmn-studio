@@ -14,23 +14,17 @@ jobs:
       with:
         node-version: 10.x
     - name: Install npm dependencies
-      run: |
-        npm ci
-        ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+      run: npm i @process-engine/ci_tools
     - name: Prepare version
       run: |
         # does prepare the version, but not commit it
         ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir
     
-    - uses: actions/upload-artifact@master
+    - name: Stash package.json
+      uses: actions/upload-artifact@master
       with:
         name: package_json
         path: package.json
-
-    - uses: actions/upload-artifact@master
-      with:
-        name: node_modules
-        path: node_modules
 
   lint_linux:
     name: "Lint sources"
@@ -39,21 +33,17 @@ jobs:
     steps:
     - uses: actions/checkout@master
     
-    - uses: actions/download-artifact@master
+    - name: Unstash package.json
+      uses: actions/download-artifact@master
       with:
         name: package_json
         path: "."
 
-    - uses: actions/download-artifact@master
-      with:
-        name: node_modules
-        path: "."
-
-    #- name: Install npm dependencies
-    #  run: |
-    #    cat package.json
-    #    npm ci
-    #    ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+    - name: Install npm dependencies
+      run: |
+        cat package.json
+        npm ci
+        ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
     - run: npm run lint
 
   build_and_test_linux:
@@ -63,7 +53,8 @@ jobs:
     steps:
     - uses: actions/checkout@master
 
-    - uses: actions/download-artifact@master
+    - name: Unstash package.json
+      uses: actions/download-artifact@master
       with:
         name: package_json
         path: "."
@@ -106,7 +97,8 @@ jobs:
       with:
         node-version: 10.x
 
-    - uses: actions/download-artifact@master
+    - name: Unstash package.json
+      uses: actions/download-artifact@master
       with:
         name: package_json
         path: "."
@@ -145,7 +137,8 @@ jobs:
       with:
         node-version: 10.x
 
-    - uses: actions/download-artifact@master
+    - name: Unstash package.json
+      uses: actions/download-artifact@master
       with:
         name: package_json
         path: "."
@@ -187,21 +180,15 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 10.x
-    
-    - uses: actions/download-artifact@master
+
+    - name: Unstash package.json
+      uses: actions/download-artifact@master
       with:
         name: package_json
         path: "."
 
-    - uses: actions/download-artifact@master
-      with:
-        name: node_modules
-        path: "."
-
-    #- name: Install npm dependencies
-    #  run: |
-    #    npm ci
-    #    ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+    - name: Install npm dependencies
+      run: npm i @process-engine/ci_tools
       
     - name: Commit and Tag
       run: |
@@ -224,20 +211,16 @@ jobs:
       with:
         node-version: 10.x
     
-    - uses: actions/download-artifact@master
+    - name: Unstash package.json
+      uses: actions/download-artifact@master
       with:
         name: package_json
         path: "."
    
-    - uses: actions/download-artifact@master
-      with:
-        name: node_modules
-        path: "."
-   
-    #- name: Install npm dependencies
-    #  run: npm ci
+    - name: Install ci tools
+      run: npm i @process-engine/ci_tools
 
     - name: Publish npm package
-      run: node ./node_modules/.bin/ci_tools publish-npm-package --create-tag-from-branch-name
+      run: ./node_modules/.bin/ci_tools publish-npm-package --create-tag-from-branch-name
       env: 
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
