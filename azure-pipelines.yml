@@ -123,8 +123,8 @@ stages:
     - script: npm run electron-build-macos
       displayName: 'npm run electron-build-macos'
 
-    # - script: npm test
-    # displayName: 'npm test'
+    - script: npm test
+      displayName: 'npm test'
 
 - stage: Commit_and_tag_version
   displayName: "Commit & tag version"
