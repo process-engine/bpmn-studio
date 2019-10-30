@@ -7,6 +7,7 @@ import * as Bluebird from 'bluebird';
 import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
 import {Subscription as RuntimeSubscription} from '@essential-projects/event_aggregator_contracts';
 
+import {IIdentity} from '@essential-projects/iam_contracts';
 import {AuthenticationStateEvent, ISolutionEntry, ISolutionService} from '../../../contracts/index';
 import environment from '../../../environment';
 import {IDashboardService, TaskList as SuspendedTaskList, TaskListEntry} from '../dashboard/contracts/index';
@@ -45,6 +46,7 @@ export class TaskList {
   private isAttached: boolean = false;
 
   private updatePromise: any;
+  private identitiyUsedForSubscriptions: IIdentity;
 
   constructor(dashboardService: IDashboardService, router: Router, solutionService: ISolutionService) {
     this.dashboardService = dashboardService;
@@ -76,10 +78,11 @@ export class TaskList {
 
     this.subscriptions = [
       this.dashboardService.eventAggregator.subscribe(AuthenticationStateEvent.LOGIN, async () => {
+        this.removeRuntimeSubscriptions();
+
         await this.updateTasks();
-      }),
-      this.dashboardService.eventAggregator.subscribe(AuthenticationStateEvent.LOGOUT, async () => {
-        await this.updateTasks();
+
+        this.setRuntimeSubscriptions();
       }),
     ];
 
@@ -87,7 +90,10 @@ export class TaskList {
 
     this.isAttached = true;
 
-    this.setRuntimeSubscriptions();
+    const subscriptionNeedsToBeSet: boolean = this.dashboardServiceSubscriptions.length === 0;
+    if (subscriptionNeedsToBeSet) {
+      this.setRuntimeSubscriptions();
+    }
   }
 
   public detached(): void {
@@ -97,7 +103,7 @@ export class TaskList {
 
     this.isAttached = false;
 
-    this.removeRuntimeSubscriptions(this.activeSolutionEntry);
+    this.removeRuntimeSubscriptions();
   }
 
   public goBack(): void {
@@ -129,7 +135,7 @@ export class TaskList {
     }
 
     if (previousActiveSolutioEntry) {
-      this.removeRuntimeSubscriptions(previousActiveSolutioEntry);
+      this.removeRuntimeSubscriptions();
     }
 
     this.tasks = [];
@@ -193,6 +199,13 @@ export class TaskList {
   }
 
   private async setRuntimeSubscriptions(): Promise<void> {
+    const subscriptionsExist: boolean = this.dashboardServiceSubscriptions.length > 0;
+    if (subscriptionsExist) {
+      this.removeRuntimeSubscriptions();
+    }
+
+    this.identitiyUsedForSubscriptions = this.activeSolutionEntry.identity;
+
     this.dashboardServiceSubscriptions = await Promise.all([
       this.dashboardService.onEmptyActivityFinished(this.activeSolutionEntry.identity, async () => {
         await this.updateTasks();
@@ -218,9 +231,9 @@ export class TaskList {
     ]);
   }
 
-  private removeRuntimeSubscriptions(solutionEntry: ISolutionEntry): void {
+  private removeRuntimeSubscriptions(): void {
     for (const subscription of this.dashboardServiceSubscriptions) {
-      this.dashboardService.removeSubscription(solutionEntry.identity, subscription);
+      this.dashboardService.removeSubscription(this.identitiyUsedForSubscriptions, subscription);
     }
 
     this.dashboardServiceSubscriptions = [];
