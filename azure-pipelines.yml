@@ -182,4 +182,4 @@ stages:
         GH_TOKEN: $(GH_TOKEN)
         # User has to have 'push' privileges on the org (to be able to, well, push to the registry)
         NPM_TOKEN: $(NPM_TOKEN)
-        GIT_BRANCH: $(Build.SourceBranchNameName)
+        GIT_BRANCH: $(Build.SourceBranchName)
