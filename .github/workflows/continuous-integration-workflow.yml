@@ -14,11 +14,6 @@ jobs:
       with:
         node-version: 10.x
 
-    - name: Log github context
-      env:
-        GITHUB_CONTEXT: ${{ toJson(github) }}
-      run: echo "$GITHUB_CONTEXT"
-
     - name: Install ci tools
       run: npm i @process-engine/ci_tools
     - name: Prepare version
@@ -201,13 +196,11 @@ jobs:
       
     - name: Commit and Tag
       run: |
-        echo ${GITHUB_REF##*/}
         ./node_modules/.bin/ci_tools commit-and-tag-version --only-on-primary-branches
         ./node_modules/.bin/ci_tools update-github-release --only-on-primary-branches --use-title-and-text-from-git-tag
       env: 
-        GH_USER: ${{ github.actor }}
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        #GIT_BRANCH: ${GITHUB_REF##*/}
+        GH_USER: ${{ secrets.GH_USER }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
   publish_npm:
     name: "Publish npm package"
@@ -240,11 +233,6 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@master
-
-    #- name: Extract branch name
-    #  shell: bash
-    #  run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
-    #  id: extract_branch
 
     - name: Use Node.js 10.x
       if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
@@ -289,8 +277,8 @@ jobs:
                               --assets dist/electron/latest-mac.yml \
                               --assets dist/electron/latest.yml
       env:
-        GH_USER: ${{ github.actor }}
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_USER: ${{ secrets.GH_USER }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
 #
 # artefakte anpassen wenn master beta develop ist 
 
