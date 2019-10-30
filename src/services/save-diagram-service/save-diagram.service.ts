@@ -11,6 +11,7 @@ import {OpenDiagramsSolutionExplorerService} from '../solution-explorer-services
 import {SolutionService} from '../solution-service/solution.service';
 import {OpenDiagramStateService} from '../solution-explorer-services/open-diagram-state.service';
 import {solutionIsRemoteSolution} from '../solution-is-remote-solution-module/solution-is-remote-solution.module';
+import {isRunningInElectron} from '../is-running-in-electron-module/is-running-in-electron.module';
 
 @inject(EventAggregator, NotificationService, 'OpenDiagramService', 'SolutionService', Router, OpenDiagramStateService)
 export class SaveDiagramService {
@@ -39,8 +40,7 @@ export class SaveDiagramService {
     this.router = router;
     this.openDiagramStateService = openDiagramStateService;
 
-    const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
-    if (isRunningInElectron) {
+    if (isRunningInElectron()) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
     }
   }

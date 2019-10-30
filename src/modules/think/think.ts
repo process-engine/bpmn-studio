@@ -3,6 +3,7 @@ import {activationStrategy} from 'aurelia-router';
 
 import {ISolutionEntry, ISolutionService, NotificationType} from '../../contracts/index';
 import {NotificationService} from '../../services/notification-service/notification.service';
+import {isRunningInElectron} from '../../services/is-running-in-electron-module/is-running-in-electron.module';
 
 export interface IThinkRouteParameters {
   view?: string;
@@ -57,18 +58,14 @@ export class Think {
   public activate(): void {
     this.showDiagramList = true;
 
-    const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
-
-    if (isRunningInElectron) {
+    if (isRunningInElectron()) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
       this.ipcRenderer.on('menubar__start_close_diagram', this.closeBpmnStudio);
     }
   }
 
   public deactivate(): void {
-    const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
-
-    if (isRunningInElectron) {
+    if (isRunningInElectron()) {
       this.ipcRenderer.removeListener('menubar__start_close_diagram', this.closeBpmnStudio);
     }
   }

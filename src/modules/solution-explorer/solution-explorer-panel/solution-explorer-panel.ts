@@ -22,6 +22,7 @@ import {SolutionExplorerList} from '../solution-explorer-list/solution-explorer-
 import {getPortListByVersion} from '../../../services/default-ports-module/default-ports.module';
 import {HttpFetchClient} from '../../fetch-http-client/http-fetch-client';
 import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
+import {isRunningInElectron} from '../../../services/is-running-in-electron-module/is-running-in-electron.module';
 
 type RemoteSolutionListEntry = {
   uri: string;
@@ -79,7 +80,7 @@ export class SolutionExplorerPanel {
     this.solutionService = solutionService;
     this.httpFetchClient = httpFetchClient;
 
-    if (this.canReadFromFileSystem()) {
+    if (this.canReadFromFileSystem) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
     }
   }
@@ -133,7 +134,7 @@ export class SolutionExplorerPanel {
   }
 
   public async attached(): Promise<void> {
-    if (this.canReadFromFileSystem()) {
+    if (this.canReadFromFileSystem) {
       this.registerElectronHooks();
       document.addEventListener('drop', this.openDiagramOnDropBehaviour);
     }
@@ -158,7 +159,7 @@ export class SolutionExplorerPanel {
   }
 
   public detached(): void {
-    if (this.canReadFromFileSystem()) {
+    if (this.canReadFromFileSystem) {
       this.removeElectronFileOpeningHooks();
       document.removeEventListener('drop', this.openDiagramOnDropBehaviour);
     }
@@ -307,7 +308,7 @@ export class SolutionExplorerPanel {
   }
 
   public async openDiagram(): Promise<void> {
-    const canNotReadFromFileSystem: boolean = !this.canReadFromFileSystem();
+    const canNotReadFromFileSystem: boolean = !this.canReadFromFileSystem;
     if (canNotReadFromFileSystem) {
       this.openDiagramInput.click();
 
@@ -350,8 +351,12 @@ export class SolutionExplorerPanel {
     return uriIsEmtpy;
   }
 
+  public get canReadFromFileSystem(): boolean {
+    return isRunningInElectron();
+  }
+
   public async openSolution(): Promise<void> {
-    const canNotReadFromFileSystem: boolean = !this.canReadFromFileSystem();
+    const canNotReadFromFileSystem: boolean = !this.canReadFromFileSystem;
     if (canNotReadFromFileSystem) {
       this.solutionInput.click();
 
@@ -399,10 +404,6 @@ export class SolutionExplorerPanel {
       default:
         return 'Development';
     }
-  }
-
-  public canReadFromFileSystem(): boolean {
-    return (window as any).nodeRequire;
   }
 
   public selectRemoteSolution(remoteSolutionUri: string): void {

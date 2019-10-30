@@ -9,6 +9,7 @@ import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 import {DiffMode, ISolutionEntry, ISolutionService, NotificationType} from '../../contracts/index';
 import environment from '../../environment';
 import {NotificationService} from '../../services/notification-service/notification.service';
+import {isRunningInElectron} from '../../services/is-running-in-electron-module/is-running-in-electron.module';
 
 type UpdateProgressData = {
   bytesPerSecond: number;
@@ -60,8 +61,7 @@ export class StatusBar {
     this.solutionService = solutionService;
     this.notificationService = notificationService;
 
-    const applicationRunsInElectron: boolean = (window as any).nodeRequire !== undefined;
-    if (applicationRunsInElectron) {
+    if (isRunningInElectron()) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
 
       this.ipcRenderer.on('update_error', () => {

@@ -23,6 +23,7 @@ import {DeployDiagramService} from '../../../services/deploy-diagram-service/dep
 import {SaveDiagramService} from '../../../services/save-diagram-service/save-diagram.service';
 import {exposeFunctionForTesting} from '../../../services/expose-functionality-module/expose-functionality.module';
 import {DiagramDetailService} from './service/diagram-detail.service';
+import {isRunningInElectron} from '../../../services/is-running-in-electron-module/is-running-in-electron.module';
 
 @inject(
   'DiagramDetailService',
@@ -106,8 +107,7 @@ export class DiagramDetail {
 
     this.selectedRemoteSolution = this.getPreviouslySelectedRemoteSolution();
 
-    const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
-    if (isRunningInElectron) {
+    if (isRunningInElectron()) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
       this.ipcRenderer.on('menubar__start_save_diagram_as', this.electronOnSaveDiagramAs);
       this.ipcRenderer.on('menubar__start_save_diagram', this.electronOnSaveDiagram);
@@ -204,8 +204,7 @@ export class DiagramDetail {
   }
 
   public detached(): void {
-    const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
-    if (isRunningInElectron) {
+    if (isRunningInElectron()) {
       this.ipcRenderer.removeListener('menubar__start_save_diagram', this.electronOnSaveDiagram);
       this.ipcRenderer.removeListener('menubar__start_save_diagram_as', this.electronOnSaveDiagramAs);
     }
