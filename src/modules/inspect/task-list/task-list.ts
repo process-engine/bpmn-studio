@@ -5,7 +5,9 @@ import {Router} from 'aurelia-router';
 import * as Bluebird from 'bluebird';
 
 import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
+import {Subscription as RuntimeSubscription} from '@essential-projects/event_aggregator_contracts';
 
+import {IIdentity} from '@essential-projects/iam_contracts';
 import {AuthenticationStateEvent, ISolutionEntry, ISolutionService} from '../../../contracts/index';
 import environment from '../../../environment';
 import {IDashboardService, TaskList as SuspendedTaskList, TaskListEntry} from '../dashboard/contracts/index';
@@ -37,18 +39,138 @@ export class TaskList {
   private router: Router;
   private solutionService: ISolutionService;
 
-  private dashboardServiceSubscriptions: Array<any> = [];
+  private dashboardServiceSubscriptions: Array<RuntimeSubscription> = [];
   private subscriptions: Array<Subscription>;
   private tasks: Array<TaskListEntry> = [];
   private getTasks: (offset?: number, limit?: number) => Promise<SuspendedTaskList>;
   private isAttached: boolean = false;
 
   private updatePromise: any;
+  private identitiyUsedForSubscriptions: IIdentity;
 
   constructor(dashboardService: IDashboardService, router: Router, solutionService: ISolutionService) {
     this.dashboardService = dashboardService;
     this.router = router;
     this.solutionService = solutionService;
+  }
+
+  public async attached(): Promise<void> {
+    const getTasksIsUndefined: boolean = this.getTasks === undefined;
+
+    this.activeSolutionUri = this.router.currentInstruction.queryParams.solutionUri;
+
+    const activeSolutionUriIsNotSet: boolean = this.activeSolutionUri === undefined;
+
+    if (activeSolutionUriIsNotSet) {
+      this.activeSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
+    }
+
+    const activeSolutionUriIsNotRemote: boolean = !this.activeSolutionUri.startsWith('http');
+    if (activeSolutionUriIsNotRemote) {
+      this.activeSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
+    }
+
+    this.activeSolutionEntry = this.solutionService.getSolutionEntryForUri(this.activeSolutionUri);
+
+    if (getTasksIsUndefined) {
+      this.getTasks = this.getAllTasks;
+    }
+
+    this.subscriptions = [
+      this.dashboardService.eventAggregator.subscribe(AuthenticationStateEvent.LOGIN, async () => {
+        this.removeRuntimeSubscriptions();
+
+        await this.updateTasks();
+
+        this.setRuntimeSubscriptions();
+      }),
+    ];
+
+    this.dashboardService.eventAggregator.publish(
+      environment.events.configPanel.solutionEntryChanged,
+      this.activeSolutionEntry,
+    );
+
+    await this.updateTasks();
+
+    this.isAttached = true;
+
+    const subscriptionNeedsToBeSet: boolean = this.dashboardServiceSubscriptions.length === 0;
+    if (subscriptionNeedsToBeSet) {
+      this.setRuntimeSubscriptions();
+    }
+  }
+
+  public detached(): void {
+    for (const subscription of this.subscriptions) {
+      subscription.dispose();
+    }
+
+    this.isAttached = false;
+
+    this.removeRuntimeSubscriptions();
+  }
+
+  public goBack(): void {
+    this.router.navigateBack();
+  }
+
+  public continueTask(task: TaskListEntry): void {
+    const {correlationId, id, processInstanceId} = task;
+
+    this.router.navigateToRoute('live-execution-tracker', {
+      diagramName: task.processModelId,
+      solutionUri: this.activeSolutionEntry.uri,
+      correlationId: correlationId,
+      processInstanceId: processInstanceId,
+      taskId: id,
+    });
+  }
+
+  public async activeSolutionEntryChanged(
+    newActiveSolutionEntry: ISolutionEntry,
+    previousActiveSolutioEntry: ISolutionEntry,
+  ): Promise<void> {
+    if (!newActiveSolutionEntry.uri.includes('http')) {
+      return;
+    }
+
+    if (this.updatePromise && this.isAttached) {
+      this.updatePromise.cancel();
+    }
+
+    if (previousActiveSolutioEntry) {
+      this.removeRuntimeSubscriptions();
+    }
+
+    this.tasks = [];
+    this.initialLoadingFinished = false;
+    this.showError = false;
+    this.dashboardService.eventAggregator.publish(
+      environment.events.configPanel.solutionEntryChanged,
+      newActiveSolutionEntry,
+    );
+
+    if (this.isAttached) {
+      await this.updateTasks();
+    }
+
+    const subscriptionNeedsToBeSet: boolean = this.dashboardServiceSubscriptions.length === 0;
+    if (subscriptionNeedsToBeSet) {
+      this.setRuntimeSubscriptions();
+    }
+  }
+
+  public currentPageChanged(): void {
+    if (!this.isAttached) {
+      return;
+    }
+
+    if (this.updatePromise && this.isAttached) {
+      this.updatePromise.cancel();
+    }
+
+    this.updateTasks();
   }
 
   public get shownTasks(): Array<TaskListEntry> {
@@ -81,35 +203,15 @@ export class TaskList {
     }
   }
 
-  public async activeSolutionEntryChanged(
-    newActiveSolutionEntry: ISolutionEntry,
-    previousActiveSolutioEntry: ISolutionEntry,
-  ): Promise<void> {
-    if (!newActiveSolutionEntry.uri.includes('http')) {
-      return;
+  private async setRuntimeSubscriptions(): Promise<void> {
+    const subscriptionsExist: boolean = this.dashboardServiceSubscriptions.length > 0;
+    if (subscriptionsExist) {
+      this.removeRuntimeSubscriptions();
     }
 
-    if (this.updatePromise) {
-      this.updatePromise.cancel();
-    }
+    this.identitiyUsedForSubscriptions = this.activeSolutionEntry.identity;
 
-    for (const subscription of this.dashboardServiceSubscriptions) {
-      this.dashboardService.removeSubscription(previousActiveSolutioEntry.identity, subscription);
-    }
-
-    this.tasks = [];
-    this.initialLoadingFinished = false;
-    this.showError = false;
-    this.dashboardService.eventAggregator.publish(
-      environment.events.configPanel.solutionEntryChanged,
-      newActiveSolutionEntry,
-    );
-
-    if (this.isAttached) {
-      await this.updateTasks();
-    }
-
-    this.dashboardServiceSubscriptions = [
+    this.dashboardServiceSubscriptions = await Promise.all([
       this.dashboardService.onEmptyActivityFinished(this.activeSolutionEntry.identity, async () => {
         await this.updateTasks();
       }),
@@ -131,79 +233,15 @@ export class TaskList {
       this.dashboardService.onProcessError(this.activeSolutionEntry.identity, async () => {
         await this.updateTasks();
       }),
-    ];
+    ]);
   }
 
-  public async attached(): Promise<void> {
-    const getTasksIsUndefined: boolean = this.getTasks === undefined;
-
-    this.activeSolutionUri = this.router.currentInstruction.queryParams.solutionUri;
-
-    const activeSolutionUriIsNotSet: boolean = this.activeSolutionUri === undefined;
-
-    if (activeSolutionUriIsNotSet) {
-      this.activeSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
+  private removeRuntimeSubscriptions(): void {
+    for (const subscription of this.dashboardServiceSubscriptions) {
+      this.dashboardService.removeSubscription(this.identitiyUsedForSubscriptions, subscription);
     }
 
-    const activeSolutionUriIsNotRemote: boolean = !this.activeSolutionUri.startsWith('http');
-    if (activeSolutionUriIsNotRemote) {
-      this.activeSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
-    }
-
-    this.activeSolutionEntry = this.solutionService.getSolutionEntryForUri(this.activeSolutionUri);
-
-    if (getTasksIsUndefined) {
-      this.getTasks = this.getAllTasks;
-    }
-
-    this.subscriptions = [
-      this.dashboardService.eventAggregator.subscribe(AuthenticationStateEvent.LOGIN, async () => {
-        await this.updateTasks();
-      }),
-      this.dashboardService.eventAggregator.subscribe(AuthenticationStateEvent.LOGOUT, async () => {
-        await this.updateTasks();
-      }),
-    ];
-
-    await this.updateTasks();
-
-    this.isAttached = true;
-  }
-
-  public detached(): void {
-    for (const subscription of this.subscriptions) {
-      subscription.dispose();
-    }
-
-    this.isAttached = false;
-  }
-
-  public goBack(): void {
-    this.router.navigateBack();
-  }
-
-  public continueTask(task: TaskListEntry): void {
-    const {correlationId, id, processInstanceId} = task;
-
-    this.router.navigateToRoute('live-execution-tracker', {
-      diagramName: task.processModelId,
-      solutionUri: this.activeSolutionEntry.uri,
-      correlationId: correlationId,
-      processInstanceId: processInstanceId,
-      taskId: id,
-    });
-  }
-
-  public currentPageChanged(): void {
-    if (!this.isAttached) {
-      return;
-    }
-
-    if (this.updatePromise) {
-      this.updatePromise.cancel();
-    }
-
-    this.updateTasks();
+    this.dashboardServiceSubscriptions = [];
   }
 
   private getAllTasks(offset?: number, limit?: number): Promise<SuspendedTaskList> {

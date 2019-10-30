@@ -90,14 +90,16 @@ export class SolutionExplorerPanel {
     const persistedInternalSolution: ISolutionEntry = this.solutionService.getSolutionEntryForUri(uriOfProcessEngine);
     const internalSolutionWasPersisted: boolean = persistedInternalSolution !== undefined;
 
-    try {
-      if (internalSolutionWasPersisted) {
-        this.solutionExplorerList.openSolution(uriOfProcessEngine, false, persistedInternalSolution.identity);
-      } else {
-        this.solutionExplorerList.openSolution(uriOfProcessEngine);
+    if ((window as any).nodeRequire) {
+      try {
+        if (internalSolutionWasPersisted) {
+          this.solutionExplorerList.openSolution(uriOfProcessEngine, false, persistedInternalSolution.identity);
+        } else {
+          this.solutionExplorerList.openSolution(uriOfProcessEngine);
+        }
+      } catch {
+        return;
       }
-    } catch {
-      return;
     }
 
     // Open the previously opened solutions.
@@ -514,7 +516,17 @@ export class SolutionExplorerPanel {
 
   private async isRemoteSolutionActive(remoteSolutionUri: string): Promise<boolean> {
     try {
-      const response: IResponse<JSON> = await this.httpFetchClient.get(remoteSolutionUri);
+      let response: IResponse<JSON>;
+      try {
+        response = await this.httpFetchClient.get(`${remoteSolutionUri}/process_engine`);
+      } catch (error) {
+        const errorIsNotFoundError: boolean = error.code === 404;
+        if (errorIsNotFoundError) {
+          response = await this.httpFetchClient.get(`${remoteSolutionUri}`);
+        } else {
+          throw error;
+        }
+      }
 
       const isResponseFromProcessEngine: boolean = response.result['name'] === '@process-engine/process_engine_runtime';
       if (!isResponseFromProcessEngine) {
