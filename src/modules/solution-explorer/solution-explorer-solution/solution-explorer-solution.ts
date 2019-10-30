@@ -14,6 +14,7 @@ import {ISolutionExplorerService} from '@process-engine/solutionexplorer.service
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {IResponse} from '@essential-projects/http_contracts';
 import {
+  AuthenticationStateEvent,
   IDiagramCreationService,
   IDiagramState,
   IDiagramStateList,
@@ -107,7 +108,7 @@ export class SolutionExplorerSolution {
     currentDiagramInputValue: undefined,
   };
 
-  private refreshTimeoutTask: NodeJS.Timer | number;
+  private refreshTimeoutTask: NodeJS.Timer;
 
   private diagramValidationRegExpList: Array<RegExp> = [/^[a-z0-9]/i, /^[._ -]/i, /^[äöüß]/i];
 
@@ -123,6 +124,7 @@ export class SolutionExplorerSolution {
   private diagramStatesChangedCallbackId: string;
   private signaler: BindingSignaler;
   private httpFetchClient: HttpFetchClient;
+  private isPolling: boolean = false;
 
   constructor(
     router: Router,
@@ -167,6 +169,11 @@ export class SolutionExplorerSolution {
     this.subscriptions = [
       this.eventAggregator.subscribe('router:navigation:success', () => {
         this.updateSolutionExplorer();
+      }),
+      this.eventAggregator.subscribe(AuthenticationStateEvent.LOGIN, async () => {
+        await this.updateSolution();
+
+        this.startPolling();
       }),
     ];
 
@@ -314,11 +321,19 @@ export class SolutionExplorerSolution {
       // In the future we can maybe display a small icon indicating the error.
       if (isError(error, UnauthorizedError)) {
         this.notificationService.showNotification(NotificationType.ERROR, 'You need to login to list process models.');
+
+        this.sortedDiagramsOfSolutions = [];
+        this.openedSolution = undefined;
+        this.stopPolling();
       } else if (isError(error, ForbiddenError)) {
         this.notificationService.showNotification(
           NotificationType.ERROR,
           "You don't have the required permissions to list process models.",
         );
+
+        this.sortedDiagramsOfSolutions = [];
+        this.openedSolution = undefined;
+        this.stopPolling();
       } else {
         this.openedSolution.diagrams = undefined;
         this.fontAwesomeIconClass = 'fa-bolt';
@@ -778,13 +793,25 @@ export class SolutionExplorerSolution {
       return;
     }
 
+    this.isPolling = true;
+
     this.refreshTimeoutTask = setTimeout(async () => {
       await this.updateSolution();
 
-      if (this.isAttached) {
+      if (this.isAttached && this.isPolling) {
         this.startPolling();
       }
     }, environment.processengine.solutionExplorerPollingIntervalInMs);
+  }
+
+  private stopPolling(): void {
+    if (this.displayedSolutionEntry.isOpenDiagramService) {
+      return;
+    }
+
+    this.isPolling = false;
+
+    clearTimeout(this.refreshTimeoutTask);
   }
 
   // TODO: This method is copied all over the place.
