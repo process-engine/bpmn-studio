@@ -86,6 +86,11 @@ export class TaskList {
       }),
     ];
 
+    this.dashboardService.eventAggregator.publish(
+      environment.events.configPanel.solutionEntryChanged,
+      this.activeSolutionEntry,
+    );
+
     await this.updateTasks();
 
     this.isAttached = true;
@@ -130,7 +135,7 @@ export class TaskList {
       return;
     }
 
-    if (this.updatePromise) {
+    if (this.updatePromise && this.isAttached) {
       this.updatePromise.cancel();
     }
 
@@ -161,7 +166,7 @@ export class TaskList {
       return;
     }
 
-    if (this.updatePromise) {
+    if (this.updatePromise && this.isAttached) {
       this.updatePromise.cancel();
     }
 
