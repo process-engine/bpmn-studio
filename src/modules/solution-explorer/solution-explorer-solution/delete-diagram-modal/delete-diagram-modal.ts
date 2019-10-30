@@ -13,6 +13,7 @@ import {IEventFunction, ISolutionService, NotificationType} from '../../../../co
 import {NotificationService} from '../../../../services/notification-service/notification.service';
 import {OpenDiagramsSolutionExplorerService} from '../../../../services/solution-explorer-services/open-diagrams-solution-explorer.service';
 import {OpenDiagramStateService} from '../../../../services/solution-explorer-services/open-diagram-state.service';
+import {solutionIsRemoteSolution} from '../../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 
 @inject('NotificationService', 'OpenDiagramStateService', Router, 'OpenDiagramService', 'SolutionService')
 export class DeleteDiagramModal {
@@ -108,7 +109,7 @@ export class DeleteDiagramModal {
             .find((diagram: IDiagram, index: number) => index === previousOrNextDiagramIndex)
         : undefined;
 
-      const diagramIsDeployed: boolean = this.diagram.uri.startsWith('http');
+      const diagramIsDeployed: boolean = solutionIsRemoteSolution(this.diagram.uri);
 
       if (diagramIsDeployed || !diagramToNavigateTo) {
         this.router.navigateToRoute('start-page');

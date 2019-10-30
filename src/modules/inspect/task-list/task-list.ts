@@ -12,6 +12,7 @@ import {AuthenticationStateEvent, ISolutionEntry, ISolutionService} from '../../
 import environment from '../../../environment';
 import {IDashboardService, TaskList as SuspendedTaskList, TaskListEntry} from '../dashboard/contracts/index';
 import {Pagination} from '../../pagination/pagination';
+import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 
 interface ITaskListRouteParameters {
   processInstanceId?: string;
@@ -65,7 +66,7 @@ export class TaskList {
       this.activeSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
     }
 
-    const activeSolutionUriIsNotRemote: boolean = !this.activeSolutionUri.startsWith('http');
+    const activeSolutionUriIsNotRemote: boolean = !solutionIsRemoteSolution(this.activeSolutionUri);
     if (activeSolutionUriIsNotRemote) {
       this.activeSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
     }
@@ -131,7 +132,7 @@ export class TaskList {
     newActiveSolutionEntry: ISolutionEntry,
     previousActiveSolutioEntry: ISolutionEntry,
   ): Promise<void> {
-    if (!newActiveSolutionEntry.uri.includes('http')) {
+    if (!solutionIsRemoteSolution(newActiveSolutionEntry.uri)) {
       return;
     }
 

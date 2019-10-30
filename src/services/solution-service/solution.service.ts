@@ -4,6 +4,7 @@ import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 
 import {ISolutionEntry, ISolutionService} from '../../contracts';
 import {SolutionExplorerServiceFactory} from '../solution-explorer-services/solution-explorer-service-factory';
+import {solutionIsRemoteSolution} from '../solution-is-remote-solution-module/solution-is-remote-solution.module';
 
 @inject('SolutionExplorerServiceFactory')
 export class SolutionService implements ISolutionService {
@@ -24,7 +25,7 @@ export class SolutionService implements ISolutionService {
     }
 
     openedSolutions.forEach(async (solution: ISolutionEntry) => {
-      const solutionIsRemote: boolean = solution.uri.startsWith('http');
+      const solutionIsRemote: boolean = solutionIsRemoteSolution(solution.uri);
 
       solution.service = solutionIsRemote
         ? await this.serviceFactory.newManagementApiSolutionExplorer()
@@ -70,7 +71,7 @@ export class SolutionService implements ISolutionService {
 
   public getRemoteSolutionEntries(): Array<ISolutionEntry> {
     const remoteEntries: Array<ISolutionEntry> = this.allSolutionEntries.filter((entry: ISolutionEntry) => {
-      return entry.uri.startsWith('http');
+      return solutionIsRemoteSolution(entry.uri);
     });
 
     return remoteEntries;

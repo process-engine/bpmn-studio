@@ -16,6 +16,7 @@ import environment from '../../environment';
 import {NotificationService} from '../../services/notification-service/notification.service';
 import {DiagramDetail} from './diagram-detail/diagram-detail';
 import {OpenDiagramStateService} from '../../services/solution-explorer-services/open-diagram-state.service';
+import {solutionIsRemoteSolution} from '../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 
 export interface IDesignRouteParameters {
   view?: string;
@@ -119,8 +120,7 @@ export class Design {
         this.activeSolutionEntry.identity,
       );
 
-      const solutionIsRemote: boolean = this.activeSolutionEntry.uri.startsWith('http');
-      if (solutionIsRemote) {
+      if (solutionIsRemoteSolution(this.activeSolutionEntry.uri)) {
         if (isRunningInElectron) {
           this.ipcRenderer.send('menu_hide-diagram-entries');
         }
@@ -366,7 +366,7 @@ export class Design {
         return diagram.name === diagramName && (diagram.uri === diagramUri || diagramUri === undefined);
       });
 
-      const diagramIsSavedOnRemoteSolution: boolean = persistedActiveDiagram.uri.startsWith('http');
+      const diagramIsSavedOnRemoteSolution: boolean = solutionIsRemoteSolution(persistedActiveDiagram.uri);
       const diagramIsSavedOnLocalSolution: boolean =
         !persistedActiveDiagram.uri.startsWith('about:open-diagrams') && !diagramIsSavedOnRemoteSolution;
 
@@ -384,7 +384,7 @@ export class Design {
     } else {
       const diagram: IDiagram = await this.activeSolutionEntry.service.loadDiagram(diagramName);
       const diagramIsSavedOnLocalSolution: boolean =
-        !diagram.uri.startsWith('about:open-diagrams') && !diagram.uri.startsWith('http');
+        !diagram.uri.startsWith('about:open-diagrams') && !solutionIsRemoteSolution(diagram.uri);
 
       if (diagramIsSavedOnLocalSolution) {
         diagram.xml = fs.readFileSync(diagram.uri, 'utf8');

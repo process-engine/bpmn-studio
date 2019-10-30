@@ -21,6 +21,7 @@ import {SolutionExplorerList} from '../solution-explorer-list/solution-explorer-
 
 import {getPortListByVersion} from '../../../services/default-ports-module/default-ports.module';
 import {HttpFetchClient} from '../../fetch-http-client/http-fetch-client';
+import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 
 type RemoteSolutionListEntry = {
   uri: string;
@@ -639,7 +640,7 @@ export class SolutionExplorerPanel {
     const activeSolution: ISolutionEntry = this.solutionService.getSolutionEntryForUri(activeSolutionUri);
 
     const activeSolutionCanCreateDiagrams: boolean =
-      activeSolution !== undefined && !activeSolution.uri.startsWith('http');
+      activeSolution !== undefined && !solutionIsRemoteSolution(activeSolution.uri);
 
     const uri: string = activeSolutionCanCreateDiagrams ? activeSolutionUri : 'about:open-diagrams';
 

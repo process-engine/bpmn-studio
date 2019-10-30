@@ -36,6 +36,7 @@ import {OpenDiagramStateService} from '../../../services/solution-explorer-servi
 import {PropertyPanel} from '../property-panel/property-panel';
 import {DiagramExportService, DiagramPrintService} from './services/index';
 import {UserConfigService} from '../../../services/user-config-service/user-config.service';
+import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 
 const sideBarRightSize: number = 35;
 
@@ -510,7 +511,7 @@ export class BpmnIo {
       }
     }
 
-    this.solutionIsRemote = this.diagramUri.startsWith('http');
+    this.solutionIsRemote = solutionIsRemoteSolution(this.diagramUri);
     if (this.solutionIsRemote) {
       const viewerNotInitialized: boolean = this.viewer === undefined;
       if (viewerNotInitialized) {
