@@ -227,3 +227,55 @@ jobs:
       run: ./node_modules/.bin/ci_tools publish-npm-package --create-tag-from-branch-name
       env: 
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish_github:
+    name: "Publish GitHub Release"
+    needs: prepare_and_tag_version
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@master
+
+    #- name: Extract branch name
+    #  shell: bash
+    #  run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
+    #  id: extract_branch
+
+    - name: Use Node.js 10.x
+      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      uses: actions/setup-node@v1
+      with:
+        node-version: 10.x
+
+    - name: Unstash package.json
+      if: success()
+      uses: actions/download-artifact@master
+      with:
+        name: package_json
+        path: "."
+#
+    #- name: Unstash macOS Electron app
+    #  uses: actions/download-artifact@master
+    #  with:
+    #    name: dist_electron_macos
+    #    path: ".dist/electron"
+    #
+    #- name: Unstash Windows Electron app
+    #  uses: actions/download-artifact@master
+    #  with:
+    #    name: dist_electron_windows
+    #    path: ".dist/electron"
+#
+    #- name: Install ci tools
+    #  run: npm i @process-engine/ci_tools
+#
+    #- name: Upload to GitHub
+    #  run: |
+    #    ./node_modules/.bin/ci_tools update-github-release \
+    #                          --assets dist/electron/bpmn-studio-setup-*.exe \
+    #                          --assets dist/electron/bpmn-studio-setup-*.exe.blockmap \
+    #                          --assets dist/electron/bpmn-studio-setup-*.zip \
+    #                          --assets dist/electron/bpmn-studio-setup-*.dmg \
+    #                          --assets dist/electron/bpmn-studio-setup-*.dmg.blockmap \
+    #                          --assets dist/electron/latest-mac.yml \
+    #                          --assets dist/electron/latest.yml
+#
