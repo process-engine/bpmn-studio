@@ -42,6 +42,7 @@ export class BasicsSection implements ISection {
   public newEnumValueIds: Array<string> = [];
   public newEnumValueNames: Array<string> = [];
   public booleanDefaultValue: boolean;
+  public booleanDefaultValueString: string;
 
   private bpmnModdle: IBpmnModdle;
   private modeler: IBpmnModeler;
@@ -220,10 +221,22 @@ export class BasicsSection implements ISection {
     this.publishDiagramChange();
   }
 
+  public updateBooleanDefaultValue(): void {
+    this.booleanDefaultValueString = this.booleanDefaultValue.toString();
+
+    this.updateDefaultValue();
+  }
+
+  public updateBooleanDefaultValueString(): void {
+    this.booleanDefaultValue = this.booleanDefaultValueString === 'true' || this.booleanDefaultValueString === '1';
+
+    this.updateDefaultValue();
+  }
+
   public updateDefaultValue(): void {
     const selectedTypeIsBoolean: boolean = this.selectedType === FormfieldTypes.boolean;
     if (selectedTypeIsBoolean) {
-      this.formElement.fields[this.selectedIndex].defaultValue = `${this.booleanDefaultValue}`;
+      this.formElement.fields[this.selectedIndex].defaultValue = `${this.booleanDefaultValueString}`;
     } else {
       this.formElement.fields[this.selectedIndex].defaultValue = this.selectedForm.defaultValue;
     }
@@ -483,7 +496,8 @@ export class BasicsSection implements ISection {
 
     const selectedTypeIsBoolean: boolean = this.selectedType === FormfieldTypes.boolean;
     if (selectedTypeIsBoolean) {
-      this.booleanDefaultValue = this.selectedForm.defaultValue === 'true' || this.selectedForm.defaultValue === '1';
+      this.booleanDefaultValueString = this.selectedForm.defaultValue;
+      this.booleanDefaultValue = this.booleanDefaultValueString === 'true' || this.booleanDefaultValueString === '1';
     }
 
     return formsWithId;
