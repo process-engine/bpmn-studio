@@ -7,8 +7,9 @@ RUN apk add --no-cache tini python make g++ supervisor
 COPY Docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Copy & extract tarball
-COPY 'bpmn-studio.tar.gz' ./
-RUN tar zxvf bpmn-studio.tar.gz
+RUN mkdir 'bpmn-studio'
+COPY 'bpmn-studio.tar.gz' ./bpmn-studio
+RUN cd bpmn-studio && tar zxvf bpmn-studio.tar.gz && rm bpmn-studio.tar.gz
 
 # Install process engine
 FROM base as process_engine
@@ -24,7 +25,7 @@ FROM process_engine as bpmn_studio
 
 ARG BPMN_STUDIO_VERSION
 
-RUN npm link
+RUN cd bpmn-studio && npm link
 
 # Create release
 FROM bpmn_studio as release
