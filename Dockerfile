@@ -7,28 +7,18 @@ RUN apk add --no-cache tini python make g++ supervisor
 COPY Docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Copy & extract tarball
-RUN mkdir 'bpmn-studio'
+RUN mkdir bpmn-studio
 COPY 'bpmn-studio.tar.gz' ./bpmn-studio
 RUN cd bpmn-studio && tar zxvf bpmn-studio.tar.gz && rm bpmn-studio.tar.gz
 
-# Install process engine
-FROM base as process_engine
+# Rebuild
+RUN cd bpmn-studio && npm run electron-rebuild && npm run electron-rebuild-sqlite-forced
 
-ARG PROCESS_ENGINE_VERSION
-# Hack to compromise priviliges error https://github.com/npm/npm/issues/17851
-RUN npm config set user 0 &&\
-    npm config set unsafe-perm true
-RUN npm install -g @process-engine/process_engine_runtime@${PROCESS_ENGINE_VERSION}
-
-# Install bpmn studio
-FROM process_engine as bpmn_studio
-
-ARG BPMN_STUDIO_VERSION
-
+# Install Studio
 RUN cd bpmn-studio && npm link
 
-# Create release
-FROM bpmn_studio as release
+# Install ProcessEngine
+RUN cd bpmn-studio/node_modules/@process-engine/process_engine_runtime && npm link
 
 EXPOSE 8000 9000
 ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
