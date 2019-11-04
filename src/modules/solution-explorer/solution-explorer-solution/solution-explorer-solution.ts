@@ -31,6 +31,7 @@ import {DeleteDiagramModal} from './delete-diagram-modal/delete-diagram-modal';
 import {DeployDiagramService} from '../../../services/deploy-diagram-service/deploy-diagram.service';
 import {SaveDiagramService} from '../../../services/save-diagram-service/save-diagram.service';
 import {HttpFetchClient} from '../../fetch-http-client/http-fetch-client';
+import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 
 const ENTER_KEY: string = 'Enter';
 const ESCAPE_KEY: string = 'Escape';
@@ -194,12 +195,11 @@ export class SolutionExplorerSolution {
       }
     }
 
-    const solutionIsRemoteSolution: boolean = this.displayedSolutionEntry.uri.startsWith('http');
-    if (solutionIsRemoteSolution && (window as any).nodeRequire) {
+    if (solutionIsRemoteSolution(this.displayedSolutionEntry.uri) && (window as any).nodeRequire) {
       this.ipcRenderer.on('menubar__start_close_diagram', this.closeDiagramEventFunction);
     }
 
-    if (this.displayedSolutionEntry.uri.startsWith('http')) {
+    if (solutionIsRemoteSolution(this.displayedSolutionEntry.uri)) {
       await this.waitForProcessEngine();
     } else {
       this.processEngineRunning = true;
@@ -343,7 +343,7 @@ export class SolutionExplorerSolution {
   }
 
   private async updateSolutionEntry(): Promise<void> {
-    const solutionIsNotRemote: boolean = !this.displayedSolutionEntry.uri.startsWith('http');
+    const solutionIsNotRemote: boolean = !solutionIsRemoteSolution(this.displayedSolutionEntry.uri);
     if (solutionIsNotRemote) {
       return;
     }
@@ -692,8 +692,7 @@ export class SolutionExplorerSolution {
       return;
     }
 
-    const solutionIsRemoteSolution: boolean = this.displayedSolutionEntry.uri.startsWith('http');
-    if (solutionIsRemoteSolution) {
+    if (solutionIsRemoteSolution(this.displayedSolutionEntry.uri)) {
       this.router.navigateToRoute('start-page');
     } else {
       this.closeDiagram(this.activeDiagram);
@@ -1422,8 +1421,7 @@ export class SolutionExplorerSolution {
         this.activeDiagram = activeSolution.diagrams.find((diagram: IDiagram) => {
           const currentDiagramIsGivenDiagram: boolean = diagram.uri === diagramUri;
 
-          const solutionIsRemoteSolution: boolean = solutionUri.startsWith('http');
-          const diagramIsInGivenSolution: boolean = solutionIsRemoteSolution
+          const diagramIsInGivenSolution: boolean = solutionIsRemoteSolution(solutionUri)
             ? diagram.uri.includes(solutionUri)
             : diagram.uri.includes(`${solutionUri}/${diagram.name}.bpmn`);
 
@@ -1503,6 +1501,6 @@ export class SolutionExplorerSolution {
   }
 
   private isUriFromRemoteSolution(uri: string): boolean {
-    return uri.startsWith('http');
+    return solutionIsRemoteSolution(uri);
   }
 }

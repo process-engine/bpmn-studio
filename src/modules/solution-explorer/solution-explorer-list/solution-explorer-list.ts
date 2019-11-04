@@ -23,6 +23,7 @@ import {SolutionExplorerServiceFactory} from '../../../services/solution-explore
 import {SolutionExplorerSolution} from '../solution-explorer-solution/solution-explorer-solution';
 import {exposeFunctionForTesting} from '../../../services/expose-functionality-module/expose-functionality.module';
 import {HttpFetchClient} from '../../fetch-http-client/http-fetch-client';
+import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 
 interface IUriToViewModelMap {
   [key: string]: SolutionExplorerSolution;
@@ -47,6 +48,8 @@ export class SolutionExplorerList {
    * This service is also put inside the map.
    */
   public openDiagramService: OpenDiagramsSolutionExplorerService;
+
+  public checkIfSolutionIsRemoteSolution: (solutionUri: string) => boolean = solutionIsRemoteSolution;
 
   /*
    * Keep a seperate map of all viewmodels for the solutions entries.
@@ -200,7 +203,7 @@ export class SolutionExplorerList {
   public async openSolution(uri: string, insertAtBeginning: boolean = false, identity?: IIdentity): Promise<void> {
     this.solutionsToOpen.push(uri);
 
-    const uriIsRemote: boolean = uri.startsWith('http');
+    const uriIsRemote: boolean = solutionIsRemoteSolution(uri);
 
     let solutionExplorer: ISolutionExplorerService;
 
@@ -447,7 +450,7 @@ export class SolutionExplorerList {
   }
 
   public getSolutionName(solutionUri: string): string {
-    const solutionIsRemote: boolean = solutionUri.startsWith('http');
+    const solutionIsRemote: boolean = solutionIsRemoteSolution(solutionUri);
     if (solutionIsRemote) {
       return solutionUri;
     }
@@ -472,7 +475,7 @@ export class SolutionExplorerList {
   }
 
   public solutionEntryIsRemote(solutionEntry: ISolutionEntry): boolean {
-    return solutionEntry.uri.startsWith('http');
+    return solutionIsRemoteSolution(solutionEntry.uri);
   }
 
   /*
@@ -501,7 +504,7 @@ export class SolutionExplorerList {
           return 1;
         }
 
-        return solutionA.uri.startsWith('http') && !solutionB.uri.startsWith('http') ? 1 : -1;
+        return solutionIsRemoteSolution(solutionA.uri) && !solutionIsRemoteSolution(solutionB.uri) ? 1 : -1;
       },
     );
 
@@ -539,7 +542,7 @@ export class SolutionExplorerList {
   }
 
   private getFontAwesomeIconForSolution(service: ISolutionExplorerService, uri: string): string {
-    const solutionIsOpenedFromRemote: boolean = uri.startsWith('http');
+    const solutionIsOpenedFromRemote: boolean = solutionIsRemoteSolution(uri);
     if (solutionIsOpenedFromRemote) {
       return 'fa-database';
     }
@@ -553,7 +556,7 @@ export class SolutionExplorerList {
   }
 
   private canCreateNewDiagramsInSolution(service: ISolutionExplorerService, uri: string): boolean {
-    const solutionIsNotOpenedFromRemote: boolean = !uri.startsWith('http');
+    const solutionIsNotOpenedFromRemote: boolean = !solutionIsRemoteSolution(uri);
     const solutionIsNotOpenDiagrams: boolean = service !== this.openDiagramService;
 
     return solutionIsNotOpenedFromRemote && solutionIsNotOpenDiagrams;
@@ -681,7 +684,7 @@ export class SolutionExplorerList {
   }
 
   private async getAuthorityForSolution(solutionUri: string): Promise<string> {
-    const solutionIsNotRemote: boolean = !solutionUri.startsWith('http');
+    const solutionIsNotRemote: boolean = !solutionIsRemoteSolution(solutionUri);
 
     if (solutionIsNotRemote) {
       return undefined;

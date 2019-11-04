@@ -15,6 +15,7 @@ import {NotificationService} from '../../../services/notification-service/notifi
 import environment from '../../../environment';
 import {IDashboardService} from '../dashboard/contracts';
 import {Pagination} from '../../pagination/pagination';
+import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 
 @inject('DashboardService', 'NotificationService', 'SolutionService', Router)
 export class ProcessList {
@@ -63,7 +64,7 @@ export class ProcessList {
     newActiveSolutionEntry: ISolutionEntry,
     previousActiveSolutionEntry: ISolutionEntry,
   ): Promise<void> {
-    if (!newActiveSolutionEntry.uri.includes('http')) {
+    if (!solutionIsRemoteSolution(newActiveSolutionEntry.uri)) {
       return;
     }
 
@@ -134,7 +135,7 @@ export class ProcessList {
       this.activeSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
     }
 
-    const activeSolutionUriIsNotRemote: boolean = !this.activeSolutionUri.startsWith('http');
+    const activeSolutionUriIsNotRemote: boolean = !solutionIsRemoteSolution(this.activeSolutionUri);
     if (activeSolutionUriIsNotRemote) {
       this.activeSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
     }

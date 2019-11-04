@@ -8,6 +8,7 @@ import {ISolutionEntry, ISolutionService, InspectPanelTab, NotificationType} fro
 import environment from '../../environment';
 import {NotificationService} from '../../services/notification-service/notification.service';
 import {Dashboard} from './dashboard/dashboard';
+import {solutionIsRemoteSolution} from '../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 
 interface IInspectRouteParameters {
   view?: string;
@@ -176,7 +177,7 @@ export class Inspect {
       this.activeSolutionEntry.identity,
     );
 
-    const solutionIsRemote: boolean = solutionUriToUse.startsWith('http');
+    const solutionIsRemote: boolean = solutionIsRemoteSolution(solutionUriToUse);
     if (solutionIsRemote) {
       this.eventAggregator.publish(
         environment.events.configPanel.solutionEntryChanged,
