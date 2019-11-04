@@ -232,6 +232,7 @@ pipeline {
       steps {
         script {
           unstash('package_json')
+          unstash('bpmn-studio.tar.gz')
 
 
           script {
