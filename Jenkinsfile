@@ -211,6 +211,13 @@ pipeline {
         }
       }
     }
+    stage('Create Tarball') {
+      steps {
+        sh('npm run create-tarball')
+
+        stash('bpmn-studio.tar.gz')
+      }
+    }
     stage('Build Docker') {
       when {
         allOf {
