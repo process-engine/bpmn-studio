@@ -37,9 +37,9 @@ HEALTHCHECK --interval=5s \
             CMD curl -f http://127.0.0.1:9000 || exit 1
 
 ARG BUILD_DATE
-ARG PROCESS_ENGINE_VERSION
+ARG BPMN_STUDIO_VERSION
 
-LABEL de.5minds.version=${PROCESS_ENGINE_VERSION} \
+LABEL de.5minds.version=${BPMN_STUDIO_VERSION} \
       de.5minds.release-date=${BUILD_DATE} \
       vendor="5Minds IT-Solutions GmbH & Co. KG" \
       maintainer="5Minds IT-Solutions GmbH & Co. KG"
