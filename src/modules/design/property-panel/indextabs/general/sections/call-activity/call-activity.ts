@@ -247,7 +247,13 @@ export class CallActivitySection implements ISection {
       return undefined;
     }
 
-    return propertiesElement.values.find((value: IPropertiesElement) => value.name === 'startEventId').value;
+    const startEventIdProperty: IProperty = propertiesElement.values.find(
+      (value: IPropertiesElement) => value.name === 'startEventId',
+    );
+
+    const startEventIdIsConfigured: boolean = startEventIdProperty !== undefined;
+
+    return startEventIdIsConfigured ? startEventIdProperty.value : undefined;
   }
 
   private getPayload(): string | undefined {
