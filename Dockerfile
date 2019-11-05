@@ -8,19 +8,22 @@ RUN apk update && apk upgrade && \
 
 COPY Docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Copy & extract tarball
+# Set Workdir
 RUN mkdir bpmn-studio
-COPY 'bpmn-studio.tar.gz' ./bpmn-studio
-RUN cd bpmn-studio && tar zxvf bpmn-studio.tar.gz && rm bpmn-studio.tar.gz
+WORKDIR /bpmn-studio
+
+# Copy & extract tarball
+COPY 'bpmn-studio.tar.gz' ./
+RUN tar zxvf bpmn-studio.tar.gz && rm bpmn-studio.tar.gz
 
 # Rebuild
-RUN cd bpmn-studio && npm run electron-rebuild-sqlite-forced
+RUN npm run electron-rebuild-sqlite-forced
 
 # Install Studio
-RUN cd bpmn-studio && npm link
+RUN npm link
 
 # Install ProcessEngine
-RUN cd bpmn-studio/node_modules/@process-engine/process_engine_runtime && npm link
+RUN cd node_modules/@process-engine/process_engine_runtime && npm link
 
 EXPOSE 8000 9000
 ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
