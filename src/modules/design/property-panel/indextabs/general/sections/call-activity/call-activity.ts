@@ -102,6 +102,10 @@ export class CallActivitySection implements ISection {
   }
 
   public selectedStartEventChanged(newValue, oldValue): void {
+    if (newValue === undefined || oldValue === undefined) {
+      return;
+    }
+
     this.publishDiagramChange();
 
     const noExtensionsElements =
