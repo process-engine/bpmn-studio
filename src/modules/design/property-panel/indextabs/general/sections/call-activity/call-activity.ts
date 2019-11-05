@@ -243,7 +243,6 @@ export class CallActivitySection implements ISection {
     const propertiesElement = this.getPropertiesElement();
 
     const propertiesElementExists: boolean = propertiesElement !== undefined;
-
     if (!propertiesElementExists) {
       return undefined;
     }
