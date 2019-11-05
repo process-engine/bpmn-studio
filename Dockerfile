@@ -3,7 +3,9 @@ ARG NODE_IMAGE_VERSION=
 # Create base image
 FROM node:${NODE_IMAGE_VERSION} as base
 
-RUN apk add --no-cache tini python make g++ supervisor
+RUN apk update && apk upgrade && \
+    apk add --no-cache tini python make g++ git supervisor
+
 COPY Docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Copy & extract tarball
