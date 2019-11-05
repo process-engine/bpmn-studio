@@ -32,6 +32,10 @@ export class StartPage {
     }
   }
 
+  public get showShortcuts(): boolean {
+    return isRunningInElectron();
+  }
+
   public openLocalSolution(): void {
     this.eventAggregator.publish(environment.events.startPage.openLocalSolution);
   }

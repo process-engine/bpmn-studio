@@ -4,21 +4,21 @@
     <div class="start-page__content">
       <h3 class="start-page__title">Welcome to BPMN Studio!</h3>
       <img class="start-page__icon" src="src/resources/images/icon.png">
-      <div class="start-page__quick-start" show.bind="isRunningInElectron">
+      <div class="start-page__quick-start" show.bind="showShortcuts">
         <div class="quick-start__item">
           <div class="quick-start__topic" click.delegate="openDiagram()">Open Diagram</div>
-          <div show.bind="isRunningInElectron && isRunningOnMacOS" class="quick-start__shortcut">⌘ + O</div>
-          <div show.bind="isRunningInElectron && isRunningOnWindows" class="quick-start__shortcut">Strg + O</div>
+          <div show.bind="showShortcuts && isRunningOnMacOS" class="quick-start__shortcut">⌘ + O</div>
+          <div show.bind="showShortcuts && isRunningOnWindows" class="quick-start__shortcut">Strg + O</div>
         </div>
         <div class="quick-start__item">
           <div class="quick-start__topic" click.delegate="openLocalSolution()">Open Solution</div>
-          <div show.bind="isRunningInElectron && isRunningOnMacOS" class="quick-start__shortcut">⌘ + ⇧ + O</div>
-          <div show.bind="isRunningInElectron && isRunningOnWindows" class="quick-start__shortcut">Strg + Shift + O</div>
+          <div show.bind="showShortcuts && isRunningOnMacOS" class="quick-start__shortcut">⌘ + ⇧ + O</div>
+          <div show.bind="showShortcuts && isRunningOnWindows" class="quick-start__shortcut">Strg + Shift + O</div>
         </div>
         <div class="quick-start__item">
           <div class="quick-start__topic" click.delegate="createNewDiagram()" data-test-create-new-diagram>New Diagram</div>
-          <div show.bind="isRunningInElectron && isRunningOnMacOS" class="quick-start__shortcut">⌘ + N</div>
-          <div show.bind="isRunningInElectron && isRunningOnWindows" class="quick-start__shortcut">Strg + N</div>
+          <div show.bind="showShortcuts && isRunningOnMacOS" class="quick-start__shortcut">⌘ + N</div>
+          <div show.bind="showShortcuts && isRunningOnWindows" class="quick-start__shortcut">Strg + N</div>
         </div>
       </div>
     </div>
