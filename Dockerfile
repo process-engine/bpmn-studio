@@ -25,7 +25,7 @@ ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.co
 
 HEALTHCHECK --interval=5s \
             --timeout=5s \
-            CMD curl -f http://127.0.0.1:9000 || exit 1
+            CMD curl -f http://127.0.0.1:9000 && curl -f http://127.0.0.1:8000 || exit 1
 
 ARG BUILD_DATE
 ARG BPMN_STUDIO_VERSION
