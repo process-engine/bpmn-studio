@@ -2,10 +2,10 @@ import {EventAggregator} from 'aurelia-event-aggregator';
 import {inject} from 'aurelia-framework';
 
 import environment from '../../environment';
+import {isRunningInElectron} from '../../services/is-running-in-electron-module/is-running-in-electron.module';
 
 @inject(EventAggregator)
 export class StartPage {
-  public isRunningInElectron: boolean = (window as any).nodeRequire;
   public isRunningOnWindows: boolean = false;
   public isRunningOnMacOS: boolean = false;
 
@@ -17,7 +17,7 @@ export class StartPage {
   }
 
   public activate(): void {
-    if (this.isRunningInElectron) {
+    if (isRunningInElectron()) {
       this.isRunningOnWindows = process.platform === 'win32';
       this.isRunningOnMacOS = process.platform === 'darwin';
 
@@ -27,9 +27,13 @@ export class StartPage {
   }
 
   public deactivate(): void {
-    if (this.isRunningInElectron) {
+    if (isRunningInElectron()) {
       this.ipcRenderer.removeListener('menubar__start_close_diagram', this.closeBpmnStudio);
     }
+  }
+
+  public get showShortcuts(): boolean {
+    return isRunningInElectron();
   }
 
   public openLocalSolution(): void {

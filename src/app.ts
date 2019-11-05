@@ -15,6 +15,7 @@ import environment from './environment';
 import {NotificationService} from './services/notification-service/notification.service';
 
 import {oidcConfig} from './open-id-connect-configuration';
+import {isRunningInElectron} from './services/is-running-in-electron-module/is-running-in-electron.module';
 
 Bluebird.Promise.config({cancellation: true});
 
@@ -40,7 +41,7 @@ export class App {
     this.notificationService = notificationService;
     this.eventAggregator = eventAggregator;
 
-    if (this.isRunningInElectron) {
+    if (isRunningInElectron()) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
 
       this.ipcRenderer.on('database-export-error', (event: Event, errorMessage: string) => {
@@ -55,7 +56,7 @@ export class App {
     this.preventDefaultBehaviour = (event: Event): boolean => {
       event.preventDefault();
 
-      if (!this.isRunningInElectron) {
+      if (!isRunningInElectron()) {
         this.notificationService.showNotification(
           NotificationType.INFO,
           'Drag-and-Drop is currently only available for the Electron application.',
@@ -113,7 +114,7 @@ export class App {
       oidcConfig.userManagerSettings.authority = openIdConnectRoute;
     }
 
-    if (this.isRunningInElectron) {
+    if (isRunningInElectron()) {
       this.ipcRenderer.on('menubar__open_preferences', this.openPreferences);
     }
   }
@@ -129,10 +130,6 @@ export class App {
     this.router.navigateToRoute('preferences');
   };
 
-  private get isRunningInElectron(): boolean {
-    return Boolean((window as any).nodeRequire);
-  }
-
   private disposeAllSubscriptions(): void {
     this.subscriptions.forEach((subscription: Subscription) => {
       subscription.dispose();
@@ -140,7 +137,7 @@ export class App {
   }
 
   public configureRouter(config: RouterConfiguration, router: Router): void {
-    if (!this.isRunningInElectron) {
+    if (!isRunningInElectron()) {
       config.options.pushState = true;
       config.options.baseRoute = '/';
     }

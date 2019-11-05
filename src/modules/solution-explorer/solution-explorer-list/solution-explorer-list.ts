@@ -24,6 +24,7 @@ import {SolutionExplorerSolution} from '../solution-explorer-solution/solution-e
 import {exposeFunctionForTesting} from '../../../services/expose-functionality-module/expose-functionality.module';
 import {HttpFetchClient} from '../../fetch-http-client/http-fetch-client';
 import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
+import {isRunningInElectron} from '../../../services/is-running-in-electron-module/is-running-in-electron.module';
 
 interface IUriToViewModelMap {
   [key: string]: SolutionExplorerSolution;
@@ -90,7 +91,7 @@ export class SolutionExplorerList {
     this.openDiagramService = openDiagramService;
     this.httpFetchClient = httpFetchClient;
 
-    const canReadFromFileSystem: boolean = (window as any).nodeRequire;
+    const canReadFromFileSystem: boolean = isRunningInElectron();
     if (canReadFromFileSystem) {
       this.createOpenDiagramServiceEntry();
     }

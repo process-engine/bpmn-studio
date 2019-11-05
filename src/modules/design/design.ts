@@ -17,6 +17,7 @@ import {NotificationService} from '../../services/notification-service/notificat
 import {DiagramDetail} from './diagram-detail/diagram-detail';
 import {OpenDiagramStateService} from '../../services/solution-explorer-services/open-diagram-state.service';
 import {solutionIsRemoteSolution} from '../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
+import {isRunningInElectron} from '../../services/is-running-in-electron-module/is-running-in-electron.module';
 
 export interface IDesignRouteParameters {
   view?: string;
@@ -103,8 +104,7 @@ export class Design {
     const navigateToAnotherDiagram: boolean =
       diagramNamesAreDifferent || diagramUrisAreDifferent || routeFromOtherView || solutionIsDifferent;
 
-    const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
-    if (isRunningInElectron) {
+    if (isRunningInElectron()) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
     }
 
@@ -121,12 +121,12 @@ export class Design {
       );
 
       if (solutionIsRemoteSolution(this.activeSolutionEntry.uri)) {
-        if (isRunningInElectron) {
+        if (isRunningInElectron()) {
           this.ipcRenderer.send('menu_hide-diagram-entries');
         }
 
         this.eventAggregator.publish(environment.events.configPanel.solutionEntryChanged, this.activeSolutionEntry);
-      } else if (isRunningInElectron) {
+      } else if (isRunningInElectron()) {
         this.ipcRenderer.send('menu_show-all-menu-entries');
       }
 
@@ -211,8 +211,7 @@ export class Design {
       }),
     ];
 
-    const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
-    if (isRunningInElectron) {
+    if (isRunningInElectron()) {
       this.ipcRenderer.send('menu_show-all-menu-entries');
     }
 
@@ -223,8 +222,7 @@ export class Design {
     this.eventAggregator.publish(environment.events.statusBar.hideDiagramViewButtons);
     this.subscriptions.forEach((subscription: Subscription) => subscription.dispose());
 
-    const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
-    if (isRunningInElectron) {
+    if (isRunningInElectron()) {
       this.ipcRenderer.send('menu_hide-diagram-entries');
     }
   }

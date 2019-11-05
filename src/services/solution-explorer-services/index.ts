@@ -9,6 +9,7 @@ import {DiagramTrashFolderService} from './diagram-trash-folder.service';
 import {OpenDiagramsSolutionExplorerService} from './open-diagrams-solution-explorer.service';
 import {OpenDiagramStateService} from './open-diagram-state.service';
 import {SolutionExplorerServiceFactory} from './solution-explorer-service-factory';
+import {isRunningInElectron} from '../is-running-in-electron-module/is-running-in-electron.module';
 
 export async function configure(config: FrameworkConfiguration): Promise<void> {
   registerManagementApi(config.container);
@@ -17,7 +18,7 @@ export async function configure(config: FrameworkConfiguration): Promise<void> {
   config.container.registerSingleton('DiagramTrashFolderService', DiagramTrashFolderService);
   config.container.registerSingleton('OpenDiagramStateService', OpenDiagramStateService);
 
-  if ((window as any).nodeRequire) {
+  if (isRunningInElectron()) {
     // only available if a filesystem is present
     registerFileSystem(config.container);
     config.container.registerSingleton('OpenDiagramService', OpenDiagramsSolutionExplorerService);

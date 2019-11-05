@@ -32,6 +32,7 @@ import {DeployDiagramService} from '../../../services/deploy-diagram-service/dep
 import {SaveDiagramService} from '../../../services/save-diagram-service/save-diagram.service';
 import {HttpFetchClient} from '../../fetch-http-client/http-fetch-client';
 import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
+import {isRunningInElectron} from '../../../services/is-running-in-electron-module/is-running-in-electron.module';
 
 const ENTER_KEY: string = 'Enter';
 const ESCAPE_KEY: string = 'Escape';
@@ -160,7 +161,7 @@ export class SolutionExplorerSolution {
 
   public async attached(): Promise<void> {
     this.isAttached = true;
-    if ((window as any).nodeRequire) {
+    if (isRunningInElectron()) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
     }
 
@@ -188,14 +189,14 @@ export class SolutionExplorerSolution {
 
       this.subscriptions.push(updateSubscription);
 
-      if ((window as any).nodeRequire) {
+      if (isRunningInElectron()) {
         this.ipcRenderer.on('menubar__start_close_diagram', this.closeDiagramEventFunction);
         this.ipcRenderer.on('menubar__start_close_all_diagrams', this.closeAllDiagramsEventFunction);
         this.ipcRenderer.on('menubar__start_save_all_diagrams', this.saveAllDiagramsEventFunction);
       }
     }
 
-    if (solutionIsRemoteSolution(this.displayedSolutionEntry.uri) && (window as any).nodeRequire) {
+    if (solutionIsRemoteSolution(this.displayedSolutionEntry.uri) && isRunningInElectron()) {
       this.ipcRenderer.on('menubar__start_close_diagram', this.closeDiagramEventFunction);
     }
 
@@ -1482,12 +1483,11 @@ export class SolutionExplorerSolution {
         await this.updateSolution();
 
         const isRemoteSolution: boolean = this.isUriFromRemoteSolution(this.openedSolution.uri);
-        const isRunningInElectron: boolean = (window as any).nodeRequire;
 
         let expectedDiagramUri: string;
         if (isRemoteSolution) {
           expectedDiagramUri = `${this.openedSolution.uri}/${input}.bpmn`;
-        } else if (isRunningInElectron) {
+        } else if (isRunningInElectron()) {
           expectedDiagramUri = join(this.openedSolution.uri, `${input}.bpmn`);
         }
 
