@@ -80,13 +80,9 @@ export class SolutionExplorerPanel {
     this.solutionService = solutionService;
     this.httpFetchClient = httpFetchClient;
 
-    if (this.canReadFromFileSystem) {
+    if (isRunningInElectron()) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
     }
-  }
-
-  public get canReadFromFileSystem(): boolean {
-    return isRunningInElectron();
   }
 
   public get connectionErrorExists(): boolean {
@@ -217,7 +213,7 @@ export class SolutionExplorerPanel {
   }
 
   public async attached(): Promise<void> {
-    if (this.canReadFromFileSystem) {
+    if (isRunningInElectron()) {
       this.registerElectronHooks();
       document.addEventListener('drop', this.openDiagramOnDropBehaviour);
     }
@@ -242,7 +238,7 @@ export class SolutionExplorerPanel {
   }
 
   public detached(): void {
-    if (this.canReadFromFileSystem) {
+    if (isRunningInElectron()) {
       this.removeElectronFileOpeningHooks();
       document.removeEventListener('drop', this.openDiagramOnDropBehaviour);
     }
@@ -334,7 +330,7 @@ export class SolutionExplorerPanel {
   }
 
   public async openDiagram(): Promise<void> {
-    const canNotReadFromFileSystem: boolean = !this.canReadFromFileSystem;
+    const canNotReadFromFileSystem: boolean = !isRunningInElectron();
     if (canNotReadFromFileSystem) {
       this.openDiagramInput.click();
 
@@ -356,7 +352,7 @@ export class SolutionExplorerPanel {
   }
 
   public async openSolution(): Promise<void> {
-    const canNotReadFromFileSystem: boolean = !this.canReadFromFileSystem;
+    const canNotReadFromFileSystem: boolean = !isRunningInElectron();
     if (canNotReadFromFileSystem) {
       this.solutionInput.click();
 
