@@ -12,7 +12,7 @@ COPY 'bpmn-studio.tar.gz' ./bpmn-studio
 RUN cd bpmn-studio && tar zxvf bpmn-studio.tar.gz && rm bpmn-studio.tar.gz
 
 # Rebuild
-RUN cd bpmn-studio && npm run electron-rebuild && npm run electron-rebuild-sqlite-forced
+RUN cd bpmn-studio && npm run electron-rebuild-sqlite-forced
 
 # Install Studio
 RUN cd bpmn-studio && npm link
