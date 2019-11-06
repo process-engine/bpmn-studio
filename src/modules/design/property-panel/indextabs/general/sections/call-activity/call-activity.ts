@@ -102,6 +102,10 @@ export class CallActivitySection implements ISection {
   }
 
   public selectedStartEventChanged(newValue, oldValue): void {
+    if (newValue === undefined || oldValue === undefined) {
+      return;
+    }
+
     this.publishDiagramChange();
 
     const noExtensionsElements =
@@ -239,12 +243,17 @@ export class CallActivitySection implements ISection {
     const propertiesElement = this.getPropertiesElement();
 
     const propertiesElementExists: boolean = propertiesElement !== undefined;
-
     if (!propertiesElementExists) {
       return undefined;
     }
 
-    return propertiesElement.values.find((value: IPropertiesElement) => value.name === 'startEventId').value;
+    const startEventIdProperty: IProperty = propertiesElement.values.find(
+      (value: IPropertiesElement) => value.name === 'startEventId',
+    );
+
+    const startEventIdIsConfigured: boolean = startEventIdProperty !== undefined;
+
+    return startEventIdIsConfigured ? startEventIdProperty.value : undefined;
   }
 
   private getPayload(): string | undefined {
@@ -258,6 +267,11 @@ export class CallActivitySection implements ISection {
     }
 
     const propertiesElement = this.getPropertiesElement();
+
+    const propertiesElementExists: boolean = propertiesElement !== undefined;
+    if (!propertiesElementExists) {
+      return undefined;
+    }
 
     const payloadProperty = propertiesElement.values.find((value: IPropertiesElement) => value.name === 'payload');
     return payloadProperty ? payloadProperty.value : undefined;
