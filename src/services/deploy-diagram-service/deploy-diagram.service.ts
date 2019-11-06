@@ -105,7 +105,7 @@ export class DeployDiagramService {
 
       this.eventAggregator.publish(environment.events.diagramDetail.onDiagramDeployed, processModelId);
     } catch (error) {
-      this.notificationService.showNotification(NotificationType.ERROR, `Unable to update diagram: ${error}.`);
+      this.notificationService.showNotification(NotificationType.ERROR, `Unable to update diagram: ${error}`);
     }
   }
 
