@@ -1,40 +1,34 @@
-ARG NODE_IMAGE_VERSION=
+ARG NODE_IMAGE_VERSION
 
 # Create base image
-FROM node:${NODE_IMAGE_VERSION} as base
+FROM node:${NODE_IMAGE_VERSION}
 
-RUN apk add --no-cache tini python make g++ supervisor
+RUN apk update && apk upgrade && \
+    apk add --no-cache make g++ git supervisor
+
 COPY Docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Install process engine
-FROM base as process_engine
+WORKDIR /bpmn-studio
 
-ARG PROCESS_ENGINE_VERSION
-# Hack to compromise priviliges error https://github.com/npm/npm/issues/17851
-RUN npm config set user 0 &&\
-    npm config set unsafe-perm true
-RUN npm install -g @process-engine/process_engine_runtime@${PROCESS_ENGINE_VERSION}
+ADD 'bpmn-studio.tar.gz' ./
 
-# Install bpmn studio
-FROM process_engine as bpmn_studio
-
-ARG BPMN_STUDIO_VERSION
-RUN npm install -g bpmn-studio@${BPMN_STUDIO_VERSION}
-
-# Create release
-FROM bpmn_studio as release
+RUN npm run electron-rebuild-sqlite-forced && \
+    npm prune --production && \
+    npm link --only=production && \
+    cd node_modules/@process-engine/process_engine_runtime && \
+    npm link --only=production
 
 EXPOSE 8000 9000
 ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
 HEALTHCHECK --interval=5s \
             --timeout=5s \
-            CMD curl -f http://127.0.0.1:9000 || exit 1
+            CMD curl -f http://127.0.0.1:9000 && curl -f http://127.0.0.1:8000 || exit 1
 
 ARG BUILD_DATE
-ARG PROCESS_ENGINE_VERSION
+ARG BPMN_STUDIO_VERSION
 
-LABEL de.5minds.version=${PROCESS_ENGINE_VERSION} \
+LABEL de.5minds.version=${BPMN_STUDIO_VERSION} \
       de.5minds.release-date=${BUILD_DATE} \
       vendor="5Minds IT-Solutions GmbH & Co. KG" \
       maintainer="5Minds IT-Solutions GmbH & Co. KG"
