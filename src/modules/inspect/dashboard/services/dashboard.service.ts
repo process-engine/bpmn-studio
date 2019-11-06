@@ -18,6 +18,8 @@ export class DashboardService implements IDashboardService {
   private dashboardRepository: IDashboardRepository;
   private managementApiClient: IManagementApiClient;
 
+  private activeSolutionEntry: ISolutionEntry;
+
   constructor(eventAggregator: EventAggregator, managementApiClient: IManagementApiClient) {
     this.eventAggregator = eventAggregator;
     this.managementApiClient = managementApiClient;
@@ -25,7 +27,10 @@ export class DashboardService implements IDashboardService {
     this.eventAggregator.subscribe(
       environment.events.configPanel.solutionEntryChanged,
       (solutionEntry: ISolutionEntry) => {
-        this.dashboardRepository = createDashboardRepository(managementApiClient, solutionEntry.processEngineVersion);
+        if (this.activeSolutionEntry !== solutionEntry) {
+          this.dashboardRepository = createDashboardRepository(managementApiClient, solutionEntry.processEngineVersion);
+          this.activeSolutionEntry = solutionEntry;
+        }
       },
     );
   }
