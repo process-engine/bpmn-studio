@@ -151,10 +151,6 @@ export class TaskList {
       newActiveSolutionEntry,
     );
 
-    if (this.getTasks === undefined) {
-      this.getTasks = this.getAllTasks;
-    }
-
     await this.updateTasks();
 
     this.setRuntimeSubscriptions();
