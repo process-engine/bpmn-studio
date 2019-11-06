@@ -43,7 +43,8 @@ export class TaskList {
   private subscriptions: Array<Subscription>;
   private tasks: Array<TaskListEntry> = [];
   private getTasks: (offset?: number, limit?: number) => Promise<SuspendedTaskList>;
-  private isAttached: boolean = false;
+
+  private isAttached: boolean;
 
   private updatePromise: any;
   private identitiyUsedForSubscriptions: IIdentity;
@@ -76,6 +77,8 @@ export class TaskList {
       this.getTasks = this.getAllTasks;
     }
 
+    await this.updateTasks();
+
     this.subscriptions = [
       this.dashboardService.eventAggregator.subscribe(AuthenticationStateEvent.LOGIN, async () => {
         this.removeRuntimeSubscriptions();
@@ -86,19 +89,9 @@ export class TaskList {
       }),
     ];
 
-    this.dashboardService.eventAggregator.publish(
-      environment.events.configPanel.solutionEntryChanged,
-      this.activeSolutionEntry,
-    );
-
-    await this.updateTasks();
-
     this.isAttached = true;
 
-    const subscriptionNeedsToBeSet: boolean = this.dashboardServiceSubscriptions.length === 0;
-    if (subscriptionNeedsToBeSet) {
-      this.setRuntimeSubscriptions();
-    }
+    this.setRuntimeSubscriptions();
   }
 
   public detached(): void {
@@ -129,44 +122,46 @@ export class TaskList {
 
   public async activeSolutionEntryChanged(
     newActiveSolutionEntry: ISolutionEntry,
-    previousActiveSolutioEntry: ISolutionEntry,
+    previousActiveSolutionEntry: ISolutionEntry,
   ): Promise<void> {
     if (!newActiveSolutionEntry.uri.includes('http')) {
       return;
     }
 
-    if (this.updatePromise && this.isAttached) {
+    if (!this.isAttached) {
+      return;
+    }
+
+    if (this.updatePromise) {
       this.updatePromise.cancel();
     }
 
-    if (previousActiveSolutioEntry) {
+    const previousActiveSolutionEntryExists: boolean = previousActiveSolutionEntry !== undefined;
+    if (previousActiveSolutionEntryExists) {
       this.removeRuntimeSubscriptions();
     }
 
     this.tasks = [];
     this.initialLoadingFinished = false;
     this.showError = false;
+
     this.dashboardService.eventAggregator.publish(
       environment.events.configPanel.solutionEntryChanged,
       newActiveSolutionEntry,
     );
 
-    if (this.isAttached) {
-      await this.updateTasks();
-    }
+    await this.updateTasks();
 
-    const subscriptionNeedsToBeSet: boolean = this.dashboardServiceSubscriptions.length === 0;
-    if (subscriptionNeedsToBeSet) {
-      this.setRuntimeSubscriptions();
-    }
+    this.setRuntimeSubscriptions();
   }
 
-  public currentPageChanged(): void {
-    if (!this.isAttached) {
+  public currentPageChanged(currentPage: number, previousPage: number): void {
+    const isInitialEvent: boolean = previousPage === undefined || previousPage === null;
+    if (isInitialEvent) {
       return;
     }
 
-    if (this.updatePromise && this.isAttached) {
+    if (this.updatePromise) {
       this.updatePromise.cancel();
     }
 
@@ -212,6 +207,9 @@ export class TaskList {
     this.identitiyUsedForSubscriptions = this.activeSolutionEntry.identity;
 
     this.dashboardServiceSubscriptions = await Promise.all([
+      this.dashboardService.onProcessTerminated(this.activeSolutionEntry.identity, async () => {
+        await this.updateTasks();
+      }),
       this.dashboardService.onEmptyActivityFinished(this.activeSolutionEntry.identity, async () => {
         await this.updateTasks();
       }),

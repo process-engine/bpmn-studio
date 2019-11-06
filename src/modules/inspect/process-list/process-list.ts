@@ -88,10 +88,7 @@ export class ProcessList {
 
     await this.updateProcessInstanceList();
 
-    const subscriptionNeedsToBeSet: boolean = this.dashboardServiceSubscriptions.length === 0;
-    if (subscriptionNeedsToBeSet) {
-      this.setRuntimeSubscriptions();
-    }
+    this.setRuntimeSubscriptions();
   }
 
   public async currentPageChanged(currentPage: number, previousPage: number): Promise<void> {
@@ -153,10 +150,7 @@ export class ProcessList {
       }),
     ];
 
-    const subscriptionNeedsToBeSet: boolean = this.dashboardServiceSubscriptions.length === 0;
-    if (subscriptionNeedsToBeSet) {
-      this.setRuntimeSubscriptions();
-    }
+    this.setRuntimeSubscriptions();
   }
 
   public detached(): void {
