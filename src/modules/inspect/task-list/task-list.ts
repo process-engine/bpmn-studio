@@ -212,6 +212,9 @@ export class TaskList {
     this.identitiyUsedForSubscriptions = this.activeSolutionEntry.identity;
 
     this.dashboardServiceSubscriptions = await Promise.all([
+      this.dashboardService.onProcessTerminated(this.activeSolutionEntry.identity, async () => {
+        await this.updateTasks();
+      }),
       this.dashboardService.onEmptyActivityFinished(this.activeSolutionEntry.identity, async () => {
         await this.updateTasks();
       }),
