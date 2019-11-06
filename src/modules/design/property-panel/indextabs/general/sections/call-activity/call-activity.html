@@ -39,7 +39,7 @@
         </tr>
       </table>
 
-      <button class="navigation-button" disabled.bind="!selectedDiagramName || !isPartOfAllDiagrams(selectedDiagramName)" click.delegate="navigateToCalledDiagram()">Navigate to called process</button>
+      <button class="navigation-button" title.bind="!selectedDiagramName || !isPartOfAllDiagrams(selectedDiagramName) ? 'The called process could not be found.' : ''" disabled.bind="!selectedDiagramName || !isPartOfAllDiagrams(selectedDiagramName)" click.delegate="navigateToCalledDiagram()">Navigate to called process</button>
     </div>
   </div>
 
