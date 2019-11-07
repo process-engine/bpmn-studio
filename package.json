@@ -55,7 +55,7 @@
     "@process-engine/dynamic_ui_core": "^1.5.0",
     "@process-engine/electron-updater": "1.1.0",
     "@process-engine/management_api_client": "6.1.0",
-    "@process-engine/process_engine_runtime": "9.1.0-beta.15",
+    "@process-engine/process_engine_runtime": "release~v9.1.0",
     "@process-engine/solutionexplorer.repository.filesystem": "4.3.0",
     "@process-engine/solutionexplorer.repository.management_api": "3.2.0",
     "@process-engine/solutionexplorer.service": "4.3.0-beta.1",
