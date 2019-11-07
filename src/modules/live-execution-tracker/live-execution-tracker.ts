@@ -84,7 +84,7 @@ export class LiveExecutionTracker {
 
   private xml: string;
 
-  private processStopped: boolean = false;
+  private processStopped: boolean = true;
   private isAttached: boolean = false;
   private parentProcessInstanceId: string;
   private parentProcessModelId: string;
@@ -242,6 +242,17 @@ export class LiveExecutionTracker {
 
     const previousTokenViewerState: boolean = JSON.parse(window.localStorage.getItem('tokenViewerLETCollapseState'));
     this.showTokenViewer = previousTokenViewerState || false;
+
+    try {
+      const processInstanceIsActive: boolean = await this.liveExecutionTrackerService.isProcessInstanceActive(
+        this.activeSolutionEntry.identity,
+        this.processInstanceId,
+      );
+
+      this.processStopped = !processInstanceIsActive;
+    } catch (error) {
+      this.processStopped = true;
+    }
   }
 
   public async detached(): Promise<void> {
