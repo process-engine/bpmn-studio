@@ -12,12 +12,13 @@ export function processEngineSupportsPagination(processEngineVersion: string): b
 
 function compareVersions(processEngineVersion: string, allowedVersion: string): boolean {
   const indexOfReleaseChannel = processEngineVersion.indexOf('-');
+  const processEngineIsStable: boolean = indexOfReleaseChannel === -1;
 
-  const versionWithoutReleaseChannel =
-    indexOfReleaseChannel !== -1 ? processEngineVersion.slice(0, indexOfReleaseChannel) : processEngineVersion;
+  const versionWithoutReleaseChannel: string = processEngineIsStable
+    ? processEngineVersion
+    : processEngineVersion.slice(0, indexOfReleaseChannel);
 
   const solutionEntryPEVersion = new SemVer(versionWithoutReleaseChannel);
-
   const allowedProcessEngineVersion = new SemVer(allowedVersion);
 
   return solutionEntryPEVersion.compare(allowedProcessEngineVersion) >= 0;
