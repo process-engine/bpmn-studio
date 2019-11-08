@@ -84,11 +84,10 @@ export class LiveExecutionTracker {
 
   private xml: string;
 
-  private processStopped: boolean = false;
+  private processStopped: boolean = true;
   private isAttached: boolean = false;
   private parentProcessInstanceId: string;
   private parentProcessModelId: string;
-  private activeCallActivities: Array<IShape> = [];
   private pollingTimer: NodeJS.Timer;
   private isColorizing: boolean = false;
   private colorizeAgain: boolean = false;
@@ -242,6 +241,17 @@ export class LiveExecutionTracker {
 
     const previousTokenViewerState: boolean = JSON.parse(window.localStorage.getItem('tokenViewerLETCollapseState'));
     this.showTokenViewer = previousTokenViewerState || false;
+
+    try {
+      const processInstanceIsActive: boolean = await this.liveExecutionTrackerService.isProcessInstanceActive(
+        this.activeSolutionEntry.identity,
+        this.processInstanceId,
+      );
+
+      this.processStopped = !processInstanceIsActive;
+    } catch (error) {
+      this.processStopped = true;
+    }
   }
 
   public async detached(): Promise<void> {
@@ -657,8 +667,6 @@ export class LiveExecutionTracker {
 
       return elementIsCallActivity;
     });
-
-    this.activeCallActivities = activeCallActivities;
 
     for (const element of activeCallActivities) {
       const overlayHtmlId: string = `${element.id}#active-call-activity`;

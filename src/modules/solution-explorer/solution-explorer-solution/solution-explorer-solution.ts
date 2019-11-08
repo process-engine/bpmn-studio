@@ -1414,6 +1414,11 @@ export class SolutionExplorerSolution {
       this.inspectView = this.router.currentInstruction.params.view;
     }
 
+    const currentRoute: string = this.router.currentInstruction.config.name;
+    if (currentRoute === 'preferences' || currentRoute === 'settings') {
+      return;
+    }
+
     this.activeDiagram = undefined;
 
     if (solutionUriSpecified && diagramNameIsSpecified) {

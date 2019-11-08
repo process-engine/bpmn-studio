@@ -8,14 +8,14 @@ import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/er
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {Subscription as RuntimeSubscription} from '@essential-projects/event_aggregator_contracts';
 
-import {AuthenticationStateEvent, ISolutionEntry} from '../../../contracts/index';
+import {AuthenticationStateEvent, ISolutionEntry, ISolutionService} from '../../../contracts/index';
 import environment from '../../../environment';
 import {getBeautifiedDate} from '../../../services/date-service/date.service';
 import {IDashboardService} from '../dashboard/contracts';
 import {processEngineSupportsCronjobEvents} from '../../../services/process-engine-version-module/process-engine-version.module';
 import {Pagination} from '../../pagination/pagination';
 
-@inject('DashboardService')
+@inject('DashboardService', 'SolutionService')
 export class CronjobList {
   @bindable public activeSolutionEntry: ISolutionEntry;
   public initialLoadingFinished: boolean = false;
@@ -35,11 +35,13 @@ export class CronjobList {
   private isAttached: boolean;
   private dashboardService: IDashboardService;
   private identitiyUsedForSubscriptions: IIdentity;
+  private solutionService: ISolutionService;
 
   private updatePromise: any;
 
-  constructor(dashboardService: IDashboardService) {
+  constructor(dashboardService: IDashboardService, solutionService: ISolutionService) {
     this.dashboardService = dashboardService;
+    this.solutionService = solutionService;
   }
 
   public async activeSolutionEntryChanged(newSolutionEntry: ISolutionEntry): Promise<void> {
@@ -78,6 +80,16 @@ export class CronjobList {
 
   public async attached(): Promise<void> {
     this.isAttached = true;
+
+    const activeSolutionUriIsNotSet: boolean =
+      this.activeSolutionEntry === undefined || this.activeSolutionEntry.uri === undefined;
+    const activeSolutionUriIsNotRemote: boolean = !this.activeSolutionEntry.uri.startsWith('http');
+
+    if (activeSolutionUriIsNotSet || activeSolutionUriIsNotRemote) {
+      const activeSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
+
+      this.activeSolutionEntry = this.solutionService.getSolutionEntryForUri(activeSolutionUri);
+    }
 
     await this.updateCronjobs();
 

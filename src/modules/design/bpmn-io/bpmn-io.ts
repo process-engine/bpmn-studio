@@ -277,6 +277,7 @@ export class BpmnIo {
       ),
 
       this.eventAggregator.subscribe(environment.events.diagramNeedsToBeUpdated, async () => {
+        this.diagramHasChanged = true;
         const diagramState: IDiagramState | null = this.openDiagramStateService.loadDiagramState(this.diagramUri);
 
         const newXml = diagramState.data.xml;
