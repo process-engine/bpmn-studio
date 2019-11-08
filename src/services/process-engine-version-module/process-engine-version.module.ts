@@ -20,6 +20,16 @@ export function processEngineSupportsCronjobEvents(processEngineVersion: string)
   return compareVersions(processEngineVersion, processEngineVersionWithCronjobEventSupport);
 }
 
+export function processEngineSupportsCronjobs(processEngineVersion: string): boolean {
+  if (!processEngineVersion) {
+    throw Error(`'${processEngineVersion}' is not a valid ProcesEngine version.`);
+  }
+
+  const processEngineVersionWithCronjobSupport: string = '8.4.0';
+
+  return compareVersions(processEngineVersion, processEngineVersionWithCronjobSupport);
+}
+
 function compareVersions(processEngineVersion: string, allowedVersion: string): boolean {
   const indexOfReleaseChannel = processEngineVersion.indexOf('-');
   const processEngineIsStable: boolean = indexOfReleaseChannel === -1;
