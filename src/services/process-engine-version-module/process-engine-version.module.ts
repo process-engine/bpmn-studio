@@ -10,6 +10,16 @@ export function processEngineSupportsPagination(processEngineVersion: string): b
   return compareVersions(processEngineVersion, processEngineVersionWithPaginationSupport);
 }
 
+export function processEngineSupportsCronjobEvents(processEngineVersion: string): boolean {
+  if (!processEngineVersion) {
+    throw Error(`'${processEngineVersion}' is not a valid ProcesEngine version.`);
+  }
+
+  const processEngineVersionWithCronjobEventSupport: string = '9.0.0';
+
+  return compareVersions(processEngineVersion, processEngineVersionWithCronjobEventSupport);
+}
+
 function compareVersions(processEngineVersion: string, allowedVersion: string): boolean {
   const indexOfReleaseChannel = processEngineVersion.indexOf('-');
   const processEngineIsStable: boolean = indexOfReleaseChannel === -1;
@@ -22,14 +32,4 @@ function compareVersions(processEngineVersion: string, allowedVersion: string): 
   const allowedProcessEngineVersion = new SemVer(allowedVersion);
 
   return solutionEntryPEVersion.compare(allowedProcessEngineVersion) >= 0;
-}
-
-export function processEngineSupportsCronjobEvents(processEngineVersion: string): boolean {
-  if (!processEngineVersion) {
-    throw Error(`'${processEngineVersion}' is not a valid ProcesEngine version.`);
-  }
-
-  const processEngineVersionWithCronjobEventSupport: string = '9.0.0';
-
-  return compareVersions(processEngineVersion, processEngineVersionWithCronjobEventSupport);
 }
