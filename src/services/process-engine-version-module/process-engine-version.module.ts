@@ -29,15 +29,7 @@ export function processEngineSupportsCronjobEvents(processEngineVersion: string)
     throw Error(`'${processEngineVersion}' is not a valid ProcesEngine version.`);
   }
 
-  const processEngineIsNoStable: boolean = processEngineVersion.indexOf('-') !== -1;
+  const processEngineVersionWithCronjobEventSupport: string = '9.0.0';
 
-  const processEngineVersionWithoutReleaseChannel: string = processEngineIsNoStable
-    ? processEngineVersion.slice(0, processEngineVersion.indexOf('-'))
-    : processEngineVersion;
-
-  const processEngineSemverVersion = new SemVer(processEngineVersionWithoutReleaseChannel);
-
-  const stableVersionWithEvents = new SemVer('9.0.0');
-
-  return processEngineSemverVersion.compare(stableVersionWithEvents) >= 0;
+  return compareVersions(processEngineVersion, processEngineVersionWithCronjobEventSupport);
 }
