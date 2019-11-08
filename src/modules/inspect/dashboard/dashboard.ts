@@ -21,6 +21,10 @@ export class Dashboard {
   }
 
   public activeSolutionEntryChanged(): void {
+    if (!this.activeSolutionEntry.uri.startsWith('http')) {
+      return;
+    }
+
     const processEngineVersion = this.activeSolutionEntry.processEngineVersion;
     const activeSolutionHasVersion: boolean = processEngineVersion !== undefined;
 
