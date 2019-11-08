@@ -24,7 +24,7 @@ function compareVersions(processEngineVersion: string, allowedVersion: string): 
   return solutionEntryPEVersion.compare(allowedProcessEngineVersion) >= 0;
 }
 
-export function processEngineSupportsCronjobEvents(processEngineVersion): boolean {
+export function processEngineSupportsCronjobEvents(processEngineVersion: string): boolean {
   if (!processEngineVersion) {
     throw Error(`'${processEngineVersion}' is not a valid ProcesEngine version.`);
   }
