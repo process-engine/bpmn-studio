@@ -2,7 +2,7 @@ import {SemVer} from 'semver';
 
 export function processEngineSupportsPagination(processEngineVersion: string): boolean {
   if (!processEngineVersion) {
-    return undefined;
+    throw Error(`'${processEngineVersion}' is not a valid ProcesEngine version.`);
   }
 
   return compareVersions(processEngineVersion, '9.0.0');
@@ -23,7 +23,7 @@ function compareVersions(processEngineVersion: string, allowedVersion: string): 
 
 export function processEngineSupportsCronjobEvents(processEngineVersion): boolean {
   if (!processEngineVersion) {
-    return undefined;
+    throw Error(`'${processEngineVersion}' is not a valid ProcesEngine version.`);
   }
 
   const processEngineIsNoStable: boolean = processEngineVersion.indexOf('-') !== -1;
