@@ -9,7 +9,12 @@ export class Dashboard {
   public showCronjobList: boolean = false;
 
   public attached(): void {
-    const processEngineVersion: string = this.activeSolutionEntry.processEngineVersion;
+    const isRemoteSolution: boolean = this.activeSolutionEntry.uri.startsWith('http');
+    const internalProcessEngineVersion: string = localStorage.getItem('InternalProcessEngineVersion');
+
+    const processEngineVersion: string = isRemoteSolution
+      ? this.activeSolutionEntry.processEngineVersion
+      : internalProcessEngineVersion;
     const activeSolutionHasVersion: boolean = processEngineVersion !== undefined;
 
     this.showCronjobList = activeSolutionHasVersion ? processEngineSupportsCronjobs(processEngineVersion) : false;
