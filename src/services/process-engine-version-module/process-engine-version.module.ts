@@ -5,7 +5,9 @@ export function processEngineSupportsPagination(processEngineVersion: string): b
     throw Error(`'${processEngineVersion}' is not a valid ProcesEngine version.`);
   }
 
-  return compareVersions(processEngineVersion, '9.0.0');
+  const processEngineVersionWithPaginationSupport: string = '9.0.0';
+
+  return compareVersions(processEngineVersion, processEngineVersionWithPaginationSupport);
 }
 
 function compareVersions(processEngineVersion: string, allowedVersion: string): boolean {
