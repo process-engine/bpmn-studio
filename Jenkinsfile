@@ -212,6 +212,16 @@ pipeline {
       }
     }
     stage('Create Tarball') {
+      when {
+        allOf {
+          expression {buildIsRequired == true}
+          anyOf {
+            branch "master"
+            branch "beta"
+            branch "develop"
+          }
+        }
+      }
       steps {
         sh('npm run create-tarball')
 
