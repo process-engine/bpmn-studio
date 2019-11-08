@@ -1,5 +1,7 @@
 import {bindable} from 'aurelia-framework';
+
 import {ISolutionEntry} from '../../../contracts';
+
 import {processEngineSupportsCronjobs} from '../../../services/process-engine-version-module/process-engine-version.module';
 
 export class Dashboard {
