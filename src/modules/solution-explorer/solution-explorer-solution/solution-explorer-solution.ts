@@ -76,6 +76,7 @@ export class SolutionExplorerSolution {
   @bindable public openDiagramService: OpenDiagramsSolutionExplorerService;
   @bindable @observable public displayedSolutionEntry: ISolutionEntry;
   @bindable public cssIconClass: string;
+  @bindable public tooltipText: string;
   public createNewDiagramInput: HTMLInputElement;
   public diagramContextMenu: HTMLElement;
   public showContextMenu: boolean = false;
@@ -340,6 +341,7 @@ export class SolutionExplorerSolution {
       }
 
       this.cssIconClass = this.originalIconClass;
+      this.tooltipText = '';
       this.processEngineRunning = true;
     } catch (error) {
       // In the future we can maybe display a small icon indicating the error.
@@ -362,9 +364,9 @@ export class SolutionExplorerSolution {
 
         this.cssIconClass = 'fa fa-bolt';
         if (solutionIsRemoteSolution(this.displayedSolutionEntry.uri)) {
-          this.cssIconClass = 'fa-bolt';
+          this.tooltipText = 'ProcessEngine is disconnected!';
         } else {
-          this.cssIconClass = 'fa-folder-minus';
+          this.tooltipText = 'Solution was removed!';
         }
 
         this.processEngineRunning = false;

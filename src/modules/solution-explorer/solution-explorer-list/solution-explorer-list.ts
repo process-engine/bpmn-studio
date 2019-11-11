@@ -620,6 +620,7 @@ export class SolutionExplorerList {
     const canCreateNewDiagramsInSolution: boolean = this.canCreateNewDiagramsInSolution(service, uri);
     const authority: string = await this.getAuthorityForSolution(uri);
     const hidden: boolean = this.getHiddenStateForSolutionUri(uri);
+    const tooltipText: string = '';
 
     const authorityIsUndefined: boolean = authority === undefined;
 
@@ -638,6 +639,7 @@ export class SolutionExplorerList {
       uri,
       service,
       cssIconClass,
+      tooltipText,
       canCloseSolution,
       canCreateNewDiagramsInSolution,
       isOpenDiagram,
