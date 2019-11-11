@@ -10,8 +10,8 @@ import {ISolutionExplorerService} from '@process-engine/solutionexplorer.service
 export interface ISolutionEntry {
   service: ISolutionExplorerService;
   uri: string;
-  fontAwesomeIconClass: string;
   isOpenDiagram: boolean;
+  cssIconClass: string;
   canCloseSolution: boolean;
   canCreateNewDiagramsInSolution: boolean;
   authority: string;

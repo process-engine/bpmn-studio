@@ -75,7 +75,7 @@ export class SolutionExplorerSolution {
   @bindable public solutionService: ISolutionExplorerService;
   @bindable public openDiagramService: OpenDiagramsSolutionExplorerService;
   @bindable @observable public displayedSolutionEntry: ISolutionEntry;
-  @bindable public fontAwesomeIconClass: string;
+  @bindable public cssIconClass: string;
   public createNewDiagramInput: HTMLInputElement;
   public diagramContextMenu: HTMLElement;
   public showContextMenu: boolean = false;
@@ -167,7 +167,7 @@ export class SolutionExplorerSolution {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
     }
 
-    this.originalIconClass = this.fontAwesomeIconClass;
+    this.originalIconClass = this.cssIconClass;
     this.updateSolutionExplorer();
 
     this.subscriptions = [
@@ -339,7 +339,7 @@ export class SolutionExplorerSolution {
         this.refreshDisplayedDiagrams();
       }
 
-      this.fontAwesomeIconClass = this.originalIconClass;
+      this.cssIconClass = this.originalIconClass;
       this.processEngineRunning = true;
     } catch (error) {
       // In the future we can maybe display a small icon indicating the error.
@@ -361,9 +361,9 @@ export class SolutionExplorerSolution {
         this.sortedDiagramsOfSolutions = [];
 
         if (solutionIsRemoteSolution(this.displayedSolutionEntry.uri)) {
-          this.fontAwesomeIconClass = 'fa-bolt';
+          this.cssIconClass = 'fa-bolt';
         } else {
-          this.fontAwesomeIconClass = 'fa-folder-minus';
+          this.cssIconClass = 'fa-folder-minus';
         }
 
         this.processEngineRunning = false;

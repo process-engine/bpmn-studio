@@ -615,7 +615,7 @@ export class SolutionExplorerList {
     processEngineVersion?: string,
   ): Promise<void> {
     const isOpenDiagram: boolean = this.isOpenDiagram(service);
-    const fontAwesomeIconClass: string = this.getFontAwesomeIconForSolution(service, uri);
+    const cssIconClass: string = this.getFontAwesomeIconForSolution(service, uri);
     const canCloseSolution: boolean = this.canCloseSolution(service, uri);
     const canCreateNewDiagramsInSolution: boolean = this.canCreateNewDiagramsInSolution(service, uri);
     const authority: string = await this.getAuthorityForSolution(uri);
@@ -637,7 +637,7 @@ export class SolutionExplorerList {
     const entry: ISolutionEntry = {
       uri,
       service,
-      fontAwesomeIconClass,
+      cssIconClass,
       canCloseSolution,
       canCreateNewDiagramsInSolution,
       isOpenDiagram,
