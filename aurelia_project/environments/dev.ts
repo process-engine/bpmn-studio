@@ -107,6 +107,7 @@ export default {
       updateProcessInstances: 'inspectCorrelation:updateProcessInstances',
     },
     solutionExplorer: {
+      closeAllOpenDiagrams: 'solutionExplorer:openDiagrams:closeAll',
       updateOpenDiagrams: 'solutioneExplorer:openDiagrams:update',
     },
   },

@@ -177,6 +177,10 @@ export class SolutionExplorerSolution {
 
         this.startPolling();
       }),
+      this.eventAggregator.subscribe(
+        environment.events.solutionExplorer.closeAllOpenDiagrams,
+        this.closeAllDiagramsEventFunction,
+      ),
     ];
 
     if (this.displayedSolutionEntry.isOpenDiagram) {

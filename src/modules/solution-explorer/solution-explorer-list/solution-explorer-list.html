@@ -61,6 +61,16 @@
               <i class="fa fa-times"></i>
             </button>
 
+
+            <button
+              class="button"
+              if.bind="solutionEntry.isOpenDiagram"
+              click.delegate="closeAllOpenDiagrams()"
+              title="Close all open diagrams">
+
+              <i class="fa fa-times"></i>
+            </button>
+
             <button class="button login-logout-button"
               if.bind="checkIfSolutionIsRemoteSolution(solutionEntry.uri) && !solutionEntry.isLoggedIn"
               click.delegate="login(solutionEntry)"

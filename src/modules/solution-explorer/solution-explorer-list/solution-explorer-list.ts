@@ -25,6 +25,7 @@ import {exposeFunctionForTesting} from '../../../services/expose-functionality-m
 import {HttpFetchClient} from '../../fetch-http-client/http-fetch-client';
 import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 import {isRunningInElectron} from '../../../services/is-running-in-electron-module/is-running-in-electron.module';
+import environment from '../../../environment';
 
 interface IUriToViewModelMap {
   [key: string]: SolutionExplorerSolution;
@@ -510,6 +511,10 @@ export class SolutionExplorerList {
     );
 
     return sortedEntries;
+  }
+
+  public closeAllOpenDiagrams(): void {
+    this.eventAggregator.publish(environment.events.solutionExplorer.closeAllOpenDiagrams);
   }
 
   private openingSolutionWasCanceled(solutionUri: string): void {
