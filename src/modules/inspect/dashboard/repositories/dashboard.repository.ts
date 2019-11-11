@@ -2,30 +2,74 @@ import {DataModels, IManagementApiClient, Messages} from '@process-engine/manage
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {Subscription} from '@essential-projects/event_aggregator_contracts';
 import {NotFoundError} from '@essential-projects/errors_ts';
+
 import {IDashboardRepository} from '../contracts/IDashboardRepository';
-import {TaskListEntry, TaskSource, TaskType} from '../contracts/index';
+import {TaskList, TaskListEntry, TaskSource, TaskType} from '../contracts/index';
+import {applyPagination} from '../../../../services/pagination-module/pagination.module';
 
 export class DashboardRepository implements IDashboardRepository {
-  protected managementApiService: IManagementApiClient;
+  protected managementApiClient: IManagementApiClient;
 
-  constructor(managementApi: IManagementApiClient) {
-    this.managementApiService = managementApi;
+  constructor(managementApiClient: IManagementApiClient) {
+    this.managementApiClient = managementApiClient;
   }
 
-  public async getAllActiveCronjobs(identity: IIdentity): Promise<DataModels.Cronjobs.CronjobList> {
-    const result = (await this.managementApiService.getAllActiveCronjobs(identity)) as any;
+  public async getAllActiveCronjobs(
+    identity: IIdentity,
+    offset: number = 0,
+    limit: number = 0,
+  ): Promise<DataModels.Cronjobs.CronjobList> {
+    const cronjobs: Array<
+      DataModels.Cronjobs.CronjobConfiguration
+    > = (await this.managementApiClient.getAllActiveCronjobs(identity)) as any;
 
-    return {cronjobs: result, totalCount: result.length};
+    return {
+      cronjobs: applyPagination(cronjobs, offset, limit),
+      totalCount: cronjobs.length,
+    };
+  }
+
+  public async getAllActiveProcessInstances(
+    identity: IIdentity,
+    offset: number = 0,
+    limit: number = 0,
+  ): Promise<DataModels.Correlations.ProcessInstanceList> {
+    const activeCorrelations: Array<DataModels.Correlations.Correlation> = (await this.getActiveCorrelations(identity))
+      .correlations;
+
+    const processInstancesForCorrelations: Array<
+      Array<DataModels.Correlations.ProcessInstance>
+    > = activeCorrelations.map((correlation) => {
+      const processInstances: Array<DataModels.Correlations.ProcessInstance> = correlation.processInstances.map(
+        (processInstance) => {
+          processInstance.correlationId = correlation.id;
+
+          return processInstance;
+        },
+      );
+
+      return processInstances;
+    });
+
+    const processInstances: Array<DataModels.Correlations.ProcessInstance> = [].concat(
+      ...processInstancesForCorrelations,
+    );
+
+    return {processInstances: applyPagination(processInstances, offset, limit), totalCount: processInstances.length};
   }
 
   public async getProcessModels(identity: IIdentity): Promise<DataModels.ProcessModels.ProcessModelList> {
-    const result = await this.managementApiService.getProcessModels(identity);
+    const result = await this.managementApiClient.getProcessModels(identity);
 
     return {processModels: result.processModels, totalCount: result.processModels.length};
   }
 
-  public async getActiveCorrelations(identity: IIdentity): Promise<DataModels.Correlations.CorrelationList> {
-    const result = (await this.managementApiService.getActiveCorrelations(identity)) as any;
+  public async getActiveCorrelations(
+    identity: IIdentity,
+    offset: number = 0,
+    limit: number = 0,
+  ): Promise<DataModels.Correlations.CorrelationList> {
+    const result = (await this.managementApiClient.getActiveCorrelations(identity, offset, limit)) as any;
 
     return {correlations: result, totalCount: result.length};
   }
@@ -34,7 +78,7 @@ export class DashboardRepository implements IDashboardRepository {
     identity: IIdentity,
     processModelId: string,
   ): Promise<DataModels.ManualTasks.ManualTaskList> {
-    const result = await this.managementApiService.getManualTasksForProcessModel(identity, processModelId);
+    const result = await this.managementApiClient.getManualTasksForProcessModel(identity, processModelId);
 
     return {manualTasks: result.manualTasks, totalCount: result.manualTasks.length};
   }
@@ -43,7 +87,7 @@ export class DashboardRepository implements IDashboardRepository {
     identity: IIdentity,
     processModelId: string,
   ): Promise<DataModels.EmptyActivities.EmptyActivityList> {
-    const result = await this.managementApiService.getEmptyActivitiesForProcessModel(identity, processModelId);
+    const result = await this.managementApiClient.getEmptyActivitiesForProcessModel(identity, processModelId);
 
     return {emptyActivities: result.emptyActivities, totalCount: result.emptyActivities.length};
   }
@@ -52,7 +96,7 @@ export class DashboardRepository implements IDashboardRepository {
     identity: IIdentity,
     processModelId: string,
   ): Promise<DataModels.UserTasks.UserTaskList> {
-    const result = await this.managementApiService.getUserTasksForProcessModel(identity, processModelId);
+    const result = await this.managementApiClient.getUserTasksForProcessModel(identity, processModelId);
 
     return {userTasks: result.userTasks, totalCount: result.userTasks.length};
   }
@@ -61,7 +105,7 @@ export class DashboardRepository implements IDashboardRepository {
     identity: IIdentity,
     correlationId: string,
   ): Promise<DataModels.ManualTasks.ManualTaskList> {
-    const result = await this.managementApiService.getManualTasksForCorrelation(identity, correlationId);
+    const result = await this.managementApiClient.getManualTasksForCorrelation(identity, correlationId);
 
     return {manualTasks: result.manualTasks, totalCount: result.manualTasks.length};
   }
@@ -70,7 +114,7 @@ export class DashboardRepository implements IDashboardRepository {
     identity: IIdentity,
     correlationId: string,
   ): Promise<DataModels.EmptyActivities.EmptyActivityList> {
-    const result = await this.managementApiService.getEmptyActivitiesForCorrelation(identity, correlationId);
+    const result = await this.managementApiClient.getEmptyActivitiesForCorrelation(identity, correlationId);
 
     return {emptyActivities: result.emptyActivities, totalCount: result.emptyActivities.length};
   }
@@ -79,7 +123,7 @@ export class DashboardRepository implements IDashboardRepository {
     identity: IIdentity,
     correlationId: string,
   ): Promise<DataModels.UserTasks.UserTaskList> {
-    const result = await this.managementApiService.getUserTasksForCorrelation(identity, correlationId);
+    const result = await this.managementApiClient.getUserTasksForCorrelation(identity, correlationId);
 
     return {userTasks: result.userTasks, totalCount: result.userTasks.length};
   }
@@ -88,7 +132,7 @@ export class DashboardRepository implements IDashboardRepository {
     identity: IIdentity,
     correlationId: string,
   ): Promise<DataModels.ManualTasks.ManualTaskList> {
-    const result = await this.managementApiService.getManualTasksForProcessInstance(identity, correlationId);
+    const result = await this.managementApiClient.getManualTasksForProcessInstance(identity, correlationId);
 
     return {manualTasks: result.manualTasks, totalCount: result.manualTasks.length};
   }
@@ -97,7 +141,7 @@ export class DashboardRepository implements IDashboardRepository {
     identity: IIdentity,
     correlationId: string,
   ): Promise<DataModels.EmptyActivities.EmptyActivityList> {
-    const result = await this.managementApiService.getEmptyActivitiesForProcessInstance(identity, correlationId);
+    const result = await this.managementApiClient.getEmptyActivitiesForProcessInstance(identity, correlationId);
 
     return {emptyActivities: result.emptyActivities, totalCount: result.emptyActivities.length};
   }
@@ -106,17 +150,17 @@ export class DashboardRepository implements IDashboardRepository {
     identity: IIdentity,
     correlationId: string,
   ): Promise<DataModels.UserTasks.UserTaskList> {
-    const result = await this.managementApiService.getUserTasksForProcessInstance(identity, correlationId);
+    const result = await this.managementApiClient.getUserTasksForProcessInstance(identity, correlationId);
 
     return {userTasks: result.userTasks, totalCount: result.userTasks.length};
   }
 
   public terminateProcessInstance(identity: IIdentity, processInstanceId: string): Promise<void> {
-    return this.managementApiService.terminateProcessInstance(identity, processInstanceId);
+    return this.managementApiClient.terminateProcessInstance(identity, processInstanceId);
   }
 
   public onProcessEnded(identity: IIdentity, callback: Function): Promise<Subscription> {
-    return this.managementApiService.onProcessEnded(
+    return this.managementApiClient.onProcessEnded(
       identity,
       (message: Messages.BpmnEvents.EndEventReachedMessage): void => {
         callback();
@@ -125,73 +169,127 @@ export class DashboardRepository implements IDashboardRepository {
   }
 
   public onProcessStarted(identity: IIdentity, callback: Function): Promise<Subscription> {
-    return this.managementApiService.onProcessStarted(
+    return this.managementApiClient.onProcessStarted(
       identity,
       (processStarted: Messages.SystemEvents.ProcessStartedMessage): void => {
-        callback();
+        callback(processStarted);
       },
     );
   }
 
   public onProcessError(identity: IIdentity, callback: Function): Promise<Subscription> {
-    return this.managementApiService.onProcessError(
+    return this.managementApiClient.onProcessError(
       identity,
-      (message: Messages.SystemEvents.ProcessErrorMessage): void => {
-        callback();
+      (processErrorMessage: Messages.SystemEvents.ProcessErrorMessage): void => {
+        callback(processErrorMessage);
+      },
+    );
+  }
+
+  public onProcessTerminated(identity: IIdentity, callback: Function): Promise<Subscription> {
+    return this.managementApiClient.onProcessTerminated(
+      identity,
+      (processErrorMessage: Messages.SystemEvents.ProcessErrorMessage): void => {
+        callback(processErrorMessage);
       },
     );
   }
 
   public onEmptyActivityFinished(identity: IIdentity, callback: Function): Promise<Subscription> {
-    return this.managementApiService.onEmptyActivityFinished(
+    return this.managementApiClient.onEmptyActivityFinished(
       identity,
-      (message: Messages.SystemEvents.EmptyActivityFinishedMessage): void => {
-        callback();
+      (emptyActivityFinishedMessage: Messages.SystemEvents.EmptyActivityFinishedMessage): void => {
+        callback(emptyActivityFinishedMessage);
       },
     );
   }
 
   public onEmptyActivityWaiting(identity: IIdentity, callback: Function): Promise<Subscription> {
-    return this.managementApiService.onEmptyActivityWaiting(
+    return this.managementApiClient.onEmptyActivityWaiting(
       identity,
-      (message: Messages.SystemEvents.EmptyActivityReachedMessage): void => {
-        callback();
+      (emptyActivityReachedMessage: Messages.SystemEvents.EmptyActivityReachedMessage): void => {
+        callback(emptyActivityReachedMessage);
       },
     );
   }
 
   public onManualTaskFinished(identity: IIdentity, callback: Function): Promise<Subscription> {
-    return this.managementApiService.onManualTaskFinished(
+    return this.managementApiClient.onManualTaskFinished(
       identity,
-      (message: Messages.SystemEvents.ManualTaskFinishedMessage): void => {
-        callback();
+      (manualTaskFinishedMessage: Messages.SystemEvents.ManualTaskFinishedMessage): void => {
+        callback(manualTaskFinishedMessage);
       },
     );
   }
 
   public onManualTaskWaiting(identity: IIdentity, callback: Function): Promise<Subscription> {
-    return this.managementApiService.onManualTaskWaiting(
+    return this.managementApiClient.onManualTaskWaiting(
       identity,
-      (message: Messages.SystemEvents.ManualTaskReachedMessage): void => {
-        callback();
+      (manualTaskReachedMessage: Messages.SystemEvents.ManualTaskReachedMessage): void => {
+        callback(manualTaskReachedMessage);
       },
     );
   }
 
   public onUserTaskFinished(identity: IIdentity, callback: Function): Promise<Subscription> {
-    return this.managementApiService.onUserTaskFinished(
+    return this.managementApiClient.onUserTaskFinished(
       identity,
-      (message: Messages.SystemEvents.UserTaskFinishedMessage): void => {
-        callback();
+      (userTaskFinishedMessage: Messages.SystemEvents.UserTaskFinishedMessage): void => {
+        callback(userTaskFinishedMessage);
       },
     );
   }
 
   public onUserTaskWaiting(identity: IIdentity, callback: Function): Promise<Subscription> {
-    return this.managementApiService.onUserTaskWaiting(
+    return this.managementApiClient.onUserTaskWaiting(
       identity,
-      (message: Messages.SystemEvents.UserTaskReachedMessage): void => {
-        callback();
+      (userTaskReachedMessage: Messages.SystemEvents.UserTaskReachedMessage): void => {
+        callback(userTaskReachedMessage);
+      },
+    );
+  }
+
+  public onCronjobCreated(identity: IIdentity, callback: Function): Promise<Subscription> {
+    return this.managementApiClient.onCronjobCreated(
+      identity,
+      (message: Messages.SystemEvents.CronjobCreatedMessage): void => {
+        callback(message);
+      },
+    );
+  }
+
+  public onCronjobExecuted(identity: IIdentity, callback: Function): Promise<Subscription> {
+    return this.managementApiClient.onCronjobExecuted(
+      identity,
+      (message: Messages.SystemEvents.CronjobExecutedMessage): void => {
+        callback(message);
+      },
+    );
+  }
+
+  public onCronjobRemoved(identity: IIdentity, callback: Function): Promise<Subscription> {
+    return this.managementApiClient.onCronjobRemoved(
+      identity,
+      (message: Messages.SystemEvents.CronjobRemovedMessage): void => {
+        callback(message);
+      },
+    );
+  }
+
+  public onCronjobStopped(identity: IIdentity, callback: Function): Promise<Subscription> {
+    return this.managementApiClient.onCronjobStopped(
+      identity,
+      (message: Messages.SystemEvents.CronjobStoppedMessage): void => {
+        callback(message);
+      },
+    );
+  }
+
+  public onCronjobUpdated(identity: IIdentity, callback: Function): Promise<Subscription> {
+    return this.managementApiClient.onCronjobUpdated(
+      identity,
+      (message: Messages.SystemEvents.CronjobUpdatedMessage): void => {
+        callback(message);
       },
     );
   }
@@ -202,7 +300,7 @@ export class DashboardRepository implements IDashboardRepository {
     correlationId: string,
     manualTaskInstanceId: string,
   ): Promise<void> {
-    return this.managementApiService.finishManualTask(identity, processInstanceId, correlationId, manualTaskInstanceId);
+    return this.managementApiClient.finishManualTask(identity, processInstanceId, correlationId, manualTaskInstanceId);
   }
 
   public finishUserTask(
@@ -212,7 +310,7 @@ export class DashboardRepository implements IDashboardRepository {
     userTaskInstanceId: string,
     userTaskResult: DataModels.UserTasks.UserTaskResult,
   ): Promise<void> {
-    return this.managementApiService.finishUserTask(
+    return this.managementApiClient.finishUserTask(
       identity,
       processInstanceId,
       correlationId,
@@ -222,10 +320,10 @@ export class DashboardRepository implements IDashboardRepository {
   }
 
   public removeSubscription(identity: IIdentity, subscription: Subscription): Promise<void> {
-    return this.managementApiService.removeSubscription(identity, subscription);
+    return this.managementApiClient.removeSubscription(identity, subscription);
   }
 
-  public async getAllSuspendedTasks(identity: IIdentity): Promise<Array<TaskListEntry>> {
+  public async getAllSuspendedTasks(identity: IIdentity, offset: number = 0, limit: number = 0): Promise<TaskList> {
     const allProcessModels: DataModels.ProcessModels.ProcessModelList = await this.getProcessModels(identity);
 
     // TODO (ph): This will create 1 + n http reqeusts, where n is the number of process models in the processengine.
@@ -274,13 +372,20 @@ export class DashboardRepository implements IDashboardRepository {
     // Flatten all results.
     const allTasks: Array<TaskListEntry> = [].concat(...allTasksForAllProcessModels);
 
-    return allTasks;
+    const taskList: TaskList = {
+      taskListEntries: applyPagination(allTasks, offset, limit),
+      totalCount: allTasks.length,
+    };
+
+    return taskList;
   }
 
   public async getSuspendedTasksForProcessInstance(
     identity: IIdentity,
     processInstanceId: string,
-  ): Promise<Array<TaskListEntry>> {
+    offset: number = 0,
+    limit: number = 0,
+  ): Promise<TaskList> {
     const userTaskList: DataModels.UserTasks.UserTaskList = await this.getUserTasksForProcessInstance(
       identity,
       processInstanceId,
@@ -296,10 +401,7 @@ export class DashboardRepository implements IDashboardRepository {
       processInstanceId,
     );
 
-    const userTasksAndProcessModels: Array<TaskListEntry> = this.mapTasksToTaskListEntry(
-      userTaskList.userTasks,
-      TaskType.UserTask,
-    );
+    const userTasks: Array<TaskListEntry> = this.mapTasksToTaskListEntry(userTaskList.userTasks, TaskType.UserTask);
     const manualTasks: Array<TaskListEntry> = this.mapTasksToTaskListEntry(
       manualTaskList.manualTasks,
       TaskType.ManualTask,
@@ -309,13 +411,22 @@ export class DashboardRepository implements IDashboardRepository {
       TaskType.EmptyActivity,
     );
 
-    return [].concat(userTasksAndProcessModels, manualTasks, emptyActivities);
+    const taskListEntries: Array<TaskListEntry> = [].concat(userTasks, manualTasks, emptyActivities);
+
+    const taskList: TaskList = {
+      taskListEntries: applyPagination(taskListEntries, offset, limit),
+      totalCount: taskListEntries.length,
+    };
+
+    return taskList;
   }
 
   public async getSuspendedTasksForCorrelation(
     identity: IIdentity,
     correlationId: string,
-  ): Promise<Array<TaskListEntry>> {
+    offset: number = 0,
+    limit: number = 0,
+  ): Promise<TaskList> {
     const runningCorrelations: DataModels.Correlations.CorrelationList = await this.getActiveCorrelations(identity);
 
     const correlation: DataModels.Correlations.Correlation = runningCorrelations.correlations.find(
@@ -356,13 +467,22 @@ export class DashboardRepository implements IDashboardRepository {
       TaskType.EmptyActivity,
     );
 
-    return [].concat(userTasks, manualTasks, emptyActivities);
+    const taskListEntries: Array<TaskListEntry> = [].concat(userTasks, manualTasks, emptyActivities);
+
+    const taskList: TaskList = {
+      taskListEntries: applyPagination(taskListEntries, offset, limit),
+      totalCount: taskListEntries.length,
+    };
+
+    return taskList;
   }
 
   public async getSuspendedTasksForProcessModel(
     identity: IIdentity,
     processModelId: string,
-  ): Promise<Array<TaskListEntry>> {
+    offset: number = 0,
+    limit: number = 0,
+  ): Promise<TaskList> {
     const userTaskList: DataModels.UserTasks.UserTaskList = await this.getUserTasksForProcessModel(
       identity,
       processModelId,
@@ -388,7 +508,14 @@ export class DashboardRepository implements IDashboardRepository {
       TaskType.EmptyActivity,
     );
 
-    return [].concat(userTasks, manualTasks, emptyActivities);
+    const taskListEntries: Array<TaskListEntry> = [].concat(userTasks, manualTasks, emptyActivities);
+
+    const taskList: TaskList = {
+      taskListEntries: applyPagination(taskListEntries, offset, limit),
+      totalCount: taskListEntries.length,
+    };
+
+    return taskList;
   }
 
   private mapTasksToTaskListEntry(tasks: Array<TaskSource>, targetType: TaskType): Array<TaskListEntry> {

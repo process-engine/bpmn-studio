@@ -4,30 +4,34 @@ import {IIdentity} from '@essential-projects/iam_contracts';
 import {DataModels, IManagementApiClient} from '@process-engine/management_api_contracts';
 
 import {EventAggregator} from 'aurelia-event-aggregator';
+import {
+  ProcessInstance,
+  ProcessInstanceList,
+} from '@process-engine/management_api_contracts/dist/data_models/correlation';
 import {IInspectCorrelationRepository, IInspectCorrelationService} from '../contracts';
-import {InspectCorrelationPaginationRepository} from '../repositories/inspect-correlation.pagination.repository';
+import {InspectCorrelationPaginationRepository} from '../repositories/inspect-correlation.pagination-repository';
 import environment from '../../../../environment';
 import {InspectCorrelationRepository} from '../repositories/inspect-correlation.repository';
 import {ISolutionEntry} from '../../../../contracts';
-import {processEngineSupportsPagination} from '../../../../services/process-engine-version-module/process-engine-version-module';
+import {processEngineSupportsPagination} from '../../../../services/process-engine-version-module/process-engine-version.module';
 
 @inject(EventAggregator, 'ManagementApiClientService')
 export class InspectCorrelationService implements IInspectCorrelationService {
   private inspectCorrelationRepository: IInspectCorrelationRepository;
   private eventAggregator: EventAggregator;
-  private managementApiService: IManagementApiClient;
+  private managementApiClient: IManagementApiClient;
 
-  constructor(eventAggregator: EventAggregator, managementApiService: IManagementApiClient) {
+  constructor(eventAggregator: EventAggregator, managementApiClient: IManagementApiClient) {
     this.eventAggregator = eventAggregator;
-    this.managementApiService = managementApiService;
+    this.managementApiClient = managementApiClient;
 
     this.eventAggregator.subscribe(
       environment.events.configPanel.solutionEntryChanged,
       (solutionEntry: ISolutionEntry) => {
         if (processEngineSupportsPagination(solutionEntry.processEngineVersion)) {
-          this.inspectCorrelationRepository = new InspectCorrelationPaginationRepository(this.managementApiService);
+          this.inspectCorrelationRepository = new InspectCorrelationPaginationRepository(this.managementApiClient);
         } else {
-          this.inspectCorrelationRepository = new InspectCorrelationRepository(this.managementApiService);
+          this.inspectCorrelationRepository = new InspectCorrelationRepository(this.managementApiClient);
         }
       },
     );
@@ -91,5 +95,27 @@ export class InspectCorrelationService implements IInspectCorrelationService {
     } catch (error) {
       return undefined;
     }
+  }
+
+  public getProcessInstancesForProcessModel(
+    identity: IIdentity,
+    processModelId: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<ProcessInstanceList> {
+    return this.inspectCorrelationRepository.getProcessInstancesForProcessModel(
+      identity,
+      processModelId,
+      offset,
+      limit,
+    );
+  }
+
+  public getProcessInstanceById(
+    identity: IIdentity,
+    processInstanceId: string,
+    processModelId: string,
+  ): Promise<ProcessInstance> {
+    return this.inspectCorrelationRepository.getProcessInstancesById(identity, processInstanceId, processModelId);
   }
 }

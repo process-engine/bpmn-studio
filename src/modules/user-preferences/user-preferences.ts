@@ -2,7 +2,7 @@ import {inject} from 'aurelia-framework';
 
 import {NotificationService} from '../../services/notification-service/notification.service';
 import {NotificationType} from '../../contracts/index';
-import {UserConfigService} from '../../services/user-config-service/userconfig.service';
+import {UserConfigService} from '../../services/user-config-service/user-config.service';
 
 @inject('NotificationService', 'UserConfigService')
 export class Preferences {

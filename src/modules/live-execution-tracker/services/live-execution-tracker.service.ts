@@ -1,6 +1,4 @@
 /* eslint-disable 6river/new-cap */
-import {inject} from 'aurelia-framework';
-
 import {Subscription} from '@essential-projects/event_aggregator_contracts';
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {IModdleElement, IShape} from '@process-engine/bpmn-elements_contracts';
@@ -18,7 +16,7 @@ import {
   defaultBpmnColors,
 } from '../../../contracts/index';
 import {ILiveExecutionTrackerRepository, ILiveExecutionTrackerService} from '../contracts/index';
-import {createRepository} from '../repositories/live-execution-tracker-repository-factory';
+import {createLiveExecutionTrackerRepository} from '../repositories/live-execution-tracker-repository-factory';
 import environment from '../../../environment';
 
 export class LiveExecutionTrackerService implements ILiveExecutionTrackerService {
@@ -26,7 +24,10 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
 
   constructor(eventAggregator: EventAggregator, managementApiClient: IManagementApiClient) {
     eventAggregator.subscribe(environment.events.configPanel.solutionEntryChanged, (solutionEntry: ISolutionEntry) => {
-      this.liveExecutionTrackerRepository = createRepository(managementApiClient, solutionEntry.processEngineVersion);
+      this.liveExecutionTrackerRepository = createLiveExecutionTrackerRepository(
+        managementApiClient,
+        solutionEntry.processEngineVersion,
+      );
     });
   }
 
@@ -86,6 +87,18 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
     callback: Function,
   ): Promise<Subscription> {
     return this.liveExecutionTrackerRepository.createProcessEndedEventListener(identity, processInstanceId, callback);
+  }
+
+  public createProcessErrorEventListener(
+    identity: IIdentity,
+    processInstanceId: string,
+    callback: Function,
+  ): Promise<Subscription> {
+    return this.liveExecutionTrackerRepository.createProcessErrorEventListener(
+      identity,
+      processInstanceId,
+      callback,
+    );
   }
 
   public createProcessTerminatedEventListener(

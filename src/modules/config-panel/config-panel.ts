@@ -6,8 +6,9 @@ import {IIdentity} from '@essential-projects/iam_contracts';
 
 import {IAuthenticationService} from '../../contracts/authentication/IAuthenticationService';
 import {AuthenticationStateEvent, ISolutionEntry, ISolutionService} from '../../contracts/index';
+import {HttpFetchClient} from '../fetch-http-client/http-fetch-client';
 
-@inject(Router, 'SolutionService', 'AuthenticationService', EventAggregator)
+@inject(Router, 'SolutionService', 'AuthenticationService', EventAggregator, 'HttpFetchClient')
 export class ConfigPanel {
   public internalSolution: ISolutionEntry;
   public authority: string;
@@ -17,17 +18,20 @@ export class ConfigPanel {
   private solutionService: ISolutionService;
   private authenticationService: IAuthenticationService;
   private eventAggregator: EventAggregator;
+  private httpFetchClient: HttpFetchClient;
 
   constructor(
     router: Router,
     solutionService: ISolutionService,
     authenticationService: IAuthenticationService,
     eventAggregator: EventAggregator,
+    httpFetchClient: HttpFetchClient,
   ) {
     this.router = router;
     this.solutionService = solutionService;
     this.authenticationService = authenticationService;
     this.eventAggregator = eventAggregator;
+    this.httpFetchClient = httpFetchClient;
   }
 
   public async attached(): Promise<void> {
@@ -76,20 +80,22 @@ export class ConfigPanel {
   }
 
   private async getAuthorityForInternalSolution(): Promise<string> {
-    const request: Request = new Request(`${this.internalSolution.uri}/security/authority`, {
-      method: 'GET',
-      mode: 'cors',
-      referrer: 'no-referrer',
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json',
-      },
-    });
+    try {
+      const fetchResponse: any = await this.httpFetchClient.get(
+        `${this.internalSolution.uri}/process_engine/security/authority`,
+      );
 
-    const response: Response = await fetch(request);
-    const authority: string = (await response.json()).authority;
+      return fetchResponse.result.authority;
+    } catch (error) {
+      const errorIsNotFoundError: boolean = error.code === 404;
+      if (errorIsNotFoundError) {
+        const fetchResponse: any = await this.httpFetchClient.get(`${this.internalSolution.uri}/security/authority`);
 
-    return authority;
+        return fetchResponse.result.authority;
+      }
+
+      return undefined;
+    }
   }
 
   public get uriIsValid(): boolean {

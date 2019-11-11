@@ -1,8 +1,9 @@
 /* eslint-disable max-lines */
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
-import {NewInstance, bindable, computedFrom, inject} from 'aurelia-framework';
+import {NewInstance, bindable, computedFrom, inject, observable} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 import {ControllerValidateResult, ValidateResult, ValidationController, ValidationRules} from 'aurelia-validation';
+import {BindingSignaler} from 'aurelia-templating-resources';
 
 import {join} from 'path';
 
@@ -11,7 +12,9 @@ import {IDiagram, ISolution} from '@process-engine/solutionexplorer.contracts';
 import {ISolutionExplorerService} from '@process-engine/solutionexplorer.service.contracts';
 
 import {IIdentity} from '@essential-projects/iam_contracts';
+import {IResponse} from '@essential-projects/http_contracts';
 import {
+  AuthenticationStateEvent,
   IDiagramCreationService,
   IDiagramState,
   IDiagramStateList,
@@ -22,11 +25,12 @@ import {
 } from '../../../contracts/index';
 import environment from '../../../environment';
 import {NotificationService} from '../../../services/notification-service/notification.service';
-import {OpenDiagramsSolutionExplorerService} from '../../../services/solution-explorer-services/OpenDiagramsSolutionExplorerService';
-import {OpenDiagramStateService} from '../../../services/solution-explorer-services/OpenDiagramStateService';
+import {OpenDiagramsSolutionExplorerService} from '../../../services/solution-explorer-services/open-diagrams-solution-explorer.service';
+import {OpenDiagramStateService} from '../../../services/solution-explorer-services/open-diagram-state.service';
 import {DeleteDiagramModal} from './delete-diagram-modal/delete-diagram-modal';
 import {DeployDiagramService} from '../../../services/deploy-diagram-service/deploy-diagram.service';
 import {SaveDiagramService} from '../../../services/save-diagram-service/save-diagram.service';
+import {HttpFetchClient} from '../../fetch-http-client/http-fetch-client';
 
 const ENTER_KEY: string = 'Enter';
 const ESCAPE_KEY: string = 'Escape';
@@ -57,6 +61,8 @@ interface IDiagramCreationState extends IDiagramNameInputState {
   'OpenDiagramStateService',
   DeployDiagramService,
   SaveDiagramService,
+  BindingSignaler,
+  'HttpFetchClient',
 )
 export class SolutionExplorerSolution {
   public activeDiagram: IDiagram;
@@ -66,7 +72,7 @@ export class SolutionExplorerSolution {
   // Fields below are bound from the html view.
   @bindable public solutionService: ISolutionExplorerService;
   @bindable public openDiagramService: OpenDiagramsSolutionExplorerService;
-  @bindable public displayedSolutionEntry: ISolutionEntry;
+  @bindable @observable public displayedSolutionEntry: ISolutionEntry;
   @bindable public fontAwesomeIconClass: string;
   public createNewDiagramInput: HTMLInputElement;
   public diagramContextMenu: HTMLElement;
@@ -102,7 +108,7 @@ export class SolutionExplorerSolution {
     currentDiagramInputValue: undefined,
   };
 
-  private refreshTimeoutTask: NodeJS.Timer | number;
+  private refreshTimeoutTask: NodeJS.Timer;
 
   private diagramValidationRegExpList: Array<RegExp> = [/^[a-z0-9]/i, /^[._ -]/i, /^[äöüß]/i];
 
@@ -116,6 +122,9 @@ export class SolutionExplorerSolution {
 
   private sortedDiagramsOfSolutions: Array<IDiagram> = [];
   private diagramStatesChangedCallbackId: string;
+  private signaler: BindingSignaler;
+  private httpFetchClient: HttpFetchClient;
+  private isPolling: boolean = false;
 
   constructor(
     router: Router,
@@ -127,6 +136,8 @@ export class SolutionExplorerSolution {
     openDiagramStateService: OpenDiagramStateService,
     deployDiagramService: DeployDiagramService,
     saveDiagramService: SaveDiagramService,
+    bindingSignaler: BindingSignaler,
+    httpFetchClient: HttpFetchClient,
   ) {
     this.router = router;
     this.eventAggregator = eventAggregator;
@@ -137,6 +148,8 @@ export class SolutionExplorerSolution {
     this.openDiagramStateService = openDiagramStateService;
     this.deployDiagramService = deployDiagramService;
     this.saveDiagramService = saveDiagramService;
+    this.signaler = bindingSignaler;
+    this.httpFetchClient = httpFetchClient;
 
     this.updateDiagramStateList();
     this.diagramStatesChangedCallbackId = this.openDiagramStateService.onDiagramStatesChanged(() => {
@@ -156,6 +169,11 @@ export class SolutionExplorerSolution {
     this.subscriptions = [
       this.eventAggregator.subscribe('router:navigation:success', () => {
         this.updateSolutionExplorer();
+      }),
+      this.eventAggregator.subscribe(AuthenticationStateEvent.LOGIN, async () => {
+        await this.updateSolution();
+
+        this.startPolling();
       }),
     ];
 
@@ -199,7 +217,16 @@ export class SolutionExplorerSolution {
       const makeRequest: Function = (): void => {
         setTimeout(async () => {
           try {
-            await fetch(this.displayedSolutionEntry.uri);
+            try {
+              await this.httpFetchClient.get(`${this.displayedSolutionEntry.uri}/process_engine`);
+            } catch (error) {
+              const errorIsNotFoundError: boolean = error.code === 404;
+              if (errorIsNotFoundError) {
+                await this.httpFetchClient.get(`${this.displayedSolutionEntry.uri}`);
+              } else {
+                throw error;
+              }
+            }
 
             this.processEngineRunning = true;
 
@@ -277,6 +304,7 @@ export class SolutionExplorerSolution {
     try {
       this.openedSolution = await this.solutionService.loadSolution();
 
+      await this.updateSolutionEntry();
       const updatedDiagramList: Array<IDiagram> = this.displayedSolutionEntry.isOpenDiagramService
         ? this.openedSolution.diagrams
         : this.openedSolution.diagrams.sort(this.diagramSorter);
@@ -293,17 +321,69 @@ export class SolutionExplorerSolution {
       // In the future we can maybe display a small icon indicating the error.
       if (isError(error, UnauthorizedError)) {
         this.notificationService.showNotification(NotificationType.ERROR, 'You need to login to list process models.');
+
+        this.sortedDiagramsOfSolutions = [];
+        this.openedSolution = undefined;
+        this.stopPolling();
       } else if (isError(error, ForbiddenError)) {
         this.notificationService.showNotification(
           NotificationType.ERROR,
           "You don't have the required permissions to list process models.",
         );
+
+        this.sortedDiagramsOfSolutions = [];
+        this.openedSolution = undefined;
+        this.stopPolling();
       } else {
         this.openedSolution.diagrams = undefined;
         this.fontAwesomeIconClass = 'fa-bolt';
         this.processEngineRunning = false;
       }
     }
+  }
+
+  private async updateSolutionEntry(): Promise<void> {
+    const solutionIsNotRemote: boolean = !this.displayedSolutionEntry.uri.startsWith('http');
+    if (solutionIsNotRemote) {
+      return;
+    }
+
+    let response: IResponse<JSON & {version: string}>;
+    try {
+      response = await this.httpFetchClient.get(`${this.displayedSolutionEntry.uri}/process_engine`);
+    } catch (error) {
+      const errorIsNotFoundError: boolean = error.code === 404;
+      if (errorIsNotFoundError) {
+        response = await this.httpFetchClient.get(`${this.displayedSolutionEntry.uri}`);
+      } else {
+        throw error;
+      }
+    }
+
+    let authority;
+    try {
+      const fetchResponse: any = await this.httpFetchClient.get(
+        `${this.displayedSolutionEntry.uri}/process_engine/security/authority`,
+      );
+
+      authority = fetchResponse.result.authority;
+    } catch (error) {
+      const errorIsNotFoundError: boolean = error.code === 404;
+      if (errorIsNotFoundError) {
+        const fetchResponse: any = await this.httpFetchClient.get(
+          `${this.displayedSolutionEntry.uri}/security/authority`,
+        );
+
+        authority = fetchResponse.result.authority;
+      } else {
+        throw error;
+      }
+    }
+
+    this.displayedSolutionEntry.authority = authority;
+    this.displayedSolutionEntry.processEngineVersion = response.result.version;
+    this.globalSolutionService.addSolutionEntry(this.displayedSolutionEntry);
+    this.signaler.signal('update-version-icon');
   }
 
   /*
@@ -713,13 +793,25 @@ export class SolutionExplorerSolution {
       return;
     }
 
+    this.isPolling = true;
+
     this.refreshTimeoutTask = setTimeout(async () => {
       await this.updateSolution();
 
-      if (this.isAttached) {
+      if (this.isAttached && this.isPolling) {
         this.startPolling();
       }
     }, environment.processengine.solutionExplorerPollingIntervalInMs);
+  }
+
+  private stopPolling(): void {
+    if (this.displayedSolutionEntry.isOpenDiagramService) {
+      return;
+    }
+
+    this.isPolling = false;
+
+    clearTimeout(this.refreshTimeoutTask);
   }
 
   // TODO: This method is copied all over the place.
@@ -1065,6 +1157,7 @@ export class SolutionExplorerSolution {
 
     await this.updateSolution();
     this.resetDiagramCreation();
+    this.activeDiagram = createdDiagram;
     this.navigateToDetailView(createdDiagram);
   }
 
@@ -1197,7 +1290,11 @@ export class SolutionExplorerSolution {
         this.diagramRenamingState.currentDiagramInputValue,
       );
 
-      this.openDiagramStateService.setDiagramChange(this.currentlyRenamingDiagram.uri, {change: 'rename'});
+      const diagramHasState: boolean =
+        this.openDiagramStateService.loadDiagramState(this.currentlyRenamingDiagram.uri) !== null;
+      if (diagramHasState) {
+        this.openDiagramStateService.setDiagramChange(this.currentlyRenamingDiagram.uri, {change: 'rename'});
+      }
     } catch (error) {
       this.notificationService.showNotification(NotificationType.WARNING, error.message);
 
@@ -1315,6 +1412,11 @@ export class SolutionExplorerSolution {
     if (routeNameNeedsUpdate) {
       this.diagramRoute = routeName;
       this.inspectView = this.router.currentInstruction.params.view;
+    }
+
+    const currentRoute: string = this.router.currentInstruction.config.name;
+    if (currentRoute === 'preferences' || currentRoute === 'settings') {
+      return;
     }
 
     this.activeDiagram = undefined;

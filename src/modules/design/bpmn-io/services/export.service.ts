@@ -1,5 +1,5 @@
 import {IExportService} from '../../../../contracts/index';
-import {DiagramExportRepository} from '../repositories/DiagramExportRepository';
+import {DiagramExportRepository} from '../repositories/diagram-export.repository';
 
 export class ExportService implements IExportService {
   private enqueuedPromises: Array<Promise<string>>;

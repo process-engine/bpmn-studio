@@ -1,5 +1,7 @@
 <template>
   <require from="./task-list.css"></require>
+  <require from="../../pagination/pagination"></require>
+
   <div class="task-list-container" id="taskListContainer">
     <h4 class="task-list-header">Tasks</h4>
     <template if.bind="initialLoadingFinished && tasks && tasks.length > 0">
@@ -30,10 +32,8 @@
           </td>
         </tr>
       </table>
-      <div class="col-md-12 col-xs-12 pagination">
-        <aubs-pagination page-size.bind="pageSize" total-items.bind="totalItems" current-page.bind="currentPage"
-          boundary-links.bind="true" pagination-size.bind="paginationSize">
-        </aubs-pagination>
+      <div if.bind="totalItems > pageSize" class="col-md-12 col-xs-12 pagination">
+        <pagination view-model.ref="pagination" current-page.two-way="currentPage" per-page.to-view="pageSize" items.to-view="totalItems" max-pages-to-display.to-view="paginationSize" content-is-async.bind="true" is-loading.two-way="paginationShowsLoading"></pagination>
       </div>
     </template>
     <template if.bind="initialLoadingFinished && (!tasks || tasks.length === 0)">

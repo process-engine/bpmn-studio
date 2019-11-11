@@ -6,20 +6,23 @@ import {Router} from 'aurelia-router';
 import {SemVer} from 'semver';
 
 import {IIdentity} from '@essential-projects/iam_contracts';
+import {IResponse} from '@essential-projects/http_contracts';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 import {ISolutionExplorerService} from '@process-engine/solutionexplorer.service.contracts';
 
 import {
+  AuthenticationStateEvent,
   IAuthenticationService,
   ILoginResult,
   ISolutionEntry,
   ISolutionService,
   IUserIdentity,
-} from '../../../contracts';
-import {OpenDiagramsSolutionExplorerService} from '../../../services/solution-explorer-services/OpenDiagramsSolutionExplorerService';
-import {SolutionExplorerServiceFactory} from '../../../services/solution-explorer-services/SolutionExplorerServiceFactory';
+} from '../../../contracts/index';
+import {OpenDiagramsSolutionExplorerService} from '../../../services/solution-explorer-services/open-diagrams-solution-explorer.service';
+import {SolutionExplorerServiceFactory} from '../../../services/solution-explorer-services/solution-explorer-service-factory';
 import {SolutionExplorerSolution} from '../solution-explorer-solution/solution-explorer-solution';
-import {exposeFunctionForTesting} from '../../../services/expose-functionality-module/expose-functionality-module';
+import {exposeFunctionForTesting} from '../../../services/expose-functionality-module/expose-functionality.module';
+import {HttpFetchClient} from '../../fetch-http-client/http-fetch-client';
 
 interface IUriToViewModelMap {
   [key: string]: SolutionExplorerSolution;
@@ -32,6 +35,7 @@ interface IUriToViewModelMap {
   'AuthenticationService',
   'SolutionService',
   'OpenDiagramService',
+  'HttpFetchClient',
 )
 export class SolutionExplorerList {
   public internalProcessEngineVersion: string;
@@ -62,6 +66,9 @@ export class SolutionExplorerList {
   private openedSolutions: Array<ISolutionEntry> = [];
   private solutionsToOpen: Array<string> = [];
   private solutionsWhoseOpeningShouldGetAborted: Array<string> = [];
+  private pollingTimeout: NodeJS.Timeout;
+
+  private httpFetchClient: HttpFetchClient;
 
   constructor(
     router: Router,
@@ -70,6 +77,7 @@ export class SolutionExplorerList {
     authenticationService: IAuthenticationService,
     solutionService: ISolutionService,
     openDiagramService: OpenDiagramsSolutionExplorerService,
+    httpFetchClient: HttpFetchClient,
   ) {
     this.router = router;
     this.eventAggregator = eventAggregator;
@@ -77,6 +85,7 @@ export class SolutionExplorerList {
     this.authenticationService = authenticationService;
     this.solutionService = solutionService;
     this.openDiagramService = openDiagramService;
+    this.httpFetchClient = httpFetchClient;
 
     const canReadFromFileSystem: boolean = (window as any).nodeRequire;
     if (canReadFromFileSystem) {
@@ -88,6 +97,7 @@ export class SolutionExplorerList {
     });
 
     this.internalSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
+    this.internalProcessEngineVersion = window.localStorage.getItem('InternalProcessEngineVersion');
   }
 
   /**
@@ -146,6 +156,10 @@ export class SolutionExplorerList {
   }
 
   public isProcessEngineNewerThanInternal(solutionEntry: ISolutionEntry): boolean {
+    if (this.internalProcessEngineVersion === 'null') {
+      return false;
+    }
+
     const internalPEVersion = new SemVer(this.internalProcessEngineVersion);
     const solutionEntryPEVersion = new SemVer(solutionEntry.processEngineVersion);
 
@@ -153,6 +167,10 @@ export class SolutionExplorerList {
   }
 
   public isProcessEngineOlderThanInternal(solutionEntry: ISolutionEntry): boolean {
+    if (this.internalProcessEngineVersion === 'null') {
+      return false;
+    }
+
     const internalPEVersion = new SemVer(this.internalProcessEngineVersion);
     const solutionEntryPEVersion = new SemVer(solutionEntry.processEngineVersion);
 
@@ -182,7 +200,6 @@ export class SolutionExplorerList {
   public async openSolution(uri: string, insertAtBeginning: boolean = false, identity?: IIdentity): Promise<void> {
     this.solutionsToOpen.push(uri);
 
-    this.internalProcessEngineVersion = await this.getProcessEngineVersionFromInternalPE(this.internalSolutionUri);
     const uriIsRemote: boolean = uri.startsWith('http');
 
     let solutionExplorer: ISolutionExplorerService;
@@ -202,7 +219,7 @@ export class SolutionExplorerList {
 
     try {
       if (uriIsRemote && uriIsNotInternalProcessEngine) {
-        const response: Response = await new Promise(
+        const response: IResponse<JSON & {version: string}> = await new Promise(
           async (resolve, reject): Promise<void> => {
             const timeout: NodeJS.Timeout = setTimeout(() => {
               if (this.solutionsWhoseOpeningShouldGetAborted.includes(uri)) {
@@ -215,10 +232,22 @@ export class SolutionExplorerList {
             }, 3000);
 
             try {
-              const fetchResponse: Response = await fetch(uri);
-              clearTimeout(timeout);
+              try {
+                const fetchResponse: any = await this.httpFetchClient.get(`${uri}/process_engine`);
 
-              resolve(fetchResponse);
+                resolve(fetchResponse);
+              } catch (error) {
+                const errorIsNotFoundError: boolean = error.code === 404;
+                if (errorIsNotFoundError) {
+                  const fetchResponse: any = await this.httpFetchClient.get(`${uri}`);
+
+                  resolve(fetchResponse);
+                } else {
+                  reject(error);
+                }
+              }
+
+              clearTimeout(timeout);
             } catch (error) {
               clearTimeout(timeout);
 
@@ -227,20 +256,24 @@ export class SolutionExplorerList {
           },
         );
 
-        const responseJSON: object & {version: string} = await response.json();
-
         if (this.solutionsWhoseOpeningShouldGetAborted.includes(uri)) {
           this.openingSolutionWasCanceled(uri);
 
           return;
         }
 
-        const isResponseFromProcessEngine: boolean = responseJSON['name'] === '@process-engine/process_engine_runtime';
+        const isResponseFromProcessEngine: boolean =
+          response.result['name'] === '@process-engine/process_engine_runtime';
         if (!isResponseFromProcessEngine) {
           throw new Error('The response was not send by a ProcessEngine.');
         }
 
-        processEngineVersion = responseJSON.version;
+        processEngineVersion = response.result.version;
+      }
+
+      const uriIsInternalProcessEngine = !uriIsNotInternalProcessEngine;
+      if (uriIsInternalProcessEngine) {
+        processEngineVersion = this.internalProcessEngineVersion;
       }
 
       if (this.solutionsWhoseOpeningShouldGetAborted.includes(uri)) {
@@ -267,9 +300,7 @@ export class SolutionExplorerList {
       const openSolutionFailedWithFailedToFetch: boolean = error.message === 'Failed to fetch';
       if (openSolutionFailedWithFailedToFetch) {
         if (!uriIsNotInternalProcessEngine) {
-          await this.getProcessEngineVersionFromInternalPE(uri);
-
-          this.openSolution(uri, insertAtBeginning, identityToUse);
+          this.startPollingForInternalEngine(uri, insertAtBeginning, identityToUse);
 
           return;
         }
@@ -292,11 +323,18 @@ export class SolutionExplorerList {
       throw new Error('Solution is already opened.');
     }
 
-    if (!processEngineVersion && !uriIsNotInternalProcessEngine) {
-      processEngineVersion = await this.getProcessEngineVersionFromInternalPE(uri);
-    }
-
     this.addSolutionEntry(uri, solutionExplorer, identityToUse, insertAtBeginning, processEngineVersion);
+  }
+
+  private startPollingForInternalEngine(uri, insertAtBeginning, identityToUse): void {
+    this.pollingTimeout = setTimeout(() => {
+      if (this.openedSolutions.some((solution: ISolutionEntry) => solution.uri === uri)) {
+        clearTimeout(this.pollingTimeout);
+        return;
+      }
+
+      this.openSolution(uri, insertAtBeginning, identityToUse);
+    }, 400);
   }
 
   /**
@@ -353,6 +391,8 @@ export class SolutionExplorerList {
 
     await solutionEntry.service.openSolution(solutionEntry.uri, solutionEntry.identity);
     this.solutionService.persistSolutionsInLocalStorage();
+
+    this.eventAggregator.publish(AuthenticationStateEvent.LOGIN);
   }
 
   public async logout(solutionEntry: ISolutionEntry): Promise<void> {
@@ -474,26 +514,6 @@ export class SolutionExplorerList {
       1,
     );
     this.solutionsToOpen.splice(this.solutionsToOpen.indexOf(solutionUri), 1);
-  }
-
-  private getProcessEngineVersionFromInternalPE(uri: string): Promise<string> {
-    return new Promise((resolve: Function): void => {
-      const makeRequest: Function = (): void => {
-        setTimeout(async () => {
-          try {
-            const response: Response = await fetch(uri);
-            const responseJSON: any = await response.json();
-
-            resolve(responseJSON.version);
-          } catch (error) {
-            makeRequest();
-          }
-          // tslint:disable-next-line: no-magic-numbers
-        }, 100);
-      };
-
-      makeRequest();
-    });
   }
 
   private cleanupSolution(uri: string): void {
@@ -667,20 +687,20 @@ export class SolutionExplorerList {
       return undefined;
     }
 
-    const request: Request = new Request(`${solutionUri}/security/authority`, {
-      method: 'GET',
-      mode: 'cors',
-      referrer: 'no-referrer',
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json',
-      },
-    });
+    try {
+      const fetchResponse: any = await this.httpFetchClient.get(`${solutionUri}/process_engine/security/authority`);
 
-    const response: Response = await fetch(request);
-    const authority: string = (await response.json()).authority;
+      return fetchResponse.result.authority;
+    } catch (error) {
+      const errorIsNotFoundError: boolean = error.code === 404;
+      if (errorIsNotFoundError) {
+        const fetchResponse: any = await this.httpFetchClient.get(`${solutionUri}/security/authority`);
 
-    return authority;
+        return fetchResponse.result.authority;
+      }
+
+      return undefined;
+    }
   }
 
   private createDummyAccessToken(): string {

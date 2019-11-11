@@ -32,10 +32,10 @@ import {
 } from '../../../contracts/index';
 import environment from '../../../environment';
 import {NotificationService} from '../../../services/notification-service/notification.service';
-import {OpenDiagramStateService} from '../../../services/solution-explorer-services/OpenDiagramStateService';
+import {OpenDiagramStateService} from '../../../services/solution-explorer-services/open-diagram-state.service';
 import {PropertyPanel} from '../property-panel/property-panel';
 import {DiagramExportService, DiagramPrintService} from './services/index';
-import {UserConfigService} from '../../../services/user-config-service/userconfig.service';
+import {UserConfigService} from '../../../services/user-config-service/user-config.service';
 
 const sideBarRightSize: number = 35;
 
@@ -228,7 +228,7 @@ export class BpmnIo {
     }, 0);
 
     if (this.solutionIsRemote) {
-      this.viewer.importXML(this.xml);
+      await this.importXmlIntoViewer(this.xml);
       this.viewer.attachTo(this.canvasModel);
     } else {
       this.modeler.attachTo(this.canvasModel);
@@ -273,6 +273,18 @@ export class BpmnIo {
           this.hideOrShowPpForSpaceReasons();
         },
       ),
+
+      this.eventAggregator.subscribe(environment.events.diagramNeedsToBeUpdated, async () => {
+        this.diagramHasChanged = true;
+        const diagramState: IDiagramState | null = this.openDiagramStateService.loadDiagramState(this.diagramUri);
+
+        const newXml = diagramState.data.xml;
+
+        await this.importXmlIntoModeler(newXml);
+
+        this.savedXml = newXml;
+        this.xml = newXml;
+      }),
 
       this.eventAggregator.subscribe(`${environment.events.diagramDetail.exportDiagramAs}:BPMN`, async () => {
         try {
@@ -445,14 +457,16 @@ export class BpmnIo {
       this.savedXml = await this.convertXml(newValue);
 
       if (this.solutionIsRemote) {
-        this.viewer.importXML(this.xml);
+        this.importXmlIntoViewer(this.xml);
       }
 
       if (this.diagramHasState(this.diagramUri)) {
-        this.recoverDiagramState();
+        await this.recoverDiagramState();
       } else {
-        this.importXmlIntoModeler(this.xml);
+        await this.importXmlIntoModeler(this.xml);
       }
+
+      this.propertyPanelViewModel.xmlWasChanged();
 
       const diagramState: IDiagramState = this.loadDiagramState(this.diagramUri);
       const diagramContainsChanges: boolean = diagramState !== null && diagramState.metadata.isChanged;
@@ -536,7 +550,7 @@ export class BpmnIo {
 
         const xmlIsNotEmpty: boolean = this.xml !== undefined && this.xml !== null;
         if (xmlIsNotEmpty) {
-          this.viewer.importXML(this.xml);
+          this.importXmlIntoViewer(this.xml);
         }
 
         this.linting.deactivateLinting();
@@ -766,6 +780,21 @@ export class BpmnIo {
   private importXmlIntoModeler(xml: string): Promise<void> {
     return new Promise((resolve: Function, reject: Function): void => {
       this.modeler.importXML(xml, (error: Error) => {
+        const errorOccured: boolean = error !== undefined;
+        if (errorOccured) {
+          reject();
+
+          return;
+        }
+
+        resolve();
+      });
+    });
+  }
+
+  private importXmlIntoViewer(xml: string): Promise<void> {
+    return new Promise((resolve: Function, reject: Function): void => {
+      this.viewer.importXML(xml, (error: Error) => {
         const errorOccured: boolean = error !== undefined;
         if (errorOccured) {
           reject();

@@ -2,6 +2,7 @@
 import fs from 'fs';
 import path from 'path';
 import {homedir} from 'os';
+import windowStateKeeper from 'electron-window-state';
 
 import JSZip from 'jszip';
 
@@ -22,12 +23,13 @@ import open from 'open';
 
 import {CancellationToken, autoUpdater} from '@process-engine/electron-updater';
 import * as pe from '@process-engine/process_engine_runtime';
+import {version as ProcessEngineVersion} from '@process-engine/process_engine_runtime/package.json';
 
 import electronOidc from './electron-oidc';
 import oidcConfig from './oidc-config';
-import ReleaseChannel from '../src/services/release-channel-service/release-channel-service';
+import ReleaseChannel from '../src/services/release-channel-service/release-channel.service';
 import {version as CurrentStudioVersion} from '../package.json';
-import {getPortListByVersion} from '../src/services/default-ports-module/default-ports-module';
+import {getPortListByVersion} from '../src/services/default-ports-module/default-ports.module';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import electron = require('electron');
@@ -325,9 +327,16 @@ function createMainWindow(): void {
 
   setElectronMenubar();
 
+  const mainWindowState = windowStateKeeper({
+    defaultWidth: 1300,
+    defaultHeight: 800,
+  });
+
   browserWindow = new BrowserWindow({
-    width: 1300,
-    height: 800,
+    width: mainWindowState.width,
+    height: mainWindowState.height,
+    x: mainWindowState.x,
+    y: mainWindowState.y,
     title: getProductName(),
     minWidth: 1300,
     minHeight: 800,
@@ -337,6 +346,8 @@ function createMainWindow(): void {
       nodeIntegration: true,
     },
   });
+
+  mainWindowState.manage(browserWindow);
 
   browserWindow.loadURL(`file://${__dirname}/../../../index.html`);
   // We need to navigate to "/" because something in the push state seems to be
@@ -350,6 +361,13 @@ function createMainWindow(): void {
 
   browserWindow.on('closed', (event) => {
     browserWindow = null;
+  });
+
+  browserWindow.on('enter-full-screen', () => {
+    browserWindow.webContents.send('toggle-fullscreen', true);
+  });
+  browserWindow.on('leave-full-screen', () => {
+    browserWindow.webContents.send('toggle-fullscreen', false);
   });
 
   browserWindow.webContents.on('new-window', (event: any, url: string) => {
@@ -868,13 +886,22 @@ async function startInternalProcessEngine(): Promise<any> {
     event.returnValue = `localhost:${port}`;
   });
 
+  ipcMain.on('get_version', (event: IpcMainEvent) => {
+    event.returnValue = ProcessEngineVersion;
+  });
+
   // TODO: Check if the ProcessEngine instance is now run on the UI thread.
   // See issue https://github.com/process-engine/bpmn-studio/issues/312
   try {
     const sqlitePath = getDatabaseFolder();
+    const logFilepath = getLogFolder();
 
-    // eslint-disable-next-line global-require
-    pe.startRuntime(sqlitePath);
+    const startupArgs = {
+      sqlitePath: sqlitePath,
+      logFilePath: logFilepath,
+    };
+
+    pe.startRuntime(startupArgs);
 
     console.log('Internal ProcessEngine started successfully.');
     internalProcessEngineStatus = 'success';
@@ -895,6 +922,14 @@ async function startInternalProcessEngine(): Promise<any> {
       internalProcessEngineStartupError,
     );
   }
+}
+
+function getLogFolder(): string {
+  return path.join(getConfigFolder(), getProcessEngineLogFolderName());
+}
+
+function getProcessEngineLogFolderName(): string {
+  return 'process_engine_logs';
 }
 
 function getDatabaseFolder(): string {

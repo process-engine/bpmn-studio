@@ -4,6 +4,7 @@ import {Router} from 'aurelia-router';
 
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 
+import {IResponse} from '@essential-projects/http_contracts';
 import {
   AuthenticationStateEvent,
   IFile,
@@ -18,7 +19,8 @@ import environment from '../../../environment';
 import {NotificationService} from '../../../services/notification-service/notification.service';
 import {SolutionExplorerList} from '../solution-explorer-list/solution-explorer-list';
 
-import {getPortListByVersion} from '../../../services/default-ports-module/default-ports-module';
+import {getPortListByVersion} from '../../../services/default-ports-module/default-ports.module';
+import {HttpFetchClient} from '../../fetch-http-client/http-fetch-client';
 
 type RemoteSolutionListEntry = {
   uri: string;
@@ -35,7 +37,7 @@ type RemoteSolutionListEntry = {
  *  - Refreshing on login/logout
  *  - Updating the remote processengine uri if needed
  */
-@inject(EventAggregator, 'NotificationService', Router, 'SolutionService')
+@inject(EventAggregator, 'NotificationService', Router, 'SolutionService', 'HttpFetchClient')
 export class SolutionExplorerPanel {
   @observable public selectedProtocol: string = 'http://';
 
@@ -61,16 +63,20 @@ export class SolutionExplorerPanel {
   private remoteSolutionHistoryStatusPollingTimer: NodeJS.Timer;
   private remoteSolutionHistoryStatusIsPolling: boolean;
 
+  private httpFetchClient: HttpFetchClient;
+
   constructor(
     eventAggregator: EventAggregator,
     notificationService: NotificationService,
     router: Router,
     solutionService: ISolutionService,
+    httpFetchClient: HttpFetchClient,
   ) {
     this.eventAggregator = eventAggregator;
     this.notificationService = notificationService;
     this.router = router;
     this.solutionService = solutionService;
+    this.httpFetchClient = httpFetchClient;
 
     if (this.canReadFromFileSystem()) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
@@ -84,14 +90,16 @@ export class SolutionExplorerPanel {
     const persistedInternalSolution: ISolutionEntry = this.solutionService.getSolutionEntryForUri(uriOfProcessEngine);
     const internalSolutionWasPersisted: boolean = persistedInternalSolution !== undefined;
 
-    try {
-      if (internalSolutionWasPersisted) {
-        this.solutionExplorerList.openSolution(uriOfProcessEngine, false, persistedInternalSolution.identity);
-      } else {
-        this.solutionExplorerList.openSolution(uriOfProcessEngine);
+    if ((window as any).nodeRequire) {
+      try {
+        if (internalSolutionWasPersisted) {
+          this.solutionExplorerList.openSolution(uriOfProcessEngine, false, persistedInternalSolution.identity);
+        } else {
+          this.solutionExplorerList.openSolution(uriOfProcessEngine);
+        }
+      } catch {
+        return;
       }
-    } catch {
-      return;
     }
 
     // Open the previously opened solutions.
@@ -508,11 +516,19 @@ export class SolutionExplorerPanel {
 
   private async isRemoteSolutionActive(remoteSolutionUri: string): Promise<boolean> {
     try {
-      const response: Response = await fetch(remoteSolutionUri);
+      let response: IResponse<JSON>;
+      try {
+        response = await this.httpFetchClient.get(`${remoteSolutionUri}/process_engine`);
+      } catch (error) {
+        const errorIsNotFoundError: boolean = error.code === 404;
+        if (errorIsNotFoundError) {
+          response = await this.httpFetchClient.get(`${remoteSolutionUri}`);
+        } else {
+          throw error;
+        }
+      }
 
-      const data: JSON = await response.json();
-
-      const isResponseFromProcessEngine: boolean = data['name'] === '@process-engine/process_engine_runtime';
+      const isResponseFromProcessEngine: boolean = response.result['name'] === '@process-engine/process_engine_runtime';
       if (!isResponseFromProcessEngine) {
         throw new Error('The response was not send by a ProcessEngine.');
       }

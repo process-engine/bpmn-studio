@@ -21,7 +21,7 @@ import {NotificationService} from '../../../services/notification-service/notifi
 import {BpmnIo} from '../bpmn-io/bpmn-io';
 import {DeployDiagramService} from '../../../services/deploy-diagram-service/deploy-diagram.service';
 import {SaveDiagramService} from '../../../services/save-diagram-service/save-diagram.service';
-import {exposeFunctionForTesting} from '../../../services/expose-functionality-module/expose-functionality-module';
+import {exposeFunctionForTesting} from '../../../services/expose-functionality-module/expose-functionality.module';
 import {DiagramDetailService} from './service/diagram-detail.service';
 
 @inject(
@@ -120,7 +120,15 @@ export class DiagramDetail {
         this.handleFormValidateEvents(event);
       }),
       this.eventAggregator.subscribe(environment.events.diagramDetail.saveDiagram, async () => {
-        await this.saveDiagram();
+        try {
+          await this.saveDiagram();
+        } catch (error) {
+          if (error.message === 'No path was selected.') {
+            return;
+          }
+
+          throw error;
+        }
 
         this.eventAggregator.publish(environment.events.diagramDetail.saveDiagramDone);
       }),
@@ -233,8 +241,12 @@ export class DiagramDetail {
 
     this.dropInvalidFormData();
 
+    this.getTokenFromStartEventAnnotation();
+    const defaultToken: any = this.getInitialTokenValues(this.initialToken);
+    const startToken = defaultToken === '' ? undefined : defaultToken;
+
     const startRequestPayload: DataModels.ProcessModels.ProcessStartRequestPayload = {
-      inputValues: parsedInitialToken,
+      inputValues: parsedInitialToken || startToken,
       correlationId: this.customCorrelationId,
     };
 
@@ -280,7 +292,7 @@ export class DiagramDetail {
 
     await this.bpmnio.saveDiagramState(this.activeDiagramUri);
 
-    this.saveDiagramService.saveDiagram(this.activeSolutionEntry, this.activeDiagram, xml);
+    await this.saveDiagramService.saveDiagram(this.activeSolutionEntry, this.activeDiagram, xml);
 
     this.bpmnio.saveCurrentXML();
     this.diagramHasChanged = false;

@@ -7,15 +7,24 @@ export class HttpFetchClient implements IHttpClient {
   private httpRedirectResponseCode: number = 300;
 
   public async get<T>(url: string, options?: IRequestOptions): Promise<IResponse<T>> {
+    const headers: any = {
+      'Access-Control-Allow-Origin': '*',
+      'Content-Type': 'application/json',
+    };
+
+    if (options !== undefined && options.headers !== undefined) {
+      const optionHeaders: Array<string> = Object.keys(options.headers);
+
+      for (const header of optionHeaders) {
+        headers[header] = options.headers[header];
+      }
+    }
+
     const request: Request = new Request(url, {
       method: 'GET',
       mode: 'cors',
       referrer: 'no-referrer',
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
+      headers: headers,
     });
 
     const response: Response = await fetch(request);
@@ -26,15 +35,24 @@ export class HttpFetchClient implements IHttpClient {
   }
 
   public async post<D, T>(url: string, data: D, options?: IRequestOptions): Promise<IResponse<T>> {
+    const headers: any = {
+      'Access-Control-Allow-Origin': '*',
+      'Content-Type': 'application/json',
+    };
+
+    if (options !== undefined && options.headers !== undefined) {
+      const optionHeaders: Array<string> = Object.keys(options.headers);
+
+      for (const header of optionHeaders) {
+        headers[header] = options.headers[header];
+      }
+    }
+
     const request: Request = new Request(url, {
       method: 'POST',
       mode: 'cors',
       referrer: 'no-referrer',
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
+      headers: headers,
       body: JSON.stringify(data),
     });
 
@@ -46,15 +64,24 @@ export class HttpFetchClient implements IHttpClient {
   }
 
   public async put<T>(url: string, data: T, options?: IRequestOptions): Promise<IResponse<T>> {
+    const headers: any = {
+      'Access-Control-Allow-Origin': '*',
+      'Content-Type': 'application/json',
+    };
+
+    if (options !== undefined && options.headers !== undefined) {
+      const optionHeaders: Array<string> = Object.keys(options.headers);
+
+      for (const header of optionHeaders) {
+        headers[header] = options.headers[header];
+      }
+    }
+
     const request: Request = new Request(url, {
       method: 'PUT',
       mode: 'cors',
       referrer: 'no-referrer',
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
+      headers: headers,
       body: JSON.stringify(data),
     });
 
@@ -66,15 +93,24 @@ export class HttpFetchClient implements IHttpClient {
   }
 
   public async delete<T>(url: string, options?: IRequestOptions): Promise<IResponse<T>> {
+    const headers: any = {
+      'Access-Control-Allow-Origin': '*',
+      'Content-Type': 'application/json',
+    };
+
+    if (options !== undefined && options.headers !== undefined) {
+      const optionHeaders: Array<string> = Object.keys(options.headers);
+
+      for (const header of optionHeaders) {
+        headers[header] = options.headers[header];
+      }
+    }
+
     const request: Request = new Request(url, {
       method: 'DELETE',
       mode: 'cors',
       referrer: 'no-referrer',
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
+      headers: headers,
     });
 
     const response: Response = await fetch(request);

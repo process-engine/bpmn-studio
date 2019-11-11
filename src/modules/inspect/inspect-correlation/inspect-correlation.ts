@@ -1,32 +1,40 @@
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {bindable, inject, observable} from 'aurelia-framework';
 
+import * as Bluebird from 'bluebird';
+
 import {IShape} from '@process-engine/bpmn-elements_contracts';
 import {DataModels} from '@process-engine/management_api_contracts';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 
-import {IEventFunction, ISolutionEntry, InspectPanelTab} from '../../../contracts/index';
+import {IEventFunction, ISolutionEntry, InspectPanelTab, NotificationType} from '../../../contracts/index';
 import environment from '../../../environment';
 import {IInspectCorrelationService} from './contracts';
 import {DiagramViewer} from './components/diagram-viewer/diagram-viewer';
 import {InspectPanel} from './components/inspect-panel/inspect-panel';
+import {DEFAULT_PAGESIZE} from './components/inspect-panel/components/correlation-list/correlation-list';
+import {NotificationService} from '../../../services/notification-service/notification.service';
 
-@inject('InspectCorrelationService', EventAggregator)
+@inject('InspectCorrelationService', EventAggregator, 'NotificationService')
 export class InspectCorrelation {
-  @bindable public processInstanceToSelect: string;
+  @bindable public processInstanceIdToSelect: string;
+  @bindable public processInstanceToSelect: DataModels.Correlations.ProcessInstance;
   @bindable public flowNodeToSelect: string;
   @bindable public activeDiagram: IDiagram;
   @bindable public activeSolutionEntry: ISolutionEntry;
   @bindable public selectedProcessInstance: DataModels.Correlations.ProcessInstance;
-  @bindable public selectedCorrelation: DataModels.Correlations.Correlation;
   @bindable public inspectPanelFullscreen: boolean = false;
   @observable public bottomPanelHeight: number = 250;
   @observable public tokenViewerWidth: number = 250;
   @bindable public diagramViewer: DiagramViewer;
   @bindable public inspectPanel: InspectPanel;
   @bindable public inspectPanelTabToShow: InspectPanelTab;
+  @bindable public totalCount: number;
 
-  public correlations: Array<DataModels.Correlations.Correlation>;
+  public offset: number = 0;
+  public limit: number = DEFAULT_PAGESIZE;
+
+  public processInstances: Array<DataModels.Correlations.ProcessInstance>;
   public token: string;
   public showInspectPanel: boolean = true;
   public showTokenViewer: boolean = false;
@@ -38,31 +46,23 @@ export class InspectCorrelation {
 
   private inspectCorrelationService: IInspectCorrelationService;
   private eventAggregator: EventAggregator;
+  private notificationService: NotificationService;
   private subscriptions: Array<Subscription>;
 
-  constructor(inspectCorrelationService: IInspectCorrelationService, eventAggregator: EventAggregator) {
+  private updatePromise: any;
+
+  constructor(
+    inspectCorrelationService: IInspectCorrelationService,
+    eventAggregator: EventAggregator,
+    notificationService: NotificationService,
+  ) {
     this.inspectCorrelationService = inspectCorrelationService;
     this.eventAggregator = eventAggregator;
+    this.notificationService = notificationService;
   }
 
   public async attached(): Promise<void> {
-    try {
-      const correlationList = await this.inspectCorrelationService.getAllCorrelationsForProcessModelId(
-        this.activeDiagram.id,
-        this.activeSolutionEntry.identity,
-      );
-
-      // https://github.com/process-engine/process_engine_runtime/issues/432
-      if (correlationList.totalCount === 0) {
-        this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
-        this.correlations = [];
-      } else {
-        this.correlations = correlationList.correlations;
-      }
-    } catch (error) {
-      this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
-      this.correlations = [];
-    }
+    this.updateProcessInstances();
 
     this.eventAggregator.publish(environment.events.statusBar.showInspectCorrelationButtons, true);
 
@@ -79,6 +79,14 @@ export class InspectCorrelation {
           this.showTokenViewer = showTokenViewer;
         },
       ),
+
+      this.eventAggregator.subscribe(environment.events.inspectCorrelation.updateProcessInstances, async (payload) => {
+        const {offset, limit} = payload;
+        this.offset = offset;
+        this.limit = limit;
+
+        await this.updateProcessInstances();
+      }),
     ];
 
     this.bottomPanelResizeDiv.addEventListener('mousedown', (mouseDownEvent: Event) => {
@@ -135,6 +143,67 @@ export class InspectCorrelation {
     }
   }
 
+  private async updateProcessInstances(): Promise<void> {
+    if (this.processInstanceIdToSelect) {
+      try {
+        this.processInstanceToSelect = await this.inspectCorrelationService.getProcessInstanceById(
+          this.activeSolutionEntry.identity,
+          this.processInstanceIdToSelect,
+          this.activeDiagram.id,
+        );
+      } catch (error) {
+        this.notificationService.showNotification(
+          NotificationType.ERROR,
+          'The requested ProcessInstance to select could not be found.',
+        );
+      }
+    }
+
+    let processInstanceList;
+
+    try {
+      processInstanceList = await this.getProcessInstancesForProcessModel();
+    } catch (error) {
+      this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
+      this.processInstances = [];
+      this.totalCount = 0;
+    }
+
+    // https://github.com/process-engine/process_engine_runtime/issues/432
+    if (processInstanceList && processInstanceList.totalCount === 0) {
+      this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
+      this.processInstances = [];
+    } else if (processInstanceList) {
+      this.processInstances = processInstanceList.processInstances;
+      this.totalCount = processInstanceList.totalCount;
+    }
+  }
+
+  private getProcessInstancesForProcessModel(): Promise<DataModels.Correlations.ProcessInstanceList> {
+    if (this.updatePromise) {
+      this.updatePromise.cancel();
+    }
+
+    this.updatePromise = new Bluebird.Promise(
+      async (resolve: Function, reject: Function): Promise<any> => {
+        try {
+          const processInstances = await this.inspectCorrelationService.getProcessInstancesForProcessModel(
+            this.activeSolutionEntry.identity,
+            this.activeDiagram.id,
+            this.offset,
+            this.limit,
+          );
+
+          resolve(processInstances);
+        } catch (error) {
+          reject(error);
+        }
+      },
+    );
+
+    return this.updatePromise;
+  }
+
   public detached(): void {
     this.eventAggregator.publish(environment.events.statusBar.showInspectCorrelationButtons, false);
 
@@ -145,23 +214,12 @@ export class InspectCorrelation {
 
   public async activeDiagramChanged(): Promise<void> {
     if (this.viewIsAttached) {
-      try {
-        const correlationList = await this.inspectCorrelationService.getAllCorrelationsForProcessModelId(
-          this.activeDiagram.id,
-          this.activeSolutionEntry.identity,
-        );
+      this.offset = 0;
+      this.limit = DEFAULT_PAGESIZE;
+      this.processInstanceIdToSelect = undefined;
+      this.processInstanceToSelect = undefined;
 
-        // https://github.com/process-engine/process_engine_runtime/issues/432
-        if (correlationList.totalCount === 0) {
-          this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
-          this.correlations = [];
-        } else {
-          this.correlations = correlationList.correlations;
-        }
-      } catch (error) {
-        this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
-        this.correlations = [];
-      }
+      this.updateProcessInstances();
     }
   }
 

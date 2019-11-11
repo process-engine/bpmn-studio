@@ -7,7 +7,7 @@ import * as bundle from '@process-engine/bpmn-js-custom-bundle';
 
 import {IModdleElement} from '@process-engine/bpmn-elements_contracts';
 import environment from '../../environment';
-import {SolutionService} from '../solution-service/SolutionService';
+import {SolutionService} from '../solution-service/solution.service';
 import {SaveDiagramService} from '../save-diagram-service/save-diagram.service';
 import {IBpmnModdle, IBpmnModeler, IDefinition, ISolutionEntry, NotificationType} from '../../contracts/index';
 import {NotificationService} from '../notification-service/notification.service';
@@ -105,7 +105,7 @@ export class DeployDiagramService {
 
       this.eventAggregator.publish(environment.events.diagramDetail.onDiagramDeployed, processModelId);
     } catch (error) {
-      this.notificationService.showNotification(NotificationType.ERROR, `Unable to update diagram: ${error}.`);
+      this.notificationService.showNotification(NotificationType.ERROR, `Unable to update diagram: ${error}`);
     }
   }
 

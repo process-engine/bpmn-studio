@@ -11,7 +11,7 @@ import {IDiagramDetailRepository, IDiagramDetailService} from '../contracts/inde
 import {ISolutionEntry} from '../../../../contracts';
 
 import environment from '../../../../environment';
-import {createRepository} from '../repository/diagram-detail-repository-factory';
+import {createDiagramDetailRepository} from '../repository/diagram-detail-repository-factory';
 
 @inject(EventAggregator, ManagementApiClient)
 export class DiagramDetailService implements IDiagramDetailService {
@@ -23,7 +23,10 @@ export class DiagramDetailService implements IDiagramDetailService {
         return;
       }
 
-      this.diagramDetailRepository = createRepository(managementApiClient, solutionEntry.processEngineVersion);
+      this.diagramDetailRepository = createDiagramDetailRepository(
+        managementApiClient,
+        solutionEntry.processEngineVersion,
+      );
     });
   }
 

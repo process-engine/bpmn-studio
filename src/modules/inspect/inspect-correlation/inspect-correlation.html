@@ -10,18 +10,18 @@
         <diagram-viewer class="inspect-correlation__diagram-viewer" view-model.ref="diagramViewer" active-solution-entry.bind="activeSolutionEntry" selected-flow-node.two-way="selectedFlowNode" active-diagram.bind="activeDiagram" process-instance.to-view="selectedProcessInstance"></diagram-viewer>
         <div class="inspect-correlation__right-resize-div" ref="rightPanelResizeDiv" show.bind="showTokenViewer"></div>
         <token-viewer class="inspect-correlation__token-viewer" css="width: ${tokenViewerWidth}px;"
-          correlation.bind="selectedCorrelation"
           active-diagram.bind="activeDiagram"
           flow-node.bind="selectedFlowNode"
           active-solution-entry.bind="activeSolutionEntry"
           process-instance-id.bind="selectedProcessInstance.processInstanceId"
+          correlation-id.bind="selectedProcessInstance.correlationId"
           show.bind="showTokenViewer"></token-viewer>
       </div>
       <div class="inspect-correlation__bottom-resize-div" ref="bottomPanelResizeDiv" if.bind="!inspectPanelFullscreen"></div>
       <div class="inspect-correlation__bottom-panel" css="height: ${bottomPanelHeight}px;"
             class.bind="inspectPanelFullscreen ? 'inspect-correlation__bottom-panel--fullscreen' : ''"
             show.bind="showInspectPanel">
-        <inspect-panel view-model.ref="inspectPanel" active-solution-entry.bind="activeSolutionEntry" active-diagram.bind="activeDiagram" correlations.bind="correlations" selected-correlation.from-view="selectedCorrelation" selected-process-instance.from-view="selectedProcessInstance" fullscreen.two-way="inspectPanelFullscreen" log.bind="log" process-instance-to-select.to-view="processInstanceToSelect"></inspect-panel>
+        <inspect-panel view-model.ref="inspectPanel" active-solution-entry.bind="activeSolutionEntry" active-diagram.bind="activeDiagram" process-instances.bind="processInstances" selected-process-instance.from-view="selectedProcessInstance" fullscreen.two-way="inspectPanelFullscreen" log.bind="log" process-instance-to-select.to-view="processInstanceToSelect" total-count.bind="totalCount"></inspect-panel>
       </div>
     </div>
 </template>

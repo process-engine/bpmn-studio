@@ -13,8 +13,13 @@ def cleanup_workspace() {
   }
 }
 
+def buildIsRequired = true
+
 pipeline {
   agent any
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20'))
+  }
   tools {
     nodejs "node-lts"
   }
@@ -23,7 +28,31 @@ pipeline {
     NODE_JS_VERSION = 'node-lts'
   }
   stages {
+    stage('Check if build is required') {
+      steps {
+        script {
+          // Taken from https://stackoverflow.com/questions/37755586/how-do-you-pull-git-committer-information-for-jenkins-pipeline
+          sh 'git --no-pager show -s --format=\'%an\' > commit-author.txt'
+          def commitAuthorName = readFile('commit-author.txt').trim()
+
+          def ciAdminName = "admin" // jenkins will set this name after every restart, so we need to look out for this.
+          def ciUserName = "process-engine-ci"
+
+          echo(commitAuthorName)
+          echo("Commiter is process-engine-ci: ${commitAuthorName == ciUserName}")
+
+          buildIsRequired = commitAuthorName != ciAdminName && commitAuthorName != ciUserName
+
+          if (!buildIsRequired) {
+            echo("Commit was made by process-engine-ci. Skipping build.")
+          }
+        }
+      }
+    }
     stage('Prepare version') {
+      when {
+        expression {buildIsRequired == true}
+      }
       steps {
         sh('npm ci')
         // sh('node ./node_modules/.bin/ci_tools npm-install-only @process-engine/ @essential-projects/')
@@ -32,23 +61,32 @@ pipeline {
         sh('node ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir')
 
         stash(includes: 'package.json', name: 'package_json')
+        stash(includes: 'node_modules/', name: 'npm_package_node_modules')
       }
     }
     stage('Build & test') {
+      when {
+        expression {buildIsRequired == true}
+      }
       parallel {
-        stage('Build & test npm package') {
+        stage('Lint sources') {
           steps {
+            unstash('npm_package_node_modules')
             unstash('package_json')
 
-            sh('npm ci')
-            // sh('node ./node_modules/.bin/ci_tools npm-install-only @process-engine/ @essential-projects/')
+            sh('npm run lint')
+          }
+        }
+        stage('Build & test npm package') {
+          steps {
+            unstash('npm_package_node_modules')
+            unstash('package_json')
 
             sh('npm run build')
 
             sh('npm test')
 
             stash(includes: 'dist/web/@fortawesome/, dist/web/, config/', name: 'npm_package_results')
-            stash(includes: 'node_modules/', name: 'npm_package_node_modules')
           }
         }
         stage('Build & test on MacOS') {
@@ -100,20 +138,15 @@ pipeline {
         }
       }
     }
-    stage('Lint sources') {
-      steps {
-        unstash('npm_package_node_modules')
-        unstash('package_json')
-
-        sh('npm run lint')
-      }
-    }
     stage('Commit & tag version') {
       when {
-        anyOf {
-          branch "master"
-          branch "beta"
-          branch "develop"
+        allOf {
+          expression {buildIsRequired == true}
+          anyOf {
+            branch "master"
+            branch "beta"
+            branch "develop"
+          }
         }
       }
       steps {
@@ -133,6 +166,9 @@ pipeline {
       }
     }
     stage('Publish') {
+      when {
+        expression {buildIsRequired == true}
+      }
       parallel {
         stage('Publish npm package') {
           steps {
@@ -177,10 +213,13 @@ pipeline {
     }
     stage('Build Docker') {
       when {
-        anyOf {
-          branch "master"
-          branch "beta"
-          branch "develop"
+        allOf {
+          expression {buildIsRequired == true}
+          anyOf {
+            branch "master"
+            branch "beta"
+            branch "develop"
+          }
         }
       }
       steps {
@@ -221,10 +260,13 @@ pipeline {
     }
     stage('Publish Docker') {
       when {
-        anyOf {
-          branch "master"
-          branch "beta"
-          branch "develop"
+        allOf {
+          expression {buildIsRequired == true}
+          anyOf {
+            branch "master"
+            branch "beta"
+            branch "develop"
+          }
         }
       }
       steps {
@@ -243,6 +285,9 @@ pipeline {
       }
     }
     stage('Cleanup') {
+      when {
+        expression {buildIsRequired == true}
+      }
       steps {
         script {
           // this stage just exists, so the cleanup-work that happens in the post-script

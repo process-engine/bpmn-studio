@@ -7,9 +7,9 @@ import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 import {DiagramStateChange, IDiagramState, ISolutionEntry, NotificationType} from '../../contracts/index';
 import environment from '../../environment';
 import {NotificationService} from '../notification-service/notification.service';
-import {OpenDiagramsSolutionExplorerService} from '../solution-explorer-services/OpenDiagramsSolutionExplorerService';
-import {SolutionService} from '../solution-service/SolutionService';
-import {OpenDiagramStateService} from '../solution-explorer-services/OpenDiagramStateService';
+import {OpenDiagramsSolutionExplorerService} from '../solution-explorer-services/open-diagrams-solution-explorer.service';
+import {SolutionService} from '../solution-service/solution.service';
+import {OpenDiagramStateService} from '../solution-explorer-services/open-diagram-state.service';
 
 @inject(EventAggregator, NotificationService, 'OpenDiagramService', 'SolutionService', Router, OpenDiagramStateService)
 export class SaveDiagramService {
@@ -118,7 +118,15 @@ export class SaveDiagramService {
     this.isSaving = true;
 
     const pathIsSet: boolean = path !== undefined;
-    const pathToSaveTo: string = pathIsSet ? path : await this.getPathToSaveTo();
+
+    let pathToSaveTo: string;
+    try {
+      pathToSaveTo = pathIsSet ? path : await this.getPathToSaveTo();
+    } catch (error) {
+      this.isSaving = false;
+
+      throw error;
+    }
 
     const diagramIsUnsaved: boolean = diagramToSave.uri.startsWith('about:open-diagrams');
     if (diagramIsUnsaved) {
@@ -209,9 +217,11 @@ export class SaveDiagramService {
   private async getPathToSaveTo(): Promise<string> {
     return new Promise((resolve: Function, reject: Function): void => {
       this.ipcRenderer.once('save_diagram_as', async (event: Event, savePath: string) => {
-        const noFileSelected: boolean = savePath === null;
-        if (noFileSelected) {
-          reject(new Error('No file was selected.'));
+        const noPathSelected: boolean = savePath === null;
+        if (noPathSelected) {
+          reject(new Error('No path was selected.'));
+
+          return;
         }
 
         resolve(savePath);

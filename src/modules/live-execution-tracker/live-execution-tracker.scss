@@ -21,7 +21,7 @@
 }
 
 .let__diagram-viewer-canvas {
-  height: calc(100% - 20px);
+  height: 100%;
 }
 
 .let__diagram-viewer-preview-container {
@@ -35,8 +35,6 @@
 }
 
 .let__overlay-button {
-  width: 40px;
-  height: 30px;
   cursor: pointer;
 }
 

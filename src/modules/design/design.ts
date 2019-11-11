@@ -15,7 +15,7 @@ import {IDiagramState, ISolutionEntry, ISolutionService, NotificationType} from 
 import environment from '../../environment';
 import {NotificationService} from '../../services/notification-service/notification.service';
 import {DiagramDetail} from './diagram-detail/diagram-detail';
-import {OpenDiagramStateService} from '../../services/solution-explorer-services/OpenDiagramStateService';
+import {OpenDiagramStateService} from '../../services/solution-explorer-services/open-diagram-state.service';
 
 export interface IDesignRouteParameters {
   view?: string;
@@ -199,6 +199,16 @@ export class Design {
       this.eventAggregator.subscribe(environment.events.bpmnio.propertyPanelActive, (showPanel: boolean) => {
         this.propertyPanelShown = showPanel;
       }),
+      this.eventAggregator.subscribe(environment.events.diagramNeedsToBeUpdated, () => {
+        const diagramState: IDiagramState | null = this.openDiagramStateService.loadDiagramState(
+          this.activeDiagram.uri,
+        );
+
+        const newXml = diagramState === null ? fs.readFileSync(this.activeDiagram.uri, 'utf8') : diagramState.data.xml;
+
+        this.xmlForDiff = newXml;
+        this.activeDiagram.xml = newXml;
+      }),
     ];
 
     const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
@@ -356,25 +366,31 @@ export class Design {
         return diagram.name === diagramName && (diagram.uri === diagramUri || diagramUri === undefined);
       });
 
-      let savedXml: string;
-      const diagramIsSavedLocally: boolean = !persistedActiveDiagram.uri.startsWith('about:open-diagrams');
-      if (diagramIsSavedLocally) {
-        try {
-          const uri = persistedActiveDiagram.uri.substring(0, persistedActiveDiagram.uri.lastIndexOf('/'));
+      const diagramIsSavedOnRemoteSolution: boolean = persistedActiveDiagram.uri.startsWith('http');
+      const diagramIsSavedOnLocalSolution: boolean =
+        !persistedActiveDiagram.uri.startsWith('about:open-diagrams') && !diagramIsSavedOnRemoteSolution;
 
-          const solutionEntry: ISolutionEntry = this.solutionService.getSolutionEntryForUri(uri);
-          const diagramFromSolution: IDiagram = await solutionEntry.service.loadDiagram(diagramName);
-          savedXml = diagramFromSolution.xml;
-        } catch {
-          savedXml = fs.readFileSync(persistedActiveDiagram.uri, 'utf8');
-        }
+      if (diagramIsSavedOnLocalSolution) {
+        persistedActiveDiagram.xml = fs.readFileSync(persistedActiveDiagram.uri, 'utf8');
+      } else if (diagramIsSavedOnRemoteSolution) {
+        const uri = persistedActiveDiagram.uri.substring(0, persistedActiveDiagram.uri.lastIndexOf('/'));
+
+        const solutionEntry: ISolutionEntry = this.solutionService.getSolutionEntryForUri(uri);
+        const diagramFromSolution: IDiagram = await solutionEntry.service.loadDiagram(diagramName);
+        persistedActiveDiagram.xml = diagramFromSolution.xml;
       }
-
-      persistedActiveDiagram.xml = savedXml !== undefined ? savedXml : persistedActiveDiagram.xml;
 
       this.activeDiagram = persistedActiveDiagram;
     } else {
-      this.activeDiagram = await this.activeSolutionEntry.service.loadDiagram(diagramName);
+      const diagram: IDiagram = await this.activeSolutionEntry.service.loadDiagram(diagramName);
+      const diagramIsSavedOnLocalSolution: boolean =
+        !diagram.uri.startsWith('about:open-diagrams') && !diagram.uri.startsWith('http');
+
+      if (diagramIsSavedOnLocalSolution) {
+        diagram.xml = fs.readFileSync(diagram.uri, 'utf8');
+      }
+
+      this.activeDiagram = diagram;
     }
   }
 

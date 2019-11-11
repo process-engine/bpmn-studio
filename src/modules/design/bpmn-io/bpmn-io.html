@@ -38,7 +38,7 @@
         <div class="modeler__properties" ref="propertyPanel" show.bind="showPropertyPanel" css="width: ${propertyPanelWidth}px; max-width: calc(100% - ${minCanvasWidth}px); min-width: ${minPropertyPanelWidth}px;">
           <div class="resize-div" ref="resizeButton"></div>
           <diagram-tools-right modeler.bind="modeler" viewer.bind="viewer" solution-is-remote.bind="solutionIsRemote"></diagram-tools-right>
-          <property-panel view-model.ref="propertyPanelViewModel" id="js-properties-panel" modeler.bind="modeler" diagram-uri.bind="diagramUri" xml.bind="xml" is-editable.bind="!solutionIsRemote" data-test-property-panel></property-panel>
+          <property-panel view-model.ref="propertyPanelViewModel" id="js-properties-panel" modeler.bind="modeler" viewer.bind="viewer" diagram-uri.bind="diagramUri" xml.bind="xml" is-editable.bind="!solutionIsRemote" data-test-property-panel></property-panel>
         </div>
       </div>
     </div>

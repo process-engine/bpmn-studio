@@ -1,5 +1,6 @@
 <template>
   <require from="./cronjob-list.css"></require>
+  <require from="../../pagination/pagination"></require>
   <div class="cronhob-list-container" id="cronhobListContainer">
     <h4 class="cronjob-list-header">Cronjobs</h4>
     <div if.bind="showCronjobList && initialLoadingFinished">
@@ -27,9 +28,7 @@
         </tr>
       </table>
       <div class="col-md-12 col-xs-12 pagination">
-        <aubs-pagination page-size.bind="pageSize" total-items.bind="totalItems" current-page.bind="currentPage"
-          boundary-links.bind="true" pagination-size.bind="paginationSize">
-        </aubs-pagination>
+        <pagination show.bind="totalItems > pageSize" view-model.ref="pagination" current-page.two-way="currentPage" per-page.to-view="pageSize" items.to-view="totalItems" max-pages-to-display.to-view="paginationSize" content-is-async.bind="true" is-loading.two-way="paginationShowsLoading"></pagination>
       </div>
     </div>
     <template if.bind="initialLoadingFinished && !showCronjobList">

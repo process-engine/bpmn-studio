@@ -1,3 +1,3 @@
-export * from './ILiveExecutionTracker.Repository';
-export * from './ILiveExecutionTracker.Service';
+export * from './ILiveExecutionTrackerRepository';
+export * from './ILiveExecutionTrackerService';
 export * from './constants';

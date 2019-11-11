@@ -1,10 +1,15 @@
 import {DataModels} from '@process-engine/management_api_contracts';
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {Subscription} from '@essential-projects/event_aggregator_contracts';
-import {TaskListEntry} from './index';
+import {TaskList} from './index';
 
 export interface IDashboardRepository {
   getAllActiveCronjobs(identity: IIdentity, offset?: number, limit?: number): Promise<DataModels.Cronjobs.CronjobList>;
+  getAllActiveProcessInstances(
+    identity: IIdentity,
+    offset?: number,
+    limit?: number,
+  ): Promise<DataModels.Correlations.ProcessInstanceList>;
   getActiveCorrelations(
     identity: IIdentity,
     offset?: number,
@@ -15,10 +20,25 @@ export interface IDashboardRepository {
     offset?: number,
     limit?: number,
   ): Promise<DataModels.ProcessModels.ProcessModelList>;
-  getAllSuspendedTasks(identity: IIdentity): Promise<Array<TaskListEntry>>;
-  getSuspendedTasksForProcessInstance(identity: IIdentity, processInstanceId: string): Promise<Array<TaskListEntry>>;
-  getSuspendedTasksForCorrelation(identity: IIdentity, correlationId: string): Promise<Array<TaskListEntry>>;
-  getSuspendedTasksForProcessModel(identity: IIdentity, processModelId: string): Promise<Array<TaskListEntry>>;
+  getAllSuspendedTasks(identity: IIdentity, offset?: number, limit?: number): Promise<TaskList>;
+  getSuspendedTasksForProcessInstance(
+    identity: IIdentity,
+    processInstanceId: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<TaskList>;
+  getSuspendedTasksForCorrelation(
+    identity: IIdentity,
+    correlationId: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<TaskList>;
+  getSuspendedTasksForProcessModel(
+    identity: IIdentity,
+    processModelId: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<TaskList>;
   getManualTasksForProcessModel(
     identity: IIdentity,
     processModelId: string,
@@ -90,11 +110,17 @@ export interface IDashboardRepository {
   onProcessEnded(identity: IIdentity, callback: Function): Promise<Subscription>;
   onProcessStarted(identity: IIdentity, callback: Function): Promise<Subscription>;
   onProcessError(identity: IIdentity, callback: Function): Promise<Subscription>;
+  onProcessTerminated(identity: IIdentity, callback: Function): Promise<Subscription>;
   onEmptyActivityFinished(identity: IIdentity, callback: Function): Promise<Subscription>;
   onEmptyActivityWaiting(identity: IIdentity, callback: Function): Promise<Subscription>;
   onUserTaskFinished(identity: IIdentity, callback: Function): Promise<Subscription>;
   onUserTaskWaiting(identity: IIdentity, callback: Function): Promise<Subscription>;
   onManualTaskFinished(identity: IIdentity, callback: Function): Promise<Subscription>;
   onManualTaskWaiting(identity: IIdentity, callback: Function): Promise<Subscription>;
+  onCronjobCreated(identity: IIdentity, callback: Function): Promise<Subscription>;
+  onCronjobUpdated(identity: IIdentity, callback: Function): Promise<Subscription>;
+  onCronjobStopped(identity: IIdentity, callback: Function): Promise<Subscription>;
+  onCronjobExecuted(identity: IIdentity, callback: Function): Promise<Subscription>;
+  onCronjobRemoved(identity: IIdentity, callback: Function): Promise<Subscription>;
   removeSubscription(identity: IIdentity, subscription: Subscription): Promise<void>;
 }

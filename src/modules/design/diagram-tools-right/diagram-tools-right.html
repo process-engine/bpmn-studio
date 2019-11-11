@@ -14,12 +14,12 @@
           <li class="dropdown-item" click.delegate="setColorOrange()"><a><i class="fas fa-stop orange"></i> Orange</a></li>
           <li class="dropdown-item fill-colorpicker--border" ref="colorPickerFill">
             <a show.bind="colorPickerLoaded" click.delegate="setPickedColor()">
-              <i class="fas fa-stop" css="color: ${fillColor ? fillColor : 'white'};"></i> Fill color <i class="fas fa-eyedropper fill-colorpicker__eyedropper"></i>
+              <i class="fas fa-stop" css="color: ${fillColor ? fillColor : 'white'};"></i> Fill color <i class="fas fa-eye-dropper fill-colorpicker__eyedropper"></i>
             </a>
           </li>
           <li class="dropdown-item border-colorpicker--border" ref="colorPickerBorder">
             <a show.bind="colorPickerLoaded" click.delegate="setPickedColor()">
-              <i class="fas fa-stop" css="color: ${borderColor ? borderColor : 'black'};"></i> Border color <i class="fas fa-eyedropper border-colorpicker__eyedropper"></i>
+              <i class="fas fa-stop" css="color: ${borderColor ? borderColor : 'black'};"></i> Border color <i class="fas fa-eye-dropper border-colorpicker__eyedropper"></i>
             </a>
           </li>
           <li class="dropdown-item"><a click.delegate="removeColor()"><i class="fas fa-stop none"></i> None</a></li>

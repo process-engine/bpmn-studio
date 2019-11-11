@@ -7,62 +7,79 @@ import {IIdentity} from '@essential-projects/iam_contracts';
 import {Subscription} from '@essential-projects/event_aggregator_contracts';
 import environment from '../../../../environment';
 import {ISolutionEntry} from '../../../../contracts';
-import {processEngineSupportsPagination} from '../../../../services/process-engine-version-module/process-engine-version-module';
-import {DashboardPaginationRepository} from '../dashboard-repositories/dashboard-pagination-repository';
-import {DashboardRepository} from '../dashboard-repositories/dashboard-repository';
 import {IDashboardRepository} from '../contracts/IDashboardRepository';
-import {IDashboardService, TaskListEntry} from '../contracts/index';
+import {IDashboardService, TaskList} from '../contracts/index';
+import {createDashboardRepository} from '../repositories/dashboard-repository-factory';
 
 @inject(EventAggregator, 'ManagementApiClientService')
 export class DashboardService implements IDashboardService {
   public eventAggregator: EventAggregator;
 
   private dashboardRepository: IDashboardRepository;
-  private managementApiService: IManagementApiClient;
+  private managementApiClient: IManagementApiClient;
 
-  constructor(eventAggregator: EventAggregator, managementApiService: IManagementApiClient) {
+  private activeSolutionEntry: ISolutionEntry;
+
+  constructor(eventAggregator: EventAggregator, managementApiClient: IManagementApiClient) {
     this.eventAggregator = eventAggregator;
-    this.managementApiService = managementApiService;
+    this.managementApiClient = managementApiClient;
 
     this.eventAggregator.subscribe(
       environment.events.configPanel.solutionEntryChanged,
       (solutionEntry: ISolutionEntry) => {
-        if (processEngineSupportsPagination(solutionEntry.processEngineVersion)) {
-          this.dashboardRepository = new DashboardPaginationRepository(this.managementApiService);
-        } else {
-          this.dashboardRepository = new DashboardRepository(this.managementApiService);
+        if (this.activeSolutionEntry !== solutionEntry) {
+          this.dashboardRepository = createDashboardRepository(managementApiClient, solutionEntry.processEngineVersion);
+          this.activeSolutionEntry = solutionEntry;
         }
       },
     );
   }
 
-  public getAllSuspendedTasks(identity: IIdentity): Promise<Array<TaskListEntry>> {
-    return this.dashboardRepository.getAllSuspendedTasks(identity);
+  public getAllSuspendedTasks(identity: IIdentity, offset?: number, limit?: number): Promise<TaskList> {
+    return this.dashboardRepository.getAllSuspendedTasks(identity, offset, limit);
+  }
+
+  public getAllActiveProcessInstances(
+    identity: IIdentity,
+    offset?: number,
+    limit?: number,
+  ): Promise<DataModels.Correlations.ProcessInstanceList> {
+    return this.dashboardRepository.getAllActiveProcessInstances(identity, offset, limit);
   }
 
   public async getSuspendedTasksForProcessInstance(
     identity: IIdentity,
     processInstanceId: string,
-  ): Promise<Array<TaskListEntry>> {
-    return this.dashboardRepository.getSuspendedTasksForProcessInstance(identity, processInstanceId);
+    offset?: number,
+    limit?: number,
+  ): Promise<TaskList> {
+    return this.dashboardRepository.getSuspendedTasksForProcessInstance(identity, processInstanceId, offset, limit);
   }
 
   public async getSuspendedTasksForCorrelation(
     identity: IIdentity,
     correlationId: string,
-  ): Promise<Array<TaskListEntry>> {
-    return this.dashboardRepository.getSuspendedTasksForCorrelation(identity, correlationId);
+    offset?: number,
+    limit?: number,
+  ): Promise<TaskList> {
+    return this.dashboardRepository.getSuspendedTasksForCorrelation(identity, correlationId, offset, limit);
   }
 
   public async getSuspendedTasksForProcessModel(
     identity: IIdentity,
     processModelId: string,
-  ): Promise<Array<TaskListEntry>> {
-    return this.dashboardRepository.getSuspendedTasksForProcessModel(identity, processModelId);
+    offset?: number,
+    limit?: number,
+  ): Promise<TaskList> {
+    return this.dashboardRepository.getSuspendedTasksForProcessModel(identity, processModelId, offset, limit);
   }
 
-  public getAllActiveCronjobs(identity: IIdentity): Promise<DataModels.Cronjobs.CronjobList> {
-    return this.dashboardRepository.getAllActiveCronjobs(identity);
+  public getAllActiveCronjobs(
+    identity: IIdentity,
+    offset?: number,
+    limit?: number,
+  ): Promise<DataModels.Cronjobs.CronjobList> {
+    return this.dashboardRepository.getAllActiveCronjobs(identity, offset, limit);
   }
 
   public getProcessModels(identity: IIdentity): Promise<DataModels.ProcessModels.ProcessModelList> {
@@ -152,6 +169,10 @@ export class DashboardService implements IDashboardService {
     return this.dashboardRepository.onProcessError(identity, callback);
   }
 
+  public onProcessTerminated(identity: IIdentity, callback: Function): Promise<Subscription> {
+    return this.dashboardRepository.onProcessTerminated(identity, callback);
+  }
+
   public onEmptyActivityFinished(identity: IIdentity, callback: Function): Promise<Subscription> {
     return this.dashboardRepository.onEmptyActivityFinished(identity, callback);
   }
@@ -192,7 +213,7 @@ export class DashboardService implements IDashboardService {
     userTaskInstanceId: string,
     userTaskResult: DataModels.UserTasks.UserTaskResult,
   ): Promise<void> {
-    return this.managementApiService.finishUserTask(
+    return this.managementApiClient.finishUserTask(
       identity,
       processInstanceId,
       correlationId,
@@ -203,5 +224,25 @@ export class DashboardService implements IDashboardService {
 
   public removeSubscription(identity: IIdentity, subscription: Subscription): Promise<void> {
     return this.dashboardRepository.removeSubscription(identity, subscription);
+  }
+
+  public onCronjobCreated(identity: IIdentity, callback: Function): Promise<Subscription> {
+    return this.dashboardRepository.onCronjobCreated(identity, callback);
+  }
+
+  public onCronjobUpdated(identity: IIdentity, callback: Function): Promise<Subscription> {
+    return this.dashboardRepository.onCronjobUpdated(identity, callback);
+  }
+
+  public onCronjobStopped(identity: IIdentity, callback: Function): Promise<Subscription> {
+    return this.dashboardRepository.onCronjobStopped(identity, callback);
+  }
+
+  public onCronjobRemoved(identity: IIdentity, callback: Function): Promise<Subscription> {
+    return this.dashboardRepository.onCronjobRemoved(identity, callback);
+  }
+
+  public onCronjobExecuted(identity: IIdentity, callback: Function): Promise<Subscription> {
+    return this.dashboardRepository.onCronjobExecuted(identity, callback);
   }
 }

@@ -16,11 +16,12 @@ import {Extensions} from './indextabs/extensions/extensions';
 import {Forms} from './indextabs/forms/forms';
 import {General} from './indextabs/general/general';
 
-import {OpenDiagramStateService} from '../../../services/solution-explorer-services/OpenDiagramStateService';
+import {OpenDiagramStateService} from '../../../services/solution-explorer-services/open-diagram-state.service';
 
 @inject('OpenDiagramStateService')
 export class PropertyPanel {
   @bindable() public modeler: IBpmnModeler;
+  @bindable() public viewer: IBpmnModeler;
   @bindable() public xml: string;
   @bindable() public diagramUri: string;
   @bindable() public isEditable: boolean;
@@ -33,8 +34,6 @@ export class PropertyPanel {
   private moddle: IBpmnModdle;
   private eventBus: IEventBus;
   private openDiagramStateService: OpenDiagramStateService;
-
-  private diagramChanged: boolean = false;
 
   constructor(openDiagramStateService: OpenDiagramStateService) {
     this.openDiagramStateService = openDiagramStateService;
@@ -72,6 +71,10 @@ export class PropertyPanel {
     }, 0);
   }
 
+  public xmlWasChanged(): void {
+    this.selectPreviouslySelectedOrFirstElement();
+  }
+
   public selectPreviouslySelectedOrFirstElement(): void {
     const diagramState: IDiagramState = this.openDiagramStateService.loadDiagramState(this.diagramUri);
 
@@ -79,6 +82,7 @@ export class PropertyPanel {
       diagramState === null ||
       diagramState.metadata.selectedElements === undefined ||
       diagramState.metadata.selectedElements.length === 0;
+
     if (noSelectedElementState) {
       this.setFirstElement();
 
@@ -124,7 +128,11 @@ export class PropertyPanel {
     const elementRegistry: IElementRegistry = this.modeler.get('elementRegistry');
     const element: IShape = elementRegistry.get(elementId);
 
-    this.modeler.get('selection').select(element);
+    if (this.viewer !== undefined) {
+      this.viewer.get('selection').select(element);
+    } else {
+      this.modeler.get('selection').select(element);
+    }
   }
 
   private processHasLanes(process: IModdleElement): boolean {
@@ -142,29 +150,5 @@ export class PropertyPanel {
     for (const indextab of this.indextabs) {
       indextab.canHandleElement = indextab.isSuitableForElement(this.elementInPanel);
     }
-  }
-
-  public diagramUriChanged(newUri: string, previousUri: string): void {
-    const previousUriDoesNotExist: boolean = previousUri === undefined;
-    if (previousUriDoesNotExist) {
-      return;
-    }
-
-    this.diagramChanged = true;
-  }
-
-  public xmlChanged(newXml: string, previousXml: string): void {
-    const previousXmlDoesNotExist: boolean = previousXml === undefined;
-    const diagramDidNotChange: boolean = !this.diagramChanged;
-    if (previousXmlDoesNotExist || diagramDidNotChange) {
-      return;
-    }
-
-    // This is needed to make sure the xml was already imported into the modeler
-    setTimeout(() => {
-      this.selectPreviouslySelectedOrFirstElement();
-    }, 0);
-
-    this.diagramChanged = false;
   }
 }

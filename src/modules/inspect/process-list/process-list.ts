@@ -4,6 +4,7 @@ import {Router} from 'aurelia-router';
 
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {DataModels} from '@process-engine/management_api_contracts';
+import {Subscription as RuntimeSubscription} from '@essential-projects/event_aggregator_contracts';
 
 import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
 import * as Bluebird from 'bluebird';
@@ -13,13 +14,7 @@ import {getBeautifiedDate} from '../../../services/date-service/date.service';
 import {NotificationService} from '../../../services/notification-service/notification.service';
 import environment from '../../../environment';
 import {IDashboardService} from '../dashboard/contracts';
-
-Bluebird.Promise.config({cancellation: true});
-
-type ProcessInstanceWithCorrelation = {
-  processInstance: DataModels.Correlations.ProcessInstance;
-  correlation: DataModels.Correlations.Correlation;
-};
+import {Pagination} from '../../pagination/pagination';
 
 @inject('DashboardService', 'NotificationService', 'SolutionService', Router)
 export class ProcessList {
@@ -29,8 +24,10 @@ export class ProcessList {
   public totalItems: number;
   public paginationSize: number = 10;
   public initialLoadingFinished: boolean = false;
-  public processInstancesToDisplay: Array<ProcessInstanceWithCorrelation> = [];
+  public processInstancesToDisplay: Array<DataModels.Correlations.ProcessInstance> = [];
   public showError: boolean;
+  public pagination: Pagination;
+  public paginationShowsLoading: boolean;
 
   private dashboardService: IDashboardService;
   private notificationService: NotificationService;
@@ -39,11 +36,16 @@ export class ProcessList {
   private router: Router;
 
   private subscriptions: Array<Subscription>;
-  private correlations: Array<DataModels.Correlations.Correlation> = [];
-  private processInstancesWithCorrelation: Array<ProcessInstanceWithCorrelation> = [];
-  private stoppedProcessInstancesWithCorrelation: Array<ProcessInstanceWithCorrelation> = [];
+  private processInstances: Array<DataModels.Correlations.ProcessInstance> = [];
+  private stoppedProcessInstances: Array<DataModels.Correlations.ProcessInstance> = [];
 
-  private handlerPromise: any;
+  private amountOfActiveProcessInstancesToDisplay: number = this.pageSize;
+  private amountOfActiveProcessInstancesToSkip: number = 0;
+
+  private dashboardServiceSubscriptions: Array<RuntimeSubscription> = [];
+
+  private updatePromise: any;
+  private identitiyUsedForSubscriptions: IIdentity;
 
   constructor(
     dashboardService: IDashboardService,
@@ -57,32 +59,67 @@ export class ProcessList {
     this.router = router;
   }
 
-  public async activeSolutionEntryChanged(newValue: ISolutionEntry, oldValue: ISolutionEntry): Promise<void> {
-    if (!newValue.uri.includes('http')) {
+  public async activeSolutionEntryChanged(
+    newActiveSolutionEntry: ISolutionEntry,
+    previousActiveSolutionEntry: ISolutionEntry,
+  ): Promise<void> {
+    if (!newActiveSolutionEntry.uri.includes('http')) {
       return;
     }
 
-    if (this.handlerPromise) {
-      this.handlerPromise.cancel();
+    if (this.updatePromise) {
+      this.updatePromise.cancel();
     }
 
-    this.correlations = [];
-    this.processInstancesWithCorrelation = [];
+    const previousActiveSolutionEntryExists: boolean = previousActiveSolutionEntry !== undefined;
+    if (previousActiveSolutionEntryExists) {
+      this.removeRuntimeSubscriptions();
+    }
+
+    this.processInstances = [];
     this.processInstancesToDisplay = [];
-    this.stoppedProcessInstancesWithCorrelation = [];
+    this.stoppedProcessInstances = [];
     this.initialLoadingFinished = false;
 
-    this.dashboardService.eventAggregator.publish(environment.events.configPanel.solutionEntryChanged, newValue);
+    this.dashboardService.eventAggregator.publish(
+      environment.events.configPanel.solutionEntryChanged,
+      newActiveSolutionEntry,
+    );
 
-    await this.updateCorrelationList();
+    await this.updateProcessInstanceList();
+
+    this.setRuntimeSubscriptions();
   }
 
-  public async currentPageChanged(newValue: number, oldValue: number): Promise<void> {
-    const oldValueIsDefined: boolean = oldValue !== undefined && oldValue !== null;
-
-    if (oldValueIsDefined) {
-      this.updateCorrelationsToDisplay();
+  public async currentPageChanged(currentPage: number, previousPage: number): Promise<void> {
+    const isInitialEvent: boolean = previousPage === undefined || previousPage === null;
+    if (isInitialEvent) {
+      return;
     }
+
+    if (this.updatePromise) {
+      this.updatePromise.cancel();
+    }
+
+    this.stoppedProcessInstances = [];
+
+    const paginationWasUsed: boolean = previousPage > 0;
+    const showNewerProcessInstances: boolean = currentPage > previousPage;
+    if (paginationWasUsed && showNewerProcessInstances) {
+      const skippedPages: number = Math.abs(currentPage - previousPage) - 1;
+
+      this.amountOfActiveProcessInstancesToSkip +=
+        this.amountOfActiveProcessInstancesToDisplay + skippedPages * this.pageSize;
+    } else {
+      const paginationGetsDisplayed: boolean = this.totalItems > this.pageSize;
+      const pageIndex: number = paginationGetsDisplayed ? this.currentPage - 1 : 0;
+
+      this.amountOfActiveProcessInstancesToSkip = pageIndex * this.pageSize;
+    }
+
+    this.amountOfActiveProcessInstancesToDisplay = this.pageSize;
+
+    this.updateProcessInstanceList();
   }
 
   public async attached(): Promise<void> {
@@ -101,32 +138,19 @@ export class ProcessList {
 
     this.activeSolutionEntry = this.solutionService.getSolutionEntryForUri(this.activeSolutionUri);
 
-    await this.updateCorrelationList();
+    await this.updateProcessInstanceList();
 
     this.subscriptions = [
       this.dashboardService.eventAggregator.subscribe(AuthenticationStateEvent.LOGIN, async () => {
-        await this.updateCorrelationList();
-      }),
-      this.dashboardService.eventAggregator.subscribe(AuthenticationStateEvent.LOGOUT, async () => {
-        await this.updateCorrelationList();
+        this.removeRuntimeSubscriptions();
+
+        await this.updateProcessInstanceList();
+
+        this.setRuntimeSubscriptions();
       }),
     ];
 
-    this.dashboardService.onProcessStarted(this.activeSolutionEntry.identity, async () => {
-      await this.updateCorrelationList();
-    });
-
-    this.dashboardService.onProcessEnded(this.activeSolutionEntry.identity, async () => {
-      await this.updateCorrelationList();
-    });
-
-    /**
-     * This notification gets also triggered when the processinstance has been terminated.
-     * Currently the onProcessTerminated notification does not work.
-     */
-    this.dashboardService.onProcessError(this.activeSolutionEntry.identity, async () => {
-      await this.updateCorrelationList();
-    });
+    this.setRuntimeSubscriptions();
   }
 
   public detached(): void {
@@ -135,82 +159,49 @@ export class ProcessList {
         subscription.dispose();
       }
     }
+
+    this.removeRuntimeSubscriptions();
   }
 
-  public async updateCorrelationList(): Promise<void> {
+  public async stopProcessInstance(processInstance: DataModels.Correlations.ProcessInstance): Promise<void> {
     try {
-      const correlationList: DataModels.Correlations.CorrelationList = await this.getAllActiveCorrelations();
-      const correlationListWasUpdated: boolean =
-        JSON.stringify(correlationList.correlations.sort(this.sortCorrelations)) !== JSON.stringify(this.correlations);
+      const onProcessTerminatedSubscription: RuntimeSubscription = await this.dashboardService.onProcessTerminated(
+        this.activeSolutionEntry.identity,
+        (message) => {
+          if (message.processInstanceId !== processInstance.processInstanceId) {
+            return;
+          }
 
-      if (correlationListWasUpdated) {
-        this.correlations = correlationList.correlations;
-        this.correlations.sort(this.sortCorrelations);
+          processInstance.state = DataModels.Correlations.CorrelationState.error;
 
-        this.processInstancesWithCorrelation = [];
-        for (const correlation of this.correlations) {
-          const processInstancesWithCorrelation: Array<
-            ProcessInstanceWithCorrelation
-          > = correlation.processInstances.map((processInstance: DataModels.Correlations.ProcessInstance) => {
-            return {
-              processInstance: processInstance,
-              correlation: correlation,
-            };
-          });
+          this.dashboardService.removeSubscription(this.activeSolutionEntry.identity, onProcessTerminatedSubscription);
+          this.dashboardService.removeSubscription(this.activeSolutionEntry.identity, onProcessErrorSubscription);
+        },
+      );
+      const onProcessErrorSubscription: RuntimeSubscription = await this.dashboardService.onProcessError(
+        this.activeSolutionEntry.identity,
+        (message) => {
+          if (message.processInstanceId !== processInstance.processInstanceId) {
+            return;
+          }
 
-          this.processInstancesWithCorrelation.push(...processInstancesWithCorrelation);
-        }
+          processInstance.state = DataModels.Correlations.CorrelationState.error;
 
-        this.updateCorrelationsToDisplay();
-      }
-
-      this.initialLoadingFinished = true;
-    } catch (error) {
-      this.initialLoadingFinished = true;
-
-      const errorIsForbiddenError: boolean = isError(error, ForbiddenError);
-      const errorIsUnauthorizedError: boolean = isError(error, UnauthorizedError);
-      const errorIsAuthenticationRelated: boolean = errorIsForbiddenError || errorIsUnauthorizedError;
-
-      if (!errorIsAuthenticationRelated) {
-        this.processInstancesToDisplay = [];
-        this.processInstancesWithCorrelation = [];
-        this.correlations = [];
-        this.showError = true;
-      }
-    }
-
-    const correlationsAreNotSet: boolean = this.correlations === undefined || this.correlations === null;
-    if (correlationsAreNotSet) {
-      this.correlations = [];
-      this.processInstancesWithCorrelation = [];
-    }
-
-    this.totalItems = this.processInstancesWithCorrelation.length;
-  }
-
-  public async stopProcessInstance(
-    processInstance: DataModels.Correlations.ProcessInstance,
-    correlation: DataModels.Correlations.Correlation,
-  ): Promise<void> {
-    try {
-      this.dashboardService.onProcessError(this.activeSolutionEntry.identity, () => {
-        processInstance.state = DataModels.Correlations.CorrelationState.error;
-      });
+          this.dashboardService.removeSubscription(this.activeSolutionEntry.identity, onProcessTerminatedSubscription);
+          this.dashboardService.removeSubscription(this.activeSolutionEntry.identity, onProcessErrorSubscription);
+        },
+      );
 
       await this.dashboardService.terminateProcessInstance(
         this.activeSolutionEntry.identity,
         processInstance.processInstanceId,
       );
 
-      const processInstanceWithCorrelation: ProcessInstanceWithCorrelation = {
-        processInstance: processInstance,
-        correlation: correlation,
-      };
+      this.stoppedProcessInstances.push(processInstance);
 
-      this.stoppedProcessInstancesWithCorrelation.push(processInstanceWithCorrelation);
+      this.amountOfActiveProcessInstancesToDisplay--;
 
-      await this.updateCorrelationList();
+      this.updateProcessInstancesToDisplay();
     } catch (error) {
       this.notificationService.showNotification(NotificationType.ERROR, `Error while stopping Process! ${error}`);
     }
@@ -220,79 +211,139 @@ export class ProcessList {
     return getBeautifiedDate(date);
   }
 
-  private async getAllActiveCorrelations(): Promise<DataModels.Correlations.CorrelationList> {
+  private async setRuntimeSubscriptions(): Promise<void> {
+    const subscriptionsExist: boolean = this.dashboardServiceSubscriptions.length > 0;
+    if (subscriptionsExist) {
+      this.removeRuntimeSubscriptions();
+    }
+
+    this.identitiyUsedForSubscriptions = this.activeSolutionEntry.identity;
+
+    this.dashboardServiceSubscriptions = await Promise.all([
+      this.dashboardService.onProcessStarted(this.activeSolutionEntry.identity, async () => {
+        await this.updateProcessInstanceList();
+      }),
+      this.dashboardService.onProcessEnded(this.activeSolutionEntry.identity, async () => {
+        await this.updateProcessInstanceList();
+      }),
+      this.dashboardService.onProcessError(this.activeSolutionEntry.identity, async () => {
+        await this.updateProcessInstanceList();
+      }),
+      this.dashboardService.onProcessTerminated(this.activeSolutionEntry.identity, async () => {
+        await this.updateProcessInstanceList();
+      }),
+    ]);
+  }
+
+  private removeRuntimeSubscriptions(): void {
+    for (const subscription of this.dashboardServiceSubscriptions) {
+      this.dashboardService.removeSubscription(this.identitiyUsedForSubscriptions, subscription);
+    }
+
+    this.dashboardServiceSubscriptions = [];
+  }
+
+  private async updateProcessInstanceList(): Promise<void> {
+    try {
+      const processInstanceList: DataModels.Correlations.ProcessInstanceList = await this.getActiveProcessInstancesForCurrentPage();
+
+      if (!processInstanceList) {
+        return;
+      }
+
+      const sortedProcessInstances: Array<
+        DataModels.Correlations.ProcessInstance
+      > = processInstanceList.processInstances.sort(this.sortProcessInstances);
+
+      const processInstanceListWasUpdated: boolean =
+        JSON.stringify(sortedProcessInstances) !== JSON.stringify(this.processInstances);
+
+      this.totalItems = processInstanceList.totalCount + this.stoppedProcessInstances.length;
+
+      if (processInstanceListWasUpdated) {
+        this.processInstances = sortedProcessInstances;
+
+        this.updateProcessInstancesToDisplay();
+      }
+
+      this.initialLoadingFinished = true;
+      this.showError = false;
+    } catch (error) {
+      this.initialLoadingFinished = true;
+
+      const errorIsForbiddenError: boolean = isError(error, ForbiddenError);
+      const errorIsUnauthorizedError: boolean = isError(error, UnauthorizedError);
+      const errorIsAuthenticationRelated: boolean = errorIsForbiddenError || errorIsUnauthorizedError;
+
+      if (!errorIsAuthenticationRelated) {
+        this.processInstancesToDisplay = [];
+        this.processInstances = [];
+
+        const errorIsNotNoProcessInstancesFound: boolean = error.code !== 404;
+
+        this.showError = errorIsNotNoProcessInstancesFound;
+      }
+    }
+
+    const processInstancesAreNotSet: boolean = this.processInstances === undefined || this.processInstances === null;
+    if (processInstancesAreNotSet) {
+      this.processInstances = [];
+    }
+  }
+
+  private async getActiveProcessInstancesForCurrentPage(): Promise<DataModels.Correlations.ProcessInstanceList> {
     const identity: IIdentity = this.activeSolutionEntry.identity;
 
-    this.handlerPromise = new Bluebird.Promise(
+    const shouldOnlyDisplayStoppedProcessInstances: boolean = this.amountOfActiveProcessInstancesToDisplay === 0;
+    if (shouldOnlyDisplayStoppedProcessInstances) {
+      return undefined;
+    }
+
+    this.updatePromise = new Bluebird.Promise(
       async (resolve: Function, reject: Function): Promise<any> => {
         try {
-          const activeCorreations = await this.dashboardService.getActiveCorrelations(identity);
+          const activeProcessInstances = await this.dashboardService.getAllActiveProcessInstances(
+            identity,
+            this.amountOfActiveProcessInstancesToSkip,
+            this.amountOfActiveProcessInstancesToDisplay,
+          );
 
-          resolve(activeCorreations);
+          resolve(activeProcessInstances);
         } catch (error) {
           reject(error);
         }
       },
     );
 
-    return this.handlerPromise;
+    return this.updatePromise;
   }
 
-  private sortCorrelations(
-    correlation1: DataModels.Correlations.Correlation,
-    correlation2: DataModels.Correlations.Correlation,
+  private sortProcessInstances(
+    firstProcessInstance: DataModels.Correlations.ProcessInstance,
+    secondProcessInstance: DataModels.Correlations.ProcessInstance,
   ): number {
-    return Date.parse(correlation2.createdAt.toString()) - Date.parse(correlation1.createdAt.toString());
-  }
-
-  private sortProcessInstancesWithCorrelation(
-    firstProcessInstanceWithCorrelation: ProcessInstanceWithCorrelation,
-    secondProcessInstanceWithCorrelation: ProcessInstanceWithCorrelation,
-  ): number {
-    const firstCorrelation: DataModels.Correlations.Correlation = firstProcessInstanceWithCorrelation.correlation;
-    const secondCorrelation: DataModels.Correlations.Correlation = secondProcessInstanceWithCorrelation.correlation;
-
-    const correlationsAreDifferent: boolean = firstCorrelation.id !== secondCorrelation.id;
-    if (correlationsAreDifferent) {
-      return Date.parse(secondCorrelation.createdAt.toString()) - Date.parse(firstCorrelation.createdAt.toString());
-    }
-
-    const firstProcessInstance: DataModels.Correlations.ProcessInstance =
-      firstProcessInstanceWithCorrelation.processInstance;
-    const secondProcessInstance: DataModels.Correlations.ProcessInstance =
-      secondProcessInstanceWithCorrelation.processInstance;
-
     return (
       Date.parse(secondProcessInstance.createdAt.toString()) - Date.parse(firstProcessInstance.createdAt.toString())
     );
   }
 
-  private updateCorrelationsToDisplay(): void {
-    const firstProcessInstanceIndex: number = (this.currentPage - 1) * this.pageSize;
-    const lastProcessInstanceIndex: number = this.pageSize * this.currentPage;
+  private updateProcessInstancesToDisplay(): void {
+    this.processInstancesToDisplay = this.processInstances;
 
-    this.processInstancesToDisplay = this.processInstancesWithCorrelation;
+    this.stoppedProcessInstances.forEach((stoppedProcessInstance: DataModels.Correlations.ProcessInstance) => {
+      const processInstanceGetsDisplayed: boolean = this.processInstancesToDisplay.some(
+        (processInstance: DataModels.Correlations.ProcessInstance) => {
+          return stoppedProcessInstance.processInstanceId === processInstance.processInstanceId;
+        },
+      );
 
-    this.stoppedProcessInstancesWithCorrelation.forEach(
-      (stoppedProcessInstanceWithCorrelation: ProcessInstanceWithCorrelation) => {
-        const processInstanceExistInDisplayArray: boolean = this.processInstancesToDisplay.some(
-          (processInstanceWithCorrelation: ProcessInstanceWithCorrelation) => {
-            return (
-              stoppedProcessInstanceWithCorrelation.processInstance === processInstanceWithCorrelation.processInstance
-            );
-          },
-        );
+      if (!processInstanceGetsDisplayed) {
+        this.processInstancesToDisplay.push(stoppedProcessInstance);
+      }
+    });
 
-        if (!processInstanceExistInDisplayArray) {
-          this.processInstancesToDisplay.push(stoppedProcessInstanceWithCorrelation);
-        }
-      },
-    );
+    this.processInstancesToDisplay.sort(this.sortProcessInstances);
 
-    this.processInstancesToDisplay.sort(this.sortProcessInstancesWithCorrelation);
-    this.processInstancesToDisplay = this.processInstancesToDisplay.slice(
-      firstProcessInstanceIndex,
-      lastProcessInstanceIndex,
-    );
+    this.paginationShowsLoading = false;
   }
 }

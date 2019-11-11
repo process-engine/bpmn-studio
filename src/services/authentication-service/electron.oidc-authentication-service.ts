@@ -69,8 +69,6 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
             idToken: tokenObject.idToken,
           };
 
-          this.eventAggregator.publish(AuthenticationStateEvent.LOGIN);
-
           ipcRenderer.removeAllListeners('oidc-login-reply');
 
           resolve(loginResult);

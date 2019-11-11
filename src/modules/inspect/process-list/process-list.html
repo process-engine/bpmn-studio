@@ -1,5 +1,6 @@
 <template>
   <require from="./process-list.css"></require>
+  <require from="../../pagination/pagination"></require>
   <div class="process-list">
     <div class="process-list-container" id="processListContainer">
       <h4 class="process-list-header">Processes</h4>
@@ -12,16 +13,16 @@
             <th>Process Model ID</th>
             <th></th>
           </tr>
-          <tr repeat.for="processInstanceWithCorrelation of processInstancesToDisplay" id="processList-${processInstanceWithCorrelation.correlation.id}" class.bind="processInstanceWithCorrelation.processInstance.state === 'error' ? 'process-list-item-stopped' : 'process-list-item'">
-            <td>${formatDate(processInstanceWithCorrelation.processInstance.createdAt)}</td>
-            <td>${processInstanceWithCorrelation.correlation.id}</td>
+          <tr repeat.for="processInstance of processInstancesToDisplay" id="processList-${processInstance.correlationId}" class.bind="processInstance.state === 'error' ? 'process-list-item-stopped' : 'process-list-item'">
+            <td>${formatDate(processInstance.createdAt)}</td>
+            <td>${processInstance.correlationId}</td>
             <td>
-              <a route-href="route: design; params.bind: { view: 'detail', diagramName: processInstanceWithCorrelation.processInstance.processModelId, solutionUri: activeSolutionEntry.uri }" class="process-list-item-modelname">${processInstanceWithCorrelation.processInstance.processModelId}</a>
+              <a route-href="route: design; params.bind: { view: 'detail', diagramName: processInstance.processModelId, solutionUri: activeSolutionEntry.uri }" class="process-list-item-modelname">${processInstance.processModelId}</a>
             </td>
             <td class="process-list__last-table-cell">
-              <a if.bind="processInstanceWithCorrelation.processInstance.state !== 'error'" route-href="route: task-list-processinstance; params.bind: { processInstanceId: processInstanceWithCorrelation.processInstance.processInstanceId, solutionUri: activeSolutionEntry.uri }" class="process-list-item-user-tasks btn btn-default">Tasks</a>
-              <a if.bind="processInstanceWithCorrelation.processInstance.state !== 'error'" route-href="route: live-execution-tracker; params.bind: { diagramName: processInstanceWithCorrelation.processInstance.processModelId, solutionUri: activeSolutionEntry.uri, correlationId: processInstanceWithCorrelation.correlation.id, processInstanceId: processInstanceWithCorrelation.processInstance.processInstanceId }" class="btn btn-default">Live Execution Tracking</a>
-              <button if.bind="processInstanceWithCorrelation.processInstance.state !== 'error'" class="btn btn-default" click.delegate="stopProcessInstance(processInstanceWithCorrelation.processInstance, processInstanceWithCorrelation.correlation)">Stop</button>
+              <a if.bind="processInstance.state !== 'error'" route-href="route: task-list-processinstance; params.bind: { processInstanceId: processInstance.processInstanceId, solutionUri: activeSolutionEntry.uri }" class="process-list-item-user-tasks btn btn-default">Tasks</a>
+              <a if.bind="processInstance.state !== 'error'" route-href="route: live-execution-tracker; params.bind: { diagramName: processInstance.processModelId, solutionUri: activeSolutionEntry.uri, correlationId: processInstance.correlationId, processInstanceId: processInstance.processInstanceId }" class="btn btn-default">Live Execution Tracking</a>
+              <button if.bind="processInstance.state !== 'error'" class="btn btn-default" click.delegate="stopProcessInstance(processInstance)">Stop</button>
             </td>
           </tr>
         </table>
@@ -31,8 +32,7 @@
         <span else class="process-list__no-processes-text">No process instances found for this user.</span>
       </template>
       <div class="col-md-12 col-xs-12 pagination" show.bind="processInstancesToDisplay && processInstancesToDisplay.length > 0">
-        <aubs-pagination page-size.bind="pageSize" total-items.bind="totalItems" current-page.bind="currentPage" boundary-links.bind="true" pagination-size.bind="paginationSize">
-        </aubs-pagination>
+        <pagination if.bind="totalItems > pageSize" view-model.ref="pagination" current-page.two-way="currentPage" per-page.to-view="pageSize" items.to-view="totalItems" max-pages-to-display.to-view="paginationSize" content-is-async.bind="true" is-loading.two-way="paginationShowsLoading"></pagination>
       </div>
       <div if.bind="!initialLoadingFinished" class="container">
         <img src="src/resources/images/gears.svg" class="loading-spinner">

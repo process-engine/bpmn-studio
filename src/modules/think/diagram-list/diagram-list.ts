@@ -15,7 +15,7 @@ export class DiagramList {
   private eventAggregator: EventAggregator;
   private router: Router;
   private subscriptions: Array<Subscription>;
-  private pollingTimeout: NodeJS.Timer | number;
+  private pollingTimeout: NodeJS.Timer;
   private isAttached: boolean = false;
 
   constructor(eventAggregator: EventAggregator, router: Router) {
@@ -33,19 +33,18 @@ export class DiagramList {
       this.eventAggregator.subscribe(AuthenticationStateEvent.LOGIN, () => {
         this.updateDiagramList();
       }),
-      this.eventAggregator.subscribe(AuthenticationStateEvent.LOGOUT, () => {
-        this.updateDiagramList();
-      }),
     ];
   }
 
   public detached(): void {
     this.isAttached = false;
 
-    clearTimeout(this.pollingTimeout as NodeJS.Timer);
+    this.stopPolling();
 
-    for (const subscription of this.subscriptions) {
-      subscription.dispose();
+    if (this.subscriptions !== undefined) {
+      for (const subscription of this.subscriptions) {
+        subscription.dispose();
+      }
     }
   }
 
@@ -59,6 +58,10 @@ export class DiagramList {
     }, environment.processengine.processDefListPollingIntervalInMs);
   }
 
+  private stopPolling(): void {
+    clearTimeout(this.pollingTimeout);
+  }
+
   public showDetails(diagramName: string): void {
     this.router.navigateToRoute('design', {
       diagramName: diagramName,
@@ -68,7 +71,11 @@ export class DiagramList {
   }
 
   private async updateDiagramList(): Promise<void> {
-    const solution: ISolution = await this.activeSolutionEntry.service.loadSolution();
-    this.allDiagrams = solution.diagrams;
+    try {
+      const solution: ISolution = await this.activeSolutionEntry.service.loadSolution();
+      this.allDiagrams = solution.diagrams;
+    } catch (error) {
+      // Do nothing
+    }
   }
 }

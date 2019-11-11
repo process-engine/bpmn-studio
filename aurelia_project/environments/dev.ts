@@ -31,6 +31,7 @@ export default {
   events: {
     differsFromOriginal: 'differsFromOriginal',
     diagramChangedOutsideTheStudio: 'diagramChangedOutsideTheStudio',
+    diagramNeedsToBeUpdated: 'diagramNeedsToBeUpdated',
     xmlChanged: 'xmlChanged',
     diagramWasSaved: 'diagramWasSaved',
     deployModals: {
@@ -103,6 +104,7 @@ export default {
       showTokenViewer: 'inspectCorrelation:tokenViewer:show',
       showLogViewer: 'inpsectCorrelation:logViewer:show',
       noCorrelationsFound: 'inspectCorrelation:diagramViewer:noCorrelationsFound',
+      updateProcessInstances: 'inspectCorrelation:updateProcessInstances',
     },
     solutionExplorer: {
       updateOpenDiagrams: 'solutioneExplorer:openDiagrams:update',

@@ -1,9 +1,12 @@
+/* eslint-disable 6river/new-cap */
 import {inject} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 
 import {IDiagram, ISolution} from '@process-engine/solutionexplorer.contracts';
+import * as bundle from '@process-engine/bpmn-js-custom-bundle';
 
-import {ISolutionEntry, ISolutionService} from '../../../../../../contracts';
+import {IShape} from '@process-engine/bpmn-elements_contracts';
+import {IBpmnModeler, IElementRegistry, ISolutionEntry, ISolutionService} from '../../../../../../contracts';
 
 @inject('SolutionService', Router)
 export class GeneralRepository {
@@ -24,5 +27,36 @@ export class GeneralRepository {
     const allDiagramsInSolution: Array<IDiagram> = solution.diagrams;
 
     return allDiagramsInSolution;
+  }
+
+  public async getAllStartEventsForDiagram(diagram: IDiagram): Promise<Array<IShape>> {
+    const modeler: IBpmnModeler = new bundle.modeler({
+      moddleExtensions: {
+        camunda: bundle.camundaModdleDescriptor,
+      },
+    });
+
+    await this.importXmlIntoModeler(modeler, diagram.xml);
+
+    const elementRegistry: IElementRegistry = modeler.get('elementRegistry');
+
+    const startEvents = elementRegistry.filter((element: IShape) => element.type === 'bpmn:StartEvent');
+
+    return startEvents;
+  }
+
+  private importXmlIntoModeler(modeler: IBpmnModeler, xml: string): Promise<void> {
+    return new Promise((resolve: Function, reject: Function): void => {
+      modeler.importXML(xml, (error: Error) => {
+        const errorOccured: boolean = error !== undefined;
+        if (errorOccured) {
+          reject();
+
+          return;
+        }
+
+        resolve();
+      });
+    });
   }
 }
