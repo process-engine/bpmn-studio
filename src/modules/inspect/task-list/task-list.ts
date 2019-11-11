@@ -133,6 +133,10 @@ export class TaskList {
       return;
     }
 
+    if (!this.isAttached) {
+      return;
+    }
+
     if (this.updatePromise) {
       this.updatePromise.cancel();
     }
