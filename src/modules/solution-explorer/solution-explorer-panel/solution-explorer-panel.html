@@ -11,7 +11,7 @@
         <div class="solution-explorer-panel__actions">
           <button
             class="button"
-            if.bind="canReadFromFileSystem()"
+            if.bind="canReadFromFileSystem"
             click.delegate="openDiagram()"
             title="Open a diagram">
 
@@ -20,7 +20,7 @@
 
           <button
             class="button"
-            if.bind="canReadFromFileSystem()"
+            if.bind="canReadFromFileSystem"
             click.delegate="openSolution()"
             title="Open a solution">
 

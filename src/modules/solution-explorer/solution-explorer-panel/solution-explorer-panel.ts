@@ -85,6 +85,10 @@ export class SolutionExplorerPanel {
     }
   }
 
+  public get canReadFromFileSystem(): boolean {
+    return isRunningInElectron();
+  }
+
   public get connectionErrorExists(): boolean {
     return this.connectionError !== undefined;
   }
