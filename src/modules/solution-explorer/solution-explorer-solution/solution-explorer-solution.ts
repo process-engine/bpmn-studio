@@ -358,7 +358,14 @@ export class SolutionExplorerSolution {
         this.openedSolution = undefined;
       } else {
         this.openedSolution.diagrams = undefined;
-        this.fontAwesomeIconClass = 'fa-bolt';
+        this.sortedDiagramsOfSolutions = [];
+
+        if (solutionIsRemoteSolution(this.displayedSolutionEntry.uri)) {
+          this.fontAwesomeIconClass = 'fa-bolt';
+        } else {
+          this.fontAwesomeIconClass = 'fa-folder-minus';
+        }
+
         this.processEngineRunning = false;
       }
     }
@@ -635,7 +642,10 @@ export class SolutionExplorerSolution {
   }
 
   public get solutionIsNotLoaded(): boolean {
-    return this.openedSolution === null || this.openedSolution === undefined || !this.processEngineRunning;
+    return (
+      solutionIsRemoteSolution(this.displayedSolutionEntry.uri) &&
+      (this.openedSolution === null || this.openedSolution === undefined || !this.processEngineRunning)
+    );
   }
 
   public get openedDiagrams(): Array<IDiagram> {
