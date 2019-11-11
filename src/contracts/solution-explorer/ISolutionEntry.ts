@@ -11,7 +11,7 @@ export interface ISolutionEntry {
   service: ISolutionExplorerService;
   uri: string;
   fontAwesomeIconClass: string;
-  isOpenDiagramService: boolean;
+  isOpenDiagram: boolean;
   canCloseSolution: boolean;
   canCreateNewDiagramsInSolution: boolean;
   authority: string;

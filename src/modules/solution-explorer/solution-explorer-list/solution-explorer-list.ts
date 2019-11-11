@@ -495,13 +495,13 @@ export class SolutionExplorerList {
 
     const sortedEntries: Array<ISolutionEntry> = filteredEntries.sort(
       (solutionA: ISolutionEntry, solutionB: ISolutionEntry) => {
-        if (solutionA.isOpenDiagramService) {
+        if (solutionA.isOpenDiagram) {
           return -1;
         }
 
         const solutionAIsInternalProcessEngine: boolean =
           solutionA.uri === window.localStorage.getItem('InternalProcessEngineRoute');
-        if (solutionAIsInternalProcessEngine || solutionB.isOpenDiagramService) {
+        if (solutionAIsInternalProcessEngine || solutionB.isOpenDiagram) {
           return 1;
         }
 
@@ -564,7 +564,7 @@ export class SolutionExplorerList {
   }
 
   private canCloseSolution(service: ISolutionExplorerService, uri: string): boolean {
-    const solutionIsNotOpenDiagrams: boolean = !this.isOpenDiagramService(service);
+    const solutionIsNotOpenDiagrams: boolean = !this.isOpenDiagram(service);
 
     const internalProcessEngineRoute: string = window.localStorage.getItem('InternalProcessEngineRoute');
     const solutionIsNotInternalSolution: boolean = uri !== internalProcessEngineRoute;
@@ -572,7 +572,7 @@ export class SolutionExplorerList {
     return solutionIsNotOpenDiagrams && solutionIsNotInternalSolution;
   }
 
-  private isOpenDiagramService(service: ISolutionExplorerService): boolean {
+  private isOpenDiagram(service: ISolutionExplorerService): boolean {
     return service === this.openDiagramService;
   }
 
@@ -609,7 +609,7 @@ export class SolutionExplorerList {
     insertAtBeginning: boolean,
     processEngineVersion?: string,
   ): Promise<void> {
-    const isOpenDiagramService: boolean = this.isOpenDiagramService(service);
+    const isOpenDiagram: boolean = this.isOpenDiagram(service);
     const fontAwesomeIconClass: string = this.getFontAwesomeIconForSolution(service, uri);
     const canCloseSolution: boolean = this.canCloseSolution(service, uri);
     const canCreateNewDiagramsInSolution: boolean = this.canCreateNewDiagramsInSolution(service, uri);
@@ -635,7 +635,7 @@ export class SolutionExplorerList {
       fontAwesomeIconClass,
       canCloseSolution,
       canCreateNewDiagramsInSolution,
-      isOpenDiagramService,
+      isOpenDiagram,
       identity,
       authority,
       isLoggedIn,

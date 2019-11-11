@@ -179,7 +179,7 @@ export class SolutionExplorerSolution {
       }),
     ];
 
-    if (this.displayedSolutionEntry.isOpenDiagramService) {
+    if (this.displayedSolutionEntry.isOpenDiagram) {
       const updateSubscription: Subscription = this.eventAggregator.subscribe(
         environment.events.solutionExplorer.updateOpenDiagrams,
         (): void => {
@@ -262,7 +262,7 @@ export class SolutionExplorerSolution {
       this.resetDiagramRenaming();
     }
 
-    if (this.displayedSolutionEntry.isOpenDiagramService) {
+    if (this.displayedSolutionEntry.isOpenDiagram) {
       this.ipcRenderer.removeListener('menubar__start_close_diagram', this.closeDiagramEventFunction);
       this.ipcRenderer.removeListener('menubar__start_close_all_diagrams', this.closeAllDiagramsEventFunction);
       this.ipcRenderer.removeListener('menubar__start_save_all_diagrams', this.saveAllDiagramsEventFunction);
@@ -306,7 +306,7 @@ export class SolutionExplorerSolution {
       this.openedSolution = await this.solutionService.loadSolution();
 
       await this.updateSolutionEntry();
-      const updatedDiagramList: Array<IDiagram> = this.displayedSolutionEntry.isOpenDiagramService
+      const updatedDiagramList: Array<IDiagram> = this.displayedSolutionEntry.isOpenDiagram
         ? this.openedSolution.diagrams
         : this.openedSolution.diagrams.sort(this.diagramSorter);
 
@@ -544,7 +544,7 @@ export class SolutionExplorerSolution {
       return;
     }
 
-    if (this.displayedSolutionEntry.isOpenDiagramService) {
+    if (this.displayedSolutionEntry.isOpenDiagram) {
       this.openNewDiagram();
 
       return;
@@ -586,10 +586,10 @@ export class SolutionExplorerSolution {
     return false;
   }
 
-  @computedFrom('displayedSolutionEntry.isOpenDiagramService', 'openedSolution')
+  @computedFrom('displayedSolutionEntry.isOpenDiagram', 'openedSolution')
   public get canRenameDiagram(): boolean {
     return (
-      !this.displayedSolutionEntry.isOpenDiagramService &&
+      !this.displayedSolutionEntry.isOpenDiagram &&
       this.openedSolution &&
       !this.isUriFromRemoteSolution(this.openedSolution.uri)
     );
@@ -610,7 +610,7 @@ export class SolutionExplorerSolution {
   }
 
   public canDeleteDiagram(): boolean {
-    return !this.displayedSolutionEntry.isOpenDiagramService && this.openedSolution !== undefined;
+    return !this.displayedSolutionEntry.isOpenDiagram && this.openedSolution !== undefined;
   }
 
   public get solutionIsNotLoaded(): boolean {
@@ -789,7 +789,7 @@ export class SolutionExplorerSolution {
   };
 
   private startPolling(): void {
-    if (this.displayedSolutionEntry.isOpenDiagramService) {
+    if (this.displayedSolutionEntry.isOpenDiagram) {
       return;
     }
 
@@ -805,7 +805,7 @@ export class SolutionExplorerSolution {
   }
 
   private stopPolling(): void {
-    if (this.displayedSolutionEntry.isOpenDiagramService) {
+    if (this.displayedSolutionEntry.isOpenDiagram) {
       return;
     }
 
@@ -925,7 +925,7 @@ export class SolutionExplorerSolution {
   }
 
   private refreshDisplayedDiagrams(): void {
-    this.sortedDiagramsOfSolutions = this.displayedSolutionEntry.isOpenDiagramService
+    this.sortedDiagramsOfSolutions = this.displayedSolutionEntry.isOpenDiagram
       ? this.openedSolution.diagrams
       : this.openedSolution.diagrams.sort(this.diagramSorter);
   }
