@@ -16,6 +16,8 @@ import {IBpmnModdle, IPageModel, ISection} from '../../../../../../../contracts'
 import environment from '../../../../../../../environment';
 import {GeneralService} from '../../service/general.service';
 
+const ProcessIdRegex: RegExp = /(?<=process id=").*?(?=")/;
+
 @inject(GeneralService, Router, EventAggregator)
 export class CallActivitySection implements ISection {
   public path: string = '/sections/call-activity/call-activity';
@@ -184,6 +186,20 @@ export class CallActivitySection implements ISection {
     this.businessObjInPanel.calledElement = this.selectedDiagramName;
 
     this.publishDiagramChange();
+  }
+
+  public getProcessIdByDiagramName(diagramName: string): string {
+    const diagram: IDiagram = this.getDiagramByName(diagramName);
+
+    const processId: string = diagram.xml.match(ProcessIdRegex)[0];
+
+    return processId;
+  }
+
+  private getDiagramByName(name: string): IDiagram {
+    return this.allDiagrams.find((diagram: IDiagram): boolean => {
+      return diagram.name === name;
+    });
   }
 
   private getPropertiesElement(): IPropertiesElement {
