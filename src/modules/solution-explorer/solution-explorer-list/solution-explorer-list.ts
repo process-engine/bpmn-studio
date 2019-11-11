@@ -550,15 +550,15 @@ export class SolutionExplorerList {
   private getFontAwesomeIconForSolution(service: ISolutionExplorerService, uri: string): string {
     const solutionIsOpenedFromRemote: boolean = solutionIsRemoteSolution(uri);
     if (solutionIsOpenedFromRemote) {
-      return 'fa-database';
+      return 'fa fa-database';
     }
 
     const solutionIsOpenDiagrams: boolean = service === this.openDiagramService;
     if (solutionIsOpenDiagrams) {
-      return 'fa-copy';
+      return 'fa fa-copy';
     }
 
-    return 'fa-folder';
+    return 'fa fa-folder';
   }
 
   private canCreateNewDiagramsInSolution(service: ISolutionExplorerService, uri: string): boolean {

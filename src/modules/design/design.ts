@@ -316,7 +316,7 @@ export class Design {
 
     const remoteSolutionsWithoutActive: Array<ISolutionEntry> = remoteSolutions.filter(
       (remoteSolution: ISolutionEntry) => {
-        return remoteSolution.uri !== this.activeSolutionEntry.uri && remoteSolution.cssIconClass !== 'fa-bolt';
+        return remoteSolution.uri !== this.activeSolutionEntry.uri && remoteSolution.cssIconClass !== 'fa fa-bolt';
       },
     );
 

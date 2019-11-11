@@ -360,6 +360,7 @@ export class SolutionExplorerSolution {
         this.openedSolution.diagrams = undefined;
         this.sortedDiagramsOfSolutions = [];
 
+        this.cssIconClass = 'fa fa-bolt';
         if (solutionIsRemoteSolution(this.displayedSolutionEntry.uri)) {
           this.cssIconClass = 'fa-bolt';
         } else {
