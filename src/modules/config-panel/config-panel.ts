@@ -11,6 +11,7 @@ import {IIdentity} from '@essential-projects/iam_contracts';
 import {IAuthenticationService} from '../../contracts/authentication/IAuthenticationService';
 import {AuthenticationStateEvent, ISolutionEntry, ISolutionService} from '../../contracts/index';
 import {HttpFetchClient} from '../fetch-http-client/http-fetch-client';
+import {isRunningInElectron} from '../../services/is-running-in-electron-module/is-running-in-electron.module';
 
 @inject(Router, 'SolutionService', 'AuthenticationService', EventAggregator, 'HttpFetchClient')
 export class ConfigPanel {
@@ -99,7 +100,7 @@ export class ConfigPanel {
 
     this.showRestartModal = false;
 
-    // Todo: Restart
+    this.ipcRenderer.send('restart');
   }
 
   public restartLater(): void {
