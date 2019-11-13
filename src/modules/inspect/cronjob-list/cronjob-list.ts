@@ -14,6 +14,7 @@ import {getBeautifiedDate} from '../../../services/date-service/date.service';
 import {IDashboardService} from '../dashboard/contracts';
 import {processEngineSupportsCronjobEvents} from '../../../services/process-engine-version-module/process-engine-version.module';
 import {Pagination} from '../../pagination/pagination';
+import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 
 @inject('DashboardService', 'SolutionService')
 export class CronjobList {
@@ -83,7 +84,7 @@ export class CronjobList {
 
     const activeSolutionUriIsNotSet: boolean =
       this.activeSolutionEntry === undefined || this.activeSolutionEntry.uri === undefined;
-    const activeSolutionUriIsNotRemote: boolean = !this.activeSolutionEntry.uri.startsWith('http');
+    const activeSolutionUriIsNotRemote: boolean = !solutionIsRemoteSolution(this.activeSolutionEntry.uri);
 
     if (activeSolutionUriIsNotSet || activeSolutionUriIsNotRemote) {
       const activeSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
