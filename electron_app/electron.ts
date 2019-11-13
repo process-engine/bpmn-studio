@@ -116,6 +116,11 @@ function initializeApplication(): void {
     }
   });
 
+  ipcMain.on('restart', (): void => {
+    app.relaunch();
+    app.quit();
+  });
+
   if (!releaseChannel.isDev()) {
     initializeAutoUpdater();
   }
