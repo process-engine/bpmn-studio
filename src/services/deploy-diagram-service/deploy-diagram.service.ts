@@ -8,7 +8,6 @@ import * as bundle from '@process-engine/bpmn-js-custom-bundle';
 import {IModdleElement} from '@process-engine/bpmn-elements_contracts';
 import environment from '../../environment';
 import {SolutionService} from '../solution-service/solution.service';
-import {SaveDiagramService} from '../save-diagram-service/save-diagram.service';
 import {
   DeployResult,
   IBpmnModdle,
@@ -19,14 +18,13 @@ import {
 } from '../../contracts/index';
 import {NotificationService} from '../notification-service/notification.service';
 
-@inject(EventAggregator, 'SolutionService', SaveDiagramService, Router, 'NotificationService')
+@inject(EventAggregator, 'SolutionService', Router, 'NotificationService')
 export class DeployDiagramService {
   private router: Router;
   private eventAggregator: EventAggregator;
   private notificationService: NotificationService;
 
   private solutionService: SolutionService;
-  private saveDiagramService: SaveDiagramService;
 
   private modeler: IBpmnModeler;
   private moddle: IBpmnModdle;
@@ -34,13 +32,11 @@ export class DeployDiagramService {
   constructor(
     eventAggregator: EventAggregator,
     solutionService: SolutionService,
-    saveDiagramService: SaveDiagramService,
     router: Router,
     notificationService: NotificationService,
   ) {
     this.eventAggregator = eventAggregator;
     this.solutionService = solutionService;
-    this.saveDiagramService = saveDiagramService;
     this.router = router;
     this.notificationService = notificationService;
 
