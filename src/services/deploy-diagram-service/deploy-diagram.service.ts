@@ -93,11 +93,6 @@ export class DeployDiagramService {
 
       const deployedDiagram: IDiagram = await solutionToDeployTo.service.loadDiagram(processModelId);
 
-      this.router.navigateToRoute('design', {
-        diagramName: deployedDiagram.name,
-        solutionUri: solutionToDeployTo.uri,
-      });
-
       this.notificationService.showNotification(
         NotificationType.SUCCESS,
         'Diagram was successfully uploaded to the connected ProcessEngine.',
