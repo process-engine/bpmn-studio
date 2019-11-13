@@ -9,7 +9,14 @@ import {IModdleElement} from '@process-engine/bpmn-elements_contracts';
 import environment from '../../environment';
 import {SolutionService} from '../solution-service/solution.service';
 import {SaveDiagramService} from '../save-diagram-service/save-diagram.service';
-import {IBpmnModdle, IBpmnModeler, IDefinition, ISolutionEntry, NotificationType} from '../../contracts/index';
+import {
+  DeployResult,
+  IBpmnModdle,
+  IBpmnModeler,
+  IDefinition,
+  ISolutionEntry,
+  NotificationType,
+} from '../../contracts/index';
 import {NotificationService} from '../notification-service/notification.service';
 
 @inject(EventAggregator, 'SolutionService', SaveDiagramService, Router, 'NotificationService')
@@ -47,7 +54,7 @@ export class DeployDiagramService {
     this.moddle = this.modeler.get('moddle');
   }
 
-  public async deployDiagram(solution: ISolutionEntry, diagram: IDiagram, xml?: string): Promise<void> {
+  public async deployDiagram(solution: ISolutionEntry, diagram: IDiagram, xml?: string): Promise<DeployResult> {
     const diagramHasChanges: boolean = xml !== undefined;
     if (diagramHasChanges) {
       diagram.xml = xml;
@@ -55,13 +62,13 @@ export class DeployDiagramService {
 
     const remoteSolutionToDeployTo: ISolutionEntry = await this.getRemoteSolutionToDeployTo();
     if (remoteSolutionToDeployTo === undefined) {
-      return;
+      return undefined;
     }
 
-    await this.uploadProcess(remoteSolutionToDeployTo, diagram);
+    return this.uploadProcess(remoteSolutionToDeployTo, diagram);
   }
 
-  private async uploadProcess(solutionToDeployTo: ISolutionEntry, diagram: IDiagram): Promise<void> {
+  private async uploadProcess(solutionToDeployTo: ISolutionEntry, diagram: IDiagram): Promise<DeployResult> {
     const processModelId: string = await this.getProcessModelIdForXml(diagram.xml);
 
     const diagramIsAlreadyDeployed: boolean = await this.diagramIsAlreadyDeployed(solutionToDeployTo, processModelId);
@@ -69,7 +76,7 @@ export class DeployDiagramService {
       const shouldOverwriteDiagram: boolean = await this.shouldOverwriteDiagram();
 
       if (!shouldOverwriteDiagram) {
-        return;
+        return undefined;
       }
     }
 
@@ -99,8 +106,15 @@ export class DeployDiagramService {
       );
 
       this.eventAggregator.publish(environment.events.diagramDetail.onDiagramDeployed, processModelId);
+
+      return {
+        diagram: deployedDiagram,
+        solution: solutionToDeployTo,
+      };
     } catch (error) {
       this.notificationService.showNotification(NotificationType.ERROR, `Unable to update diagram: ${error}`);
+
+      return undefined;
     }
   }
 
