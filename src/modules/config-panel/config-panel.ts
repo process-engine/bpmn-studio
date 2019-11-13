@@ -77,12 +77,18 @@ export class ConfigPanel {
       this.eventAggregator.publish(AuthenticationStateEvent.LOGOUT);
     }
 
-    const iamServiceConfig = this.getIamServiceConfig();
+    if (isRunningInElectron()) {
+      const iamServiceConfig = this.getIamServiceConfig();
 
-    const authorityChanged: boolean = iamServiceConfig.basePath !== this.authority;
-    if (authorityChanged) {
-      this.showRestartModal = true;
+      const authorityChanged: boolean = iamServiceConfig.basePath !== this.authority;
+      if (authorityChanged) {
+        this.showRestartModal = true;
+      } else {
+        this.router.navigateBack();
+      }
     } else {
+      this.internalSolution.authority = this.authority;
+
       this.router.navigateBack();
     }
   }
