@@ -14,7 +14,13 @@ import {
 import {DataModels} from '@process-engine/management_api_contracts';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 
-import {IElementRegistry, ISolutionEntry, IUserInputValidationRule, NotificationType} from '../../../contracts/index';
+import {
+  DeployResult,
+  IElementRegistry,
+  ISolutionEntry,
+  IUserInputValidationRule,
+  NotificationType,
+} from '../../../contracts/index';
 
 import environment from '../../../environment';
 import {NotificationService} from '../../../services/notification-service/notification.service';
@@ -464,7 +470,16 @@ export class DiagramDetail {
   private async deployDiagram(): Promise<void> {
     const xml: string | undefined = this.diagramHasChanged ? await this.bpmnio.getXML() : undefined;
 
-    this.deployDiagramService.deployDiagram(this.activeSolutionEntry, this.activeDiagram, xml);
+    const deployResult: DeployResult = await this.deployDiagramService.deployDiagram(
+      this.activeSolutionEntry,
+      this.activeDiagram,
+      xml,
+    );
+
+    this.router.navigateToRoute('design', {
+      diagramName: deployResult.diagram.name,
+      solutionUri: deployResult.solution.uri,
+    });
   }
 
   /**
