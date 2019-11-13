@@ -13,6 +13,7 @@ export class ConfigPanel {
   public internalSolution: ISolutionEntry;
   public authority: string;
   public defaultAuthority: string;
+  public showRestartModal: boolean;
 
   private router: Router;
   private solutionService: ISolutionService;
@@ -66,9 +67,12 @@ export class ConfigPanel {
       this.eventAggregator.publish(AuthenticationStateEvent.LOGOUT);
     }
 
-    this.internalSolution.authority = this.authority;
-
-    this.router.navigateBack();
+    const authorityChanged: boolean = this.internalSolution.authority !== this.authority;
+    if (authorityChanged) {
+      this.showRestartModal = true;
+    } else {
+      this.router.navigateBack();
+    }
   }
 
   public setDefaultAuthority(): void {
@@ -77,6 +81,26 @@ export class ConfigPanel {
 
   public cancelUpdate(): void {
     this.router.navigateBack();
+  }
+
+  public restartNow(): void {
+    this.saveNewAuthority();
+
+    this.showRestartModal = false;
+
+    // Todo: Restart
+  }
+
+  public restartLater(): void {
+    this.saveNewAuthority();
+
+    this.showRestartModal = false;
+
+    this.router.navigateBack();
+  }
+
+  private saveNewAuthority(): void {
+    this.internalSolution.authority = this.authority;
   }
 
   private async getAuthorityForInternalSolution(): Promise<string> {
