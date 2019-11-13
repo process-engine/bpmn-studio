@@ -803,7 +803,7 @@ async function startInternalProcessEngine(): Promise<any> {
   const userDataFolderPath = releaseChannel.isDev() ? devUserDataFolderPath : prodUserDataFolderPath;
 
   if (!releaseChannel.isDev()) {
-    process.env.CONFIG_PATH = path.join(__dirname, '..', '..', '..', 'config');
+    process.env.CONFIG_PATH = path.join(__dirname, '..', '..', '..', '..', '..', 'config');
   }
 
   const configForGetPort = {
