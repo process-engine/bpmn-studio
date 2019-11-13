@@ -84,6 +84,8 @@ export class ConfigPanel {
 
       const authorityChanged: boolean = iamServiceConfig.basePath !== this.authority;
       if (authorityChanged) {
+        await this.saveNewAuthority();
+
         this.showRestartModal = true;
       } else {
         this.router.navigateBack();
@@ -104,16 +106,12 @@ export class ConfigPanel {
   }
 
   public async restartNow(): Promise<void> {
-    await this.saveNewAuthority();
-
     this.showRestartModal = false;
 
     this.ipcRenderer.send('restart');
   }
 
   public async restartLater(): Promise<void> {
-    await this.saveNewAuthority();
-
     this.showRestartModal = false;
 
     this.router.navigateBack();
