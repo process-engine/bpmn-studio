@@ -40,6 +40,7 @@ export class CallActivitySection implements ISection {
   @observable public payload: string;
   public payloadInput: HTMLTextAreaElement;
   public diagramNamesWithProcessIds: Array<DiagramNameWithProcessId> = [];
+  public showPayloadModal: boolean;
 
   public callActivitySection: CallActivitySection = this;
 

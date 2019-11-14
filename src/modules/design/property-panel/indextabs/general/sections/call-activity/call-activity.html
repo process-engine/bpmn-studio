@@ -29,7 +29,7 @@
         </tr>
         <tr show.bind="selectedStartEvent">
           <th>Payload
-            <a class="payload-enlarge-link" click.delegate="showModal = true"><small class="payload-enlarge-link">Enlarge</small>
+            <a class="payload-enlarge-link" click.delegate="showPayloadModal = true"><small class="payload-enlarge-link">Enlarge</small>
           </th>
           <td>
             <textarea ref="payloadInput" class="props-input-textarea name-input" value.bind="payload" disabled.bind="!isEditable"></textarea>
@@ -41,14 +41,13 @@
     </div>
   </div>
 
-
-  <modal show.bind="showModal"
+  <modal show.bind="showPayloadModal"
          header-text="Editing: Payload">
     <template replace-part="modal-body" autofocus>
       <textarea class="form-control script-task" value.bind="payload" rows="10" aria-multiline="true" autofocus wrap="soft" disabled.bind="!isEditable"></textarea>
     </template>
     <template replace-part="modal-footer">
-      <button type="button" class="btn btn-primary" data-dismiss="modal" click.delegate="showModal = false">Okay</button>
+      <button type="button" class="btn btn-primary" data-dismiss="modal" click.delegate="showPayloadModal = false">Okay</button>
     </template>
   </modal>
 
