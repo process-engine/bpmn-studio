@@ -117,6 +117,9 @@ jobs:
       env: 
         CSC_LINK: ${{ secrets.CSC_LINK }}
 
+    - name: Run the tests
+      run: npm test
+
     - name: Prepare macOS Bundle
       run: |
         mkdir dist_electron_macos
