@@ -12,10 +12,10 @@
       <table>
         <tr repeat.for="property of properties" index.bind="$index">
           <td class="key-value-column-left">
-            <input data-fieldIndex="${$index}" focus.one-time="shouldFocus" blur.trigger="inputFieldBlurred($index, $event)" type="text" class="props-input key-value-input" value.bind="newNames[$index]" placeholder="Name" change.delegate="changeName($index)" disabled.bind="!isEditable">
+            <input data-fieldIndex="${$index}" type="text" class="props-input key-value-input" placeholder="Name" focus.one-time="shouldFocus" blur.trigger="inputFieldBlurred($index, $event)" value.bind="newNames[$index]" change.delegate="changeName($index)" disabled.bind="!isEditable">
           </td>
           <td class="key-value-column-right">
-            <input data-fieldIndex="${$index}" type="text" class="props-input key-value-input" blur.trigger="inputFieldBlurred($index, $event)" value.bind="newValues[$index]" placeholder="Value" change.delegate="changeValue($index)" disabled.bind="!isEditable">
+            <input data-fieldIndex="${$index}" type="text" class="props-input key-value-input" placeholder="Value"  blur.trigger="inputFieldBlurred($index, $event)" value.bind="newValues[$index]" change.delegate="changeValue($index)" disabled.bind="!isEditable">
           </td>
           <td>
             <button class="button key-value-delete-button" click.delegate="removeProperty($index)" disabled.bind="!isEditable">
