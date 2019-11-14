@@ -268,14 +268,14 @@ jobs:
       uses: actions/download-artifact@master
       with:
         name: dist_electron_macos
-        path: ".dist/electron"
+        path: "dist/electron"
 
     - name: Unstash Windows Electron app
       if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
       uses: actions/download-artifact@master
       with:
         name: dist_electron_windows
-        path: ".dist/electron"
+        path: "dist/electron"
 
     - name: Install ci tools
       if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
@@ -295,6 +295,3 @@ jobs:
       env:
         GH_USER: ${{ secrets.GH_USER }}
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
-#
-# artefakte anpassen wenn master beta develop ist 
-
