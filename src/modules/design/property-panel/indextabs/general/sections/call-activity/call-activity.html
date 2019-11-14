@@ -9,7 +9,7 @@
           <th>Process</th>
           <td>
             <div class="called-process-selection">
-              <input class="called-process-selection__input " type="text" list="diagrams" value.bind="selectedDiagramName" change.delegate="updateCalledDiagram()" disabled.bind="!isEditable"}>
+              <input class="called-process-selection__input props-input" type="text" list="diagrams" value.bind="selectedDiagramName" change.delegate="updateCalledDiagram()" disabled.bind="!isEditable"}>
                 <datalist id="diagrams">
                   <option repeat.for="diagram of allDiagrams" value="${diagram.name}">
                 </datalist>
@@ -21,7 +21,7 @@
           <th>StartEvent</th>
           <td>
             <div class="called-process-selection">
-            <input class="called-process-selection__input" type="text" list="start-events" value.bind="selectedStartEvent" change.delegate="selectedStartEventChanged" disabled.bind="!isEditable">
+            <input class="called-process-selection__input props-input" type="text" list="start-events" value.bind="selectedStartEvent" change.delegate="selectedStartEventChanged" disabled.bind="!isEditable">
               <datalist id="start-events">
                 <option repeat.for="startEvent of startEvents" value="${startEvent.id}">
               </datalist>

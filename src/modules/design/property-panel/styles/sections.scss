@@ -56,6 +56,16 @@
   opacity: 0.5;
 }
 
+.props-input::-webkit-calendar-picker-indicator {
+  opacity: 0.5;
+}
+
+.props-input::-webkit-calendar-picker-indicator:hover {
+  cursor: pointer;
+  opacity: 1;
+  background: inherit;
+}
+
 .props-select {
   padding-right: 22px;
   border-radius: 0;
