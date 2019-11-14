@@ -23,12 +23,17 @@ type DiagramNameWithProcessId = {
   processId: string;
 };
 
+type StartEventIdWithDiagramName = {
+  diagramName: string;
+  startEventId: string;
+};
+
 @inject(GeneralService, Router, EventAggregator)
 export class CallActivitySection implements ISection {
   public path: string = '/sections/call-activity/call-activity';
   public canHandleElement: boolean = false;
   @observable public allDiagrams: Array<IDiagram>;
-  public startEvents: Array<IShape>;
+  public startEventIdsWithDiagramNames: Array<StartEventIdWithDiagramName>;
   public previouslySelectedDiagram: string;
   public selectedProcessId: string;
   @observable public selectedStartEvent: string;
@@ -57,19 +62,20 @@ export class CallActivitySection implements ISection {
     await this.getAllDiagrams();
 
     this.previouslySelectedDiagram = this.businessObjInPanel.calledElement;
-    this.selectedDiagramName = this.businessObjInPanel.calledElement;
+    this.selectedProcessId = this.businessObjInPanel.calledElement;
 
-    if (this.selectedDiagramName) {
+    const processIdIsSelected: boolean = this.selectedProcessId !== undefined;
+    if (processIdIsSelected) {
       try {
-        this.startEvents = await this.generalService.getAllStartEventsForDiagram(this.selectedDiagramName);
+        this.startEventIdsWithDiagramNames = await this.getAllStartEventsForProcessId(this.selectedProcessId);
       } catch (error) {
-        this.startEvents = [];
+        this.startEventIdsWithDiagramNames = [];
       }
 
       this.selectedStartEvent = this.getSelectedStartEvent();
 
-      if (this.selectedStartEvent === undefined && this.startEvents.length > 0) {
-        this.selectedStartEvent = this.startEvents[0].id;
+      if (this.selectedStartEvent === undefined && this.startEventIdsWithDiagramNames.length > 0) {
+        this.selectedStartEvent = this.startEventIdsWithDiagramNames[0].startEventId;
       }
 
       this.payload = this.getPayload();
@@ -209,9 +215,9 @@ export class CallActivitySection implements ISection {
 
   public async updateCalledDiagram(): Promise<void> {
     try {
-      this.startEvents = await this.generalService.getAllStartEventsForDiagram(this.selectedDiagramName);
+      this.startEventIdsWithDiagramNames = await this.getAllStartEventsForProcessId(this.selectedProcessId);
     } catch (error) {
-      this.startEvents = [];
+      this.startEventIdsWithDiagramNames = [];
     }
 
     this.businessObjInPanel.calledElement = this.selectedProcessId;

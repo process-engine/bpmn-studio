@@ -22,7 +22,7 @@
             <div class="called-process-selection">
             <input class="called-process-selection__input props-input" type="text" list="start-events" value.bind="selectedStartEvent" change.delegate="selectedStartEventChanged" disabled.bind="!isEditable">
               <datalist id="start-events">
-                <option repeat.for="startEvent of startEvents" value="${startEvent.id}">
+                <option repeat.for="startEventIdWithDiagramName of startEventIdsWithDiagramNames" value="${startEventIdWithDiagramName.startEventId}">Filename: ${startEventIdWithDiagramName.diagramName}</option>
               </datalist>
             </div>
           </td>
