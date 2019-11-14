@@ -105,6 +105,9 @@ stages:
     - script: npm test
       displayName: 'npm test'
 
+    - publish: 'dist/electron'
+      artifact: dist_electron_windows
+
   - job: macOS
     pool:
       vmImage: 'macOS-latest'
@@ -125,6 +128,9 @@ stages:
 
     - script: npm test
       displayName: 'npm test'
+
+    - publish: 'dist/electron'
+      artifact: dist_electron_macos
 
 - stage: Commit_and_tag_version
   displayName: "Commit & tag version"
