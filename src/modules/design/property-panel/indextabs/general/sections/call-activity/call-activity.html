@@ -16,7 +16,6 @@
             </div>
           </td>
         </tr>
-
         <tr>
           <th>StartEvent</th>
           <td>
@@ -28,7 +27,6 @@
             </div>
           </td>
         </tr>
-
         <tr show.bind="selectedStartEvent">
           <th>Payload
             <a class="payload-enlarge-link" click.delegate="showModal = true"><small class="payload-enlarge-link">Enlarge</small>
@@ -38,7 +36,6 @@
           </td>
         </tr>
       </table>
-
       <button class="navigation-button" title.bind="!selectedDiagramName || !isPartOfAllDiagrams(selectedDiagramName) ? 'The called process could not be found.' : ''" disabled.bind="!selectedDiagramName || !isPartOfAllDiagrams(selectedDiagramName)" click.delegate="navigateToCalledDiagram()">Navigate to called process</button>
     </div>
   </div>
