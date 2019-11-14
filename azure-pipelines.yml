@@ -194,3 +194,39 @@ stages:
         # User has to have 'push' privileges on the org (to be able to, well, push to the registry)
         NPM_TOKEN: $(NPM_TOKEN)
         #GIT_BRANCH: $(Build.SourceBranchName)
+#  
+#  - job: Linux
+#    pool:
+#      vmImage: 'ubuntu-16.04'
+#    steps:
+#    - task: NodeTool@0
+#      inputs:
+#        versionSpec: '10.x'
+#      displayName: 'Install Node.js'
+#
+#    - checkout: self
+#
+#    - script: |
+#        npm ci
+#      displayName: 'npm ci'
+#
+#    - download: current
+#      artifact: package_json
+#
+#    - download: current
+#      artifact: dist_electron_windows
+#
+#    - download: current
+#      artifact: dist_electron_macos
+#
+#    - script: |
+#        ./node_modules/.bin/ci_tools update-github-release \
+#                      --assets dist/electron/bpmn-studio-setup-*.exe \
+#                      --assets dist/electron/bpmn-studio-setup-*.exe.blockmap \
+#                      --assets dist/electron/bpmn-studio-setup-*.zip \
+#                      --assets dist/electron/bpmn-studio-setup-*.dmg \
+#                      --assets dist/electron/bpmn-studio-setup-*.dmg.blockmap \
+#                      --assets dist/electron/latest-mac.yml \
+#                      --assets dist/electron/latest.yml
+#      displayName: 'Upload GitHub Release'
+#
