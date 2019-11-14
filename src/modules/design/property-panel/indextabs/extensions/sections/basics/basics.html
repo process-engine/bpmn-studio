@@ -9,7 +9,7 @@
       </button>
     </div>
     <div class="panel__content">
-      <table>
+      <table class="property-table">
         <tr repeat.for="property of properties" index.bind="$index">
           <td class="key-value-column-left">
             <input data-fieldIndex="${$index}" type="text" class="props-input key-value-input" placeholder="Name" focus.one-time="shouldFocus" blur.trigger="inputFieldBlurred($index, $event)" value.bind="newNames[$index]" change.delegate="changeName($index)" disabled.bind="!isEditable">
