@@ -18,17 +18,23 @@ import {GeneralService} from '../../service/general.service';
 
 const ProcessIdRegex: RegExp = /(?<=process id=").*?(?=")/;
 
+type DiagramNameWithProcessId = {
+  diagramName: string;
+  processId: string;
+};
+
 @inject(GeneralService, Router, EventAggregator)
 export class CallActivitySection implements ISection {
   public path: string = '/sections/call-activity/call-activity';
   public canHandleElement: boolean = false;
-  public allDiagrams: Array<IDiagram>;
+  @observable public allDiagrams: Array<IDiagram>;
   public startEvents: Array<IShape>;
   public previouslySelectedDiagram: string;
-  public selectedDiagramName: string;
+  public selectedProcessId: string;
   @observable public selectedStartEvent: string;
   @observable public payload: string;
   public payloadInput: HTMLTextAreaElement;
+  public diagramNamesWithProcessIds: Array<DiagramNameWithProcessId> = [];
 
   private businessObjInPanel: ICallActivityElement;
   private generalService: GeneralService;
@@ -89,17 +95,42 @@ export class CallActivitySection implements ISection {
     return elementIsCallActivity;
   }
 
-  public navigateToCalledDiagram(): void {
+  public async navigateToCalledDiagram(): Promise<void> {
+    const diagramNamesForGivenProcessId: Array<string> = this.getAllDiagramNamesForProcessId(this.selectedProcessId);
+
+    let diagramName: string;
+
+    if (diagramNamesForGivenProcessId.length === 1) {
+      diagramName = diagramNamesForGivenProcessId[0];
+    } else {
+      try {
+        diagramName = await this.letUserChooseDiagram(diagramNamesForGivenProcessId);
+      } catch {
+        return;
+      }
+    }
+
     this.router.navigateToRoute('design', {
-      diagramName: this.selectedDiagramName,
+      diagramName: diagramName,
       solutionUri: this.activeSolutionUri,
       view: 'detail',
     });
   }
 
-  public isPartOfAllDiagrams(diagramName: string): boolean {
-    return this.allDiagrams.some((diagram: IDiagram): boolean => {
-      return diagram.name === diagramName;
+  public isPartOfAllDiagrams(processId: string): boolean {
+    return this.diagramNamesWithProcessIds.some((diagramNameWithProcessId: DiagramNameWithProcessId): boolean => {
+      return diagramNameWithProcessId.processId === processId;
+    });
+  }
+
+  public allDiagramsChanged(): void {
+    this.diagramNamesWithProcessIds = this.allDiagrams.map((diagram: IDiagram) => {
+      const diagramNameWithProcessId: DiagramNameWithProcessId = {
+        diagramName: diagram.name,
+        processId: this.getProcessIdByDiagramName(diagram.name),
+      };
+
+      return diagramNameWithProcessId;
     });
   }
 
@@ -183,7 +214,7 @@ export class CallActivitySection implements ISection {
       this.startEvents = [];
     }
 
-    this.businessObjInPanel.calledElement = this.selectedDiagramName;
+    this.businessObjInPanel.calledElement = this.selectedProcessId;
 
     this.publishDiagramChange();
   }
@@ -327,4 +358,38 @@ export class CallActivitySection implements ISection {
     };
     window.addEventListener('mouseup', resizeListenerFunction);
   };
+
+  private async getAllStartEventsForProcessId(processId: string): Promise<Array<StartEventIdWithDiagramName>> {
+    const diagramNamesForGivenProcessId: Array<string> = this.getAllDiagramNamesForProcessId(processId);
+
+    const startEventIdsWithDiagramNames: Array<StartEventIdWithDiagramName> = [];
+    for (const diagramName of diagramNamesForGivenProcessId) {
+      const startEventsForDiagram: Array<IShape> = await this.generalService.getAllStartEventsForDiagram(diagramName);
+
+      const startEventIdsForDiagramWithDiagramName: Array<StartEventIdWithDiagramName> = startEventsForDiagram.map(
+        (startEvent: IShape) => {
+          return {
+            diagramName: diagramName,
+            startEventId: startEvent.id,
+          };
+        },
+      );
+
+      startEventIdsWithDiagramNames.push(...startEventIdsForDiagramWithDiagramName);
+    }
+
+    return startEventIdsWithDiagramNames;
+  }
+
+  private getAllDiagramNamesForProcessId(processId: string): Array<string> {
+    const diagramNamesForGivenProcessId: Array<string> = this.diagramNamesWithProcessIds
+      .filter((diagramNameWithProcessId: DiagramNameWithProcessId) => {
+        return diagramNameWithProcessId.processId === processId;
+      })
+      .map((diagramNameWithProcessId: DiagramNameWithProcessId) => {
+        return diagramNameWithProcessId.diagramName;
+      });
+
+    return diagramNamesForGivenProcessId;
+  }
 }

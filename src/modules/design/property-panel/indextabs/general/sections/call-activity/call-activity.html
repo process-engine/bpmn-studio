@@ -9,10 +9,10 @@
           <th>Process ID</th>
           <td>
             <div class="called-process-selection">
-              <input class="called-process-selection__input props-input" type="text" list="diagrams" value.bind="selectedDiagramName" change.delegate="updateCalledDiagram()" disabled.bind="!isEditable"}>
-                <datalist id="diagrams">
-                  <option repeat.for="diagram of allDiagrams" value="${getProcessIdByDiagramName(diagram.name)}">Filename: ${diagram.name}</option>
-                </datalist>
+              <input class="called-process-selection__input props-input" type="text" list="diagrams" value.bind="selectedProcessId" change.delegate="updateCalledDiagram()" disabled.bind="!isEditable"}>
+              <datalist id="diagrams">
+                <option repeat.for="diagramNameWithProcessId of diagramNamesWithProcessIds" value="${diagramNameWithProcessId.processId}">Filename: ${diagramNameWithProcessId.diagramName}</option>
+              </datalist>
             </div>
           </td>
         </tr>
@@ -36,7 +36,8 @@
           </td>
         </tr>
       </table>
-      <button class="btn btn-default btn-sm navigation-button" title.bind="!selectedDiagramName || !isPartOfAllDiagrams(selectedDiagramName) ? 'The called process could not be found.' : ''" disabled.bind="!selectedDiagramName || !isPartOfAllDiagrams(selectedDiagramName)" click.delegate="navigateToCalledDiagram()">Navigate to called process</button>
+
+      <button class="btn btn-default btn-sm navigation-button" title.bind="!selectedProcessId || !isPartOfAllDiagrams(selectedProcessId) ? 'The called process could not be found.' : ''" disabled.bind="!selectedProcessId || !isPartOfAllDiagrams(selectedProcessId)" click.delegate="navigateToCalledDiagram()">Navigate to called process</button>
     </div>
   </div>
 
