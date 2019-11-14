@@ -12,7 +12,7 @@ import {
 } from '@process-engine/bpmn-elements_contracts';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 
-import {IBpmnModdle, IPageModel, ISection} from '../../../../../../../contracts';
+import {IBpmnModdle, IPageModel, ISection, IEventFunction} from '../../../../../../../contracts';
 import environment from '../../../../../../../environment';
 import {GeneralService} from '../../service/general.service';
 
@@ -40,6 +40,12 @@ export class CallActivitySection implements ISection {
   @observable public payload: string;
   public payloadInput: HTMLTextAreaElement;
   public diagramNamesWithProcessIds: Array<DiagramNameWithProcessId> = [];
+
+  public callActivitySection: CallActivitySection = this;
+
+  public showChooseDiagramModal: boolean;
+  public diagramNamesToSelectFrom: Array<string>;
+  public selectedDiagramName: string;
 
   private businessObjInPanel: ICallActivityElement;
   private generalService: GeneralService;
@@ -110,7 +116,7 @@ export class CallActivitySection implements ISection {
       diagramName = diagramNamesForGivenProcessId[0];
     } else {
       try {
-        diagramName = await this.letUserChooseDiagram(diagramNamesForGivenProcessId);
+        diagramName = await this.handleDiagramSelection(diagramNamesForGivenProcessId);
       } catch {
         return;
       }
@@ -397,5 +403,34 @@ export class CallActivitySection implements ISection {
       });
 
     return diagramNamesForGivenProcessId;
+  }
+
+  private async handleDiagramSelection(diagramNames: Array<string>): Promise<string> {
+    return new Promise((resolve: Function, reject: Function): void => {
+      this.diagramNamesToSelectFrom = diagramNames;
+
+      this.showChooseDiagramModal = true;
+
+      const cancelNavigation: IEventFunction = (): void => {
+        this.showChooseDiagramModal = false;
+
+        reject();
+
+        document.getElementById('confirmNavigationModal').removeEventListener('click', confirmNavigation);
+      };
+
+      const confirmNavigation: IEventFunction = async (): Promise<void> => {
+        this.showChooseDiagramModal = false;
+
+        resolve(this.selectedDiagramName);
+
+        document.getElementById('cancelNavigationModal').removeEventListener('click', cancelNavigation);
+      };
+
+      setTimeout(() => {
+        document.getElementById('cancelNavigationModal').addEventListener('click', cancelNavigation, {once: true});
+        document.getElementById('confirmNavigationModal').addEventListener('click', confirmNavigation, {once: true});
+      }, 0);
+    });
   }
 }
