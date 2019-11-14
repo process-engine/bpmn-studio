@@ -109,3 +109,18 @@ router-view {
 .dropdown-item:hover {
   background-color: #e6e6e6 !important;
 }
+
+.checkbox-input {
+  position: relative
+}
+
+.checkbox-input__checkbox {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 9px;
+}
+
+.checkbox-input__input {
+  padding-left: 30px;
+}

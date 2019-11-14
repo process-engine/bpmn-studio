@@ -77,14 +77,10 @@
         <tr>
           <th>Default Value</th>
           <td>
-            <div if.bind="selectedType === FormfieldTypes.boolean" class="input-group">
-              <div class="input-group-prepend">
-                <div class="input-group-text">
-                  <input type="checkbox" checked.bind="booleanDefaultValue" change.delegate="updateBooleanDefaultValue()" disabled.bind="!isEditable">
-                </div>
-              </div>
-              <input type="text" class="form-control" value.bind="booleanDefaultValueString" change.delegate="updateBooleanDefaultValueString()" disabled.bind="!isEditable">
-            </div>
+            <div if.bind="selectedType === FormfieldTypes.boolean" class="checkbox-input">
+              <input type="checkbox" class="checkbox-input__checkbox" checked.bind="booleanDefaultValue" change.delegate="updateBooleanDefaultValue()" disabled.bind="!isEditable">
+               <input type="text" class="props-input checkbox-input__input" value.bind="booleanDefaultValueString" change.delegate="updateBooleanDefaultValueString()" disabled.bind="!isEditable">
+             </div>
             <input else type="text" class="props-input" value.bind="selectedForm.defaultValue"  placeholder="Default Value" change.delegate="updateDefaultValue()" disabled.bind="!isEditable">
           </td>
         </tr>
