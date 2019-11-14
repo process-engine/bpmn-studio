@@ -383,7 +383,7 @@ function createMainWindow(): void {
 
   const platformIsWindows = process.platform === 'win32';
   if (platformIsWindows) {
-    browserWindow.webContents.session.on('will-download', (event, downloadItem) => {
+    browserWindow.webContents.session.on('will-download', async (event, downloadItem) => {
       const defaultFilename = downloadItem.getFilename();
 
       const fileTypeIndex = defaultFilename.lastIndexOf('.') + 1;
@@ -392,7 +392,7 @@ function createMainWindow(): void {
       const fileExtensionIsBPMN = fileExtension === 'bpmn';
       const fileType = fileExtensionIsBPMN ? 'BPMN (.bpmn)' : `Image (.${fileExtension})`;
 
-      const filename = dialog.showSaveDialogSync({
+      const saveDialogResult = await dialog.showSaveDialog({
         defaultPath: defaultFilename,
         filters: [
           {
@@ -406,21 +406,20 @@ function createMainWindow(): void {
         ],
       });
 
-      const downloadCanceled = filename === undefined;
-      if (downloadCanceled) {
+      if (saveDialogResult.canceled) {
         downloadItem.cancel();
 
         return;
       }
 
-      downloadItem.setSavePath(filename);
+      downloadItem.setSavePath(saveDialogResult.filePath);
     });
   }
 }
 
 function setSaveDiagramAsListener(): void {
-  ipcMain.on('open_save-diagram-as_dialog', (event) => {
-    const filePath = dialog.showSaveDialogSync({
+  ipcMain.on('open_save-diagram-as_dialog', async (event) => {
+    const saveDialogResult = await dialog.showSaveDialog({
       filters: [
         {
           name: 'BPMN',
@@ -432,6 +431,8 @@ function setSaveDiagramAsListener(): void {
         },
       ],
     });
+
+    const filePath: string = saveDialogResult.canceled ? undefined : saveDialogResult.filePath;
 
     event.sender.send('save_diagram_as', filePath);
   });
@@ -1045,7 +1046,7 @@ async function exportDatabases(): Promise<void> {
   const downloadPath = electron.app.getPath('downloads');
   const defaultPath = path.join(downloadPath, `database-backup-${now}.zip`);
 
-  const savePath: string = dialog.showSaveDialogSync({
+  const saveDialogResult = await dialog.showSaveDialog({
     defaultPath: defaultPath,
     filters: [
       {
@@ -1059,12 +1060,12 @@ async function exportDatabases(): Promise<void> {
     ],
   });
 
-  if (!savePath) {
+  if (saveDialogResult.canceled) {
     return;
   }
 
   zip.generateAsync({type: 'nodebuffer'}).then((content) => {
-    fs.writeFileSync(savePath, content);
+    fs.writeFileSync(saveDialogResult.filePath, content);
   });
 }
 
