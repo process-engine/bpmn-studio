@@ -194,6 +194,7 @@ stages:
       displayName: 'Publish to npm'
       env:
         NPM_TOKEN: $(NPM_TOKEN)
+        GIT_BRANCH: $(Build.SourceBranch)
   
  # - job: Publish_GitHub_release
  #   pool:
