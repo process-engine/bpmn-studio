@@ -18,11 +18,6 @@ stages:
       vmImage: 'ubuntu-16.04'
     steps:
 
-
-    - script: |
-        git status
-        git branch
-
     - checkout: self
       persistCredentials: true
       clean: true
