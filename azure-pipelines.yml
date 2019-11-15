@@ -3,11 +3,6 @@
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
 
-#trigger:
-#  branches:
-#    include:
-#    - '*'  
-
 pr: none
 
 stages:
@@ -20,22 +15,13 @@ stages:
       vmImage: 'ubuntu-16.04'
     steps:
 
-    #- checkout: self
-    #  persistCredentials: true
-    #  clean: true
-
-    - script: |
-        git status
-        git branch
-
     - task: NodeTool@0
       inputs:
         versionSpec: '10.x'
       displayName: 'Install Node.js'
 
-    - script: |
-        npm ci
-      displayName: 'npm ci'
+    - script: npm i @process-engine/ci_tools
+      displayName: 'Install CI Tools'
 
     - script: |
         node ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir
@@ -46,199 +32,201 @@ stages:
     - publish: './package.json'
       artifact: package_json
 
+
+- stage: Build_and_test
+  displayName: Build and test
+  jobs:
+  - job: Lint_sources
+    displayName: Lint sources
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '10.x'
+      displayName: 'Install Node.js'
+
+    - script: npm ci
+      displayName: 'npm ci'
+
+    - script: npm run lint
+      displayName: 'npm run lint'
+
+  - job: Build_and_test_web
+    displayName: Build and test web app
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '10.x'
+      displayName: 'Install Node.js'
+
+    - download: current
+      artifact: package_json
+
+    - script: |
+        npm ci
+        ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+      displayName: 'Install dependencies'
+
+    - script: npm run build
+      displayName: 'Build web app'
+
+    - script: xvfb-run --auto-servernum npm test
+      displayName: 'Test web app'
+
+    - publish: 'dist/web'
+      artifact: NpmPackage-DistWeb
+
+    - publish: 'config'
+      artifact: NpmPackage-config
+
+  - job: Build_and_test_Windows
+    displayName: Build and test Windows app
+    pool:
+      vmImage: 'vs2017-win2016'
+    steps:
+
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '10.x'
+      displayName: 'Install Node.js'
+
+    - download: current
+      artifact: package_json
+
+    - script: |
+        npm ci
+        ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+      displayName: 'Install dependencies'
+
+    - script: npm run electron-build-windows
+      displayName: 'Build the Windows app'
+
+    - script: npm test
+      displayName: 'Test the Windows app'
+
+    - publish: 'dist/electron'
+      artifact: dist_electron_windows
+
+  - job: Build_and_test_macOS
+    displayName: Build and test macOS app
+    pool:
+      vmImage: 'macOS-latest'
+    steps:
+
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '10.x'
+      displayName: 'Install Node.js'
+
+    - download: current
+      artifact: package_json
+
+    - script: |
+        npm ci
+        ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+      displayName: 'Install dependencies'
+
+    - script: npm run electron-build-macos
+      displayName: 'Build the macOS app'
+
+    - script: npm test
+      displayName: 'Test the macOS app'
+
+    - publish: 'dist/electron'
+      artifact: dist_electron_macos
+
+- stage: Commit_and_tag_version
+  displayName: Commit & tag version
+  jobs:
+  - job: Linux
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '10.x'
+      displayName: 'Install Node.js'
+
+    - script: npm i @process-engine/ci_tools
+      displayName: 'Install CI Tools'
+
+    - download: current
+      artifact: package_json
+
+    - script: |
+        ./node_modules/.bin/ci_tools commit-and-tag-version --only-on-primary-branches
+        ./node_modules/.bin/ci_tools update-github-release --only-on-primary-branches --use-title-and-text-from-git-tag
+      displayName: 'Commit and Tag'
+      env:
+        # User has to have 'admin' privileges on the repo (to be able to push to protected branches).
+        GH_USER: $(GH_USER)
+        GH_TOKEN: $(GH_TOKEN)
+        GIT_BRANCH: $(Build.SourceBranch)
+
+- stage: Publish
+  jobs:
+  - job: Publish_npm_package
+    displayName: Publish npm package
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '10.x'
+      displayName: 'Install Node.js'
+
+    - script: npm i @process-engine/ci_tools
+      displayName: 'Install CI Tools'
+
+    - download: current
+      artifact: package_json
+
+    - script: |
+        ./node_modules/.bin/ci_tools publish-npm-package --create-tag-from-branch-name
+      displayName: 'Publish to npm'
+      env:
+        NPM_TOKEN: $(NPM_TOKEN)
+  
+ # - job: Publish_GitHub_release
+ #   pool:
+ #     vmImage: 'ubuntu-16.04'
+ #   steps:
 #
-#- stage: Build_and_test
-#  displayName: Build and test
-#  jobs:
-#  - job: Lint_sources
-#    displayName: Lint sources
-#    pool:
-#      vmImage: 'ubuntu-16.04'
-#    steps:
-#    - task: NodeTool@0
-#      inputs:
-#        versionSpec: '10.x'
-#      displayName: 'Install Node.js'
+ #   - task: NodeTool@0
+ #     inputs:
+ #       versionSpec: '10.x'
+ #     displayName: 'Install Node.js'
 #
-#    - script: npm ci
-#      displayName: 'npm ci'
+ #   - script: npm i @process-engine/ci_tools
+ #     displayName: 'Install CI Tools'
 #
-#    - script: npm run lint
-#      displayName: 'npm run lint'
+ #   - download: current
+ #     artifact: package_json
 #
-#  - job: Linux
-#    pool:
-#      vmImage: 'ubuntu-16.04'
-#    steps:
-#    - task: NodeTool@0
-#      inputs:
-#        versionSpec: '10.x'
-#      displayName: 'Install Node.js'
+ #   - download: current
+ #     artifact: dist_electron_windows
 #
-#    - download: current
-#      artifact: package_json
+ #   - download: current
+ #     artifact: dist_electron_macos
 #
-#    - script: ls -al
-#      displayName: 'ls -al'
-#
-#    - script: npm install
-#      displayName: 'npm install'
-#
-#    - script: npm run build
-#      displayName: 'npm run build'
-#
-#    - script: xvfb-run --auto-servernum npm test
-#      displayName: 'npm test'
-#
-#    - publish: 'dist/web'
-#      artifact: NpmPackage-DistWeb
-#
-#    - publish: 'config'
-#      artifact: NpmPackage-config
-#
-#  - job: Windows
-#    pool:
-#      vmImage: 'vs2017-win2016'
-#    steps:
-#    - task: NodeTool@0
-#      inputs:
-#        versionSpec: '10.x'
-#      displayName: 'Install Node.js'
-#
-#    - download: current
-#      artifact: package_json
-#
-#    - script: npm install
-#      displayName: 'npm install'
-#
-#    - script: npm run electron-build-windows
-#      displayName: 'npm run electron-build-windows'
-#
-#    - script: npm test
-#      displayName: 'npm test'
-#
-#    - publish: 'dist/electron'
-#      artifact: dist_electron_windows
-#
-#  - job: macOS
-#    pool:
-#      vmImage: 'macOS-latest'
-#    steps:
-#    - task: NodeTool@0
-#      inputs:
-#        versionSpec: '10.x'
-#      displayName: 'Install Node.js'
-#
-#    - download: current
-#      artifact: package_json
-#
-#    - script: npm install
-#      displayName: 'npm install'
-#
-#    - script: npm run electron-build-macos
-#      displayName: 'npm run electron-build-macos'
-#
-#    - script: npm test
-#      displayName: 'npm test'
-#
-#    - publish: 'dist/electron'
-#      artifact: dist_electron_macos
-#
-#- stage: Commit_and_tag_version
-#  displayName: "Commit & tag version"
-#  jobs:
-#  - job: Linux
-#    pool:
-#      vmImage: 'ubuntu-16.04'
-#    steps:
-#    - task: NodeTool@0
-#      inputs:
-#        versionSpec: '10.x'
-#      displayName: 'Install Node.js'
-#
-#    #- checkout: self
-#
-#    - script: |
-#        git status
-#        npm ci
-#      displayName: 'npm ci'
-#
-#    - download: current
-#      artifact: package_json
-#
-#    - script: |
-#        node ./node_modules/.bin/ci_tools commit-and-tag-version --only-on-primary-branches
-#        node ./node_modules/.bin/ci_tools update-github-release --only-on-primary-branches --use-title-and-text-from-git-tag
-#      displayName: 'Commit and Tag'
-#      env:
-#        # User has to have 'admin' privileges on the repo (to be able to push to protected branches).
-#        GH_USER: $(GH_USER)
-#        GH_TOKEN: $(GH_TOKEN)
-#        #GIT_BRANCH: $(Build.SourceBranchName)
-#
-#- stage: Publish
-#  jobs:
-#  - job: Linux
-#    pool:
-#      vmImage: 'ubuntu-16.04'
-#    steps:
-#    - task: NodeTool@0
-#      inputs:
-#        versionSpec: '10.x'
-#      displayName: 'Install Node.js'
-#
-#    - checkout: self
-#
-#    - script: |
-#        npm ci
-#      displayName: 'npm ci'
-#
-#    - download: current
-#      artifact: package_json
-#
-#    - script: |
-#        node ./node_modules/.bin/ci_tools publish-npm-package --create-tag-from-branch-name
-#      displayName: 'Publish to npm'
-#      env:
-#        # User has to have 'admin' privileges on the repo (to be able to push to protected branches).
-#        GH_USER: $(GH_USER)
-#        GH_TOKEN: $(GH_TOKEN)
-#        # User has to have 'push' privileges on the org (to be able to, well, push to the registry)
-#        NPM_TOKEN: $(NPM_TOKEN)
-#        #GIT_BRANCH: $(Build.SourceBranchName)
-#  
-#  - job: Linux
-#    pool:
-#      vmImage: 'ubuntu-16.04'
-#    steps:
-#    - task: NodeTool@0
-#      inputs:
-#        versionSpec: '10.x'
-#      displayName: 'Install Node.js'
-#
-#    - checkout: self
-#
-#    - script: |
-#        npm ci
-#      displayName: 'npm ci'
-#
-#    - download: current
-#      artifact: package_json
-#
-#    - download: current
-#      artifact: dist_electron_windows
-#
-#    - download: current
-#      artifact: dist_electron_macos
-#
-#    - script: |
-#        ./node_modules/.bin/ci_tools update-github-release \
-#                      --assets dist/electron/bpmn-studio-setup-*.exe \
-#                      --assets dist/electron/bpmn-studio-setup-*.exe.blockmap \
-#                      --assets dist/electron/bpmn-studio-setup-*.zip \
-#                      --assets dist/electron/bpmn-studio-setup-*.dmg \
-#                      --assets dist/electron/bpmn-studio-setup-*.dmg.blockmap \
-#                      --assets dist/electron/latest-mac.yml \
-#                      --assets dist/electron/latest.yml
-#      displayName: 'Upload GitHub Release'
+ #   - script: |
+ #       ./node_modules/.bin/ci_tools update-github-release \
+ #                     --assets dist/electron/bpmn-studio-setup-*.exe \
+ #                     --assets dist/electron/bpmn-studio-setup-*.exe.blockmap \
+ #                     --assets dist/electron/bpmn-studio-setup-*.zip \
+ #                     --assets dist/electron/bpmn-studio-setup-*.dmg \
+ #                     --assets dist/electron/bpmn-studio-setup-*.dmg.blockmap \
+ #                     --assets dist/electron/latest-mac.yml \
+ #                     --assets dist/electron/latest.yml
+ #     displayName: 'Upload GitHub Release'
+ #     env:
+ #       GH_USER: $(GH_USER)
+ #       GH_TOKEN: $(GH_TOKEN)
 #
