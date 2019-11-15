@@ -4,8 +4,9 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
 
 trigger:
-- master
-
+  branches:
+    include:
+    - '*'  
 
 stages:
 
@@ -16,6 +17,10 @@ stages:
     pool:
       vmImage: 'ubuntu-16.04'
     steps:
+    - checkout: self
+      persistCredentials: true
+      clean: true
+
     - task: NodeTool@0
       inputs:
         versionSpec: '10.x'
@@ -144,7 +149,7 @@ stages:
         versionSpec: '10.x'
       displayName: 'Install Node.js'
 
-    - checkout: self
+    #- checkout: self
 
     - script: |
         git status
