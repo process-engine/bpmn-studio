@@ -25,7 +25,7 @@ stages:
 
     - script: |
         node ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir
-      displayName: 'ci_tools prepare-version --allow-dirty-workdir'
+      displayName: 'Prepare version'
       env:
         GIT_BRANCH: $(Build.SourceBranch)
 
@@ -48,10 +48,10 @@ stages:
       displayName: 'Install Node.js'
 
     - script: npm ci
-      displayName: 'npm ci'
+      displayName: 'Install dependencies'
 
     - script: npm run lint
-      displayName: 'npm run lint'
+      displayName: 'Lint sources'
 
   - job: Build_and_test_web
     displayName: Build and test web app
@@ -143,7 +143,8 @@ stages:
 - stage: Commit_and_tag_version
   displayName: Commit & tag version
   jobs:
-  - job: Linux
+  - job: Commit_and_tag
+    displayName: Commit and tag new version
     pool:
       vmImage: 'ubuntu-16.04'
     steps:
