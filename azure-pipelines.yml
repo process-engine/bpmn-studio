@@ -17,9 +17,19 @@ stages:
     pool:
       vmImage: 'ubuntu-16.04'
     steps:
-    #- checkout: self
-    #  persistCredentials: true
-    #  clean: true
+
+
+    - script: |
+        git status
+        git branch
+
+    - checkout: self
+      persistCredentials: true
+      clean: true
+
+    - script: |
+        git status
+        git branch
 
     - task: NodeTool@0
       inputs:
