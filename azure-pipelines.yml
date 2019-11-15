@@ -3,10 +3,10 @@
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
 
-trigger:
-  branches:
-    include:
-    - '*'  
+#trigger:
+#  branches:
+#    include:
+#    - '*'  
 
 stages:
 
@@ -17,9 +17,9 @@ stages:
     pool:
       vmImage: 'ubuntu-16.04'
     steps:
-    - checkout: self
-      persistCredentials: true
-      clean: true
+    #- checkout: self
+    #  persistCredentials: true
+    #  clean: true
 
     - task: NodeTool@0
       inputs:
@@ -39,166 +39,166 @@ stages:
     - publish: './package.json'
       artifact: package_json
 
-
-- stage: Build_and_test
-  displayName: Build and test
-  jobs:
-  - job: Lint_sources
-    displayName: Lint sources
-    pool:
-      vmImage: 'ubuntu-16.04'
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '10.x'
-      displayName: 'Install Node.js'
-
-    - script: npm ci
-      displayName: 'npm ci'
-
-    - script: npm run lint
-      displayName: 'npm run lint'
-
-  - job: Linux
-    pool:
-      vmImage: 'ubuntu-16.04'
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '10.x'
-      displayName: 'Install Node.js'
-
-    - download: current
-      artifact: package_json
-
-    - script: ls -al
-      displayName: 'ls -al'
-
-    - script: npm install
-      displayName: 'npm install'
-
-    - script: npm run build
-      displayName: 'npm run build'
-
-    - script: xvfb-run --auto-servernum npm test
-      displayName: 'npm test'
-
-    - publish: 'dist/web'
-      artifact: NpmPackage-DistWeb
-
-    - publish: 'config'
-      artifact: NpmPackage-config
-
-  - job: Windows
-    pool:
-      vmImage: 'vs2017-win2016'
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '10.x'
-      displayName: 'Install Node.js'
-
-    - download: current
-      artifact: package_json
-
-    - script: npm install
-      displayName: 'npm install'
-
-    - script: npm run electron-build-windows
-      displayName: 'npm run electron-build-windows'
-
-    - script: npm test
-      displayName: 'npm test'
-
-    - publish: 'dist/electron'
-      artifact: dist_electron_windows
-
-  - job: macOS
-    pool:
-      vmImage: 'macOS-latest'
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '10.x'
-      displayName: 'Install Node.js'
-
-    - download: current
-      artifact: package_json
-
-    - script: npm install
-      displayName: 'npm install'
-
-    - script: npm run electron-build-macos
-      displayName: 'npm run electron-build-macos'
-
-    - script: npm test
-      displayName: 'npm test'
-
-    - publish: 'dist/electron'
-      artifact: dist_electron_macos
-
-- stage: Commit_and_tag_version
-  displayName: "Commit & tag version"
-  jobs:
-  - job: Linux
-    pool:
-      vmImage: 'ubuntu-16.04'
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '10.x'
-      displayName: 'Install Node.js'
-
-    #- checkout: self
-
-    - script: |
-        git status
-        npm ci
-      displayName: 'npm ci'
-
-    - download: current
-      artifact: package_json
-
-    - script: |
-        node ./node_modules/.bin/ci_tools commit-and-tag-version --only-on-primary-branches
-        node ./node_modules/.bin/ci_tools update-github-release --only-on-primary-branches --use-title-and-text-from-git-tag
-      displayName: 'Commit and Tag'
-      env:
-        # User has to have 'admin' privileges on the repo (to be able to push to protected branches).
-        GH_USER: $(GH_USER)
-        GH_TOKEN: $(GH_TOKEN)
-        #GIT_BRANCH: $(Build.SourceBranchName)
-
-- stage: Publish
-  jobs:
-  - job: Linux
-    pool:
-      vmImage: 'ubuntu-16.04'
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '10.x'
-      displayName: 'Install Node.js'
-
-    - checkout: self
-
-    - script: |
-        npm ci
-      displayName: 'npm ci'
-
-    - download: current
-      artifact: package_json
-
-    - script: |
-        node ./node_modules/.bin/ci_tools publish-npm-package --create-tag-from-branch-name
-      displayName: 'Publish to npm'
-      env:
-        # User has to have 'admin' privileges on the repo (to be able to push to protected branches).
-        GH_USER: $(GH_USER)
-        GH_TOKEN: $(GH_TOKEN)
-        # User has to have 'push' privileges on the org (to be able to, well, push to the registry)
-        NPM_TOKEN: $(NPM_TOKEN)
-        #GIT_BRANCH: $(Build.SourceBranchName)
+#
+#- stage: Build_and_test
+#  displayName: Build and test
+#  jobs:
+#  - job: Lint_sources
+#    displayName: Lint sources
+#    pool:
+#      vmImage: 'ubuntu-16.04'
+#    steps:
+#    - task: NodeTool@0
+#      inputs:
+#        versionSpec: '10.x'
+#      displayName: 'Install Node.js'
+#
+#    - script: npm ci
+#      displayName: 'npm ci'
+#
+#    - script: npm run lint
+#      displayName: 'npm run lint'
+#
+#  - job: Linux
+#    pool:
+#      vmImage: 'ubuntu-16.04'
+#    steps:
+#    - task: NodeTool@0
+#      inputs:
+#        versionSpec: '10.x'
+#      displayName: 'Install Node.js'
+#
+#    - download: current
+#      artifact: package_json
+#
+#    - script: ls -al
+#      displayName: 'ls -al'
+#
+#    - script: npm install
+#      displayName: 'npm install'
+#
+#    - script: npm run build
+#      displayName: 'npm run build'
+#
+#    - script: xvfb-run --auto-servernum npm test
+#      displayName: 'npm test'
+#
+#    - publish: 'dist/web'
+#      artifact: NpmPackage-DistWeb
+#
+#    - publish: 'config'
+#      artifact: NpmPackage-config
+#
+#  - job: Windows
+#    pool:
+#      vmImage: 'vs2017-win2016'
+#    steps:
+#    - task: NodeTool@0
+#      inputs:
+#        versionSpec: '10.x'
+#      displayName: 'Install Node.js'
+#
+#    - download: current
+#      artifact: package_json
+#
+#    - script: npm install
+#      displayName: 'npm install'
+#
+#    - script: npm run electron-build-windows
+#      displayName: 'npm run electron-build-windows'
+#
+#    - script: npm test
+#      displayName: 'npm test'
+#
+#    - publish: 'dist/electron'
+#      artifact: dist_electron_windows
+#
+#  - job: macOS
+#    pool:
+#      vmImage: 'macOS-latest'
+#    steps:
+#    - task: NodeTool@0
+#      inputs:
+#        versionSpec: '10.x'
+#      displayName: 'Install Node.js'
+#
+#    - download: current
+#      artifact: package_json
+#
+#    - script: npm install
+#      displayName: 'npm install'
+#
+#    - script: npm run electron-build-macos
+#      displayName: 'npm run electron-build-macos'
+#
+#    - script: npm test
+#      displayName: 'npm test'
+#
+#    - publish: 'dist/electron'
+#      artifact: dist_electron_macos
+#
+#- stage: Commit_and_tag_version
+#  displayName: "Commit & tag version"
+#  jobs:
+#  - job: Linux
+#    pool:
+#      vmImage: 'ubuntu-16.04'
+#    steps:
+#    - task: NodeTool@0
+#      inputs:
+#        versionSpec: '10.x'
+#      displayName: 'Install Node.js'
+#
+#    #- checkout: self
+#
+#    - script: |
+#        git status
+#        npm ci
+#      displayName: 'npm ci'
+#
+#    - download: current
+#      artifact: package_json
+#
+#    - script: |
+#        node ./node_modules/.bin/ci_tools commit-and-tag-version --only-on-primary-branches
+#        node ./node_modules/.bin/ci_tools update-github-release --only-on-primary-branches --use-title-and-text-from-git-tag
+#      displayName: 'Commit and Tag'
+#      env:
+#        # User has to have 'admin' privileges on the repo (to be able to push to protected branches).
+#        GH_USER: $(GH_USER)
+#        GH_TOKEN: $(GH_TOKEN)
+#        #GIT_BRANCH: $(Build.SourceBranchName)
+#
+#- stage: Publish
+#  jobs:
+#  - job: Linux
+#    pool:
+#      vmImage: 'ubuntu-16.04'
+#    steps:
+#    - task: NodeTool@0
+#      inputs:
+#        versionSpec: '10.x'
+#      displayName: 'Install Node.js'
+#
+#    - checkout: self
+#
+#    - script: |
+#        npm ci
+#      displayName: 'npm ci'
+#
+#    - download: current
+#      artifact: package_json
+#
+#    - script: |
+#        node ./node_modules/.bin/ci_tools publish-npm-package --create-tag-from-branch-name
+#      displayName: 'Publish to npm'
+#      env:
+#        # User has to have 'admin' privileges on the repo (to be able to push to protected branches).
+#        GH_USER: $(GH_USER)
+#        GH_TOKEN: $(GH_TOKEN)
+#        # User has to have 'push' privileges on the org (to be able to, well, push to the registry)
+#        NPM_TOKEN: $(NPM_TOKEN)
+#        #GIT_BRANCH: $(Build.SourceBranchName)
 #  
 #  - job: Linux
 #    pool:
