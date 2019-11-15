@@ -91,7 +91,7 @@ export class SaveDiagramService {
 
       this.eventAggregator.publish(environment.events.diagramWasSaved, diagramToSave.uri);
     } catch (error) {
-      this.notificationService.showNotification(NotificationType.ERROR, `Unable to save the file: ${error}.`);
+      this.notificationService.showNotification(NotificationType.ERROR, `Unable to save the file: ${error}`);
 
       setTimeout(() => {
         this.isSaving = false;
