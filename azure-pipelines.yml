@@ -78,7 +78,7 @@ stages:
     - script: xvfb-run --auto-servernum npm test
       displayName: 'Test web app'
 
-    - displayName: Prepare Web Bundle
+    - displayName: 'Prepare Web Bundle'
       script: | 
         mkdir -p dist_web/dist/web
         cp index.html dist_web/index.html
@@ -148,7 +148,7 @@ stages:
     - script: npm test
       displayName: 'Test the macOS app'
 
-    - displayName: Prepare macOS Bundle
+    - displayName: 'Prepare macOS Bundle'
       script: |
         mkdir dist_electron_macos
         cp dist/electron/bpmn-studio-setup**.zip dist_electron_macos
