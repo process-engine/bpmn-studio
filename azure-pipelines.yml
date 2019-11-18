@@ -115,7 +115,12 @@ stages:
     - script: npm test
       displayName: 'Test the Windows app'
 
-    - publish: 'dist/electron'
+    - powershell: |
+        mkdir dist_electron_windows
+        copy-item .\dist\electron\bpmn-studio-setup-**.exe .\dist_electron_windows\
+      displayName: Prepare Windows Bundle
+
+    - publish: 'dist_electron_windows'
       artifact: dist_electron_windows
 
   - job: Build_and_test_macOS
