@@ -8,7 +8,7 @@ pr: none
 variables:
   workspace: $(Pipeline.Workspace)
   branch: $(Build.SourceBranch)
-  branchToRelease: or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/develop'), eq(variables['Build.SourceBranch'], 'refs/heads/beta'))
+  branchToRelease: $[or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/develop'), eq(variables['Build.SourceBranch'], 'refs/heads/beta'))]
 #refs/heads/
 stages:
 
