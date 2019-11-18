@@ -213,39 +213,40 @@ stages:
         NPM_TOKEN: $(NPM_TOKEN)
         GIT_BRANCH: $(Build.SourceBranch)
   
- # - job: Publish_GitHub_release
- #   pool:
- #     vmImage: 'ubuntu-16.04'
- #   steps:
-#
- #   - task: NodeTool@0
- #     inputs:
- #       versionSpec: '10.x'
- #     displayName: 'Install Node.js'
-#
- #   - script: npm i @process-engine/ci_tools
- #     displayName: 'Install CI Tools'
-#
- #   - download: current
- #     artifact: package_json
-#
- #   - download: current
- #     artifact: dist_electron_windows
-#
- #   - download: current
- #     artifact: dist_electron_macos
-#
- #   - script: |
- #       ./node_modules/.bin/ci_tools update-github-release \
- #                     --assets dist/electron/bpmn-studio-setup-*.exe \
- #                     --assets dist/electron/bpmn-studio-setup-*.exe.blockmap \
- #                     --assets dist/electron/bpmn-studio-setup-*.zip \
- #                     --assets dist/electron/bpmn-studio-setup-*.dmg \
- #                     --assets dist/electron/bpmn-studio-setup-*.dmg.blockmap \
- #                     --assets dist/electron/latest-mac.yml \
- #                     --assets dist/electron/latest.yml
- #     displayName: 'Upload GitHub Release'
- #     env:
- #       GH_USER: $(GH_USER)
- #       GH_TOKEN: $(GH_TOKEN)
-#
+  - job: Publish_GitHub_release
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '10.x'
+      displayName: 'Install Node.js'
+
+    - script: npm i @process-engine/ci_tools
+      displayName: 'Install CI Tools'
+
+    - download: current
+      artifact: package_json
+
+    - download: current
+      artifact: dist_electron_windows
+
+    - download: current
+      artifact: dist_electron_macos
+
+    - script: |
+        l
+    #- script: |
+    #    ./node_modules/.bin/ci_tools update-github-release \
+    #                  --assets dist/electron/bpmn-studio-setup-*.exe \
+    #                  --assets dist/electron/bpmn-studio-setup-*.exe.blockmap \
+    #                  --assets dist/electron/bpmn-studio-setup-*.zip \
+    #                  --assets dist/electron/bpmn-studio-setup-*.dmg \
+    #                  --assets dist/electron/bpmn-studio-setup-*.dmg.blockmap \
+    #                  --assets dist/electron/latest-mac.yml \
+    #                  --assets dist/electron/latest.yml
+    #  displayName: 'Upload GitHub Release'
+    #  env:
+    #    GH_USER: $(GH_USER)
+    #    GH_TOKEN: $(GH_TOKEN)
