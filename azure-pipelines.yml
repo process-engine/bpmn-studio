@@ -5,6 +5,9 @@
 
 pr: none
 
+variables:
+  global_variable: $(System.DefaultWorkingDirectory)
+
 stages:
 
 - stage: Prepare_version
@@ -238,9 +241,8 @@ stages:
 
     - script: |
         ls -la
-        $WDIR
-      env: 
-        WDIR: $(System.DefaultWorkingDirectory)
+
+    - bash: echo $(global_variable)
     #- script: |
     #    ./node_modules/.bin/ci_tools update-github-release \
     #                  --assets dist/electron/bpmn-studio-setup-*.exe \
