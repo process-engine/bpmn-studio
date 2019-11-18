@@ -78,11 +78,17 @@ stages:
     - script: xvfb-run --auto-servernum npm test
       displayName: 'Test web app'
 
-    - publish: 'dist/web'
-      artifact: NpmPackage-DistWeb
-
-    - publish: 'config'
-      artifact: NpmPackage-config
+    - displayName: Prepare Web Bundle
+      script: | 
+        mkdir -p dist_web/dist/web
+        cp index.html dist_web/index.html
+        cp -r dist/web dist_web/dist
+        mkdir -p dist_web/src/resources
+        cp -r src/resources dist_web/src
+        cp favicon.ico dist_web/
+    
+    - publish: 'dist_web'
+      artifact: dist_web
 
   - job: Build_and_test_Windows
     displayName: Build and test Windows app
