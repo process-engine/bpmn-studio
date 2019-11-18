@@ -78,14 +78,14 @@ stages:
     - script: xvfb-run --auto-servernum npm test
       displayName: 'Test web app'
 
-    - displayName: 'Prepare Web Bundle'
-      script: | 
+    - script: | 
         mkdir -p dist_web/dist/web
         cp index.html dist_web/index.html
         cp -r dist/web dist_web/dist
         mkdir -p dist_web/src/resources
         cp -r src/resources dist_web/src
         cp favicon.ico dist_web/
+      displayName: 'Prepare Web Bundle'
     
     - publish: 'dist_web'
       artifact: dist_web
@@ -148,11 +148,11 @@ stages:
     - script: npm test
       displayName: 'Test the macOS app'
 
-    - displayName: 'Prepare macOS Bundle'
-      script: |
+    - script: |
         mkdir dist_electron_macos
         cp dist/electron/bpmn-studio-setup**.zip dist_electron_macos
         cp dist/electron/bpmn-studio-setup**.dmg dist_electron_macos
+      displayName: 'Prepare macOS Bundle'
 
     - publish: 'dist_electron_macos'
       artifact: dist_electron_macos
