@@ -148,7 +148,13 @@ stages:
     - script: npm test
       displayName: 'Test the macOS app'
 
-    - publish: 'dist/electron'
+    - displayName: Prepare macOS Bundle
+      script: |
+        mkdir dist_electron_macos
+        cp dist/electron/bpmn-studio-setup**.zip dist_electron_macos
+        cp dist/electron/bpmn-studio-setup**.dmg dist_electron_macos
+
+    - publish: 'dist_electron_macos'
       artifact: dist_electron_macos
 
 - stage: Commit_and_tag_version
