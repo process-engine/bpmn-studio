@@ -236,7 +236,7 @@ stages:
       artifact: dist_electron_macos
 
     - script: |
-        l
+        ls -la
     #- script: |
     #    ./node_modules/.bin/ci_tools update-github-release \
     #                  --assets dist/electron/bpmn-studio-setup-*.exe \
