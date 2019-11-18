@@ -6,8 +6,8 @@
 pr: none
 
 variables:
-  working_dir: $(System.DefaultWorkingDirectory)
   workspace: $(Pipeline.Workspace)
+  branch: $(Build.SourceBranch)
 
 stages:
 
@@ -19,7 +19,7 @@ stages:
       vmImage: 'ubuntu-16.04'
     steps:
 
-    - bash: echo $(working_dir)
+    - bash: echo $(branch)
     - bash: echo $(workspace)
 
     - task: NodeTool@0
@@ -243,27 +243,15 @@ stages:
     - download: current
       artifact: dist_electron_macos
 
-    - script: |
-        ls -la
-
-    - bash: echo $(workspace)
-
-    - script: |
-        cd $(workspace)/dist_electron_windows
-        ls -la
-
-    - script: |
-        cd $(workspace)/dist_electron_macos
-        ls -la
     #- script: |
     #    ./node_modules/.bin/ci_tools update-github-release \
-    #                  --assets $(workspace)/dist/electron/bpmn-studio-setup-*.exe \
-    #                  --assets $(workspace)/dist/electron/bpmn-studio-setup-*.exe.blockmap \
-    #                  --assets $(workspace)/dist/electron/bpmn-studio-setup-*.zip \
-    #                  --assets $(workspace)/dist/electron/bpmn-studio-setup-*.dmg \
-    #                  --assets $(workspace)/dist/electron/bpmn-studio-setup-*.dmg.blockmap \
-    #                  --assets $(workspace)/dist/electron/latest-mac.yml \
-    #                  --assets $(workspace)/dist/electron/latest.yml
+    #                  --assets $(workspace)/dist_electron_windows/bpmn-studio-setup-*.exe \
+    #                  --assets $(workspace)/dist_electron_windows/bpmn-studio-setup-*.exe.blockmap \
+    #                  --assets $(workspace)/dist_electron_macos/bpmn-studio-setup-*.zip \
+    #                  --assets $(workspace)/dist_electron_macos/bpmn-studio-setup-*.dmg \
+    #                  --assets $(workspace)/dist_electron_macos/bpmn-studio-setup-*.dmg.blockmap \
+    #                  --assets $(workspace)/dist_electron_macos/latest-mac.yml \
+    #                  --assets $(workspace)/dist_electron_windows/latest.yml
     #  displayName: 'Upload GitHub Release'
     #  env:
     #    GH_USER: $(GH_USER)
