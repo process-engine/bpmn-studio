@@ -6,7 +6,8 @@
 pr: none
 
 variables:
-  global_variable: $(System.DefaultWorkingDirectory)
+  working_dir: $(System.DefaultWorkingDirectory)
+  workspace: $(Pipeline.Workspace)
 
 stages:
 
@@ -17,6 +18,11 @@ stages:
     pool:
       vmImage: 'ubuntu-16.04'
     steps:
+
+    - bash: echo $(working_dir)
+    - bash: echo $(workspace)
+
+    - script: pwd
 
     - task: NodeTool@0
       inputs:
