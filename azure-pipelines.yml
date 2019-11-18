@@ -8,19 +8,22 @@ pr: none
 variables:
   workspace: $(Pipeline.Workspace)
   branch: $(Build.SourceBranch)
-
+  branchToRelease: or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/develop'), eq(variables['Build.SourceBranch'], 'refs/heads/beta'))
+#refs/heads/
 stages:
 
 - stage: Prepare_version
   displayName: Prepare version
   jobs:
   - job: Linux
+    displayName: Prepare Version
     pool:
       vmImage: 'ubuntu-16.04'
     steps:
 
     - bash: echo $(branch)
     - bash: echo $(workspace)
+    - bash: echo $(branchToRelease)
 
     - task: NodeTool@0
       inputs:
@@ -126,6 +129,12 @@ stages:
         mkdir dist_electron_windows
         copy-item .\dist\electron\bpmn-studio-setup-**.exe .\dist_electron_windows\
       displayName: Prepare Windows Bundle
+
+    - powershell: |
+        copy-item .\dist\electron\bpmn-studio-setup-**.exe.blockmap .\dist_electron_windows\
+        copy-item .\dist\electron\latest.yml .\dist_electron_windows\
+      displayName: Prepare Windows Bundle for GitHub Release
+      condition: $(branchToRelease)
 
     - publish: 'dist_electron_windows'
       artifact: dist_electron_windows
