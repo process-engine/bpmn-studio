@@ -226,8 +226,6 @@ export class SolutionExplorerSolution {
         this.solutionEventListenerId = this.displayedSolutionEntry.service.watchSolution(() => {
           this.updateSolution();
         });
-      } else {
-        this.startPolling();
       }
     }
   }
@@ -350,7 +348,6 @@ export class SolutionExplorerSolution {
 
         this.sortedDiagramsOfSolutions = [];
         this.openedSolution = undefined;
-        this.stopPolling();
       } else if (isError(error, ForbiddenError)) {
         this.notificationService.showNotification(
           NotificationType.ERROR,
@@ -359,7 +356,6 @@ export class SolutionExplorerSolution {
 
         this.sortedDiagramsOfSolutions = [];
         this.openedSolution = undefined;
-        this.stopPolling();
       } else {
         this.openedSolution.diagrams = undefined;
         this.fontAwesomeIconClass = 'fa-bolt';
@@ -812,32 +808,6 @@ export class SolutionExplorerSolution {
   private saveAllDiagramsEventFunction: Function = (): void => {
     this.saveAllUnsavedDiagrams();
   };
-
-  private startPolling(): void {
-    if (this.displayedSolutionEntry.isOpenDiagram) {
-      return;
-    }
-
-    this.isPolling = true;
-
-    this.refreshTimeoutTask = setTimeout(async () => {
-      await this.updateSolution();
-
-      if (this.isAttached && this.isPolling) {
-        this.startPolling();
-      }
-    }, environment.processengine.solutionExplorerPollingIntervalInMs);
-  }
-
-  private stopPolling(): void {
-    if (this.displayedSolutionEntry.isOpenDiagram) {
-      return;
-    }
-
-    this.isPolling = false;
-
-    clearTimeout(this.refreshTimeoutTask);
-  }
 
   // TODO: This method is copied all over the place.
   private async navigateToDetailView(diagram: IDiagram): Promise<void> {

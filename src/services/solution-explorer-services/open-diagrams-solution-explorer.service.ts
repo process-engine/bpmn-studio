@@ -314,7 +314,7 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
     this.solutionExplorerToOpenDiagrams.unwatchFile(filepath);
   }
 
-  public watchSolution(caallback: () => void): string {
+  public watchSolution(callback: () => void): string {
     throw new Error('Method not supported.');
   }
 
