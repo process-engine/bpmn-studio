@@ -7,9 +7,9 @@ pr: none
 
 variables:
   workspace: $(Pipeline.Workspace)
-  branch: $(Build.SourceBranch)
-  branchToRelease: $[or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/develop'), eq(variables['Build.SourceBranch'], 'refs/heads/beta'))]
-#refs/heads/
+  currentBranch: $(Build.SourceBranch)
+  isBranchToRelease: $[or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/develop'), eq(variables['Build.SourceBranch'], 'refs/heads/beta'))]
+
 stages:
 
 - stage: Prepare_version
@@ -21,9 +21,9 @@ stages:
       vmImage: 'ubuntu-16.04'
     steps:
 
-    - bash: echo $(branch)
+    - bash: echo $(currentBranch)
     - bash: echo $(workspace)
-    - bash: echo $(branchToRelease)
+    - bash: echo $(isBranchToRelease)
 
     - task: NodeTool@0
       inputs:
@@ -37,7 +37,7 @@ stages:
         node ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir
       displayName: 'Prepare version'
       env:
-        GIT_BRANCH: $(Build.SourceBranch)
+        GIT_BRANCH: $(currentBranch)
 
     - publish: './package.json'
       artifact: package_json
@@ -134,7 +134,7 @@ stages:
         copy-item .\dist\electron\bpmn-studio-setup-**.exe.blockmap .\dist_electron_windows\
         copy-item .\dist\electron\latest.yml .\dist_electron_windows\
       displayName: Prepare Windows Bundle for GitHub Release
-      condition: $(branchToRelease)
+      condition: $(isBranchToRelease)
 
     - publish: 'dist_electron_windows'
       artifact: dist_electron_windows
@@ -201,7 +201,7 @@ stages:
         # User has to have 'admin' privileges on the repo (to be able to push to protected branches).
         GH_USER: $(GH_USER)
         GH_TOKEN: $(GH_TOKEN)
-        GIT_BRANCH: $(Build.SourceBranch)
+        GIT_BRANCH: $(currentBranch)
 
 - stage: Publish
   jobs:
@@ -227,7 +227,7 @@ stages:
       displayName: 'Publish to npm'
       env:
         NPM_TOKEN: $(NPM_TOKEN)
-        GIT_BRANCH: $(Build.SourceBranch)
+        GIT_BRANCH: $(currentBranch)
   
   - job: Publish_GitHub_release
     displayName: Publish GitHub Release
