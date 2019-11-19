@@ -315,7 +315,7 @@ export class SolutionExplorerSolution {
         : this.openedSolution.diagrams.sort(this.diagramSorter);
 
       const diagramsOfSolutionChanged: boolean =
-        this.sortedDiagramsOfSolutions.toString() !== updatedDiagramList.toString();
+        JSON.stringify(this.sortedDiagramsOfSolutions) !== JSON.stringify(updatedDiagramList);
       if (diagramsOfSolutionChanged) {
         this.refreshDisplayedDiagrams();
       }
