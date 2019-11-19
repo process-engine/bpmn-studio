@@ -369,7 +369,9 @@ export class Design {
         !persistedActiveDiagram.uri.startsWith('about:open-diagrams') && !diagramIsSavedOnRemoteSolution;
 
       if (diagramIsSavedOnLocalSolution) {
-        persistedActiveDiagram.xml = fs.readFileSync(persistedActiveDiagram.uri, 'utf8');
+        if (fs.existsSync(persistedActiveDiagram.uri)) {
+          persistedActiveDiagram.xml = fs.readFileSync(persistedActiveDiagram.uri, 'utf8');
+        }
       } else if (diagramIsSavedOnRemoteSolution) {
         const uri = persistedActiveDiagram.uri.substring(0, persistedActiveDiagram.uri.lastIndexOf('/'));
 
