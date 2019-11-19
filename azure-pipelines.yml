@@ -35,6 +35,8 @@ stages:
       env:
         GIT_BRANCH: $(currentBranch)
 
+    - script: cat package.json
+    
     - publish: './package.json'
       artifact: package_json
 
@@ -197,6 +199,8 @@ stages:
     - download: current
       artifact: package_json
 
+    - script: cat package.json
+
     - script: |
         ./node_modules/.bin/ci_tools commit-and-tag-version --only-on-primary-branches
         ./node_modules/.bin/ci_tools update-github-release --only-on-primary-branches --use-title-and-text-from-git-tag
@@ -225,6 +229,8 @@ stages:
 
     - download: current
       artifact: package_json
+
+    - script: cat package.json
 
     - script: |
         ./node_modules/.bin/ci_tools publish-npm-package --create-tag-from-branch-name
