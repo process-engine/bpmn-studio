@@ -38,6 +38,8 @@ export class CronjobList {
   private identitiyUsedForSubscriptions: IIdentity;
   private solutionService: ISolutionService;
 
+  private solutionEventListenerId: string;
+
   private updatePromise: any;
 
   constructor(dashboardService: IDashboardService, solutionService: ISolutionService) {
@@ -45,7 +47,10 @@ export class CronjobList {
     this.solutionService = solutionService;
   }
 
-  public async activeSolutionEntryChanged(newSolutionEntry: ISolutionEntry): Promise<void> {
+  public async activeSolutionEntryChanged(
+    newSolutionEntry: ISolutionEntry,
+    previousActiveSolutionEntry: ISolutionEntry,
+  ): Promise<void> {
     if (!newSolutionEntry.uri.includes('http')) {
       return;
     }
@@ -67,6 +72,14 @@ export class CronjobList {
     } else {
       this.startPolling();
     }
+
+    if (this.solutionEventListenerId !== undefined) {
+      previousActiveSolutionEntry.service.unwatchSolution(this.solutionEventListenerId);
+    }
+
+    this.solutionEventListenerId = this.activeSolutionEntry.service.watchSolution(() => {
+      this.updateCronjobs();
+    });
 
     this.cronjobsToDisplay = [];
     this.initialLoadingFinished = false;
@@ -119,6 +132,12 @@ export class CronjobList {
         }
       }),
     ];
+
+    if (this.solutionEventListenerId === undefined) {
+      this.solutionEventListenerId = this.activeSolutionEntry.service.watchSolution(() => {
+        this.updateCronjobs();
+      });
+    }
   }
 
   public async detached(): Promise<void> {
@@ -128,6 +147,10 @@ export class CronjobList {
 
     this.isAttached = false;
     this.stopPolling();
+
+    if (this.solutionEventListenerId !== undefined) {
+      this.activeSolutionEntry.service.unwatchSolution(this.solutionEventListenerId);
+    }
 
     this.removeRuntimeSubscriptions();
   }
