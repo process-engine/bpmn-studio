@@ -177,7 +177,13 @@ export class SolutionExplorerSolution {
       this.eventAggregator.subscribe(AuthenticationStateEvent.LOGIN, async () => {
         await this.updateSolution();
 
-        this.startPolling();
+        if (this.solutionEventListenerId !== undefined) {
+          this.displayedSolutionEntry.service.unwatchSolution(this.solutionEventListenerId);
+        }
+
+        this.solutionEventListenerId = this.displayedSolutionEntry.service.watchSolution(() => {
+          this.updateSolution();
+        });
       }),
       this.eventAggregator.subscribe(
         environment.events.solutionExplorer.closeAllOpenDiagrams,
@@ -246,7 +252,9 @@ export class SolutionExplorerSolution {
 
             await this.updateSolution();
 
-            this.startPolling();
+            this.solutionEventListenerId = this.displayedSolutionEntry.service.watchSolution(() => {
+              this.updateSolution();
+            });
 
             resolve(true);
           } catch (error) {
