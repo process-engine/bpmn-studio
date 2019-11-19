@@ -6,6 +6,7 @@
 pr: none
 
 variables:
+  workDir: $(System.DefaultWorkingDirectory)
   workspace: $(Pipeline.Workspace)
   currentBranch: $(Build.SourceBranch)
   isBranchToRelease: $[or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/develop'), eq(variables['Build.SourceBranch'], 'refs/heads/beta'))]
@@ -36,7 +37,7 @@ stages:
         GIT_BRANCH: $(currentBranch)
 
     - script: cat package.json
-    
+
     - publish: './package.json'
       artifact: package_json
 
@@ -75,6 +76,11 @@ stages:
     - download: current
       artifact: package_json
 
+    - script: mv $(workspace)/package_json/package.json $(workDir)/package.json
+      displayName: Move package.json to working dir
+
+    - script: cat package.json
+    
     - script: |
         npm ci
         ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
@@ -111,6 +117,11 @@ stages:
 
     - download: current
       artifact: package_json
+
+    - powershell: Move-Item -Path $(workspace)\package_json\package.json -Destination $(workdir)\package.json
+      displayName: Move package.json to working dir
+
+    - script: cat package.json
 
     - script: |
         npm ci
@@ -150,6 +161,11 @@ stages:
 
     - download: current
       artifact: package_json
+
+    - script: mv $(workspace)/package_json/package.json $(workDir)/package.json
+      displayName: Move package.json to working dir
+
+    - script: cat package.json
 
     - script: |
         npm ci
@@ -199,6 +215,9 @@ stages:
     - download: current
       artifact: package_json
 
+    - script: mv $(workspace)/package_json/package.json $(workDir)/package.json
+      displayName: Move package.json to working dir
+
     - script: cat package.json
 
     - script: |
@@ -230,6 +249,9 @@ stages:
     - download: current
       artifact: package_json
 
+    - script: mv $(workspace)/package_json/package.json $(workDir)/package.json
+      displayName: Move package.json to working dir
+
     - script: cat package.json
 
     - script: |
@@ -255,6 +277,9 @@ stages:
 
     - download: current
       artifact: package_json
+
+    - script: mv $(workspace)/package_json/package.json $(workDir)/package.json
+      displayName: Move package.json to working dir
 
     - download: current
       artifact: dist_electron_windows
