@@ -145,7 +145,7 @@
     "popper.js": "^1.16.0",
     "prettier": "^1.18.2",
     "requirejs": "^2.3.6",
-    "spectron": "^6.0.0",
+    "spectron": "6.0.0",
     "tether": "^1.4.7",
     "text": "github:requirejs/text#latest",
     "through2": "^3.0.1",
