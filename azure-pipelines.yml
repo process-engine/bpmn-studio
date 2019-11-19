@@ -156,6 +156,8 @@ stages:
 
     - script: npm run electron-build-macos
       displayName: 'Build the macOS app'
+      env:
+        CSC_LINK: $(CSC_LINK)
 
     - script: npm test
       displayName: 'Test the macOS app'
