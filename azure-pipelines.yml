@@ -118,7 +118,7 @@ stages:
     - download: current
       artifact: package_json
 
-    - powershell: Move-Item -Path $(workspace)\package_json\package.json -Destination $(workdir)\package.json
+    - powershell: Move-Item -Path $(workspace)\package_json\package.json -Destination $(workdir)\package.json -Force
       displayName: Move package.json to working dir
 
     - script: cat package.json
