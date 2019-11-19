@@ -104,6 +104,8 @@ export class SolutionExplorerSolution {
     isCreateDiagramInputShown: false,
   };
 
+  private solutionEventListenerId: string;
+
   private diagramStateList: Array<IDiagramStateListEntry>;
 
   private diagramRenamingState: IDiagramNameInputState = {
@@ -212,8 +214,15 @@ export class SolutionExplorerSolution {
 
       setTimeout(async () => {
         await this.updateSolution();
-        this.startPolling();
       }, 0);
+
+      if (!this.displayedSolutionEntry.isOpenDiagram) {
+        this.solutionEventListenerId = this.displayedSolutionEntry.service.watchSolution(() => {
+          this.updateSolution();
+        });
+      } else {
+        this.startPolling();
+      }
     }
   }
 
@@ -273,6 +282,10 @@ export class SolutionExplorerSolution {
     }
 
     this.openDiagramStateService.removeOnDiagramStatesChangedListener(this.diagramStatesChangedCallbackId);
+
+    if (this.solutionEventListenerId !== undefined) {
+      this.displayedSolutionEntry.service.unwatchSolution(this.solutionEventListenerId);
+    }
   }
 
   public async showDeleteDiagramModal(diagram: IDiagram, event: Event): Promise<void> {
