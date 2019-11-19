@@ -107,8 +107,6 @@ jobs:
     
     - name: Install NPM dependencies
       run: |
-        cat package.json
-        npm install -g npm
         npm ci
         ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
 
