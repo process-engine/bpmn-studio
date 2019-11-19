@@ -134,7 +134,7 @@ stages:
         copy-item .\dist\electron\bpmn-studio-setup-**.exe.blockmap .\dist_electron_windows\
         copy-item .\dist\electron\latest.yml .\dist_electron_windows\
       displayName: 'Prepare Windows Bundle for GitHub Release'
-      condition: isBranchToRelease
+      condition: eq(variables['isBranchToRelease'], true)
 
     - publish: 'dist_electron_windows'
       artifact: dist_electron_windows
