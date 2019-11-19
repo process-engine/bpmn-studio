@@ -174,7 +174,7 @@ stages:
         cp dist/electron/bpmn-studio-setup**.dmg.blockmap dist_electron_macos
         cp dist/electron/latest-mac.yml dist_electron_macos
       displayName: 'Prepare macOS Bundle for GitHub Release'
-      condition: $(isBranchToRelease)
+      condition: eq(variables['isBranchToRelease'], true)
 
     - publish: 'dist_electron_macos'
       artifact: dist_electron_macos
