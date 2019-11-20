@@ -19,7 +19,6 @@ import {
 export class ConfigPanel {
   public internalSolution: ISolutionEntry;
   public authority: string;
-  public defaultAuthority: string;
   public showRestartModal: boolean;
 
   private router: Router;
@@ -52,7 +51,6 @@ export class ConfigPanel {
 
     this.internalSolution = this.solutionService.getSolutionEntryForUri(internalSolutionUri);
     this.authority = this.internalSolution.authority;
-    this.defaultAuthority = await this.getAuthorityForInternalSolution();
   }
 
   public async updateSettings(): Promise<void> {
@@ -95,10 +93,6 @@ export class ConfigPanel {
 
       this.router.navigateBack();
     }
-  }
-
-  public setDefaultAuthority(): void {
-    this.authority = this.defaultAuthority;
   }
 
   public cancelUpdate(): void {
@@ -147,25 +141,6 @@ export class ConfigPanel {
     }
 
     return iamServiceConfigPath;
-  }
-
-  private async getAuthorityForInternalSolution(): Promise<string> {
-    try {
-      const fetchResponse: any = await this.httpFetchClient.get(
-        `${this.internalSolution.uri}/process_engine/security/authority`,
-      );
-
-      return fetchResponse.result.authority;
-    } catch (error) {
-      const errorIsNotFoundError: boolean = error.code === 404;
-      if (errorIsNotFoundError) {
-        const fetchResponse: any = await this.httpFetchClient.get(`${this.internalSolution.uri}/security/authority`);
-
-        return fetchResponse.result.authority;
-      }
-
-      return undefined;
-    }
   }
 
   public get uriIsValid(): boolean {
