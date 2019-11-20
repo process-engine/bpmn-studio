@@ -12,7 +12,7 @@ import {
 } from '@process-engine/bpmn-elements_contracts';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 
-import {IBpmnModdle, IPageModel, ISection, IEventFunction} from '../../../../../../../contracts';
+import {IBpmnModdle, IEventFunction, IPageModel, ISection} from '../../../../../../../contracts';
 import environment from '../../../../../../../environment';
 import {GeneralService} from '../../service/general.service';
 
