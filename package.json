@@ -57,7 +57,7 @@
     "@process-engine/management_api_client": "6.2.0",
     "@process-engine/process_engine_runtime": "9.1.0",
     "@process-engine/solutionexplorer.repository.filesystem": "4.4.0-alpha.2",
-    "@process-engine/solutionexplorer.repository.management_api": "3.3.0-alpha.1",
+    "@process-engine/solutionexplorer.repository.management_api": "3.3.0-alpha.2",
     "@process-engine/solutionexplorer.service": "4.4.0-alpha.1",
     "about-window": "1.13.0",
     "aurelia-open-id-connect": "2.0.2",
