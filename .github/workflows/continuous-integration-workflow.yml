@@ -294,6 +294,7 @@ jobs:
   #      GH_USER: ${{ secrets.GH_USER }}
   #      GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
+  ### in build linux integrieren
   create_tarball:
     name: "Create Tarball"
     runs-on: ubuntu-18.04
@@ -324,7 +325,7 @@ jobs:
         path: bpmn-studio.tar.gz
 
   build_docker:
-    name: "Build Docker Image"
+    name: "Build & Publish Docker Image"
     needs: create_tarball
     runs-on: ubuntu-18.04
     steps:
@@ -340,3 +341,12 @@ jobs:
       with:
         name: bpmn-studio_tar
         path: "."
+
+    - name: Get BPMN Studio version
+      run: node --print --eval "require(\'./package.json\').version"
+      id: studio_version
+
+    - name: Log Studio Version
+      run: echo $VERSION
+      env:
+        VERSION: ${{ steps.studio_version.outputs }}
