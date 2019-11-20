@@ -17,14 +17,6 @@
             - only contains the following characters: a-Z 0-9 - . _ ~ : / ? # [ ] @ ! $ & ' ( ) * + , ; = .
           </div>
         </div>
-        <div class="config-panel__card__alert alert alert-info" if.bind="authority !== defaultAuthority" role="alert">
-          <span>
-            <i class="fa fa-info-circle" aria-hidden="true"></i>
-            The authority has been changed. Click
-            <a class="config-panel__card__alert__link alert-link" click.delegate="setDefaultAuthority()">here</a>
-            to use the default authority, this will change the authority to <code>${defaultAuthority}</code>.
-          </span>
-        </div>
       </div>
     </div>
     <button class="btn btn-default" click.delegate="cancelUpdate()">Cancel</button>
