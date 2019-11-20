@@ -313,7 +313,9 @@ jobs:
         ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
 
     - name: Create Tarball
-      run: npm run create-tarball
+      run: |
+        npm run build
+        npm run create-tarball
 
     - name: Stash Tarball
       uses: actions/upload-artifact@master
@@ -323,6 +325,7 @@ jobs:
 
   build_docker:
     name: "Build Docker Image"
+    needs: create_tarball
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@master
@@ -337,5 +340,3 @@ jobs:
       with:
         name: bpmn-studio_tar
         path: "."
-
-    
