@@ -97,6 +97,7 @@
           open-diagram-service.bind="openDiagramService"
           view-model.ref="solutionEntryViewModels[solutionEntry.uri]"
           css-icon-class.two-way="solutionEntry.cssIconClass"
+          is-connected.two-way="solutionEntry.isConnected"
           tooltip-text.two-way="solutionEntry.tooltipText"
           style.bind="solutionEntry.hidden ? 'display: none;' : 'display: inherit;'">
         </solution-explorer-solution>

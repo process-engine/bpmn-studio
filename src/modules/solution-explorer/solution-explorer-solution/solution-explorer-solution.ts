@@ -76,6 +76,7 @@ export class SolutionExplorerSolution {
   @bindable public openDiagramService: OpenDiagramsSolutionExplorerService;
   @bindable @observable public displayedSolutionEntry: ISolutionEntry;
   @bindable public cssIconClass: string;
+  @bindable public isConnected: boolean;
   @bindable public tooltipText: string;
   public createNewDiagramInput: HTMLInputElement;
   public diagramContextMenu: HTMLElement;
@@ -340,6 +341,7 @@ export class SolutionExplorerSolution {
         this.refreshDisplayedDiagrams();
       }
 
+      this.isConnected = true;
       this.cssIconClass = this.originalIconClass;
       this.tooltipText = '';
       this.processEngineRunning = true;
@@ -363,6 +365,7 @@ export class SolutionExplorerSolution {
         this.sortedDiagramsOfSolutions = [];
 
         this.cssIconClass = 'fa fa-bolt';
+        this.isConnected = false;
         if (solutionIsRemoteSolution(this.displayedSolutionEntry.uri)) {
           this.tooltipText = 'ProcessEngine is disconnected!';
         } else {

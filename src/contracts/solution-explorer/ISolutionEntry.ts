@@ -13,6 +13,7 @@ export interface ISolutionEntry {
   isOpenDiagram: boolean;
   cssIconClass: string;
   tooltipText: string;
+  isConnected: boolean;
   canCloseSolution: boolean;
   canCreateNewDiagramsInSolution: boolean;
   authority: string;

@@ -621,6 +621,7 @@ export class SolutionExplorerList {
     const authority: string = await this.getAuthorityForSolution(uri);
     const hidden: boolean = this.getHiddenStateForSolutionUri(uri);
     const tooltipText: string = '';
+    const isConnected: boolean = true;
 
     const authorityIsUndefined: boolean = authority === undefined;
 
@@ -640,6 +641,7 @@ export class SolutionExplorerList {
       service,
       cssIconClass,
       tooltipText,
+      isConnected,
       canCloseSolution,
       canCreateNewDiagramsInSolution,
       isOpenDiagram,
