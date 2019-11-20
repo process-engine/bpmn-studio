@@ -2,23 +2,32 @@ import {EventAggregator} from 'aurelia-event-aggregator';
 import {inject} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
 
+import * as fs from 'fs';
+import path from 'path';
+
 import {IIdentity} from '@essential-projects/iam_contracts';
 
 import {IAuthenticationService} from '../../contracts/authentication/IAuthenticationService';
 import {AuthenticationStateEvent, ISolutionEntry, ISolutionService} from '../../contracts/index';
 import {HttpFetchClient} from '../fetch-http-client/http-fetch-client';
+import {
+  isRunningAsDevelop,
+  isRunningInElectron,
+} from '../../services/is-running-in-electron-module/is-running-in-electron.module';
 
 @inject(Router, 'SolutionService', 'AuthenticationService', EventAggregator, 'HttpFetchClient')
 export class ConfigPanel {
   public internalSolution: ISolutionEntry;
   public authority: string;
   public defaultAuthority: string;
+  public showRestartModal: boolean;
 
   private router: Router;
   private solutionService: ISolutionService;
   private authenticationService: IAuthenticationService;
   private eventAggregator: EventAggregator;
   private httpFetchClient: HttpFetchClient;
+  private ipcRenderer: any;
 
   constructor(
     router: Router,
@@ -32,6 +41,10 @@ export class ConfigPanel {
     this.authenticationService = authenticationService;
     this.eventAggregator = eventAggregator;
     this.httpFetchClient = httpFetchClient;
+
+    if (isRunningInElectron()) {
+      this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
+    }
   }
 
   public async attached(): Promise<void> {
@@ -66,9 +79,22 @@ export class ConfigPanel {
       this.eventAggregator.publish(AuthenticationStateEvent.LOGOUT);
     }
 
-    this.internalSolution.authority = this.authority;
+    if (isRunningInElectron()) {
+      const iamServiceConfig = await this.getIamServiceConfig();
 
-    this.router.navigateBack();
+      const authorityChanged: boolean = iamServiceConfig.basePath !== this.authority;
+      if (authorityChanged) {
+        await this.saveNewAuthority();
+
+        this.showRestartModal = true;
+      } else {
+        this.router.navigateBack();
+      }
+    } else {
+      this.internalSolution.authority = this.authority;
+
+      this.router.navigateBack();
+    }
   }
 
   public setDefaultAuthority(): void {
@@ -77,6 +103,50 @@ export class ConfigPanel {
 
   public cancelUpdate(): void {
     this.router.navigateBack();
+  }
+
+  public async restartNow(): Promise<void> {
+    this.showRestartModal = false;
+
+    this.ipcRenderer.send('restart');
+  }
+
+  public async restartLater(): Promise<void> {
+    this.showRestartModal = false;
+
+    this.router.navigateBack();
+  }
+
+  private async saveNewAuthority(): Promise<void> {
+    const iamServiceConfig = await this.getIamServiceConfig();
+
+    iamServiceConfig.basePath = this.authority;
+    iamServiceConfig.claimPath = `${this.authority}claims/ensure`;
+
+    const configPath: string = await this.getIamServiceConfigPath();
+    fs.writeFileSync(configPath, JSON.stringify(iamServiceConfig, null, 2));
+  }
+
+  private async getIamServiceConfig(): Promise<any> {
+    const configPath: string = await this.getIamServiceConfigPath();
+    const iamServiceConfig = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+
+    return iamServiceConfig;
+  }
+
+  private async getIamServiceConfigPath(): Promise<string> {
+    const pathToJson: string = 'config/sqlite/iam/iam_service.json';
+
+    let iamServiceConfigPath: string;
+
+    const isDevelop: boolean = await isRunningAsDevelop();
+    if (!isDevelop) {
+      iamServiceConfigPath = path.join(__dirname, '..', '..', pathToJson);
+    } else {
+      iamServiceConfigPath = path.join(__dirname, pathToJson);
+    }
+
+    return iamServiceConfigPath;
   }
 
   private async getAuthorityForInternalSolution(): Promise<string> {

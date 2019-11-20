@@ -116,6 +116,15 @@ function initializeApplication(): void {
     }
   });
 
+  ipcMain.on('restart', (): void => {
+    app.relaunch();
+    app.quit();
+  });
+
+  ipcMain.on('isDevelop', (event) => {
+    event.sender.send('isDevelop', releaseChannel.isDev());
+  });
+
   if (!releaseChannel.isDev()) {
     initializeAutoUpdater();
   }
@@ -803,7 +812,7 @@ async function startInternalProcessEngine(): Promise<any> {
   const userDataFolderPath = releaseChannel.isDev() ? devUserDataFolderPath : prodUserDataFolderPath;
 
   if (!releaseChannel.isDev()) {
-    process.env.CONFIG_PATH = path.join(__dirname, '..', '..', '..', 'config');
+    process.env.CONFIG_PATH = path.join(__dirname, '..', '..', '..', '..', '..', 'config');
   }
 
   const configForGetPort = {

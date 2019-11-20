@@ -41,7 +41,7 @@
         <tr if.bind="totalCount > minPageSize" class="correlation-table__table-row">
           <td>
             <div class="correlation-table__pagesize-entry">
-              PageSize: 
+              Page size: 
             </div>
             <select class="form-control correlation-table__pagesize-entry--select" value.bind="pageSize">
               <option model.bind="size" repeat.for="size of pageSizes">${size}</option>
