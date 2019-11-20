@@ -6,13 +6,13 @@
     <div class="panel__content">
       <table class="props-table">
         <tr>
-          <th>Process</th>
+          <th>Process ID</th>
           <td>
             <div class="called-process-selection">
-              <input class="called-process-selection__input props-input" type="text" list="diagrams" value.bind="selectedDiagramName" change.delegate="updateCalledDiagram()" disabled.bind="!isEditable"}>
-                <datalist id="diagrams">
-                  <option repeat.for="diagram of allDiagrams" value="${diagram.name}">
-                </datalist>
+              <input class="called-process-selection__input props-input" type="text" list="diagrams" value.bind="selectedProcessId" change.delegate="updateCalledDiagram()" disabled.bind="!isEditable"}>
+              <datalist id="diagrams">
+                <option repeat.for="diagramNameWithProcessId of diagramNamesWithProcessIds" value="${diagramNameWithProcessId.processId}">Filename: ${diagramNameWithProcessId.diagramName}</option>
+              </datalist>
             </div>
           </td>
         </tr>
@@ -22,32 +22,51 @@
             <div class="called-process-selection">
             <input class="called-process-selection__input props-input" type="text" list="start-events" value.bind="selectedStartEvent" change.delegate="selectedStartEventChanged" disabled.bind="!isEditable">
               <datalist id="start-events">
-                <option repeat.for="startEvent of startEvents" value="${startEvent.id}">
+                <option repeat.for="startEventIdWithDiagramName of startEventIdsWithDiagramNames" value="${startEventIdWithDiagramName.startEventId}">Filename: ${startEventIdWithDiagramName.diagramName}</option>
               </datalist>
             </div>
           </td>
         </tr>
         <tr show.bind="selectedStartEvent">
           <th>Payload
-            <a class="payload-enlarge-link" click.delegate="showModal = true"><small class="payload-enlarge-link">Enlarge</small>
+            <a class="payload-enlarge-link" click.delegate="showPayloadModal = true"><small class="payload-enlarge-link">Enlarge</small>
           </th>
           <td>
             <textarea ref="payloadInput" class="props-input-textarea name-input" value.bind="payload" disabled.bind="!isEditable"></textarea>
           </td>
         </tr>
       </table>
-      <button class="btn btn-default btn-sm navigation-button" title.bind="!selectedDiagramName || !isPartOfAllDiagrams(selectedDiagramName) ? 'The called process could not be found.' : ''" disabled.bind="!selectedDiagramName || !isPartOfAllDiagrams(selectedDiagramName)" click.delegate="navigateToCalledDiagram()">Navigate to called process</button>
+
+      <button class="btn btn-default btn-sm navigation-button" title.bind="!selectedProcessId || !isPartOfAllDiagrams(selectedProcessId) ? 'The called process could not be found.' : ''" disabled.bind="!selectedProcessId || !isPartOfAllDiagrams(selectedProcessId)" click.delegate="navigateToCalledDiagram()">Navigate to called process</button>
     </div>
   </div>
 
-
-  <modal show.bind="showModal"
+  <modal show.bind="showPayloadModal"
          header-text="Editing: Payload">
     <template replace-part="modal-body" autofocus>
       <textarea class="form-control script-task" value.bind="payload" rows="10" aria-multiline="true" autofocus wrap="soft" disabled.bind="!isEditable"></textarea>
     </template>
     <template replace-part="modal-footer">
-      <button type="button" class="btn btn-primary" data-dismiss="modal" click.delegate="showModal = false">Okay</button>
+      <button type="button" class="btn btn-primary" data-dismiss="modal" click.delegate="showPayloadModal = false">Okay</button>
+    </template>
+  </modal>
+
+
+  <modal if.bind="showChooseDiagramModal" header-text="Choose Diagram">
+    <template replace-part="modal-body">
+      Multiple diagrams were found with that Process ID.
+      Which diagram would you like to see?
+      <select class="props-input props-select" value.bind="callActivitySection.selectedDiagramName">
+          <option model.bind="null">-Choose Diagram-</option>
+          <option repeat.for="diagramName of diagramNamesToSelectFrom"
+                  model="${diagramName}">
+            ${diagramName}
+          </option>
+        </select>
+    </template>
+    <template replace-part="modal-footer">
+      <button type="button" class="btn btn-default" data-dismiss="modal" id="cancelNavigationModal">Cancel</button>
+      <button type="button" class="btn btn-primary" data-dismiss="modal" id="confirmNavigationModal" disabled.bind="!callActivitySection.selectedDiagramName">Navigate</button>
     </template>
   </modal>
 </template>

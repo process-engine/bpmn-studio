@@ -12,21 +12,41 @@ import {
 } from '@process-engine/bpmn-elements_contracts';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 
-import {IBpmnModdle, IPageModel, ISection} from '../../../../../../../contracts';
+import {IBpmnModdle, IEventFunction, IPageModel, ISection} from '../../../../../../../contracts';
 import environment from '../../../../../../../environment';
 import {GeneralService} from '../../service/general.service';
+
+const ProcessIdRegex: RegExp = /(?<=process id=").*?(?=")/;
+
+type DiagramNameWithProcessId = {
+  diagramName: string;
+  processId: string;
+};
+
+type StartEventIdWithDiagramName = {
+  diagramName: string;
+  startEventId: string;
+};
 
 @inject(GeneralService, Router, EventAggregator)
 export class CallActivitySection implements ISection {
   public path: string = '/sections/call-activity/call-activity';
   public canHandleElement: boolean = false;
-  public allDiagrams: Array<IDiagram>;
-  public startEvents: Array<IShape>;
+  @observable public allDiagrams: Array<IDiagram>;
+  public startEventIdsWithDiagramNames: Array<StartEventIdWithDiagramName>;
   public previouslySelectedDiagram: string;
-  public selectedDiagramName: string;
+  public selectedProcessId: string;
   @observable public selectedStartEvent: string;
   @observable public payload: string;
   public payloadInput: HTMLTextAreaElement;
+  public diagramNamesWithProcessIds: Array<DiagramNameWithProcessId> = [];
+  public showPayloadModal: boolean;
+
+  public callActivitySection: CallActivitySection = this;
+
+  public showChooseDiagramModal: boolean;
+  public diagramNamesToSelectFrom: Array<string>;
+  public selectedDiagramName: string;
 
   private businessObjInPanel: ICallActivityElement;
   private generalService: GeneralService;
@@ -49,19 +69,20 @@ export class CallActivitySection implements ISection {
     await this.getAllDiagrams();
 
     this.previouslySelectedDiagram = this.businessObjInPanel.calledElement;
-    this.selectedDiagramName = this.businessObjInPanel.calledElement;
+    this.selectedProcessId = this.businessObjInPanel.calledElement;
 
-    if (this.selectedDiagramName) {
+    const processIdIsSelected: boolean = this.selectedProcessId !== undefined;
+    if (processIdIsSelected) {
       try {
-        this.startEvents = await this.generalService.getAllStartEventsForDiagram(this.selectedDiagramName);
+        this.startEventIdsWithDiagramNames = await this.getAllStartEventsForProcessId(this.selectedProcessId);
       } catch (error) {
-        this.startEvents = [];
+        this.startEventIdsWithDiagramNames = [];
       }
 
       this.selectedStartEvent = this.getSelectedStartEvent();
 
-      if (this.selectedStartEvent === undefined && this.startEvents.length > 0) {
-        this.selectedStartEvent = this.startEvents[0].id;
+      if (this.selectedStartEvent === undefined && this.startEventIdsWithDiagramNames.length > 0) {
+        this.selectedStartEvent = this.startEventIdsWithDiagramNames[0].startEventId;
       }
 
       this.payload = this.getPayload();
@@ -87,17 +108,42 @@ export class CallActivitySection implements ISection {
     return elementIsCallActivity;
   }
 
-  public navigateToCalledDiagram(): void {
+  public async navigateToCalledDiagram(): Promise<void> {
+    const diagramNamesForGivenProcessId: Array<string> = this.getAllDiagramNamesForProcessId(this.selectedProcessId);
+
+    let diagramName: string;
+
+    if (diagramNamesForGivenProcessId.length === 1) {
+      diagramName = diagramNamesForGivenProcessId[0];
+    } else {
+      try {
+        diagramName = await this.handleDiagramSelection(diagramNamesForGivenProcessId);
+      } catch {
+        return;
+      }
+    }
+
     this.router.navigateToRoute('design', {
-      diagramName: this.selectedDiagramName,
+      diagramName: diagramName,
       solutionUri: this.activeSolutionUri,
       view: 'detail',
     });
   }
 
-  public isPartOfAllDiagrams(diagramName: string): boolean {
-    return this.allDiagrams.some((diagram: IDiagram): boolean => {
-      return diagram.name === diagramName;
+  public isPartOfAllDiagrams(processId: string): boolean {
+    return this.diagramNamesWithProcessIds.some((diagramNameWithProcessId: DiagramNameWithProcessId): boolean => {
+      return diagramNameWithProcessId.processId === processId;
+    });
+  }
+
+  public allDiagramsChanged(): void {
+    this.diagramNamesWithProcessIds = this.allDiagrams.map((diagram: IDiagram) => {
+      const diagramNameWithProcessId: DiagramNameWithProcessId = {
+        diagramName: diagram.name,
+        processId: this.getProcessIdByDiagramName(diagram.name),
+      };
+
+      return diagramNameWithProcessId;
     });
   }
 
@@ -176,14 +222,28 @@ export class CallActivitySection implements ISection {
 
   public async updateCalledDiagram(): Promise<void> {
     try {
-      this.startEvents = await this.generalService.getAllStartEventsForDiagram(this.selectedDiagramName);
+      this.startEventIdsWithDiagramNames = await this.getAllStartEventsForProcessId(this.selectedProcessId);
     } catch (error) {
-      this.startEvents = [];
+      this.startEventIdsWithDiagramNames = [];
     }
 
-    this.businessObjInPanel.calledElement = this.selectedDiagramName;
+    this.businessObjInPanel.calledElement = this.selectedProcessId;
 
     this.publishDiagramChange();
+  }
+
+  public getProcessIdByDiagramName(diagramName: string): string {
+    const diagram: IDiagram = this.getDiagramByName(diagramName);
+
+    const processId: string = diagram.xml.match(ProcessIdRegex)[0];
+
+    return processId;
+  }
+
+  private getDiagramByName(name: string): IDiagram {
+    return this.allDiagrams.find((diagram: IDiagram): boolean => {
+      return diagram.name === name;
+    });
   }
 
   private getPropertiesElement(): IPropertiesElement {
@@ -311,4 +371,67 @@ export class CallActivitySection implements ISection {
     };
     window.addEventListener('mouseup', resizeListenerFunction);
   };
+
+  private async getAllStartEventsForProcessId(processId: string): Promise<Array<StartEventIdWithDiagramName>> {
+    const diagramNamesForGivenProcessId: Array<string> = this.getAllDiagramNamesForProcessId(processId);
+
+    const startEventIdsWithDiagramNames: Array<StartEventIdWithDiagramName> = [];
+    for (const diagramName of diagramNamesForGivenProcessId) {
+      const startEventsForDiagram: Array<IShape> = await this.generalService.getAllStartEventsForDiagram(diagramName);
+
+      const startEventIdsForDiagramWithDiagramName: Array<StartEventIdWithDiagramName> = startEventsForDiagram.map(
+        (startEvent: IShape) => {
+          return {
+            diagramName: diagramName,
+            startEventId: startEvent.id,
+          };
+        },
+      );
+
+      startEventIdsWithDiagramNames.push(...startEventIdsForDiagramWithDiagramName);
+    }
+
+    return startEventIdsWithDiagramNames;
+  }
+
+  private getAllDiagramNamesForProcessId(processId: string): Array<string> {
+    const diagramNamesForGivenProcessId: Array<string> = this.diagramNamesWithProcessIds
+      .filter((diagramNameWithProcessId: DiagramNameWithProcessId) => {
+        return diagramNameWithProcessId.processId === processId;
+      })
+      .map((diagramNameWithProcessId: DiagramNameWithProcessId) => {
+        return diagramNameWithProcessId.diagramName;
+      });
+
+    return diagramNamesForGivenProcessId;
+  }
+
+  private async handleDiagramSelection(diagramNames: Array<string>): Promise<string> {
+    return new Promise((resolve: Function, reject: Function): void => {
+      this.diagramNamesToSelectFrom = diagramNames;
+
+      this.showChooseDiagramModal = true;
+
+      const cancelNavigation: IEventFunction = (): void => {
+        this.showChooseDiagramModal = false;
+
+        reject();
+
+        document.getElementById('confirmNavigationModal').removeEventListener('click', confirmNavigation);
+      };
+
+      const confirmNavigation: IEventFunction = async (): Promise<void> => {
+        this.showChooseDiagramModal = false;
+
+        resolve(this.selectedDiagramName);
+
+        document.getElementById('cancelNavigationModal').removeEventListener('click', cancelNavigation);
+      };
+
+      setTimeout(() => {
+        document.getElementById('cancelNavigationModal').addEventListener('click', cancelNavigation, {once: true});
+        document.getElementById('confirmNavigationModal').addEventListener('click', confirmNavigation, {once: true});
+      }, 0);
+    });
+  }
 }
