@@ -22,11 +22,9 @@
             <input type="text" class="props-input" value.bind="businessObjInPanel.name" change.delegate="updateName()" disabled.bind="!isEditable" data-test-property-panel-element-name>
           </td>
         </tr>
-      </table>
-      <table class="props-table-docs">
         <tr>
+          <th>Docs <a class="docs-enlarge-link" click.delegate="showModal = true"><small class="docs-enlarge-text">Enlarge</small></a></th>
           <td>
-              Docs <a class="docs-enlarge-link" click.delegate="showModal = true"><small class="docs-enlarge-text">Enlarge</small></a>
             <textarea type="text" ref="docsInput" class="props-input-textarea" value.bind="elementDocumentation" change.delegate="updateDocumentation()" disabled.bind="!isEditable" aria-multiline="true"></textarea>
           </td>
         </tr>

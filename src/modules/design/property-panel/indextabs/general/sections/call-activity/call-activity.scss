@@ -1,10 +1,12 @@
 .navigation-button {
   width: 100%;
   margin-top: 10px;
+  background: #f7f7f7;;
 }
 
 .navigation-button:disabled {
   opacity: 0.5;
+  background: #d6d6d6;
 }
 
 .called-process-selection {

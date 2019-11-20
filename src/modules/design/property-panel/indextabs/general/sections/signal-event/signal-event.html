@@ -23,12 +23,10 @@
             </select>
           </td>
         </tr>
-      </table>
-      <table show.bind="selectedId" class="props-table">
-        <tr>
-          <th class="name-property">Name</th>
+        <tr show.bind="selectedId">
+          <th>Name</th>
           <td>
-            <input type="text" class="props-input name-input" value.bind="selectedSignal.name" change.delegate="updateName()" disabled.bind="!isEditable">
+            <input type="text" class="props-input" value.bind="selectedSignal.name" change.delegate="updateName()" disabled.bind="!isEditable">
           </td>
         </tr>
       </table>

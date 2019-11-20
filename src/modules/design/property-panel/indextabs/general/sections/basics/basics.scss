@@ -22,11 +22,13 @@
 .props-input-textarea {
   width: 100%;
   height: 25px;
+  max-height: 200px;
   min-height: 25px;
   padding-bottom: 5px;
   margin-top: 5px;
   background: transparent;
   border: none;
+  outline: none;
   border-bottom: 1px solid #e9e9e9;
   font-weight: 400;
   color: #5c5c5c;
@@ -49,6 +51,7 @@
 }
 
 .docs-enlarge-link {
+  display: block;
   cursor: pointer;
   color: #007bff !important;
 }

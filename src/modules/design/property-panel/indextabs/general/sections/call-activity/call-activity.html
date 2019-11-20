@@ -9,37 +9,34 @@
           <th>Process</th>
           <td>
             <div class="called-process-selection">
-              <input class="called-process-selection__input " type="text" list="diagrams" value.bind="selectedDiagramName" change.delegate="updateCalledDiagram()" disabled.bind="!isEditable"}>
+              <input class="called-process-selection__input props-input" type="text" list="diagrams" value.bind="selectedDiagramName" change.delegate="updateCalledDiagram()" disabled.bind="!isEditable"}>
                 <datalist id="diagrams">
                   <option repeat.for="diagram of allDiagrams" value="${diagram.name}">
                 </datalist>
             </div>
           </td>
         </tr>
-
         <tr>
           <th>StartEvent</th>
           <td>
             <div class="called-process-selection">
-            <input class="called-process-selection__input" type="text" list="start-events" value.bind="selectedStartEvent" change.delegate="selectedStartEventChanged" disabled.bind="!isEditable">
+            <input class="called-process-selection__input props-input" type="text" list="start-events" value.bind="selectedStartEvent" change.delegate="selectedStartEventChanged" disabled.bind="!isEditable">
               <datalist id="start-events">
                 <option repeat.for="startEvent of startEvents" value="${startEvent.id}">
               </datalist>
             </div>
           </td>
         </tr>
-
         <tr show.bind="selectedStartEvent">
           <th>Payload
             <a class="payload-enlarge-link" click.delegate="showModal = true"><small class="payload-enlarge-link">Enlarge</small>
           </th>
           <td>
-            <textarea ref="payloadInput" class="props-textarea name-input" value.bind="payload" disabled.bind="!isEditable"></textarea>
+            <textarea ref="payloadInput" class="props-input-textarea name-input" value.bind="payload" disabled.bind="!isEditable"></textarea>
           </td>
         </tr>
       </table>
-
-      <button class="navigation-button" title.bind="!selectedDiagramName || !isPartOfAllDiagrams(selectedDiagramName) ? 'The called process could not be found.' : ''" disabled.bind="!selectedDiagramName || !isPartOfAllDiagrams(selectedDiagramName)" click.delegate="navigateToCalledDiagram()">Navigate to called process</button>
+      <button class="btn btn-default btn-sm navigation-button" title.bind="!selectedDiagramName || !isPartOfAllDiagrams(selectedDiagramName) ? 'The called process could not be found.' : ''" disabled.bind="!selectedDiagramName || !isPartOfAllDiagrams(selectedDiagramName)" click.delegate="navigateToCalledDiagram()">Navigate to called process</button>
     </div>
   </div>
 
