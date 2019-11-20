@@ -75,7 +75,9 @@ export class SolutionExplorerSolution {
   @bindable public solutionService: ISolutionExplorerService;
   @bindable public openDiagramService: OpenDiagramsSolutionExplorerService;
   @bindable @observable public displayedSolutionEntry: ISolutionEntry;
-  @bindable public fontAwesomeIconClass: string;
+  @bindable public cssIconClass: string;
+  @bindable public isConnected: boolean;
+  @bindable public tooltipText: string;
   public createNewDiagramInput: HTMLInputElement;
   public diagramContextMenu: HTMLElement;
   public showContextMenu: boolean = false;
@@ -167,7 +169,7 @@ export class SolutionExplorerSolution {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
     }
 
-    this.originalIconClass = this.fontAwesomeIconClass;
+    this.originalIconClass = this.cssIconClass;
     this.updateSolutionExplorer();
 
     this.subscriptions = [
@@ -339,7 +341,9 @@ export class SolutionExplorerSolution {
         this.refreshDisplayedDiagrams();
       }
 
-      this.fontAwesomeIconClass = this.originalIconClass;
+      this.isConnected = true;
+      this.cssIconClass = this.originalIconClass;
+      this.tooltipText = '';
       this.processEngineRunning = true;
     } catch (error) {
       // In the future we can maybe display a small icon indicating the error.
@@ -358,7 +362,16 @@ export class SolutionExplorerSolution {
         this.openedSolution = undefined;
       } else {
         this.openedSolution.diagrams = undefined;
-        this.fontAwesomeIconClass = 'fa-bolt';
+        this.sortedDiagramsOfSolutions = [];
+
+        this.cssIconClass = 'fa fa-bolt';
+        this.isConnected = false;
+        if (solutionIsRemoteSolution(this.displayedSolutionEntry.uri)) {
+          this.tooltipText = 'ProcessEngine is disconnected!';
+        } else {
+          this.tooltipText = 'Solution was removed!';
+        }
+
         this.processEngineRunning = false;
       }
     }
@@ -635,7 +648,10 @@ export class SolutionExplorerSolution {
   }
 
   public get solutionIsNotLoaded(): boolean {
-    return this.openedSolution === null || this.openedSolution === undefined || !this.processEngineRunning;
+    return (
+      solutionIsRemoteSolution(this.displayedSolutionEntry.uri) &&
+      (this.openedSolution === null || this.openedSolution === undefined || !this.processEngineRunning)
+    );
   }
 
   public get openedDiagrams(): Array<IDiagram> {

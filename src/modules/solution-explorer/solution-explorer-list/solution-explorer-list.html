@@ -16,7 +16,7 @@
             <i if.bind="solutionEntry.hidden" class="fas fa-angle-right collapse__icon" title="Expand Solution"></i>
             <i if.bind="!solutionEntry.hidden" class="fas fa-angle-down collapse__icon" title="Collapse Solution"></i>
 
-            <i class="fa ${solutionEntry.fontAwesomeIconClass} solution-entry__solution-icon" title.bind="solutionEntry.fontAwesomeIconClass === 'fa-bolt' ? 'ProcessEngine Disconnected!' : ''"></i>
+            <i class="${solutionEntry.cssIconClass} solution-entry__solution-icon" title.bind="solutionEntry.tooltipText"></i>
 
             <i if.bind="checkIfSolutionIsRemoteSolution(solutionEntry.uri) && isProcessEngineNewerThanInternal(solutionEntry) & signal:'update-version-icon'" class="fas fa-info-circle version-info version-info--new" click.capture="showNewerModal($event)" title="ProcessEngine is newer. Click to show more information."></i>
             <i if.bind="checkIfSolutionIsRemoteSolution(solutionEntry.uri) && isProcessEngineOlderThanInternal(solutionEntry) & signal:'update-version-icon'" class="fas fa-info-circle version-info version-info--old" click.capture="showOlderModal($event)" title="ProcessEngine is outdated. Click to show more information."></i>
@@ -96,7 +96,9 @@
           solution-service.bind="solutionEntry.service"
           open-diagram-service.bind="openDiagramService"
           view-model.ref="solutionEntryViewModels[solutionEntry.uri]"
-          font-awesome-icon-class.two-way="solutionEntry.fontAwesomeIconClass"
+          css-icon-class.two-way="solutionEntry.cssIconClass"
+          is-connected.two-way="solutionEntry.isConnected"
+          tooltip-text.two-way="solutionEntry.tooltipText"
           style.bind="solutionEntry.hidden ? 'display: none;' : 'display: inherit;'">
         </solution-explorer-solution>
       </div>

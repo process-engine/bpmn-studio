@@ -550,15 +550,15 @@ export class SolutionExplorerList {
   private getFontAwesomeIconForSolution(service: ISolutionExplorerService, uri: string): string {
     const solutionIsOpenedFromRemote: boolean = solutionIsRemoteSolution(uri);
     if (solutionIsOpenedFromRemote) {
-      return 'fa-database';
+      return 'fa fa-database';
     }
 
     const solutionIsOpenDiagrams: boolean = service === this.openDiagramService;
     if (solutionIsOpenDiagrams) {
-      return 'fa-copy';
+      return 'fa fa-copy';
     }
 
-    return 'fa-folder';
+    return 'fa fa-folder';
   }
 
   private canCreateNewDiagramsInSolution(service: ISolutionExplorerService, uri: string): boolean {
@@ -615,11 +615,13 @@ export class SolutionExplorerList {
     processEngineVersion?: string,
   ): Promise<void> {
     const isOpenDiagram: boolean = this.isOpenDiagram(service);
-    const fontAwesomeIconClass: string = this.getFontAwesomeIconForSolution(service, uri);
+    const cssIconClass: string = this.getFontAwesomeIconForSolution(service, uri);
     const canCloseSolution: boolean = this.canCloseSolution(service, uri);
     const canCreateNewDiagramsInSolution: boolean = this.canCreateNewDiagramsInSolution(service, uri);
     const authority: string = await this.getAuthorityForSolution(uri);
     const hidden: boolean = this.getHiddenStateForSolutionUri(uri);
+    const tooltipText: string = '';
+    const isConnected: boolean = true;
 
     const authorityIsUndefined: boolean = authority === undefined;
 
@@ -637,7 +639,9 @@ export class SolutionExplorerList {
     const entry: ISolutionEntry = {
       uri,
       service,
-      fontAwesomeIconClass,
+      cssIconClass,
+      tooltipText,
+      isConnected,
       canCloseSolution,
       canCreateNewDiagramsInSolution,
       isOpenDiagram,
