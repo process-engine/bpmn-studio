@@ -347,5 +347,6 @@ jobs:
       id: studio_version
 
     - name: Log Studio Version
-      run: echo ${{ steps.studio_version.outputs }}
-
+      run: echo ${VERSION}
+      env:
+        VERSION: ${{ steps.studio_version.outputs }}
