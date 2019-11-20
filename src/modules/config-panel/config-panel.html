@@ -13,8 +13,8 @@
         <div class="config-panel__card__alert alert alert-danger" if.bind="!uriIsValid" role="alert">
           <div style="white-space: pre-line;"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> The entered authority must be a valid uri.
             To make it valid make sure:
-              - it begins with "http://" or "https://" and
-              - only contains the following characters: a-Z, 0-9, "-", ".", "_", "~", ":", "/", "?", "#", "[", "]", "@", "!", "$", "&", `'`, "(", ")", "*", "+", ",", ";", "=" and "."
+            - it begins with "http://" or "https://" and
+            - only contains the following characters: a-Z 0-9 - . _ ~ : / ? # [ ] @ ! $ & ' ( ) * + , ; = .
           </div>
         </div>
         <div class="config-panel__card__alert alert alert-info" if.bind="authority !== defaultAuthority" role="alert">
