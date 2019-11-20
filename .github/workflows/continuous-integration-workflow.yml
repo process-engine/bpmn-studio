@@ -343,8 +343,9 @@ jobs:
         path: "."
 
     - name: Get BPMN Studio version
-      run: node --print --eval "require('./package.json').version"
+      shell: bash
+      run: echo "##[set-output name=version;]$(node --print --eval \"require('./package.json').version\")"
       id: studio_version
 
     - name: Log Studio Version
-      run: echo ${steps.studio_version}
+      run: echo ${steps.studio_version.outputs.version}
