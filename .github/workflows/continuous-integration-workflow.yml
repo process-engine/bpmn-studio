@@ -343,7 +343,7 @@ jobs:
         path: "."
 
     - name: Get BPMN Studio version
-      run: node --print --eval "require(\'./package.json\').version"
+      run: node --print --eval "require('./package.json').version"
       id: studio_version
 
     - name: Log Studio Version
