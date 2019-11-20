@@ -40,6 +40,8 @@ export class TaskList {
   private router: Router;
   private solutionService: ISolutionService;
 
+  private solutionEventListenerId: string;
+
   private dashboardServiceSubscriptions: Array<RuntimeSubscription> = [];
   private subscriptions: Array<Subscription>;
   private tasks: Array<TaskListEntry> = [];
@@ -93,6 +95,12 @@ export class TaskList {
     this.isAttached = true;
 
     this.setRuntimeSubscriptions();
+
+    if (this.solutionEventListenerId === undefined) {
+      this.solutionEventListenerId = this.activeSolutionEntry.service.watchSolution(() => {
+        this.updateTasks();
+      });
+    }
   }
 
   public detached(): void {
@@ -101,6 +109,10 @@ export class TaskList {
     }
 
     this.isAttached = false;
+
+    if (this.solutionEventListenerId !== undefined) {
+      this.activeSolutionEntry.service.unwatchSolution(this.solutionEventListenerId);
+    }
 
     this.removeRuntimeSubscriptions();
   }
@@ -145,6 +157,14 @@ export class TaskList {
     if (previousActiveSolutionEntryExists) {
       this.removeRuntimeSubscriptions();
     }
+
+    if (this.solutionEventListenerId !== undefined) {
+      previousActiveSolutionEntry.service.unwatchSolution(this.solutionEventListenerId);
+    }
+
+    this.solutionEventListenerId = this.activeSolutionEntry.service.watchSolution(() => {
+      this.updateTasks();
+    });
 
     this.tasks = [];
     this.initialLoadingFinished = false;

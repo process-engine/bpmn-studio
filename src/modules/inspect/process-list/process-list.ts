@@ -40,6 +40,8 @@ export class ProcessList {
   private processInstances: Array<DataModels.Correlations.ProcessInstance> = [];
   private stoppedProcessInstances: Array<DataModels.Correlations.ProcessInstance> = [];
 
+  private solutionEventListenerId: string;
+
   private amountOfActiveProcessInstancesToDisplay: number = this.pageSize;
   private amountOfActiveProcessInstancesToSkip: number = 0;
 
@@ -76,6 +78,14 @@ export class ProcessList {
     if (previousActiveSolutionEntryExists) {
       this.removeRuntimeSubscriptions();
     }
+
+    if (this.solutionEventListenerId !== undefined) {
+      previousActiveSolutionEntry.service.unwatchSolution(this.solutionEventListenerId);
+    }
+
+    this.solutionEventListenerId = this.activeSolutionEntry.service.watchSolution(() => {
+      this.updateProcessInstanceList();
+    });
 
     this.processInstances = [];
     this.processInstancesToDisplay = [];
@@ -152,6 +162,12 @@ export class ProcessList {
     ];
 
     this.setRuntimeSubscriptions();
+
+    if (this.solutionEventListenerId === undefined) {
+      this.solutionEventListenerId = this.activeSolutionEntry.service.watchSolution(() => {
+        this.updateProcessInstanceList();
+      });
+    }
   }
 
   public detached(): void {
@@ -159,6 +175,10 @@ export class ProcessList {
       for (const subscription of this.subscriptions) {
         subscription.dispose();
       }
+    }
+
+    if (this.solutionEventListenerId !== undefined) {
+      this.activeSolutionEntry.service.unwatchSolution(this.solutionEventListenerId);
     }
 
     this.removeRuntimeSubscriptions();
