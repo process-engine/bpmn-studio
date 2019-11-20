@@ -349,7 +349,19 @@ jobs:
     - name: Log Studio Version
       run: |
         echo $VERSION
-        echo $(VERSION)
-        echo ${VERSION}
+#        echo $(VERSION)
+#        echo ${VERSION}
       env:
         VERSION: ${{ steps.studio_version.outputs.version }}
+
+    - name: Build Docker Image
+      run: |
+        docker build --build-arg NODE_IMAGE_VERSION=10-alpine \
+                    --build-arg BPMN_STUDIO_VERSION=$VERSION \
+                    --no-cache \
+                    --tag 5minds/bpmn-studio-bundle:$VERSION .
+      env:
+        VERSION: ${{ steps.studio_version.outputs.version }}
+
+    - name: Show Docker Images
+      run: docker images
