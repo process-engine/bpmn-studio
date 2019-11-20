@@ -365,3 +365,11 @@ jobs:
 
     - name: Show Docker Images
       run: docker images
+
+    - name: Dockerize
+      uses: manusa/actions-publish-docker@master
+      with:
+        name: 5minds/bpmn-studio-bundle
+        username: ${{ secrets.DOCKER_USER }}
+        password: ${{ secrets.DOCKER_PASS }}
+        tag: ${{ steps.studio_version.outputs.version }}
