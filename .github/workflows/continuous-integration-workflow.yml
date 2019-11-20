@@ -366,10 +366,19 @@ jobs:
     - name: Show Docker Images
       run: docker images
 
-    - name: Dockerize
-      uses: manusa/actions-publish-docker@master
-      with:
-        name: 5minds/bpmn-studio-bundle
-        username: ${{ secrets.DOCKER_USER }}
-        password: ${{ secrets.DOCKER_PASS }}
-        tag: ${{ steps.studio_version.outputs.version }}
+    - name: Login to Docker
+      run: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+      env:
+        DOCKER_USER: ${{ secrets.DOCKER_USER }}
+        DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+
+    - name: Push Docker Image
+      run: docker push 5minds/bpmn-studio-bundle
+      
+   # - name: Dockerize
+   #   uses: manusa/actions-publish-docker@master
+   #   with:
+   #     name: 5minds/bpmn-studio-bundle
+   #     username: ${{ secrets.DOCKER_USER }}
+   #     password: ${{ secrets.DOCKER_PASS }}
+   #     tag: ${{ steps.studio_version.outputs.version }}
