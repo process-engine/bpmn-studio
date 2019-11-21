@@ -9,10 +9,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@master
-    - name: Use Node.js 10.x
+    - name: Use Node.js 12.x
       uses: actions/setup-node@v1
       with:
-        node-version: 10.x
+        node-version: 12.x
 
     - name: Install ci tools
       run: npm i @process-engine/ci_tools
@@ -103,10 +103,10 @@ jobs:
     runs-on: macOS-latest
     steps:
     - uses: actions/checkout@master
-    - name: Use Node.js 10.x
+    - name: Use Node.js 12.x
       uses: actions/setup-node@v1
       with:
-        node-version: 10.x
+        node-version: 12.x
 
     - name: Unstash package.json
       uses: actions/download-artifact@master
@@ -151,10 +151,10 @@ jobs:
     runs-on: windows-2016
     steps:
     - uses: actions/checkout@master
-    - name: Use Node.js 10.x
+    - name: Use Node.js 12.x
       uses: actions/setup-node@v1
       with:
-        node-version: 10.x
+        node-version: 12.x
 
     - name: Unstash package.json
       uses: actions/download-artifact@master
@@ -203,10 +203,10 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@master
-    - name: Use Node.js 10.x
+    - name: Use Node.js 12.x
       uses: actions/setup-node@v1
       with:
-        node-version: 10.x
+        node-version: 12.x
 
     - name: Unstash package.json
       uses: actions/download-artifact@master
@@ -231,10 +231,10 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@master
-    - name: Use Node.js 10.x
+    - name: Use Node.js 12.x
       uses: actions/setup-node@v1
       with:
-        node-version: 10.x
+        node-version: 12.x
     
     - name: Unstash package.json
       uses: actions/download-artifact@master
@@ -257,11 +257,11 @@ jobs:
     steps:
     - uses: actions/checkout@master
 
-    - name: Use Node.js 10.x
+    - name: Use Node.js 12.x
       if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
       uses: actions/setup-node@v1
       with:
-        node-version: 10.x
+        node-version: 12.x
 
     - name: Unstash package.json
       if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
@@ -310,10 +310,10 @@ jobs:
   #  steps:
   #  - uses: actions/checkout@master
 #
-  #  - name: Use Node.js 10.x
+  #  - name: Use Node.js 12.x
   #    uses: actions/setup-node@v1
   #    with:
-  #      node-version: 10.x
+  #      node-version: 12.x
 #
   #      # später noch package json unstashen und davon installieren 
 #
@@ -340,10 +340,10 @@ jobs:
     steps:
     - uses: actions/checkout@master
 
-    - name: Use Node.js 10.x
+    - name: Use Node.js 12.x
       uses: actions/setup-node@v1
       with:
-        node-version: 10.x
+        node-version: 12.x
 
     - name: Unstash package.json
       uses: actions/download-artifact@master
