@@ -308,7 +308,7 @@ stages:
     #    GH_TOKEN: $(GH_TOKEN)
 
   - job: Build_and_publish_Docker
-    displayName: Build and Publish Docker Image
+    displayName: Publish Docker Image
     pool:
       vmImage: 'ubuntu-16.04'
     steps:
