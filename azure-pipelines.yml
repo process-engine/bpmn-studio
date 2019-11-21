@@ -104,6 +104,12 @@ stages:
     - publish: 'dist_web'
       artifact: dist_web
 
+    - script: npm run create-tarball
+      displayName: 'Create Tarball'
+
+    - publish: 'bpmn-studio_tar'
+      artifact: bpmn-studio.tar.gz
+
   - job: Build_and_test_Windows
     displayName: Build and test Windows app
     pool:
