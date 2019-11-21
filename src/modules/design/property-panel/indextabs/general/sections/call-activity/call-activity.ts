@@ -198,7 +198,14 @@ export class CallActivitySection implements ISection {
     }
     this.publishDiagramChange();
 
-    const propertiesElement = this.getPropertiesElement();
+    let propertiesElement = this.getPropertiesElement();
+
+    if (propertiesElement === undefined) {
+      this.createPropertiesElement();
+
+      propertiesElement = this.getPropertiesElement();
+    }
+
     const payloadProperty = propertiesElement.values.findIndex((value: IProperty) => value.name === 'payload');
 
     if (!newValue.trim()) {
@@ -247,6 +254,10 @@ export class CallActivitySection implements ISection {
   }
 
   private getPropertiesElement(): IPropertiesElement {
+    if (this.businessObjInPanel === undefined || this.businessObjInPanel.extensionElements === undefined) {
+      return undefined;
+    }
+
     const propertiesElement: IPropertiesElement = this.businessObjInPanel.extensionElements.values.find(
       (extensionValue: IExtensionElement) => {
         if (!extensionValue) {
@@ -280,6 +291,10 @@ export class CallActivitySection implements ISection {
   private createPropertiesElement(): void {
     const properties: Array<IProperty> = [];
     const propertiesElement: IPropertiesElement = this.moddle.create('camunda:Properties', {values: properties});
+
+    if (this.businessObjInPanel.extensionElements === undefined) {
+      this.createExtensionElement();
+    }
 
     const extensionElementValuesExists: boolean = this.businessObjInPanel.extensionElements.values !== undefined;
 
