@@ -306,3 +306,29 @@ stages:
     #  env:
     #    GH_USER: $(GH_USER)
     #    GH_TOKEN: $(GH_TOKEN)
+
+  - job: Build_and_publish_Docker
+    displayName: Build and Publish Docker Image
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+
+    - download: current
+      artifact: package_json
+
+    - script: mv $(workspace)/package_json/package.json $(workDir)/package.json
+      displayName: Move package.json to working dir
+
+    - download: current
+      artifact: bpmn-studio_tar
+
+    - script: mv $(workspace)/bpmn-studio_tar/bpmn-studio.tar.gz $(workDir)/bpmn-studio.tar.gz
+      displayName: Move tarball to working dir
+
+    - script: echo "##vso[task.setvariable variable=version]$(node --print --eval "require('./package.json').version")"
+      name: getVersionStep
+      displayName: Get BPMN Studio version
+
+    - script: echo $(getVersionStep.version)
+      name: echovar
+      displayNem: Log Variable
