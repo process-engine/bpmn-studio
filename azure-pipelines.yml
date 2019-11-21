@@ -331,4 +331,4 @@ stages:
 
     - script: echo $(getVersionStep.version)
       name: echovar
-      displayNem: Log Variable
+      displayName: Log Variable
