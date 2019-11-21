@@ -1,4 +1,4 @@
-import * as print from 'print-js';
+import print from 'print-js';
 import {IDiagramPrintService} from '../../../../contracts';
 
 export class DiagramPrintService implements IDiagramPrintService {
@@ -29,12 +29,12 @@ export class DiagramPrintService implements IDiagramPrintService {
 
     const png: string = await this.generateImageFromSVG('png', svgToPrint);
 
-    const printOptions: {printable: string; type?: string} = {
+    const printOptions: print.Configuration = {
       printable: png,
       type: 'image',
     };
 
-    print.default(printOptions);
+    print(printOptions);
     return Promise.resolve();
   }
 

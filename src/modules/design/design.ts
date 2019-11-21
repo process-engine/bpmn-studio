@@ -16,6 +16,8 @@ import environment from '../../environment';
 import {NotificationService} from '../../services/notification-service/notification.service';
 import {DiagramDetail} from './diagram-detail/diagram-detail';
 import {OpenDiagramStateService} from '../../services/solution-explorer-services/open-diagram-state.service';
+import {solutionIsRemoteSolution} from '../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
+import {isRunningInElectron} from '../../services/is-running-in-electron-module/is-running-in-electron.module';
 
 export interface IDesignRouteParameters {
   view?: string;
@@ -102,8 +104,7 @@ export class Design {
     const navigateToAnotherDiagram: boolean =
       diagramNamesAreDifferent || diagramUrisAreDifferent || routeFromOtherView || solutionIsDifferent;
 
-    const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
-    if (isRunningInElectron) {
+    if (isRunningInElectron()) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
     }
 
@@ -119,14 +120,13 @@ export class Design {
         this.activeSolutionEntry.identity,
       );
 
-      const solutionIsRemote: boolean = this.activeSolutionEntry.uri.startsWith('http');
-      if (solutionIsRemote) {
-        if (isRunningInElectron) {
+      if (solutionIsRemoteSolution(this.activeSolutionEntry.uri)) {
+        if (isRunningInElectron()) {
           this.ipcRenderer.send('menu_hide-diagram-entries');
         }
 
         this.eventAggregator.publish(environment.events.configPanel.solutionEntryChanged, this.activeSolutionEntry);
-      } else if (isRunningInElectron) {
+      } else if (isRunningInElectron()) {
         this.ipcRenderer.send('menu_show-all-menu-entries');
       }
 
@@ -211,8 +211,7 @@ export class Design {
       }),
     ];
 
-    const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
-    if (isRunningInElectron) {
+    if (isRunningInElectron()) {
       this.ipcRenderer.send('menu_show-all-menu-entries');
     }
 
@@ -223,8 +222,7 @@ export class Design {
     this.eventAggregator.publish(environment.events.statusBar.hideDiagramViewButtons);
     this.subscriptions.forEach((subscription: Subscription) => subscription.dispose());
 
-    const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
-    if (isRunningInElectron) {
+    if (isRunningInElectron()) {
       this.ipcRenderer.send('menu_hide-diagram-entries');
     }
   }
@@ -318,7 +316,7 @@ export class Design {
 
     const remoteSolutionsWithoutActive: Array<ISolutionEntry> = remoteSolutions.filter(
       (remoteSolution: ISolutionEntry) => {
-        return remoteSolution.uri !== this.activeSolutionEntry.uri && remoteSolution.fontAwesomeIconClass !== 'fa-bolt';
+        return remoteSolution.uri !== this.activeSolutionEntry.uri && remoteSolution.isConnected;
       },
     );
 
@@ -366,12 +364,14 @@ export class Design {
         return diagram.name === diagramName && (diagram.uri === diagramUri || diagramUri === undefined);
       });
 
-      const diagramIsSavedOnRemoteSolution: boolean = persistedActiveDiagram.uri.startsWith('http');
+      const diagramIsSavedOnRemoteSolution: boolean = solutionIsRemoteSolution(persistedActiveDiagram.uri);
       const diagramIsSavedOnLocalSolution: boolean =
         !persistedActiveDiagram.uri.startsWith('about:open-diagrams') && !diagramIsSavedOnRemoteSolution;
 
       if (diagramIsSavedOnLocalSolution) {
-        persistedActiveDiagram.xml = fs.readFileSync(persistedActiveDiagram.uri, 'utf8');
+        if (fs.existsSync(persistedActiveDiagram.uri)) {
+          persistedActiveDiagram.xml = fs.readFileSync(persistedActiveDiagram.uri, 'utf8');
+        }
       } else if (diagramIsSavedOnRemoteSolution) {
         const uri = persistedActiveDiagram.uri.substring(0, persistedActiveDiagram.uri.lastIndexOf('/'));
 
@@ -384,7 +384,7 @@ export class Design {
     } else {
       const diagram: IDiagram = await this.activeSolutionEntry.service.loadDiagram(diagramName);
       const diagramIsSavedOnLocalSolution: boolean =
-        !diagram.uri.startsWith('about:open-diagrams') && !diagram.uri.startsWith('http');
+        !diagram.uri.startsWith('about:open-diagrams') && !solutionIsRemoteSolution(diagram.uri);
 
       if (diagramIsSavedOnLocalSolution) {
         diagram.xml = fs.readFileSync(diagram.uri, 'utf8');

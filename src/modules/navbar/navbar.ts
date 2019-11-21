@@ -7,6 +7,8 @@ import {BrowserWindow} from 'electron';
 import {ISolutionEntry, ISolutionService, NotificationType} from '../../contracts/index';
 import environment from '../../environment';
 import {NotificationService} from '../../services/notification-service/notification.service';
+import {solutionIsRemoteSolution} from '../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
+import {isRunningInElectron} from '../../services/is-running-in-electron-module/is-running-in-electron.module';
 
 @inject(Router, EventAggregator, 'NotificationService', 'SolutionService')
 export class NavBar {
@@ -56,8 +58,7 @@ export class NavBar {
     this.notificationService = notificationService;
     this.solutionService = solutionService;
 
-    const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
-    if (isRunningInElectron) {
+    if (isRunningInElectron()) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
     }
   }
@@ -140,7 +141,7 @@ export class NavBar {
   }
 
   public maximizeWindow = (): void => {
-    if (!(window as any).nodeRequire) {
+    if (!isRunningInElectron()) {
       return undefined;
     }
 
@@ -325,7 +326,7 @@ export class NavBar {
       return;
     }
 
-    const activeSolutionIsRemoteSolution: boolean = this.activeSolutionEntry.uri.startsWith('http');
+    const activeSolutionIsRemoteSolution: boolean = solutionIsRemoteSolution(this.activeSolutionEntry.uri);
     this.showProcessName = this.activeDiagram.name !== undefined;
 
     this.navbarTitle = activeSolutionIsRemoteSolution ? this.activeDiagram.id : this.activeDiagram.name;
@@ -337,7 +338,7 @@ export class NavBar {
     const activeRoute: string = this.router.currentInstruction.config.name;
 
     const activeSolutionIsRemoteSolution: boolean =
-      this.activeSolutionEntry.uri.startsWith('http') && this.activeDiagram !== undefined;
+      solutionIsRemoteSolution(this.activeSolutionEntry.uri) && this.activeDiagram !== undefined;
     const activeRouteIsDiagramDetail: boolean = activeRoute === 'design';
     const activeRouteIsInspect: boolean = activeRoute === 'inspect';
     const activeRouteIsLET: boolean = activeRoute === 'live-execution-tracker';
@@ -391,7 +392,7 @@ export class NavBar {
       return;
     }
 
-    this.savingTargetIsRemoteSolution = this.activeSolutionEntry.uri.startsWith('http');
+    this.savingTargetIsRemoteSolution = solutionIsRemoteSolution(this.activeSolutionEntry.uri);
 
     const solutionIsSet: boolean = this.activeSolutionEntry !== undefined;
     const diagramName: string = this.router.currentInstruction.params.diagramName;
@@ -440,8 +441,6 @@ export class NavBar {
     const currentPlatform: string = navigator.platform;
     const currentPlatformIsMac: boolean = macRegex.test(currentPlatform);
 
-    const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
-
-    return currentPlatformIsMac && isRunningInElectron;
+    return currentPlatformIsMac && isRunningInElectron();
   }
 }

@@ -314,6 +314,14 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
     this.solutionExplorerToOpenDiagrams.unwatchFile(filepath);
   }
 
+  public watchSolution(callback: () => void): string {
+    throw new Error('Method not supported.');
+  }
+
+  public unwatchSolution(eventListenerId: string): void {
+    throw new Error('Method not supported.');
+  }
+
   private findIndexOfDiagramWithURI(uri: string): number {
     const index: number = this.openedDiagrams.findIndex((diagram: IDiagram): boolean => {
       return diagram.uri === uri;

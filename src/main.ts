@@ -6,6 +6,7 @@ import environment from './environment';
 import {NotificationService} from './services/notification-service/notification.service';
 
 import {oidcConfig} from './open-id-connect-configuration';
+import {isRunningInElectron} from './services/is-running-in-electron-module/is-running-in-electron.module';
 
 export function configure(aurelia: Aurelia): void {
   if (navigator.cookieEnabled === false) {
@@ -14,7 +15,7 @@ export function configure(aurelia: Aurelia): void {
     throw new Error(`In order to use the web version of BPMN Studio please enable cookies for this URL: ${url}.`);
   }
 
-  if ((window as any).nodeRequire) {
+  if (isRunningInElectron()) {
     const ipcRenderer: any = (window as any).nodeRequire('electron').ipcRenderer;
     const newHost: string = ipcRenderer.sendSync('get_host');
     const processEngineVersion: string = ipcRenderer.sendSync('get_version');
@@ -73,8 +74,7 @@ export function configure(aurelia: Aurelia): void {
   aurelia.start().then(() => {
     aurelia.setRoot();
 
-    const applicationRunsInElectron: boolean = (window as any).nodeRequire !== undefined;
-    if (applicationRunsInElectron) {
+    if (isRunningInElectron()) {
       const ipcRenderer: any = (window as any).nodeRequire('electron').ipcRenderer;
       // subscribe to processengine status
       ipcRenderer.send('add_internal_processengine_status_listener');

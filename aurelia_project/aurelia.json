@@ -257,7 +257,7 @@
           },
           {
             "name": "print-js",
-            "main": "dist/print.min.js",
+            "main": "dist/print.js",
             "path": "../node_modules/print-js"
           },
           {

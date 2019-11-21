@@ -2,39 +2,44 @@ import {SemVer} from 'semver';
 
 export function processEngineSupportsPagination(processEngineVersion: string): boolean {
   if (!processEngineVersion) {
-    return undefined;
+    throw Error(`'${processEngineVersion}' is not a valid ProcesEngine version.`);
   }
 
-  return compareVersions(processEngineVersion, '9.0.0');
+  const processEngineVersionWithPaginationSupport: string = '9.0.0';
+
+  return compareVersions(processEngineVersion, processEngineVersionWithPaginationSupport);
+}
+
+export function processEngineSupportsCronjobEvents(processEngineVersion: string): boolean {
+  if (!processEngineVersion) {
+    throw Error(`'${processEngineVersion}' is not a valid ProcesEngine version.`);
+  }
+
+  const processEngineVersionWithCronjobEventSupport: string = '9.0.0';
+
+  return compareVersions(processEngineVersion, processEngineVersionWithCronjobEventSupport);
+}
+
+export function processEngineSupportsCronjobs(processEngineVersion: string): boolean {
+  if (!processEngineVersion) {
+    throw Error(`'${processEngineVersion}' is not a valid ProcesEngine version.`);
+  }
+
+  const processEngineVersionWithCronjobSupport: string = '8.4.0';
+
+  return compareVersions(processEngineVersion, processEngineVersionWithCronjobSupport);
 }
 
 function compareVersions(processEngineVersion: string, allowedVersion: string): boolean {
   const indexOfReleaseChannel = processEngineVersion.indexOf('-');
+  const processEngineIsStable: boolean = indexOfReleaseChannel === -1;
 
-  const versionWithoutReleaseChannel =
-    indexOfReleaseChannel !== -1 ? processEngineVersion.slice(0, indexOfReleaseChannel) : processEngineVersion;
+  const versionWithoutReleaseChannel: string = processEngineIsStable
+    ? processEngineVersion
+    : processEngineVersion.slice(0, indexOfReleaseChannel);
 
   const solutionEntryPEVersion = new SemVer(versionWithoutReleaseChannel);
-
   const allowedProcessEngineVersion = new SemVer(allowedVersion);
 
   return solutionEntryPEVersion.compare(allowedProcessEngineVersion) >= 0;
-}
-
-export function processEngineSupportsCronjobEvents(processEngineVersion): boolean {
-  if (!processEngineVersion) {
-    return undefined;
-  }
-
-  const processEngineIsNoStable: boolean = processEngineVersion.indexOf('-') !== -1;
-
-  const processEngineVersionWithoutReleaseChannel: string = processEngineIsNoStable
-    ? processEngineVersion.slice(0, processEngineVersion.indexOf('-'))
-    : processEngineVersion;
-
-  const processEngineSemverVersion = new SemVer(processEngineVersionWithoutReleaseChannel);
-
-  const stableVersionWithEvents = new SemVer('9.0.0');
-
-  return processEngineSemverVersion.compare(stableVersionWithEvents) >= 0;
 }

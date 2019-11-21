@@ -77,7 +77,10 @@
         <tr>
           <th>Default Value</th>
           <td>
-            <input if.bind="selectedType === FormfieldTypes.boolean" type="checkbox" class="props-input" checked.bind="booleanDefaultValue" change.delegate="updateDefaultValue()" disabled.bind="!isEditable">
+            <div if.bind="selectedType === FormfieldTypes.boolean" class="checkbox-input">
+              <input type="checkbox" class="checkbox-input__checkbox" checked.bind="booleanDefaultValue" change.delegate="updateBooleanDefaultValue()" disabled.bind="!isEditable">
+              <input type="text" class="props-input checkbox-input__input" value.bind="booleanDefaultValueString" change.delegate="updateBooleanDefaultValueString()" disabled.bind="!isEditable">
+             </div>
             <input else type="text" class="props-input" value.bind="selectedForm.defaultValue"  placeholder="Default Value" change.delegate="updateDefaultValue()" disabled.bind="!isEditable">
           </td>
         </tr>

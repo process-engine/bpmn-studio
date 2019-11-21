@@ -211,6 +211,23 @@ pipeline {
         }
       }
     }
+    stage('Create Tarball') {
+      when {
+        allOf {
+          expression {buildIsRequired == true}
+          anyOf {
+            branch "master"
+            branch "beta"
+            branch "develop"
+          }
+        }
+      }
+      steps {
+        sh('npm run create-tarball')
+
+        stash('bpmn-studio.tar.gz')
+      }
+    }
     stage('Build Docker') {
       when {
         allOf {
@@ -225,18 +242,13 @@ pipeline {
       steps {
         script {
           unstash('package_json')
+          unstash('bpmn-studio.tar.gz')
 
 
           script {
             bpmn_studio_raw_package_version = sh(script: 'node --print --eval "require(\'./package.json\').version"', returnStdout: true)
             bpmn_studio_version = bpmn_studio_raw_package_version.trim()
             echo("bpmn_studio_version is '${bpmn_studio_version}'")
-          }
-
-          script {
-            process_engine_raw_package_version = sh(script: 'node --print --eval "require(\'./package.json\').dependencies[\'@process-engine/process_engine_runtime\']"', returnStdout: true)
-            process_engine_version = process_engine_raw_package_version.trim()
-            echo("process_engine_version is '${process_engine_version}'")
           }
 
           def docker_image_name = '5minds/bpmn-studio-bundle';
@@ -246,7 +258,6 @@ pipeline {
           full_image_name = "${docker_image_name}:${bpmn_studio_version}";
 
           sh("docker build --build-arg NODE_IMAGE_VERSION=${docker_node_version} \
-                          --build-arg PROCESS_ENGINE_VERSION=${process_engine_version} \
                           --build-arg BPMN_STUDIO_VERSION=${bpmn_studio_version} \
                           --build-arg BUILD_DATE=${BUILD_TIMESTAMP} \
                           --no-cache \

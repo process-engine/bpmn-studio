@@ -35,3 +35,7 @@
 .uri-input--invalid:focus {
   border: 2px red solid;
 }
+
+.config-panel__invalid-uri-message {
+  white-space: pre-line;
+}

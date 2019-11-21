@@ -8,6 +8,8 @@ import {ISolutionEntry, ISolutionService, InspectPanelTab, NotificationType} fro
 import environment from '../../environment';
 import {NotificationService} from '../../services/notification-service/notification.service';
 import {Dashboard} from './dashboard/dashboard';
+import {solutionIsRemoteSolution} from '../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
+import {isRunningInElectron} from '../../services/is-running-in-electron-module/is-running-in-electron.module';
 
 interface IInspectRouteParameters {
   view?: string;
@@ -112,18 +114,14 @@ export class Inspect {
       this.showInspectCorrelation = true;
     }
 
-    const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
-
-    if (isRunningInElectron) {
+    if (isRunningInElectron()) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
       this.ipcRenderer.on('menubar__start_close_diagram', this.closeBpmnStudio);
     }
   }
 
   public deactivate(): void {
-    const isRunningInElectron: boolean = Boolean((window as any).nodeRequire);
-
-    if (isRunningInElectron) {
+    if (isRunningInElectron()) {
       this.ipcRenderer.removeListener('menubar__start_close_diagram', this.closeBpmnStudio);
     }
   }
@@ -176,7 +174,7 @@ export class Inspect {
       this.activeSolutionEntry.identity,
     );
 
-    const solutionIsRemote: boolean = solutionUriToUse.startsWith('http');
+    const solutionIsRemote: boolean = solutionIsRemoteSolution(solutionUriToUse);
     if (solutionIsRemote) {
       this.eventAggregator.publish(
         environment.events.configPanel.solutionEntryChanged,

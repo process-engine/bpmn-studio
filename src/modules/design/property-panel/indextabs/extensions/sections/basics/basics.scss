@@ -1,9 +1,15 @@
-.key-value-column-left {
-  width: 30%;
+.property-table {
+  border-collapse: separate;
 }
 
-.key-value-column-right {
+.property-table-column-left {
+  width: 30%;
+  padding-right: 3px;
+}
+
+.property-table-column-right {
   width: 70%;
+  padding-left: 3px;
 }
 
 .key-value-input {

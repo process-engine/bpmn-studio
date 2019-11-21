@@ -15,6 +15,7 @@ import {NotificationService} from '../../../services/notification-service/notifi
 import environment from '../../../environment';
 import {IDashboardService} from '../dashboard/contracts';
 import {Pagination} from '../../pagination/pagination';
+import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 
 @inject('DashboardService', 'NotificationService', 'SolutionService', Router)
 export class ProcessList {
@@ -38,6 +39,8 @@ export class ProcessList {
   private subscriptions: Array<Subscription>;
   private processInstances: Array<DataModels.Correlations.ProcessInstance> = [];
   private stoppedProcessInstances: Array<DataModels.Correlations.ProcessInstance> = [];
+
+  private solutionEventListenerId: string;
 
   private amountOfActiveProcessInstancesToDisplay: number = this.pageSize;
   private amountOfActiveProcessInstancesToSkip: number = 0;
@@ -63,7 +66,7 @@ export class ProcessList {
     newActiveSolutionEntry: ISolutionEntry,
     previousActiveSolutionEntry: ISolutionEntry,
   ): Promise<void> {
-    if (!newActiveSolutionEntry.uri.includes('http')) {
+    if (!solutionIsRemoteSolution(newActiveSolutionEntry.uri)) {
       return;
     }
 
@@ -75,6 +78,14 @@ export class ProcessList {
     if (previousActiveSolutionEntryExists) {
       this.removeRuntimeSubscriptions();
     }
+
+    if (this.solutionEventListenerId !== undefined) {
+      previousActiveSolutionEntry.service.unwatchSolution(this.solutionEventListenerId);
+    }
+
+    this.solutionEventListenerId = this.activeSolutionEntry.service.watchSolution(() => {
+      this.updateProcessInstanceList();
+    });
 
     this.processInstances = [];
     this.processInstancesToDisplay = [];
@@ -88,10 +99,7 @@ export class ProcessList {
 
     await this.updateProcessInstanceList();
 
-    const subscriptionNeedsToBeSet: boolean = this.dashboardServiceSubscriptions.length === 0;
-    if (subscriptionNeedsToBeSet) {
-      this.setRuntimeSubscriptions();
-    }
+    this.setRuntimeSubscriptions();
   }
 
   public async currentPageChanged(currentPage: number, previousPage: number): Promise<void> {
@@ -134,7 +142,7 @@ export class ProcessList {
       this.activeSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
     }
 
-    const activeSolutionUriIsNotRemote: boolean = !this.activeSolutionUri.startsWith('http');
+    const activeSolutionUriIsNotRemote: boolean = !solutionIsRemoteSolution(this.activeSolutionUri);
     if (activeSolutionUriIsNotRemote) {
       this.activeSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
     }
@@ -153,9 +161,12 @@ export class ProcessList {
       }),
     ];
 
-    const subscriptionNeedsToBeSet: boolean = this.dashboardServiceSubscriptions.length === 0;
-    if (subscriptionNeedsToBeSet) {
-      this.setRuntimeSubscriptions();
+    this.setRuntimeSubscriptions();
+
+    if (this.solutionEventListenerId === undefined) {
+      this.solutionEventListenerId = this.activeSolutionEntry.service.watchSolution(() => {
+        this.updateProcessInstanceList();
+      });
     }
   }
 
@@ -164,6 +175,10 @@ export class ProcessList {
       for (const subscription of this.subscriptions) {
         subscription.dispose();
       }
+    }
+
+    if (this.solutionEventListenerId !== undefined) {
+      this.activeSolutionEntry.service.unwatchSolution(this.solutionEventListenerId);
     }
 
     this.removeRuntimeSubscriptions();
@@ -257,17 +272,13 @@ export class ProcessList {
         return;
       }
 
-      const sortedProcessInstances: Array<
-        DataModels.Correlations.ProcessInstance
-      > = processInstanceList.processInstances.sort(this.sortProcessInstances);
-
       const processInstanceListWasUpdated: boolean =
-        JSON.stringify(sortedProcessInstances) !== JSON.stringify(this.processInstances);
+        JSON.stringify(processInstanceList.processInstances) !== JSON.stringify(this.processInstances);
 
       this.totalItems = processInstanceList.totalCount + this.stoppedProcessInstances.length;
 
       if (processInstanceListWasUpdated) {
-        this.processInstances = sortedProcessInstances;
+        this.processInstances = processInstanceList.processInstances;
 
         this.updateProcessInstancesToDisplay();
       }
@@ -324,15 +335,6 @@ export class ProcessList {
     return this.updatePromise;
   }
 
-  private sortProcessInstances(
-    firstProcessInstance: DataModels.Correlations.ProcessInstance,
-    secondProcessInstance: DataModels.Correlations.ProcessInstance,
-  ): number {
-    return (
-      Date.parse(secondProcessInstance.createdAt.toString()) - Date.parse(firstProcessInstance.createdAt.toString())
-    );
-  }
-
   private updateProcessInstancesToDisplay(): void {
     this.processInstancesToDisplay = this.processInstances;
 
@@ -347,8 +349,6 @@ export class ProcessList {
         this.processInstancesToDisplay.push(stoppedProcessInstance);
       }
     });
-
-    this.processInstancesToDisplay.sort(this.sortProcessInstances);
 
     this.paginationShowsLoading = false;
   }

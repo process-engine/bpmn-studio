@@ -51,6 +51,15 @@ solution-explorer-panel {
   min-width: 20px;
 }
 
+.solution-explorer-panel__card__alert {
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+
+.solution-explorer-panel__invalid-uri-message {
+  white-space: pre-line;
+}
+
 /*
  * Remote Solution Modal Dialog
 */

@@ -12,7 +12,6 @@ export default {
   },
   openIdConnect: {
     authority: 'http://localhost:5000',
-    defaultAuthority: 'http://localhost:5000',
   },
   processengine: {
     liveExecutionTrackerPollingIntervalInMs: 1000,
@@ -107,6 +106,7 @@ export default {
       updateProcessInstances: 'inspectCorrelation:updateProcessInstances',
     },
     solutionExplorer: {
+      closeAllOpenDiagrams: 'solutionExplorer:openDiagrams:closeAll',
       updateOpenDiagrams: 'solutioneExplorer:openDiagrams:update',
     },
   },

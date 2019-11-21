@@ -46,10 +46,10 @@
         <template if.bind="currentlyRenamingDiagramUri !== diagram.uri">
 
           <i if.bind="shouldFileIconBeShown()" class="diagram-entry__icon fa fa-cogs"></i>
-          <i if.bind="displayedSolutionEntry.isOpenDiagramService && diagramChangedStateMap.get(diagram.uri)" class="diagram-entry__unsaved-icon fas fa-circle"></i>
+          <i if.bind="displayedSolutionEntry.isOpenDiagram && diagramChangedStateMap.get(diagram.uri)" class="diagram-entry__unsaved-icon fas fa-circle"></i>
           <div class="diagram-entry__name-container" contextmenu.delegate="activateContextMenu($event, diagram)">
-            <span class="diagram-entry__name" title="${diagram.name}" title.bind="displayedSolutionEntry.isOpenDiagramService ? diagram.uri : ''">${diagram.name}</span>
-            <span class="diagram-entry__location" if.bind="displayedSolutionEntry.isOpenDiagramService" title="${getDiagramLocation(diagram.uri)}">${getDiagramFolder(diagram.uri)}</span>
+            <span class="diagram-entry__name" title="${diagram.name}" title.bind="displayedSolutionEntry.isOpenDiagram ? diagram.uri : ''">${diagram.name}</span>
+            <span class="diagram-entry__location" if.bind="displayedSolutionEntry.isOpenDiagram" title="${getDiagramLocation(diagram.uri)}">${getDiagramFolder(diagram.uri)}</span>
           </div>
 
           <div class="diagram-entry__actions">
@@ -64,7 +64,7 @@
 
             <button
               class="button"
-              if.bind="displayedSolutionEntry.isOpenDiagramService"
+              if.bind="displayedSolutionEntry.isOpenDiagram"
               click.delegate="closeDiagram(diagram, $event)"
               title="Close the diagram">
 
