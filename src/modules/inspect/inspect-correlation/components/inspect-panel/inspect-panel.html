@@ -2,19 +2,26 @@
   <require from="./inspect-panel.css"></require>
   <require from="./components/log-viewer/log-viewer"></require>
   <require from="./components/correlation-list/correlation-list"></require>
+  <require from="./components/process-instance-list/process-instance-list"></require>
   <div class="inspect-panel">
     <div class="inspect-panel__control-bar">
       <div class="inspect-panel__tabs">
         <button class="inspect-panel__tab"
                 class.bind="showCorrelationList ? 'inspect-panel__active-tab' : ''"
-                click.delegate="changeTab(inspectPanelTab.CorrelationList)"
-                title="Show a list of all ProcessInstances for this process model">
-          ProcessInstance List (${totalCount})
+                title="Show a list of all Correlations for this process model"
+                click.delegate="changeTab(inspectPanelTab.CorrelationList)">
+          Correlaton List (${totalCorrelationCount})
+        </button>
+        <button class="inspect-panel__tab ${selectedCorrelation === undefined ? 'inspect-panel__disabled-tab' : ''} ${showProcessInstanceList ? 'inspect-panel__active-tab' : ''}"
+                disabled.bind="selectedCorrelation === undefined"
+                title.bind="selectedCorrelation !== undefined ? 'Show a list of all Process Instances for the selected Correlation' : 'Select a correlation in order to toggle the Process Instance table'"
+                click.delegate="changeTab(inspectPanelTab.ProcessInstanceList)">
+          ProcessInstance List (${totalProcessInstanceCount})
         </button>
         <button class="inspect-panel__tab ${showLogViewer ? 'inspect-panel__active-tab' : ''}"
                 class.bind="selectedProcessInstance === undefined ? 'inspect-panel__disabled-tab' : ''"
                 disabled.bind="selectedProcessInstance === undefined"
-                title.bind="selectedProcessInstance !== undefined ? 'Show log of correlation' : 'Select a correlation in order to toggle the log viewer'"
+                title.bind="selectedProcessInstance !== undefined ? 'Show log of the selected Process Instaance' : 'Select a correlation in order to toggle the log viewer'"
                 click.delegate="changeTab(inspectPanelTab.LogViewer)">
           Log Viewer
         </button>
@@ -24,7 +31,8 @@
       </div>
     </div>
     <div class="inspect-panel__body">
-      <correlation-list show.bind="showCorrelationList" active-diagram.bind="activeDiagram" process-instances.to-view="processInstances" selected-process-instance.from-view="selectedProcessInstance" process-instance-to-select.to-view="processInstanceToSelect" total-count.bind="totalCount"></correlation-list>
+      <correlation-list show.bind="showCorrelationList" active-diagram.bind="activeDiagram" correlations.to-view="correlations"  selected-correlation.from-view="selectedCorrelation" correlaton-to-select.to-view="correlationToSelect" total-count.bind="totalCorrelationCount"></correlation-list>
+      <process-instance-list show.bind="showProcessInstanceList" active-diagram.bind="activeDiagram" process-instances.to-view="processInstances" selected-process-instance.from-view="selectedProcessInstance" process-instance-to-select.to-view="processInstanceToSelect" total-count.bind="totalProcessInstanceCount"></process-instance-list>
       <log-viewer if.bind="showLogViewer" active-solution-entry.bind="activeSolutionEntry" process-instance.to-view="selectedProcessInstance"></log-viewer>
     </div>
   </div>
