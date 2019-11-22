@@ -137,7 +137,7 @@ jobs:
         cp dist/electron/bpmn-studio-setup**.dmg dist_electron_macos
 
     - name: Prepare macOS Bundle for GitHub Release
-      if: ${{ env.isBranchToRelease }}
+      if: env.isBranchToRelease
       run: |
         cp dist/electron/bpmn-studio-setup**.dmg.blockmap dist_electron_macos
         cp dist/electron/latest-mac.yml dist_electron_macos
@@ -188,7 +188,7 @@ jobs:
       shell: powershell
 
     - name: Prepare Windows Bundle for GitHub Release
-      if: ${{ env.isBranchToRelease }}
+      if: env.isBranchToRelease
       run: |
         copy-item .\dist\electron\bpmn-studio-setup-**.exe.blockmap .\dist_electron_windows\
         copy-item .\dist\electron\latest.yml .\dist_electron_windows\
@@ -261,38 +261,38 @@ jobs:
     - uses: actions/checkout@master
 
     - name: Use Node.js 12.x
-      if: ${{ env.isBranchToRelease }}
+      if: env.isBranchToRelease
       uses: actions/setup-node@v1
       with:
         node-version: 12.x
 
     - name: Unstash package.json
-      if: ${{ env.isBranchToRelease }}
+      if: env.isBranchToRelease
       uses: actions/download-artifact@master
       with:
         name: package_json
         path: "."
 
     - name: Unstash macOS Electron app
-      if: ${{ env.isBranchToRelease }}
+      if: env.isBranchToRelease
       uses: actions/download-artifact@master
       with:
         name: dist_electron_macos
         path: "dist/electron"
 
     - name: Unstash Windows Electron app
-      if: ${{ env.isBranchToRelease }}
+      if: env.isBranchToRelease
       uses: actions/download-artifact@master
       with:
         name: dist_electron_windows
         path: "dist/electron"
 
     - name: Install ci tools
-      if: ${{ env.isBranchToRelease }}
+      if: env.isBranchToRelease
       run: npm i @process-engine/ci_tools
 
     - name: Upload to GitHub
-      if: ${{ env.isBranchToRelease }}
+      if: env.isBranchToRelease
       run: |
         ./node_modules/.bin/ci_tools update-github-release \
                               --assets dist/electron/bpmn-studio-setup-*.exe \
@@ -314,33 +314,33 @@ jobs:
     - uses: actions/checkout@master
 
     - name: Unstash package.json
-      if: ${{ env.isBranchToRelease }}
+      if: env.isBranchToRelease
       uses: actions/download-artifact@master
       with:
         name: package_json
         path: "."
 
     - name: Unstash Tarball
-      if: ${{ env.isBranchToRelease }}
+      if: env.isBranchToRelease
       uses: actions/download-artifact@master
       with:
         name: bpmn-studio_tar
         path: "."
 
     - name: Get BPMN Studio version
-      if: ${{ env.isBranchToRelease }}
+      if: env.isBranchToRelease
       run: echo "##[set-output name=version;]$(node --print --eval "require('./package.json').version")"
       id: studio_version
 
     - name: Log Studio Version
-      if: ${{ env.isBranchToRelease }}
+      if: env.isBranchToRelease
       run: |
         echo $VERSION
       env:
         VERSION: ${{ steps.studio_version.outputs.version }}
 
     - name: Build Docker Image
-      if: ${{ env.isBranchToRelease }}
+      if: env.isBranchToRelease
       run: |
         docker build --build-arg NODE_IMAGE_VERSION=10-alpine \
                     --build-arg BPMN_STUDIO_VERSION=$VERSION \
@@ -350,16 +350,16 @@ jobs:
         VERSION: ${{ steps.studio_version.outputs.version }}
 
     - name: Show Docker Images
-      if: ${{ env.isBranchToRelease }}
+      if: env.isBranchToRelease
       run: docker images
 
     - name: Login to Docker
-      if: ${{ env.isBranchToRelease }}
+      if: env.isBranchToRelease
       run: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
       env:
         DOCKER_USER: ${{ secrets.DOCKER_USER }}
         DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
 
     - name: Push Docker Image
-      if: ${{ env.isBranchToRelease }}
+      if: env.isBranchToRelease
       run: docker push 5minds/bpmn-studio-bundle
