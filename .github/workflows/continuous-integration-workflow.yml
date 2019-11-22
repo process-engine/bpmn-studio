@@ -71,10 +71,7 @@ jobs:
         npm ci
         ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
     - name: Build the web app 
-      run: |
-        head package.json
-        ls -al
-        npm run build
+      run: npm run build
 
     - name: Run the tests
       run: npm test
@@ -140,7 +137,7 @@ jobs:
         cp dist/electron/bpmn-studio-setup**.dmg dist_electron_macos
 
     - name: Prepare macOS Bundle for GitHub Release
-      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      if: isBranchToRelease
       run: |
         cp dist/electron/bpmn-studio-setup**.dmg.blockmap dist_electron_macos
         cp dist/electron/latest-mac.yml dist_electron_macos
@@ -191,7 +188,7 @@ jobs:
       shell: powershell
 
     - name: Prepare Windows Bundle for GitHub Release
-      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      if: isBranchToRelease
       run: |
         copy-item .\dist\electron\bpmn-studio-setup-**.exe.blockmap .\dist_electron_windows\
         copy-item .\dist\electron\latest.yml .\dist_electron_windows\
@@ -264,38 +261,38 @@ jobs:
     - uses: actions/checkout@master
 
     - name: Use Node.js 12.x
-      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      if: isBranchToRelease
       uses: actions/setup-node@v1
       with:
         node-version: 12.x
 
     - name: Unstash package.json
-      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      if: isBranchToRelease
       uses: actions/download-artifact@master
       with:
         name: package_json
         path: "."
 
     - name: Unstash macOS Electron app
-      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      if: isBranchToRelease
       uses: actions/download-artifact@master
       with:
         name: dist_electron_macos
         path: "dist/electron"
 
     - name: Unstash Windows Electron app
-      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      if: isBranchToRelease
       uses: actions/download-artifact@master
       with:
         name: dist_electron_windows
         path: "dist/electron"
 
     - name: Install ci tools
-      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      if: isBranchToRelease
       run: npm i @process-engine/ci_tools
 
     - name: Upload to GitHub
-      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      if: isBranchToRelease
       run: |
         ./node_modules/.bin/ci_tools update-github-release \
                               --assets dist/electron/bpmn-studio-setup-*.exe \
@@ -317,33 +314,33 @@ jobs:
     - uses: actions/checkout@master
 
     - name: Unstash package.json
-      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      if: isBranchToRelease
       uses: actions/download-artifact@master
       with:
         name: package_json
         path: "."
 
     - name: Unstash Tarball
-      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      if: isBranchToRelease
       uses: actions/download-artifact@master
       with:
         name: bpmn-studio_tar
         path: "."
 
     - name: Get BPMN Studio version
-      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      if: isBranchToRelease
       run: echo "##[set-output name=version;]$(node --print --eval "require('./package.json').version")"
       id: studio_version
 
     - name: Log Studio Version
-      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      if: isBranchToRelease
       run: |
         echo $VERSION
       env:
         VERSION: ${{ steps.studio_version.outputs.version }}
 
     - name: Build Docker Image
-      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      if: isBranchToRelease
       run: |
         docker build --build-arg NODE_IMAGE_VERSION=10-alpine \
                     --build-arg BPMN_STUDIO_VERSION=$VERSION \
@@ -353,16 +350,16 @@ jobs:
         VERSION: ${{ steps.studio_version.outputs.version }}
 
     - name: Show Docker Images
-      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      if: isBranchToRelease
       run: docker images
 
     - name: Login to Docker
-      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      if: isBranchToRelease
       run: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
       env:
         DOCKER_USER: ${{ secrets.DOCKER_USER }}
         DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
 
     - name: Push Docker Image
-      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      if: isBranchToRelease
       run: docker push 5minds/bpmn-studio-bundle
