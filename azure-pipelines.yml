@@ -331,6 +331,8 @@ stages:
       name: getVersionStep
       displayName: Get BPMN Studio version
 
-    - script: echo $(getVersionStep.version)
+    - script: echo $VERSION
       name: echovar
       displayName: Log Variable
+      env:
+        VERSION: $(getVersionStep.version)
