@@ -107,6 +107,8 @@ stages:
     - script: npm run create-tarball
       displayName: 'Create Tarball'
 
+    - script: ls -la
+    
     - publish: 'bpmn-studio_tar'
       artifact: bpmn-studio.tar.gz
 
