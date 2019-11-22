@@ -2,6 +2,9 @@ name: Node CI
 
 on: [push]
 
+env:
+  isBranchToRelease: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+
 jobs:
   prepare_version:
     name: Prepare Version
@@ -9,6 +12,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@master
+
+    - name: Log env
+      run: echo $isBranchToRelease
+      
     - name: Use Node.js 12.x
       uses: actions/setup-node@v1
       with:
@@ -18,7 +25,6 @@ jobs:
       run: npm i @process-engine/ci_tools
     - name: Prepare version
       run: |
-        # does prepare the version, but not commit it
         ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir
     
     - name: Stash package.json
@@ -333,8 +339,6 @@ jobs:
       if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
       run: |
         echo $VERSION
-#        echo $(VERSION)
-#        echo ${VERSION}
       env:
         VERSION: ${{ steps.studio_version.outputs.version }}
 
