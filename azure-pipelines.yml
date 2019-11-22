@@ -185,8 +185,8 @@ stages:
       env:
         CSC_LINK: $(CSC_LINK)
 
-    #- script: npm test
-     # displayName: 'Test the macOS app'
+    - script: npm test
+      displayName: 'Test the macOS app'
 
     - script: |
         mkdir dist_electron_macos
