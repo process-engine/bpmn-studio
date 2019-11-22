@@ -233,7 +233,6 @@ stages:
         ./node_modules/.bin/ci_tools update-github-release --only-on-primary-branches --use-title-and-text-from-git-tag
       displayName: 'Commit and Tag'
       env:
-        # User has to have 'admin' privileges on the repo (to be able to push to protected branches).
         GH_USER: $(GH_USER)
         GH_TOKEN: $(GH_TOKEN)
         GIT_BRANCH: $(currentBranch)
@@ -312,7 +311,7 @@ stages:
 
   - job: Build_and_publish_Docker
     displayName: Publish Docker Image
-    #condition: eq(variables['isBranchToRelease'], true)
+    condition: eq(variables['isBranchToRelease'], true)
     pool:
       vmImage: 'ubuntu-16.04'
     steps:
