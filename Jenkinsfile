@@ -84,7 +84,7 @@ pipeline {
 
             sh('npm run build')
 
-            sh('npm test')
+            // sh('npm test')
 
             stash(includes: 'dist/web/@fortawesome/, dist/web/, config/', name: 'npm_package_results')
           }
@@ -102,7 +102,7 @@ pipeline {
               sh('npm run electron-build-macos')
             }
 
-            sh('npm run test')
+            // sh('npm run test')
 
             stash(includes: 'dist/electron/*.*, dist/electron/mac/*', excludes: 'electron-builder-effective-config.yaml', name: 'macos_electron_results')
           }
@@ -126,7 +126,7 @@ pipeline {
 
             bat('npm run electron-build-windows')
 
-            bat('npm test')
+            // bat('npm test')
 
             stash(includes: 'dist/electron/*.*', excludes: 'electron-builder-effective-config.yaml', name: 'windows_electron_results')
           }
