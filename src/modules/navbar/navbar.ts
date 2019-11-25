@@ -326,6 +326,7 @@ export class NavBar {
       return;
     }
 
+    console.log(this.activeSolutionEntry.uri);
     const activeSolutionIsRemoteSolution: boolean = solutionIsRemoteSolution(this.activeSolutionEntry.uri);
     this.showProcessName = this.activeDiagram.name !== undefined;
 
@@ -395,6 +396,8 @@ export class NavBar {
       return;
     }
 
+    console.log(solutionUri);
+    console.log(this.activeSolutionEntry.uri);
     this.savingTargetIsRemoteSolution = solutionIsRemoteSolution(this.activeSolutionEntry.uri);
     console.log(`savingtargetisERemoveSolution ${this.savingTargetIsRemoteSolution}`);
 
