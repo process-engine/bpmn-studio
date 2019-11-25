@@ -332,7 +332,7 @@ export class NavBar {
     this.navbarTitle = activeSolutionIsRemoteSolution ? this.activeDiagram.id : this.activeDiagram.name;
 
     this.savingTargetIsRemoteSolution = activeSolutionIsRemoteSolution;
-    console.log('saving targetIsRemoteSolution', this.savingTargetIsRemoteSolution);
+    console.log(`saving targetIsRemoteSolution ${this.savingTargetIsRemoteSolution}`);
   }
 
   private updateNavbarTools(): void {
@@ -391,11 +391,12 @@ export class NavBar {
     const activeSolutionIsUndefined: boolean = this.activeSolutionEntry === undefined;
     if (activeSolutionIsUndefined) {
       console.log('active solution is undefined => return');
+      console.log(JSON.stringify(this.activeSolutionEntry));
       return;
     }
 
     this.savingTargetIsRemoteSolution = solutionIsRemoteSolution(this.activeSolutionEntry.uri);
-    console.log('savingtargetisERemoveSolution', this.savingTargetIsRemoteSolution);
+    console.log(`savingtargetisERemoveSolution ${this.savingTargetIsRemoteSolution}`);
 
     const solutionIsSet: boolean = this.activeSolutionEntry !== undefined;
     const diagramName: string = this.router.currentInstruction.params.diagramName;
