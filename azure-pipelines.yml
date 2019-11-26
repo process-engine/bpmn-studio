@@ -14,7 +14,7 @@ variables:
 stages:
 
 - stage: Prepare_version
-  displayName: Prepare version
+  displayName: Prepare Version
   jobs:
   - job: Linux
     displayName: Prepare Version
@@ -32,7 +32,7 @@ stages:
 
     - script: |
         node ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir
-      displayName: 'Prepare version'
+      displayName: 'Prepare Version'
       env:
         GIT_BRANCH: $(currentBranch)
 
@@ -43,10 +43,10 @@ stages:
 
 
 - stage: Build_and_test
-  displayName: Build and test
+  displayName: Build and Test
   jobs:
   - job: Lint_sources
-    displayName: Lint sources
+    displayName: Lint Sources
     pool:
       vmImage: 'ubuntu-16.04'
     steps:
@@ -57,13 +57,13 @@ stages:
       displayName: 'Install Node.js'
 
     - script: npm ci
-      displayName: 'Install dependencies'
+      displayName: 'Install Dependencies'
 
     - script: npm run lint
-      displayName: 'Lint sources'
+      displayName: 'Lint Sources'
 
   - job: Build_and_test_web
-    displayName: Build and test web app
+    displayName: Build and Test Web App
     pool:
       vmImage: 'ubuntu-16.04'
     steps:
@@ -77,20 +77,20 @@ stages:
       artifact: package_json
 
     - script: mv $(workspace)/package_json/package.json $(workDir)/package.json
-      displayName: Move package.json to working dir
+      displayName: Move package.json to Working Dir
 
     - script: cat package.json
     
     - script: |
         npm ci
         ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
-      displayName: 'Install dependencies'
+      displayName: 'Install Dependencies'
 
     - script: npm run build
-      displayName: 'Build web app'
+      displayName: 'Build Web App'
 
     - script: xvfb-run --auto-servernum npm test
-      displayName: 'Test web app'
+      displayName: 'Test Web App'
 
     - script: | 
         mkdir -p dist_web/dist/web
@@ -127,20 +127,20 @@ stages:
       artifact: package_json
 
     - powershell: Move-Item -Path $(workspace)\package_json\package.json -Destination $(workdir)\package.json -Force
-      displayName: Move package.json to working dir
+      displayName: Move package.json to Working Dir
 
     - script: cat package.json
 
     - script: |
         npm ci
         ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
-      displayName: 'Install dependencies'
+      displayName: 'Install Dependencies'
 
     - script: npm run electron-build-windows
-      displayName: 'Build the Windows app'
+      displayName: 'Build the Windows App'
 
     - script: npm test
-      displayName: 'Test the Windows app'
+      displayName: 'Test the Windows App'
 
     - powershell: |
         mkdir dist_electron_windows
@@ -157,7 +157,7 @@ stages:
       artifact: dist_electron_windows
 
   - job: Build_and_test_macOS
-    displayName: Build and test macOS app
+    displayName: Build and Test macOS App
     pool:
       vmImage: 'macOS-latest'
     steps:
@@ -171,22 +171,22 @@ stages:
       artifact: package_json
 
     - script: mv $(workspace)/package_json/package.json $(workDir)/package.json
-      displayName: Move package.json to working dir
+      displayName: Move package.json to Working Dir
 
     - script: cat package.json
 
     - script: |
         npm ci
         ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
-      displayName: 'Install dependencies'
+      displayName: 'Install Dependencies'
 
     - script: npm run electron-build-macos
-      displayName: 'Build the macOS app'
+      displayName: 'Build the macOS App'
       env:
         CSC_LINK: $(CSC_LINK)
 
     - script: npm test
-      displayName: 'Test the macOS app'
+      displayName: 'Test the macOS App'
 
     - script: |
         mkdir dist_electron_macos
@@ -204,10 +204,10 @@ stages:
       artifact: dist_electron_macos
 
 - stage: Commit_and_tag_version
-  displayName: Commit & tag version
+  displayName: Commit & Tag Version
   jobs:
   - job: Commit_and_tag
-    displayName: Commit and tag new version
+    displayName: Commit and Tag New Version
     pool:
       vmImage: 'ubuntu-16.04'
     steps:
@@ -224,7 +224,7 @@ stages:
       artifact: package_json
 
     - script: mv $(workspace)/package_json/package.json $(workDir)/package.json
-      displayName: Move package.json to working dir
+      displayName: Move package.json to Working Dir
 
     - script: cat package.json
 
@@ -240,7 +240,7 @@ stages:
 - stage: Publish
   jobs:
   - job: Publish_npm_package
-    displayName: Publish npm package
+    displayName: Publish npm Package
     pool:
       vmImage: 'ubuntu-16.04'
     steps:
@@ -257,7 +257,7 @@ stages:
       artifact: package_json
 
     - script: mv $(workspace)/package_json/package.json $(workDir)/package.json
-      displayName: Move package.json to working dir
+      displayName: Move package.json to Working Dir
 
     - script: cat package.json
 
@@ -287,7 +287,7 @@ stages:
       artifact: package_json
 
     - script: mv $(workspace)/package_json/package.json $(workDir)/package.json
-      displayName: Move package.json to working dir
+      displayName: Move package.json to Working Dir
 
     - download: current
       artifact: dist_electron_windows
@@ -320,17 +320,17 @@ stages:
       artifact: package_json
 
     - script: mv $(workspace)/package_json/package.json $(workDir)/package.json
-      displayName: Move package.json to working dir
+      displayName: Move package.json to Working Dir
 
     - download: current
       artifact: bpmn-studio_tar
 
     - script: mv $(workspace)/bpmn-studio_tar/bpmn-studio.tar.gz $(workDir)/bpmn-studio.tar.gz
-      displayName: Move tarball to working dir
+      displayName: Move Tarball to Working Dir
 
     - script: echo "##vso[task.setvariable variable=version]$(node --print --eval "require('./package.json').version")"
       name: getVersionStep
-      displayName: Get BPMN Studio version
+      displayName: Get BPMN Studio Version
 
     - script: echo $VERSION
       name: echovar
