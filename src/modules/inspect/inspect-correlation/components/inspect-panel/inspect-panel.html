@@ -16,7 +16,7 @@
                 disabled.bind="selectedCorrelation === undefined"
                 title.bind="selectedCorrelation !== undefined ? 'Show a list of all Process Instances for the selected Correlation' : 'Select a correlation in order to toggle the Process Instance table'"
                 click.delegate="changeTab(inspectPanelTab.ProcessInstanceList)">
-          ProcessInstance List (${totalProcessInstanceCount})
+          Process Instance List (${totalProcessInstanceCount})
         </button>
         <button class="inspect-panel__tab ${showLogViewer ? 'inspect-panel__active-tab' : ''}"
                 class.bind="selectedProcessInstance === undefined ? 'inspect-panel__disabled-tab' : ''"
