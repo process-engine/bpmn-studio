@@ -15,7 +15,7 @@ jobs:
       with:
         node-version: 12.x
 
-    - name: Install ci tools
+    - name: Install CI Tools
       run: npm i @process-engine/ci_tools
     - name: Prepare version
       run: |
@@ -28,7 +28,7 @@ jobs:
         path: package.json
 
   lint_linux:
-    name: "Lint sources"
+    name: "Lint Sources"
     needs: prepare_version
     runs-on: ubuntu-18.04
     steps:
@@ -40,7 +40,7 @@ jobs:
         name: package_json
         path: "."
 
-    - name: Install npm dependencies
+    - name: Install npm Dependencies
       run: |
         cat package.json
         npm ci
@@ -60,14 +60,14 @@ jobs:
         name: package_json
         path: "."
 
-    - name: Install npm dependencies
+    - name: Install npm Dependencies
       run: |
         npm ci
         ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
-    - name: Build the web app 
+    - name: Build the Web App 
       run: npm run build
 
-    - name: Run the tests
+    - name: Run the Tests
       run: npm test
 
     - name: Create Tarball
@@ -81,7 +81,7 @@ jobs:
         name: bpmn-studio_tar
         path: bpmn-studio.tar.gz
 
-    - name: Bundle web
+    - name: Bundle Web
       run: | 
         mkdir -p dist_web/dist/web
         cp index.html dist_web/index.html
@@ -91,7 +91,7 @@ jobs:
         cp favicon.ico dist_web/
 
     - uses: actions/upload-artifact@master
-      name: Upload web app
+      name: Upload Web App
       with:
         name: dist_web
         path: dist_web
@@ -113,17 +113,17 @@ jobs:
         name: package_json
         path: "."
     
-    - name: Install NPM dependencies
+    - name: Install npm Dependencies
       run: |
         npm ci
         ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
 
-    - name: Build the Electron app
+    - name: Build the Electron App
       run: npm run electron-build-macos
       env: 
         CSC_LINK: ${{ secrets.CSC_LINK }}
 
-    - name: Run the tests
+    - name: Run the Tests
       run: npm test
 
     - name: Prepare macOS Bundle
@@ -161,20 +161,20 @@ jobs:
         name: package_json
         path: "."
     
-    - name: Install npm dependencies
+    - name: Install npm Dependencies
       run: |
         npm ci
         ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
       shell: powershell
 
-    - name: Install Windows build tools
+    - name: Install Windows Build Tools
       run: npm --vs2015 install --global windows-build-tools
       shell: powershell
 
-    - name: Build the Electron app
+    - name: Build the Electron App
       run: npm run electron-build-windows
 
-    - name: Run the tests
+    - name: Run the Tests
       run: npm test
 
     - name: Prepare Windows Bundle
@@ -191,7 +191,7 @@ jobs:
       shell: powershell
 
     - uses: actions/upload-artifact@master
-      name: Upload Electron Windows app
+      name: Upload Electron Windows App
       with:
         name: dist_electron_windows
         path: dist_electron_windows
@@ -213,7 +213,7 @@ jobs:
         name: package_json
         path: "."
 
-    - name: Install ci tools
+    - name: Install CI Tools
       run: npm i @process-engine/ci_tools
       
     - name: Commit and Tag
@@ -225,7 +225,7 @@ jobs:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
   publish_npm:
-    name: "Publish npm package"
+    name: "Publish npm Package"
     needs: prepare_and_tag_version
     runs-on: ubuntu-18.04
     steps:
@@ -241,7 +241,7 @@ jobs:
         name: package_json
         path: "."
    
-    - name: Install ci tools
+    - name: Install CI Tools
       run: npm i @process-engine/ci_tools
 
     - name: Publish npm package
@@ -269,21 +269,21 @@ jobs:
         name: package_json
         path: "."
 
-    - name: Unstash macOS Electron app
+    - name: Unstash macOS Electron App
       if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
       uses: actions/download-artifact@master
       with:
         name: dist_electron_macos
         path: "dist/electron"
 
-    - name: Unstash Windows Electron app
+    - name: Unstash Windows Electron App
       if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
       uses: actions/download-artifact@master
       with:
         name: dist_electron_windows
         path: "dist/electron"
 
-    - name: Install ci tools
+    - name: Install CI Tools
       if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
       run: npm i @process-engine/ci_tools
 
@@ -323,7 +323,7 @@ jobs:
         name: bpmn-studio_tar
         path: "."
 
-    - name: Get BPMN Studio version
+    - name: Get BPMN Studio Version
       if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
       run: echo "##[set-output name=version;]$(node --print --eval "require('./package.json').version")"
       id: studio_version
