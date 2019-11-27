@@ -10,7 +10,10 @@ on:
       - 'release/**'
 
 jobs:
-  build:
+  prepare_version:
+    name: Prepare Version
+    runs-on: ubuntu-18.04
+    if: "!contains(github.actor, 'alexanderkasten')"
 
     steps:
     - uses: actions/checkout@master
