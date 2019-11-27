@@ -1,5 +1,5 @@
 {
-  "name": "bpmn-studio",
+  "name": "bpmn-studio-alpha",
   "description": "An Aurelia application for designing BPMN diagrams, which can also be connected to a process engine to execute these diagrams.",
   "version": "5.10.0-alpha.26",
   "author": {
