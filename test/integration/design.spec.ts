@@ -70,14 +70,14 @@ describe('Design View', function foo() {
     await testClient.ensureVisible('[data-element-id="Collaboration_1cidyxu"]');
   });
 
-  it.skip('should select a StartEvent after opening a diagram', async () => {
+  it('should select a StartEvent after opening a diagram', async () => {
     await testClient.createAndOpenNewDiagram();
     await testClient.designView.showPropertyPanel();
 
     await testClient.assertSelectedBpmnElementHasName('Start Event');
   });
 
-  it.skip('should select a element the user clicks on', async () => {
+  it('should select a element the user clicks on', async () => {
     await testClient.createAndOpenNewDiagram();
     await testClient.designView.showPropertyPanel();
 

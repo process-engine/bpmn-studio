@@ -3,359 +3,106 @@
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
 
-#pr: none
-#
-#variables:
-#  workDir: $(System.DefaultWorkingDirectory)
-#  workspace: $(Pipeline.Workspace)
-#  currentBranch: $(Build.SourceBranch)
-#  isBranchToRelease: $[or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/develop'), eq(variables['Build.SourceBranch'], 'refs/heads/beta'))]
-#
-#stages:
-#
-#- stage: Prepare_version
-#  displayName: Prepare Version
-#  jobs:
-#  - job: Linux
-#    displayName: Prepare Version
-#    pool:
-#      vmImage: 'ubuntu-16.04'
-#    steps:
-#
-#    - task: NodeTool@0
-#      inputs:
-#        versionSpec: '10.x'
-#      displayName: 'Install Node.js'
-#
-#    - script: npm i @process-engine/ci_tools
-#      displayName: 'Install CI Tools'
-#
-#    - script: |
-#        node ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir
-#      displayName: 'Prepare Version'
-#      env:
-#        GIT_BRANCH: $(currentBranch)
-#
-#    - script: cat package.json
-#
-#    - publish: './package.json'
-#      artifact: package_json
-#
-#
-#- stage: Build_and_test
-#  displayName: Build and Test
-#  jobs:
-#  - job: Lint_sources
-#    displayName: Lint Sources
-#    pool:
-#      vmImage: 'ubuntu-16.04'
-#    steps:
-#
-#    - task: NodeTool@0
-#      inputs:
-#        versionSpec: '10.x'
-#      displayName: 'Install Node.js'
-#
-#    - script: npm ci
-#      displayName: 'Install Dependencies'
-#
-#    - script: npm run lint
-#      displayName: 'Lint Sources'
-#
-#  - job: Build_and_test_web
-#    displayName: Build and Test Web App
-#    pool:
-#      vmImage: 'ubuntu-16.04'
-#    steps:
-#
-#    - task: NodeTool@0
-#      inputs:
-#        versionSpec: '10.x'
-#      displayName: 'Install Node.js'
-#
-#    - download: current
-#      artifact: package_json
-#
-#    - script: mv $(workspace)/package_json/package.json $(workDir)/package.json
-#      displayName: Move package.json to Working Dir
-#
-#    - script: cat package.json
-#    
-#    - script: |
-#        npm ci
-#        ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
-#      displayName: 'Install Dependencies'
-#
-#    - script: npm run build
-#      displayName: 'Build Web App'
-#
-#    - script: xvfb-run --auto-servernum npm test
-#      displayName: 'Test Web App'
-#
-#    - script: | 
-#        mkdir -p dist_web/dist/web
-#        cp index.html dist_web/index.html
-#        cp -r dist/web dist_web/dist
-#        mkdir -p dist_web/src/resources
-#        cp -r src/resources dist_web/src
-#        cp favicon.ico dist_web/
-#      displayName: 'Prepare Web Bundle'
-#    
-#    - publish: 'dist_web'
-#      artifact: dist_web
-#
-#    - script: npm run create-tarball
-#      displayName: 'Create Tarball'
-#
-#    - script: ls -la
-#
-#    - publish: 'bpmn-studio.tar.gz'
-#      artifact: bpmn-studio_tar
-#
-#  - job: Build_and_test_Windows
-#    displayName: Build and test Windows app
-#    pool:
-#      vmImage: 'vs2017-win2016'
-#    steps:
-#
-#    - task: NodeTool@0
-#      inputs:
-#        versionSpec: '10.x'
-#      displayName: 'Install Node.js'
-#
-#    - download: current
-#      artifact: package_json
-#
-#    - powershell: Move-Item -Path $(workspace)\package_json\package.json -Destination $(workdir)\package.json -Force
-#      displayName: Move package.json to Working Dir
-#
-#    - script: cat package.json
-#
-#    - script: |
-#        npm ci
-#        ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
-#      displayName: 'Install Dependencies'
-#
-#    - script: npm run electron-build-windows
-#      displayName: 'Build the Windows App'
-#
-#    - script: npm test
-#      displayName: 'Test the Windows App'
-#
-#    - powershell: |
-#        mkdir dist_electron_windows
-#        copy-item .\dist\electron\bpmn-studio-setup-**.exe .\dist_electron_windows\
-#      displayName: 'Prepare Windows Bundle'
-#
-#    - powershell: |
-#        copy-item .\dist\electron\bpmn-studio-setup-**.exe.blockmap .\dist_electron_windows\
-#        copy-item .\dist\electron\latest.yml .\dist_electron_windows\
-#      displayName: 'Prepare Windows Bundle for GitHub Release'
-#      condition: eq(variables['isBranchToRelease'], true)
-#
-#    - publish: 'dist_electron_windows'
-#      artifact: dist_electron_windows
-#
-#  - job: Build_and_test_macOS
-#    displayName: Build and Test macOS App
-#    pool:
-#      vmImage: 'macOS-latest'
-#    steps:
-#
-#    - task: NodeTool@0
-#      inputs:
-#        versionSpec: '10.x'
-#      displayName: 'Install Node.js'
-#
-#    - download: current
-#      artifact: package_json
-#
-#    - script: mv $(workspace)/package_json/package.json $(workDir)/package.json
-#      displayName: Move package.json to Working Dir
-#
-#    - script: cat package.json
-#
-#    - script: |
-#        npm ci
-#        ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
-#      displayName: 'Install Dependencies'
-#
-#    - script: npm run electron-build-macos
-#      displayName: 'Build the macOS App'
-#      env:
-#        CSC_LINK: $(CSC_LINK)
-#
-#    - script: npm test
-#      displayName: 'Test the macOS App'
-#
-#    - script: |
-#        mkdir dist_electron_macos
-#        cp dist/electron/bpmn-studio-setup**.zip dist_electron_macos
-#        cp dist/electron/bpmn-studio-setup**.dmg dist_electron_macos
-#      displayName: 'Prepare macOS Bundle'
-#
-#    - script: |
-#        cp dist/electron/bpmn-studio-setup**.dmg.blockmap dist_electron_macos
-#        cp dist/electron/latest-mac.yml dist_electron_macos
-#      displayName: 'Prepare macOS Bundle for GitHub Release'
-#      condition: eq(variables['isBranchToRelease'], true)
-#
-#    - publish: 'dist_electron_macos'
-#      artifact: dist_electron_macos
-#
-#- stage: Commit_and_tag_version
-#  displayName: Commit & Tag Version
-#  jobs:
-#  - job: Commit_and_tag
-#    displayName: Commit and Tag New Version
-#    pool:
-#      vmImage: 'ubuntu-16.04'
-#    steps:
-#
-#    - task: NodeTool@0
-#      inputs:
-#        versionSpec: '10.x'
-#      displayName: 'Install Node.js'
-#
-#    - script: npm i @process-engine/ci_tools
-#      displayName: 'Install CI Tools'
-#
-#    - download: current
-#      artifact: package_json
-#
-#    - script: mv $(workspace)/package_json/package.json $(workDir)/package.json
-#      displayName: Move package.json to Working Dir
-#
-#    - script: cat package.json
-#
-#    - script: |
-#        ./node_modules/.bin/ci_tools commit-and-tag-version --only-on-primary-branches
-#        ./node_modules/.bin/ci_tools update-github-release --only-on-primary-branches --use-title-and-text-from-git-tag
-#      displayName: 'Commit and Tag'
-#      env:
-#        GH_USER: $(GH_USER)
-#        GH_TOKEN: $(GH_TOKEN)
-#        GIT_BRANCH: $(currentBranch)
-#
-#- stage: Publish
-#  jobs:
-#  - job: Publish_npm_package
-#    displayName: Publish npm Package
-#    pool:
-#      vmImage: 'ubuntu-16.04'
-#    steps:
-#
-#    - task: NodeTool@0
-#      inputs:
-#        versionSpec: '10.x'
-#      displayName: 'Install Node.js'
-#
-#    - script: npm i @process-engine/ci_tools
-#      displayName: 'Install CI Tools'
-#
-#    - download: current
-#      artifact: package_json
-#
-#    - script: mv $(workspace)/package_json/package.json $(workDir)/package.json
-#      displayName: Move package.json to Working Dir
-#
-#    - script: cat package.json
-#
-#    - script: |
-#        ./node_modules/.bin/ci_tools publish-npm-package --create-tag-from-branch-name
-#      displayName: 'Publish to npm'
-#      env:
-#        NPM_TOKEN: $(NPM_TOKEN)
-#        GIT_BRANCH: $(currentBranch)
-#  
-#  - job: Publish_GitHub_release
-#    displayName: Publish GitHub Release
-#    condition: eq(variables['isBranchToRelease'], true)
-#    pool:
-#      vmImage: 'ubuntu-16.04'
-#    steps:
-#
-#    - task: NodeTool@0
-#      inputs:
-#        versionSpec: '10.x'
-#      displayName: 'Install Node.js'
-#
-#    - script: npm i @process-engine/ci_tools
-#      displayName: 'Install CI Tools'
-#
-#    - download: current
-#      artifact: package_json
-#
-#    - script: mv $(workspace)/package_json/package.json $(workDir)/package.json
-#      displayName: Move package.json to Working Dir
-#
-#    - download: current
-#      artifact: dist_electron_windows
-#
-#    - download: current
-#      artifact: dist_electron_macos
-#
-#    - script: |
-#        ./node_modules/.bin/ci_tools update-github-release \
-#                      --assets $(workspace)/dist_electron_windows/bpmn-studio-setup-*.exe \
-#                      --assets $(workspace)/dist_electron_windows/bpmn-studio-setup-*.exe.blockmap \
-#                      --assets $(workspace)/dist_electron_macos/bpmn-studio-setup-*.zip \
-#                      --assets $(workspace)/dist_electron_macos/bpmn-studio-setup-*.dmg \
-#                      --assets $(workspace)/dist_electron_macos/bpmn-studio-setup-*.dmg.blockmap \
-#                      --assets $(workspace)/dist_electron_macos/latest-mac.yml \
-#                      --assets $(workspace)/dist_electron_windows/latest.yml
-#      displayName: 'Upload GitHub Release'
-#      env:
-#        GH_USER: $(GH_USER)
-#        GH_TOKEN: $(GH_TOKEN)
-#
-#  - job: Build_and_publish_Docker
-#    displayName: Publish Docker Image
-#    condition: eq(variables['isBranchToRelease'], true)
-#    pool:
-#      vmImage: 'ubuntu-16.04'
-#    steps:
-#
-#    - download: current
-#      artifact: package_json
-#
-#    - script: mv $(workspace)/package_json/package.json $(workDir)/package.json
-#      displayName: Move package.json to Working Dir
-#
-#    - download: current
-#      artifact: bpmn-studio_tar
-#
-#    - script: mv $(workspace)/bpmn-studio_tar/bpmn-studio.tar.gz $(workDir)/bpmn-studio.tar.gz
-#      displayName: Move Tarball to Working Dir
-#
-#    - script: echo "##vso[task.setvariable variable=version]$(node --print --eval "require('./package.json').version")"
-#      name: getVersionStep
-#      displayName: Get BPMN Studio Version
-#
-#    - script: echo $VERSION
-#      name: echovar
-#      displayName: Log Variable
-#      env:
-#        VERSION: $(getVersionStep.version)
-#
-#    - script: |
-#        docker build --build-arg NODE_IMAGE_VERSION=10-alpine \
-#                --build-arg BPMN_STUDIO_VERSION=$VERSION \
-#                --no-cache \
-#                --tag 5minds/bpmn-studio-bundle:$VERSION .
-#      displayName: Build Docker Image
-#      env:
-#        VERSION: $(getVersionStep.version)
-#
-#    - script: docker images
-#      displayName: Show Docker Images
-#
-#    - script: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-#      displayName: Login to DockerHub
-#      env:
-#        DOCKER_USER: $(DOCKER_USER)
-#        DOCKER_PASS: $(DOCKER_PASS)
-#
-#    - script: docker push 5minds/bpmn-studio-bundle
-#      displayName: Push Docker Image
-#
+trigger:
+- master
+
+
+stages:
+- stage: BuildAndTest
+  displayName: Build and Test
+
+  jobs:
+
+  - job: Linux
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '10.x'
+      displayName: 'Install Node.js'
+
+    # Initialize offscreen display for integration tests
+    - script: |
+        mkdir /tmp/.X11-unix
+        sudo chmod 1777 /tmp/.X11-unix
+        sudo chown root /tmp/.X11-unix/
+        sudo apt-get install xorg
+        sudo apt-get install xvfb
+        sudo apt-get install libxfont-dev xfonts-100dpi xfonts-75dpi xfonts-scalable xfonts-cyrillic
+        export DISPLAY=:99.0
+        Xvfb $DISPLAY -screen 0 1024x768x16 &
+        sleep 3
+      displayName: Install Xvfb
+
+    - script: npm ci
+      displayName: 'npm ci'
+
+    - script: npm run build
+      displayName: 'npm run build'
+
+    - script: xvfb-run --auto-servernum npm test
+      displayName: 'Run Tests'
+
+    - publish: '@fortawesome'
+      artifact: NpmPackage-Fortawesome
+
+    - publish: 'bootstrap'
+      artifact: NpmPackage-Bootstrap
+
+    - publish: 'scripts'
+      artifact: NpmPackage-Scripts
+
+    - publish: 'config'
+      artifact: NpmPackage-config
+
+  - job: Windows
+    pool:
+      vmImage: 'vs2017-win2016'
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '10.x'
+      displayName: 'Install Node.js'
+
+    - script: npm ci
+      displayName: 'npm ci'
+
+    - script: npm run electron-build-windows
+      displayName: 'npm run electron-build-windows'
+
+    - script: npm run test-electron-windows
+      displayName: 'npm test-electron-windows'
+
+  - job: macOS
+    pool:
+      vmImage: 'macOS-10.13'
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '10.x'
+      displayName: 'Install Node.js'
+
+    - script: npm ci
+      displayName: 'npm ci'
+
+    - script: npm run electron-build-macos
+      displayName: 'npm run electron-build-macos'
+
+    - script: npm run test-electron-macos
+      displayName: 'npm test-electron-macos'
+
+- stage: Publish
+  jobs:
+  - job: Linux
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '10.x'
+      displayName: 'Install Node.js'
+
+    - script: |
+        echo TODO
+      displayName: 'Publish to npm'
