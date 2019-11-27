@@ -1,9 +1,13 @@
 name: Node CI
 
-on: 
+on:
   push:
-    tags-ignore:
-    - v*.* 
+    branches:    
+      - master      
+      - develop
+      - beta
+      - 'feature/**'
+      - 'release/**'
 
 jobs:
   build:
