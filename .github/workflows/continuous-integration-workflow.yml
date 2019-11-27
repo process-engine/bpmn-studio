@@ -12,7 +12,120 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+
+    - name: Use Node.js 12.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+
+    - name: Show Actor
+      run: echo $ACTOR
+      env: ${{ github.actor }}
+      
+    - name: Install CI Tools
+      run: npm i @process-engine/ci_tools
+    - name: Prepare version
+      run: |
+        ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir
+    
+    - name: Stash package.json
+      uses: actions/upload-artifact@master
+      with:
+        name: package_json
+        path: package.json
+
+  lint_linux:
+    name: "Lint Sources"
+    needs: prepare_version
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@master
+    
+    - name: Unstash package.json
+      uses: actions/download-artifact@master
+      with:
+        name: package_json
+        path: "."
+
+    - name: Install npm Dependencies
+      run: |
+        cat package.json
+        npm ci
+        ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+    - run: npm run lint
+
+  build_and_test_linux:
+    name: "Build & Test (Linux)"
+    needs: prepare_version
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@master
+
+    - name: Unstash package.json
+      uses: actions/download-artifact@master
+      with:
+        name: package_json
+        path: "."
+
+    - name: Install npm Dependencies
+      run: |
+        npm ci
+        ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+    - name: Build the Web App 
+      run: npm run build
+
+    - name: Run the Tests
+      run: npm test
+
+    - name: Create Tarball
+      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      run: npm run create-tarball
+
+    - name: Stash Tarball
+      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      uses: actions/upload-artifact@master
+      with:
+        name: bpmn-studio_tar
+        path: bpmn-studio.tar.gz
+
+    - name: Bundle Web
+      run: | 
+        mkdir -p dist_web/dist/web
+        cp index.html dist_web/index.html
+        cp -r dist/web dist_web/dist
+        mkdir -p dist_web/src/resources
+        cp -r src/resources dist_web/src
+        cp favicon.ico dist_web/
+
+    - uses: actions/upload-artifact@master
+      name: Upload Web App
+      with:
+        name: dist_web
+        path: dist_web
+
+  build_and_test_macos:
+    name: "Build & Test (macOS)"
+    needs: prepare_version
+    runs-on: macOS-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Use Node.js 12.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+
+    - name: Unstash package.json
+      uses: actions/download-artifact@master
+      with:
+        name: package_json
+        path: "."
+    
+    - name: Install npm Dependencies
+      run: |
+        npm ci
+        ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
 
     steps:
     - uses: actions/checkout@master
