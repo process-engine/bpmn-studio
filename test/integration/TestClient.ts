@@ -233,7 +233,15 @@ export class TestClient {
   }
 
   public async openView(uriPath: string): Promise<void> {
-    return this.app.browserWindow.loadURL(`${APP_BASE_URL}${uriPath}`);
+    try {
+      await this.app.browserWindow.loadURL(`${APP_BASE_URL}${uriPath}`);
+    } catch (error) {
+      const errorIsNavigatedError: boolean = error.message.includes('Inspected target navigated or closed');
+
+      if (!errorIsNavigatedError) {
+        throw error;
+      }
+    }
   }
 
   private async execCommand(command: string): Promise<any> {
