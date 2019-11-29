@@ -67,7 +67,7 @@ describe('Design View', function foo() {
   it('should render a diagram correctly', async () => {
     await testClient.createAndOpenNewDiagram();
 
-    await testClient.ensureVisible('[data-element-id="Collaboration_1cidyxu"]');
+    await testClient.ensureVisible('[data-element-id="Collaboration_1cidyxu"]', 40000);
   });
 
   it('should select a StartEvent after opening a diagram', async () => {

@@ -3,13 +3,13 @@ import {TestClient} from './TestClient';
 import {applicationArgs} from './modules/get-application-args';
 
 async function assertXmlViewHasContent(): Promise<void> {
-  await testClient.ensureVisible('[data-test-xml-view-content]');
+  await testClient.ensureVisible('[data-test-xml-view-content]', 40000);
   const xmlViewContent = await testClient.getTextFromElement('[data-test-xml-view-content]');
   assert.notEqual(xmlViewContent, null);
 }
 
 async function assertXmlViewContainsText(text: string): Promise<void> {
-  await testClient.ensureVisible('[data-test-xml-view-content]');
+  await testClient.ensureVisible('[data-test-xml-view-content]', 40000);
 
   const xmlViewContent = await testClient.getTextFromElement('[data-test-xml-view-content]');
   const xmlViewContentContainsText: boolean = xmlViewContent.includes(text);
