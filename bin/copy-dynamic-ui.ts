@@ -6,7 +6,7 @@ const DESTINATION_PATH = path.join(process.cwd(), 'dist', 'web', 'dynamic_ui_cor
 
 function copyDynamicUi(): void {
   try {
-    fs.copySync(DYNAMICUI_PATH, DESTINATION_PATH);
+    fs.copySync(DYNAMICUI_PATH, DESTINATION_PATH, {dereference: true});
     console.log(`Successfully copied ${DYNAMICUI_PATH} to ${DESTINATION_PATH}`);
   } catch (err) {
     console.error(err);
