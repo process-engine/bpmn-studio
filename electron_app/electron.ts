@@ -125,7 +125,7 @@ function initializeApplication(): void {
     event.sender.send('isDevelop', releaseChannel.isDev());
   });
 
-  if (!releaseChannel.isDev() || !process.env.SPECTRON_TESTS) {
+  if (!releaseChannel.isDev() && !process.env.SPECTRON_TESTS) {
     initializeAutoUpdater();
   }
 
