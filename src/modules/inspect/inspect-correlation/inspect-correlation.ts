@@ -225,6 +225,7 @@ export class InspectCorrelation {
     if (processInstanceList && processInstanceList.totalCount === 0) {
       this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
       this.processInstances = [];
+      this.totalProcessInstanceCount = 0;
     } else if (processInstanceList) {
       this.processInstances = processInstanceList.processInstances;
       this.totalProcessInstanceCount = processInstanceList.totalCount;
