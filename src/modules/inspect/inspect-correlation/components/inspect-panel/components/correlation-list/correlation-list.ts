@@ -150,7 +150,7 @@ export class CorrelationList {
       limit: this.pageSize,
     };
 
-    this.eventAggregator.publish(environment.events.inspectCorrelation.updateProcessInstances, payload);
+    this.eventAggregator.publish(environment.events.inspectCorrelation.updateCorrelations, payload);
   }
 
   private convertCorrelationsIntoTableData(
