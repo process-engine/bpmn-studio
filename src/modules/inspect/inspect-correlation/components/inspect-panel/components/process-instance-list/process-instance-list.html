@@ -44,11 +44,11 @@
             </div>
             <select class="form-control process-instance-table__pagesize-entry--select" value.bind="pageSize">
               <option model.bind="size" repeat.for="size of pageSizes">${size}</option>
-              <option model.bind="totalCount">${totalCount}</option>
+              <option model.bind="0">All</option>
             </select>
           </td>
           <td class="process-instance-table__pagination-entry">
-            <pagination show.bind="pageSize < totalCount" view-model.ref="pagination" current-page.two-way="currentPage" per-page.to-view="pageSize" items.to-view="totalCount" max-pages-to-display.to-view="paginationSize" content-is-async.bind="true" is-loading.two-way="paginationShowsLoading"></pagination>
+            <pagination show.bind="pageSize < totalCount && pageSize > 0" view-model.ref="pagination" current-page.two-way="currentPage" per-page.to-view="pageSize" items.to-view="totalCount" max-pages-to-display.to-view="paginationSize" content-is-async.bind="true" is-loading.two-way="paginationShowsLoading"></pagination>
           </td>
         </tr>
       </tbody>
