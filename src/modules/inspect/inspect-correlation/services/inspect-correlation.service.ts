@@ -40,8 +40,15 @@ export class InspectCorrelationService implements IInspectCorrelationService {
   public async getAllCorrelationsForProcessModelId(
     identity: IIdentity,
     processModelId: string,
+    offset?: number,
+    limit?: number,
   ): Promise<DataModels.Correlations.CorrelationList> {
-    return this.inspectCorrelationRepository.getAllCorrelationsForProcessModelId(identity, processModelId);
+    return this.inspectCorrelationRepository.getAllCorrelationsForProcessModelId(
+      identity,
+      processModelId,
+      offset,
+      limit,
+    );
   }
 
   public async getCorrelationById(
