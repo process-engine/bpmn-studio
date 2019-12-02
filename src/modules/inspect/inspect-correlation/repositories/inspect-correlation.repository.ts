@@ -2,8 +2,6 @@ import {IIdentity} from '@essential-projects/iam_contracts';
 import {DataModels, IManagementApiClient} from '@process-engine/management_api_contracts';
 
 import {
-  Correlation,
-  CorrelationList,
   ProcessInstance,
   ProcessInstanceList,
 } from '@process-engine/management_api_contracts/dist/data_models/correlation';
