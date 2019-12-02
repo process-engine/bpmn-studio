@@ -1,10 +1,11 @@
 import {TestClient} from './TestClient';
 import {applicationArgs} from './modules/get-application-args';
 
+const VISIBLE_TIMEOUT = 40000;
 let testClient: TestClient;
 
 async function stopProcess(): Promise<void> {
-  await testClient.ensureVisible('[data-test-stop-process-button]', 40000);
+  await testClient.ensureVisible('[data-test-stop-process-button]', VISIBLE_TIMEOUT);
   await testClient.clickOn('[data-test-stop-process-button]');
   await testClient.ensureNotVisible('[data-test-stop-process-button]');
 }

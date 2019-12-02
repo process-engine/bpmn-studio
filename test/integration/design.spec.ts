@@ -1,6 +1,7 @@
 import {TestClient} from './TestClient';
 import {applicationArgs} from './modules/get-application-args';
 
+const VISIBLE_TIMEOUT = 40000;
 let testClient: TestClient;
 
 describe('Design View', function foo() {
@@ -67,7 +68,7 @@ describe('Design View', function foo() {
   it('should render a diagram correctly', async () => {
     await testClient.createAndOpenNewDiagram();
 
-    await testClient.ensureVisible('[data-element-id="Collaboration_1cidyxu"]', 40000);
+    await testClient.ensureVisible('[data-element-id="Collaboration_1cidyxu"]', VISIBLE_TIMEOUT);
   });
 
   it.skip('should select a StartEvent after opening a diagram', async () => {

@@ -26,7 +26,7 @@ function getUserConfigFolder(): string {
 const APP_BASE_URL = `file://${__dirname}/../../../../index.html`;
 const DATABASE_PATH = path.join(getUserConfigFolder(), 'bpmn-studio-tests', 'process_engine_databases');
 const SAVE_DIAGRAM_DIR = path.join(getUserConfigFolder(), 'bpmn-studio-tests', 'saved_diagrams');
-
+const VISIBLE_TIMEOUT = 40000;
 export class TestClient {
   public solutionExplorer: SolutionExplorer = new SolutionExplorer(this);
   public designView: DesignViewClient = new DesignViewClient(this, SAVE_DIAGRAM_DIR);
@@ -48,11 +48,11 @@ export class TestClient {
   }
 
   public async startPageLoaded(): Promise<void> {
-    await this.ensureVisible('[data-test-start-page]', 40000);
+    await this.ensureVisible('[data-test-start-page]', VISIBLE_TIMEOUT);
   }
 
   public async clickOnBpmnElementWithName(name): Promise<void> {
-    await this.ensureVisible(`.djs-label=${name}`, 40000);
+    await this.ensureVisible(`.djs-label=${name}`, VISIBLE_TIMEOUT);
     await this.clickOn(`.djs-label=${name}`);
   }
 
@@ -62,15 +62,15 @@ export class TestClient {
   }
 
   public async assertDiagramIsOnFileSystem(): Promise<void> {
-    await this.ensureVisible('[data-test-navbar-icon-local-solution]', 40000);
+    await this.ensureVisible('[data-test-navbar-icon-local-solution]', VISIBLE_TIMEOUT);
   }
 
   public async assertDiagramIsOnProcessEngine(): Promise<void> {
-    await this.ensureVisible('[data-test-navbar-icon-remote-solution]', 40000);
+    await this.ensureVisible('[data-test-navbar-icon-remote-solution]', VISIBLE_TIMEOUT);
   }
 
   public async assertNavbarTitleIs(name): Promise<void> {
-    await this.ensureVisible('[data-test-navbar-title]', 40000);
+    await this.ensureVisible('[data-test-navbar-title]', VISIBLE_TIMEOUT);
     const navbarTitle = await this.getTextFromElement('[data-test-navbar-title]');
 
     assert.equal(navbarTitle, name);
@@ -81,7 +81,7 @@ export class TestClient {
   }
 
   public async assertDiagramIsUnsaved(): Promise<void> {
-    await this.ensureVisible('[data-test-edited-label]', 40000);
+    await this.ensureVisible('[data-test-edited-label]', VISIBLE_TIMEOUT);
   }
 
   public async ensureVisible(selector: string, timeout?: number): Promise<boolean> {
@@ -138,13 +138,13 @@ export class TestClient {
       await this.openView('#/think/diagram-list/diagram');
     }
 
-    await this.ensureVisible('diagram-list', 40000);
+    await this.ensureVisible('diagram-list', VISIBLE_TIMEOUT);
   }
 
   public async openThinkViewFromNavbar(): Promise<void> {
-    await this.ensureVisible('[data-test-navbar="Think"]', 40000);
+    await this.ensureVisible('[data-test-navbar="Think"]', VISIBLE_TIMEOUT);
     await this.clickOn('[data-test-navbar="Think"]');
-    await this.ensureVisible('diagram-list', 40000);
+    await this.ensureVisible('diagram-list', VISIBLE_TIMEOUT);
   }
 
   public async openStartPage(): Promise<void> {
@@ -156,9 +156,9 @@ export class TestClient {
       await this.openStartPage();
     }
 
-    await this.ensureVisible('[data-test-create-new-diagram]', 40000);
+    await this.ensureVisible('[data-test-create-new-diagram]', VISIBLE_TIMEOUT);
     await this.clickOn('[data-test-create-new-diagram]');
-    await this.ensureVisible('[data-test-navbar-title]', 40000);
+    await this.ensureVisible('[data-test-navbar-title]', VISIBLE_TIMEOUT);
   }
 
   public async assertSelectedBpmnElementHasName(name): Promise<void> {

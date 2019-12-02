@@ -2,14 +2,16 @@ import assert from 'assert';
 import {TestClient} from './TestClient';
 import {applicationArgs} from './modules/get-application-args';
 
+const VISIBLE_TIMEOUT = 40000;
+
 async function assertXmlViewHasContent(): Promise<void> {
-  await testClient.ensureVisible('[data-test-xml-view-content]', 40000);
+  await testClient.ensureVisible('[data-test-xml-view-content]', VISIBLE_TIMEOUT);
   const xmlViewContent = await testClient.getTextFromElement('[data-test-xml-view-content]');
   assert.notEqual(xmlViewContent, null);
 }
 
 async function assertXmlViewContainsText(text: string): Promise<void> {
-  await testClient.ensureVisible('[data-test-xml-view-content]', 40000);
+  await testClient.ensureVisible('[data-test-xml-view-content]', VISIBLE_TIMEOUT);
 
   const xmlViewContent = await testClient.getTextFromElement('[data-test-xml-view-content]');
   const xmlViewContentContainsText: boolean = xmlViewContent.includes(text);
