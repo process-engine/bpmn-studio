@@ -157,6 +157,17 @@ jobs:
         name: dist_electron_macos
         path: dist_electron_macos
 
+    - name: Slack Notification
+      uses: homoluctus/slatify@master
+      if: always()
+      with:
+        type: ${{ job.status }}
+        job_name: 'macOS Tests'
+        mention_if: 'always'
+        url: ${{ secrets.SLACK_WEBHOOK }}
+        commit: true
+        token: ${{ secrets.GH_TOKEN }}
+
   build_and_test_windows:
     name: "Build & Test (Windows)"
     needs: prepare_version
@@ -208,6 +219,17 @@ jobs:
       with:
         name: dist_electron_windows
         path: dist_electron_windows
+
+    - name: Slack Notification
+      uses: homoluctus/slatify@master
+      if: always()
+      with:
+        type: ${{ job.status }}
+        job_name: 'Windows Tests'
+        mention_if: 'always'
+        url: ${{ secrets.SLACK_WEBHOOK }}
+        commit: true
+        token: ${{ secrets.GH_TOKEN }}
 
   prepare_and_tag_version:
     name: "Commit & Tag Version"
@@ -310,6 +332,17 @@ jobs:
       env:
         GH_USER: ${{ secrets.GH_USER }}
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+    - name: Slack Notification
+      uses: homoluctus/slatify@master
+      if: always()
+      with:
+        type: ${{ job.status }}
+        job_name: 'GitHub Release'
+        mention_if: 'always'
+        url: ${{ secrets.SLACK_WEBHOOK }}
+        commit: true
+        token: ${{ secrets.GH_TOKEN }}
 
   build_docker:
     name: "Build & Publish Docker Image"
