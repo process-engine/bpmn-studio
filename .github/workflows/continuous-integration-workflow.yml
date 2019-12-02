@@ -160,7 +160,7 @@ jobs:
   build_and_test_windows:
     name: "Build & Test (Windows)"
     needs: prepare_version
-    runs-on: windows-2016
+    runs-on: windows-latest
     steps:
     - uses: actions/checkout@master
     - name: Use Node.js 12.x
