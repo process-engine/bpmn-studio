@@ -307,7 +307,7 @@ export class InspectCorrelation {
     }
   }
 
-  public async selectedCorrelationChanged(): Promise<void> {
+  public selectedCorrelationChanged(): void {
     if (this.viewIsAttached) {
       this.updateProcessInstances();
     }

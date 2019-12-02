@@ -57,7 +57,7 @@ export class CorrelationList {
     this.eventAggregator.publish(environment.events.inspectCorrelation.showProcessInstanceList);
   }
 
-  public async selectCorrelation(selectedTableEntry: ICorrelationTableEntry): Promise<void> {
+  public selectCorrelation(selectedTableEntry: ICorrelationTableEntry): void {
     this.selectedCorrelation = this.getCorrelationForTableEntry(selectedTableEntry);
     this.selectedTableEntry = selectedTableEntry;
   }
