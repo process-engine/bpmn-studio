@@ -129,7 +129,7 @@ export class CorrelationList {
         offset: 0,
         limit: this.pageSize,
       };
-      this.eventAggregator.publish(environment.events.inspectCorrelation.updateProcessInstances, payload);
+      this.eventAggregator.publish(environment.events.inspectCorrelation.updateCorrelations, payload);
 
       return;
     }
