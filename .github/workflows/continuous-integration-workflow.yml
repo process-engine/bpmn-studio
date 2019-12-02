@@ -392,3 +392,21 @@ jobs:
 
     - name: Push Docker Image
       run: docker push 5minds/bpmn-studio-bundle
+
+  announce_releasenotes:
+    name: Announce Releasenotes
+    needs: prepare_version
+    runs-on: ubuntu-18.04
+    # if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install CI-Tools
+      run: npm install @process-engine/ci_tools@`node -p -e "require('./package.json').dependencies['@process-engine/ci_tools']"` --no-save
+
+    - name: Publish Releasenotes
+      run: |
+        ./node_modules/.bin/ci_tools publish-releasenotes-on-slack
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_ANNOUNCER_WEBHOOK }}
