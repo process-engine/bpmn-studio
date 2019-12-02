@@ -134,6 +134,11 @@ export class ProcessInstanceList {
       return;
     }
 
+    const showAllProcessInstances: boolean = this.pageSize === 0;
+    if (showAllProcessInstances) {
+      this.currentPage = 1;
+    }
+
     const isFirstPage: boolean = this.currentPage === 1;
     if (isFirstPage) {
       const payload = {
