@@ -15,7 +15,7 @@
           <th class="process-instance-table__headline" if.bind="false" click.delegate="sortList(processInstanceListSortProperty.User)">
             User <i if.bind="sortSettings.sortProperty === processInstanceListSortProperty.User" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
-          <th class="process-instance-table__headline" click.delegate="sortList(processInstanceListSortProperty.ProcessModeld)">
+          <th class="process-instance-table__headline" click.delegate="sortList(processInstanceListSortProperty.ProcessModelId)">
             Process Model ID <i if.bind="sortSettings.sortProperty === processInstanceListSortProperty.ProcessModelId" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
           <th class="process-instance-table__headline" click.delegate="sortList(processInstanceListSortProperty.ProcessInstanceId)">
