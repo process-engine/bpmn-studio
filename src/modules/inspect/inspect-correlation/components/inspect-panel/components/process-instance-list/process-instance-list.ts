@@ -178,7 +178,7 @@ export class ProcessInstanceList {
       const tableEntry: ProcessInstanceTableEntry = {
         startedAt: formattedStartedDate,
         state: processInstance.state,
-        user: 'Not supported yet.',
+        user: processInstance.identity.userId,
         processModelId: processInstance.processModelId,
         processInstanceId: processInstance.processInstanceId,
       };

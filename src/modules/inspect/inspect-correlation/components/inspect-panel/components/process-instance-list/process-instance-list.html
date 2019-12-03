@@ -12,7 +12,7 @@
           <th class="process-instance-table__headline" click.delegate="sortList(processInstanceListSortProperty.State)">
             State <i if.bind="sortSettings.sortProperty == processInstanceListSortProperty.State" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
-          <th class="process-instance-table__headline" if.bind="false" click.delegate="sortList(processInstanceListSortProperty.User)">
+          <th class="process-instance-table__headline" click.delegate="sortList(processInstanceListSortProperty.User)">
             User <i if.bind="sortSettings.sortProperty === processInstanceListSortProperty.User" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
           <th class="process-instance-table__headline" click.delegate="sortList(processInstanceListSortProperty.ProcessModelId)">
@@ -33,7 +33,7 @@
         <tr dblclick.delegate="showLogViewer()" class="process-instance-table__table-row" repeat.for="tableEntry of sortedTableData" class.bind="tableEntry.processInstanceId === selectedTableEntry.processInstanceId ? 'process-instance-table__selected-entry': ''" click.delegate="selectProcessInstance(tableEntry)">
           <td class="process-instance-table__table-entry">${tableEntry.startedAt}</td>
           <td class="process-instance-table__table-entry process-instance-table__table-entry--state">${tableEntry.state}</td>
-          <td if.bind="false" class="process-instance-table__table-entry">${tableEntry.user}</td>
+          <td class="process-instance-table__table-entry">${tableEntry.user}</td>
           <td class="process-instance-table__table-entry">${tableEntry.processModelId}</td>
           <td class="process-instance-table__table-entry">${tableEntry.processInstanceId}</td>
         </tr>
