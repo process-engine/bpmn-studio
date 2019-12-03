@@ -167,7 +167,6 @@ export class CorrelationList {
       const tableEntry: ICorrelationTableEntry = {
         startedAt: formattedStartedDate,
         state: correlation.state,
-        user: 'Not supported yet.',
         correlationId: correlation.id,
       };
 

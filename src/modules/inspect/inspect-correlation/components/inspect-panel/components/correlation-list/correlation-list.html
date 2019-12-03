@@ -12,9 +12,6 @@
           <th class="correlation-table__headline" click.delegate="sortList(correlationListSortProperty.State)">
             State <i if.bind="sortSettings.sortProperty == correlationListSortProperty.State" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
-          <th class="correlation-table__headline" if.bind="false" click.delegate="sortList(correlationListSortProperty.User)">
-            User <i if.bind="sortSettings.sortProperty === correlationListSortProperty.User" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
-          </th>
           <th class="correlation-table__headline" click.delegate="sortList(correlationListSortProperty.CorrelationId)">
             Correlation ID <i if.bind="sortSettings.sortProperty === correlationListSortProperty.CorrelationId" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
@@ -24,13 +21,11 @@
         <tr if.bind="correlationToSelectTableEntry" dblclick.delegate="showProcessInstanceList()" class="correlation-table__table-row correlation-table__table-row--instance-to-select" class.bind="correlationToSelectTableEntry.correlationId === selectedTableEntry.correlationId ? 'correlation-table__selected-entry': ''" click.delegate="selectCorrelation(correlationToSelectTableEntry)">
           <td class="correlation-table__table-entry">${correlationToSelectTableEntry.startedAt}</td>
           <td class="correlation-table__table-entry correlation-table__table-entry--state">${correlationToSelectTableEntry.state}</td>
-          <td if.bind="false" class="correlation-table__table-entry">${correlationToSelectTableEntry.user}</td>
           <td class="correlation-table__table-entry">${correlationToSelectTableEntry.correlationId}</td>
         </tr>
         <tr dblclick.delegate="showProcessInstanceList()" class="correlation-table__table-row" repeat.for="tableEntry of sortedTableData" class.bind="tableEntry.correlationId === selectedTableEntry.correlationId ? 'correlation-table__selected-entry': ''" click.delegate="selectCorrelation(tableEntry)">
           <td class="correlation-table__table-entry">${tableEntry.startedAt}</td>
           <td class="correlation-table__table-entry correlation-table__table-entry--state">${tableEntry.state}</td>
-          <td if.bind="false" class="correlation-table__table-entry">${tableEntry.user}</td>
           <td class="correlation-table__table-entry">${tableEntry.correlationId}</td>
         </tr>
         <tr if.bind="totalCount > minPageSize" class="correlation-table__table-row">
