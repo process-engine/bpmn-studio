@@ -42,7 +42,7 @@ jobs:
     needs: prepare_version
     runs-on: ubuntu-18.04
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v1
 
     - name: Unstash package.json
       uses: actions/download-artifact@master
@@ -62,7 +62,7 @@ jobs:
     needs: prepare_version
     runs-on: ubuntu-18.04
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v1
 
     - name: Unstash package.json
       uses: actions/download-artifact@master
@@ -111,7 +111,7 @@ jobs:
     needs: prepare_version
     runs-on: macOS-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v1
     - name: Use Node.js 12.x
       uses: actions/setup-node@v1
       with:
@@ -170,7 +170,7 @@ jobs:
     needs: prepare_version
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v1
     - name: Use Node.js 12.x
       uses: actions/setup-node@v1
       with:
@@ -233,7 +233,7 @@ jobs:
     needs: [build_and_test_linux, build_and_test_macos, build_and_test_windows]
     runs-on: ubuntu-18.04
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v1
     - name: Use Node.js 12.x
       uses: actions/setup-node@v1
       with:
@@ -261,7 +261,7 @@ jobs:
     needs: prepare_and_tag_version
     runs-on: ubuntu-18.04
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v1
     - name: Use Node.js 12.x
       uses: actions/setup-node@v1
       with:
@@ -288,7 +288,7 @@ jobs:
     if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
 
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v1
 
     - name: Use Node.js 12.x
       uses: actions/setup-node@v1
@@ -348,7 +348,7 @@ jobs:
     if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
 
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v1
 
     - name: Unstash package.json
       uses: actions/download-artifact@master
