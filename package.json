@@ -107,8 +107,6 @@
     "@types/semver": "^6.0.1",
     "@types/spectrum": "^1.5.31",
     "@types/toastr": "^2.1.37",
-    "@types/bluebird": "^3.5.27",
-    "@types/mocha": "^5.2.7",
     "aurelia-animator-css": "1.0.4",
     "aurelia-bootstrap": "0.1.20",
     "aurelia-bootstrapper": "2.3.3",
