@@ -1,0 +1,40 @@
+<template>
+  <require from="./feedback-modal.css"></require>
+
+  <modal if.bind="showFeedbackModal"
+         header-text="Feedback"
+         body-style="max-height: 450px; overflow: scroll;">
+  <template replace-part="modal-body">
+    <div>
+      What problems did you encounter while working with the BPMN Studio?
+      <textarea type="text" class="props-input-textarea" aria-multiline="true" value.bind="bugs"></textarea>
+    </div>
+    <div>
+      Do you have any suggestions for improvements?
+      <textarea type="text" class="props-input-textarea" aria-multiline="true" value.bind="suggestions"></textarea>
+    </div>
+    <div>
+      <input type="checkbox" class="feedback-modal__checkbox" checked.bind="attachInternalDatabases"/> Attach internal ProcessEngines databases (if you have a problem with deployed diagrams this is probably helpful)
+    </div>
+    <div>
+      <input type="checkbox" class="feedback-modal__checkbox" checked.bind="showProcessModelSelection"/> Attach any diagrams
+    </div>
+    <div if.bind="showProcessModelSelection">
+     <div repeat.for="solution of solutions">
+      <div class="feedback-modal__solution-title" click.delegate="toggleSolutionVisiblity(solution.name)">
+        <i class="fas" class.bind="showSolutionList[solution.name] ? 'fa-angle-down' : 'fa-angle-right'"></i> ${solution.name}
+      </div>
+      <div show.bind="showSolutionList[solution.name]" repeat.for="diagram of solution.diagrams">
+        <input type="checkbox" class="feedback-modal__checkbox" checked.bind="selectedDiagrams[diagram.uri]"/> ${diagram.name}
+      </div>
+     </div>
+     Is there any additional information needed for the attached diagrams?
+     <textarea type="text" class="props-input-textarea" aria-multiline="true" value.bind="additionalDiagramInformation"></textarea>
+    </div>
+  </template>
+  <template replace-part="modal-footer">
+    <button type="button" class="btn btn-default" data-dismiss="modal" click.delegate="abort()">Abbrechen</button>
+    <button type="button" class="btn btn-primary" data-dismiss="modal" click.delegate="sendFeedback()">Senden</button>
+  </template>
+  </modal>
+</template>

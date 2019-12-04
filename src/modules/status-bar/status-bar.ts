@@ -221,6 +221,10 @@ export class StatusBar {
     this.updateStarted = false;
   }
 
+  public showFeedbackModal(): void {
+    this.eventAggregator.publish(environment.events.showFeedbackModal, true);
+  }
+
   private refreshRightButtons(): void {
     const currentView: string = this.router.currentInstruction.params.view;
     switch (currentView) {

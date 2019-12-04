@@ -7,6 +7,7 @@ export * from './diffview/index';
 export * from './dynamic-ui/index';
 export * from './eventbus/index';
 export * from './exportService/index';
+export * from './feedback/index';
 export * from './file-input-event/index';
 export * from './notification/index';
 export * from './print/index';
