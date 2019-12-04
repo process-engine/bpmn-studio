@@ -14,6 +14,7 @@ import {getBeautifiedDate} from '../../../services/date-service/date.service';
 import {IDashboardService} from '../dashboard/contracts';
 import {processEngineSupportsCronjobEvents} from '../../../services/process-engine-version-module/process-engine-version.module';
 import {Pagination} from '../../pagination/pagination';
+import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 
 @inject('DashboardService', 'SolutionService')
 export class CronjobList {
@@ -37,6 +38,8 @@ export class CronjobList {
   private identitiyUsedForSubscriptions: IIdentity;
   private solutionService: ISolutionService;
 
+  private solutionEventListenerId: string;
+
   private updatePromise: any;
 
   constructor(dashboardService: IDashboardService, solutionService: ISolutionService) {
@@ -44,7 +47,10 @@ export class CronjobList {
     this.solutionService = solutionService;
   }
 
-  public async activeSolutionEntryChanged(newSolutionEntry: ISolutionEntry): Promise<void> {
+  public async activeSolutionEntryChanged(
+    newSolutionEntry: ISolutionEntry,
+    previousActiveSolutionEntry: ISolutionEntry,
+  ): Promise<void> {
     if (!newSolutionEntry.uri.includes('http')) {
       return;
     }
@@ -67,6 +73,14 @@ export class CronjobList {
       this.startPolling();
     }
 
+    if (this.solutionEventListenerId !== undefined) {
+      previousActiveSolutionEntry.service.unwatchSolution(this.solutionEventListenerId);
+    }
+
+    this.solutionEventListenerId = this.activeSolutionEntry.service.watchSolution(() => {
+      this.updateCronjobs();
+    });
+
     this.cronjobsToDisplay = [];
     this.initialLoadingFinished = false;
     this.showError = false;
@@ -83,7 +97,7 @@ export class CronjobList {
 
     const activeSolutionUriIsNotSet: boolean =
       this.activeSolutionEntry === undefined || this.activeSolutionEntry.uri === undefined;
-    const activeSolutionUriIsNotRemote: boolean = !this.activeSolutionEntry.uri.startsWith('http');
+    const activeSolutionUriIsNotRemote: boolean = !solutionIsRemoteSolution(this.activeSolutionEntry.uri);
 
     if (activeSolutionUriIsNotSet || activeSolutionUriIsNotRemote) {
       const activeSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
@@ -118,6 +132,12 @@ export class CronjobList {
         }
       }),
     ];
+
+    if (this.solutionEventListenerId === undefined) {
+      this.solutionEventListenerId = this.activeSolutionEntry.service.watchSolution(() => {
+        this.updateCronjobs();
+      });
+    }
   }
 
   public async detached(): Promise<void> {
@@ -127,6 +147,10 @@ export class CronjobList {
 
     this.isAttached = false;
     this.stopPolling();
+
+    if (this.solutionEventListenerId !== undefined) {
+      this.activeSolutionEntry.service.unwatchSolution(this.solutionEventListenerId);
+    }
 
     this.removeRuntimeSubscriptions();
   }

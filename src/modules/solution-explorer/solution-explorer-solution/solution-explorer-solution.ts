@@ -31,6 +31,8 @@ import {DeleteDiagramModal} from './delete-diagram-modal/delete-diagram-modal';
 import {DeployDiagramService} from '../../../services/deploy-diagram-service/deploy-diagram.service';
 import {SaveDiagramService} from '../../../services/save-diagram-service/save-diagram.service';
 import {HttpFetchClient} from '../../fetch-http-client/http-fetch-client';
+import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
+import {isRunningInElectron} from '../../../services/is-running-in-electron-module/is-running-in-electron.module';
 
 const ENTER_KEY: string = 'Enter';
 const ESCAPE_KEY: string = 'Escape';
@@ -73,7 +75,9 @@ export class SolutionExplorerSolution {
   @bindable public solutionService: ISolutionExplorerService;
   @bindable public openDiagramService: OpenDiagramsSolutionExplorerService;
   @bindable @observable public displayedSolutionEntry: ISolutionEntry;
-  @bindable public fontAwesomeIconClass: string;
+  @bindable public cssIconClass: string;
+  @bindable public isConnected: boolean;
+  @bindable public tooltipText: string;
   public createNewDiagramInput: HTMLInputElement;
   public diagramContextMenu: HTMLElement;
   public showContextMenu: boolean = false;
@@ -101,6 +105,8 @@ export class SolutionExplorerSolution {
     currentDiagramInputValue: undefined,
     isCreateDiagramInputShown: false,
   };
+
+  private solutionEventListenerId: string;
 
   private diagramStateList: Array<IDiagramStateListEntry>;
 
@@ -159,11 +165,11 @@ export class SolutionExplorerSolution {
 
   public async attached(): Promise<void> {
     this.isAttached = true;
-    if ((window as any).nodeRequire) {
+    if (isRunningInElectron()) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
     }
 
-    this.originalIconClass = this.fontAwesomeIconClass;
+    this.originalIconClass = this.cssIconClass;
     this.updateSolutionExplorer();
 
     this.subscriptions = [
@@ -173,11 +179,21 @@ export class SolutionExplorerSolution {
       this.eventAggregator.subscribe(AuthenticationStateEvent.LOGIN, async () => {
         await this.updateSolution();
 
-        this.startPolling();
+        if (this.solutionEventListenerId !== undefined) {
+          this.displayedSolutionEntry.service.unwatchSolution(this.solutionEventListenerId);
+        }
+
+        this.solutionEventListenerId = this.displayedSolutionEntry.service.watchSolution(() => {
+          this.updateSolution();
+        });
       }),
+      this.eventAggregator.subscribe(
+        environment.events.solutionExplorer.closeAllOpenDiagrams,
+        this.closeAllDiagramsEventFunction,
+      ),
     ];
 
-    if (this.displayedSolutionEntry.isOpenDiagramService) {
+    if (this.displayedSolutionEntry.isOpenDiagram) {
       const updateSubscription: Subscription = this.eventAggregator.subscribe(
         environment.events.solutionExplorer.updateOpenDiagrams,
         (): void => {
@@ -187,19 +203,18 @@ export class SolutionExplorerSolution {
 
       this.subscriptions.push(updateSubscription);
 
-      if ((window as any).nodeRequire) {
+      if (isRunningInElectron()) {
         this.ipcRenderer.on('menubar__start_close_diagram', this.closeDiagramEventFunction);
         this.ipcRenderer.on('menubar__start_close_all_diagrams', this.closeAllDiagramsEventFunction);
         this.ipcRenderer.on('menubar__start_save_all_diagrams', this.saveAllDiagramsEventFunction);
       }
     }
 
-    const solutionIsRemoteSolution: boolean = this.displayedSolutionEntry.uri.startsWith('http');
-    if (solutionIsRemoteSolution && (window as any).nodeRequire) {
+    if (solutionIsRemoteSolution(this.displayedSolutionEntry.uri) && isRunningInElectron()) {
       this.ipcRenderer.on('menubar__start_close_diagram', this.closeDiagramEventFunction);
     }
 
-    if (this.displayedSolutionEntry.uri.startsWith('http')) {
+    if (solutionIsRemoteSolution(this.displayedSolutionEntry.uri)) {
       await this.waitForProcessEngine();
     } else {
       this.processEngineRunning = true;
@@ -207,8 +222,13 @@ export class SolutionExplorerSolution {
 
       setTimeout(async () => {
         await this.updateSolution();
-        this.startPolling();
       }, 0);
+
+      if (!this.displayedSolutionEntry.isOpenDiagram) {
+        this.solutionEventListenerId = this.displayedSolutionEntry.service.watchSolution(() => {
+          this.updateSolution();
+        });
+      }
     }
   }
 
@@ -232,7 +252,9 @@ export class SolutionExplorerSolution {
 
             await this.updateSolution();
 
-            this.startPolling();
+            this.solutionEventListenerId = this.displayedSolutionEntry.service.watchSolution(() => {
+              this.updateSolution();
+            });
 
             resolve(true);
           } catch (error) {
@@ -261,13 +283,17 @@ export class SolutionExplorerSolution {
       this.resetDiagramRenaming();
     }
 
-    if (this.displayedSolutionEntry.isOpenDiagramService) {
+    if (this.displayedSolutionEntry.isOpenDiagram) {
       this.ipcRenderer.removeListener('menubar__start_close_diagram', this.closeDiagramEventFunction);
       this.ipcRenderer.removeListener('menubar__start_close_all_diagrams', this.closeAllDiagramsEventFunction);
       this.ipcRenderer.removeListener('menubar__start_save_all_diagrams', this.saveAllDiagramsEventFunction);
     }
 
     this.openDiagramStateService.removeOnDiagramStatesChangedListener(this.diagramStatesChangedCallbackId);
+
+    if (this.solutionEventListenerId !== undefined) {
+      this.displayedSolutionEntry.service.unwatchSolution(this.solutionEventListenerId);
+    }
   }
 
   public async showDeleteDiagramModal(diagram: IDiagram, event: Event): Promise<void> {
@@ -305,17 +331,19 @@ export class SolutionExplorerSolution {
       this.openedSolution = await this.solutionService.loadSolution();
 
       await this.updateSolutionEntry();
-      const updatedDiagramList: Array<IDiagram> = this.displayedSolutionEntry.isOpenDiagramService
+      const updatedDiagramList: Array<IDiagram> = this.displayedSolutionEntry.isOpenDiagram
         ? this.openedSolution.diagrams
         : this.openedSolution.diagrams.sort(this.diagramSorter);
 
       const diagramsOfSolutionChanged: boolean =
-        this.sortedDiagramsOfSolutions.toString() !== updatedDiagramList.toString();
+        JSON.stringify(this.sortedDiagramsOfSolutions) !== JSON.stringify(updatedDiagramList);
       if (diagramsOfSolutionChanged) {
         this.refreshDisplayedDiagrams();
       }
 
-      this.fontAwesomeIconClass = this.originalIconClass;
+      this.isConnected = true;
+      this.cssIconClass = this.originalIconClass;
+      this.tooltipText = '';
       this.processEngineRunning = true;
     } catch (error) {
       // In the future we can maybe display a small icon indicating the error.
@@ -324,7 +352,6 @@ export class SolutionExplorerSolution {
 
         this.sortedDiagramsOfSolutions = [];
         this.openedSolution = undefined;
-        this.stopPolling();
       } else if (isError(error, ForbiddenError)) {
         this.notificationService.showNotification(
           NotificationType.ERROR,
@@ -333,17 +360,25 @@ export class SolutionExplorerSolution {
 
         this.sortedDiagramsOfSolutions = [];
         this.openedSolution = undefined;
-        this.stopPolling();
       } else {
         this.openedSolution.diagrams = undefined;
-        this.fontAwesomeIconClass = 'fa-bolt';
+        this.sortedDiagramsOfSolutions = [];
+
+        this.cssIconClass = 'fa fa-bolt';
+        this.isConnected = false;
+        if (solutionIsRemoteSolution(this.displayedSolutionEntry.uri)) {
+          this.tooltipText = 'ProcessEngine is disconnected!';
+        } else {
+          this.tooltipText = 'Solution was removed!';
+        }
+
         this.processEngineRunning = false;
       }
     }
   }
 
   private async updateSolutionEntry(): Promise<void> {
-    const solutionIsNotRemote: boolean = !this.displayedSolutionEntry.uri.startsWith('http');
+    const solutionIsNotRemote: boolean = !solutionIsRemoteSolution(this.displayedSolutionEntry.uri);
     if (solutionIsNotRemote) {
       return;
     }
@@ -543,7 +578,7 @@ export class SolutionExplorerSolution {
       return;
     }
 
-    if (this.displayedSolutionEntry.isOpenDiagramService) {
+    if (this.displayedSolutionEntry.isOpenDiagram) {
       this.openNewDiagram();
 
       return;
@@ -585,10 +620,10 @@ export class SolutionExplorerSolution {
     return false;
   }
 
-  @computedFrom('displayedSolutionEntry.isOpenDiagramService', 'openedSolution')
+  @computedFrom('displayedSolutionEntry.isOpenDiagram', 'openedSolution')
   public get canRenameDiagram(): boolean {
     return (
-      !this.displayedSolutionEntry.isOpenDiagramService &&
+      !this.displayedSolutionEntry.isOpenDiagram &&
       this.openedSolution &&
       !this.isUriFromRemoteSolution(this.openedSolution.uri)
     );
@@ -609,11 +644,14 @@ export class SolutionExplorerSolution {
   }
 
   public canDeleteDiagram(): boolean {
-    return !this.displayedSolutionEntry.isOpenDiagramService && this.openedSolution !== undefined;
+    return !this.displayedSolutionEntry.isOpenDiagram && this.openedSolution !== undefined;
   }
 
   public get solutionIsNotLoaded(): boolean {
-    return this.openedSolution === null || this.openedSolution === undefined || !this.processEngineRunning;
+    return (
+      solutionIsRemoteSolution(this.displayedSolutionEntry.uri) &&
+      (this.openedSolution === null || this.openedSolution === undefined || !this.processEngineRunning)
+    );
   }
 
   public get openedDiagrams(): Array<IDiagram> {
@@ -692,8 +730,7 @@ export class SolutionExplorerSolution {
       return;
     }
 
-    const solutionIsRemoteSolution: boolean = this.displayedSolutionEntry.uri.startsWith('http');
-    if (solutionIsRemoteSolution) {
+    if (solutionIsRemoteSolution(this.displayedSolutionEntry.uri)) {
       this.router.navigateToRoute('start-page');
     } else {
       this.closeDiagram(this.activeDiagram);
@@ -787,32 +824,6 @@ export class SolutionExplorerSolution {
   private saveAllDiagramsEventFunction: Function = (): void => {
     this.saveAllUnsavedDiagrams();
   };
-
-  private startPolling(): void {
-    if (this.displayedSolutionEntry.isOpenDiagramService) {
-      return;
-    }
-
-    this.isPolling = true;
-
-    this.refreshTimeoutTask = setTimeout(async () => {
-      await this.updateSolution();
-
-      if (this.isAttached && this.isPolling) {
-        this.startPolling();
-      }
-    }, environment.processengine.solutionExplorerPollingIntervalInMs);
-  }
-
-  private stopPolling(): void {
-    if (this.displayedSolutionEntry.isOpenDiagramService) {
-      return;
-    }
-
-    this.isPolling = false;
-
-    clearTimeout(this.refreshTimeoutTask);
-  }
 
   // TODO: This method is copied all over the place.
   private async navigateToDetailView(diagram: IDiagram): Promise<void> {
@@ -925,7 +936,7 @@ export class SolutionExplorerSolution {
   }
 
   private refreshDisplayedDiagrams(): void {
-    this.sortedDiagramsOfSolutions = this.displayedSolutionEntry.isOpenDiagramService
+    this.sortedDiagramsOfSolutions = this.displayedSolutionEntry.isOpenDiagram
       ? this.openedSolution.diagrams
       : this.openedSolution.diagrams.sort(this.diagramSorter);
   }
@@ -1427,8 +1438,7 @@ export class SolutionExplorerSolution {
         this.activeDiagram = activeSolution.diagrams.find((diagram: IDiagram) => {
           const currentDiagramIsGivenDiagram: boolean = diagram.uri === diagramUri;
 
-          const solutionIsRemoteSolution: boolean = solutionUri.startsWith('http');
-          const diagramIsInGivenSolution: boolean = solutionIsRemoteSolution
+          const diagramIsInGivenSolution: boolean = solutionIsRemoteSolution(solutionUri)
             ? diagram.uri.includes(solutionUri)
             : diagram.uri.includes(`${solutionUri}/${diagram.name}.bpmn`);
 
@@ -1489,12 +1499,11 @@ export class SolutionExplorerSolution {
         await this.updateSolution();
 
         const isRemoteSolution: boolean = this.isUriFromRemoteSolution(this.openedSolution.uri);
-        const isRunningInElectron: boolean = (window as any).nodeRequire;
 
         let expectedDiagramUri: string;
         if (isRemoteSolution) {
           expectedDiagramUri = `${this.openedSolution.uri}/${input}.bpmn`;
-        } else if (isRunningInElectron) {
+        } else if (isRunningInElectron()) {
           expectedDiagramUri = join(this.openedSolution.uri, `${input}.bpmn`);
         }
 
@@ -1508,6 +1517,6 @@ export class SolutionExplorerSolution {
   }
 
   private isUriFromRemoteSolution(uri: string): boolean {
-    return uri.startsWith('http');
+    return solutionIsRemoteSolution(uri);
   }
 }

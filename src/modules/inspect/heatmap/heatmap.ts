@@ -14,6 +14,7 @@ import {
 } from '../../../contracts/index';
 
 import {IFlowNodeAssociation, IHeatmapService} from './contracts';
+import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 
 @inject('HeatmapService')
 export class Heatmap {
@@ -60,7 +61,7 @@ export class Heatmap {
       return;
     }
 
-    const diagramIsNoRemoteDiagram: boolean = !this.activeDiagram.uri.startsWith('http');
+    const diagramIsNoRemoteDiagram: boolean = !solutionIsRemoteSolution(this.activeDiagram.uri);
     if (diagramIsNoRemoteDiagram) {
       this.noRuntimeInformation = true;
       return;

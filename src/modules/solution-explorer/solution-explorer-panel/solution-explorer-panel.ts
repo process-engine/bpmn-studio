@@ -21,6 +21,8 @@ import {SolutionExplorerList} from '../solution-explorer-list/solution-explorer-
 
 import {getPortListByVersion} from '../../../services/default-ports-module/default-ports.module';
 import {HttpFetchClient} from '../../fetch-http-client/http-fetch-client';
+import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
+import {isRunningInElectron} from '../../../services/is-running-in-electron-module/is-running-in-electron.module';
 
 type RemoteSolutionListEntry = {
   uri: string;
@@ -78,9 +80,92 @@ export class SolutionExplorerPanel {
     this.solutionService = solutionService;
     this.httpFetchClient = httpFetchClient;
 
-    if (this.canReadFromFileSystem()) {
+    if (isRunningInElectron()) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
     }
+  }
+
+  public get canReadFromFileSystem(): boolean {
+    return isRunningInElectron();
+  }
+
+  public get connectionErrorExists(): boolean {
+    return this.connectionError !== undefined;
+  }
+
+  public get remoteSolutionHistoryWithStatus(): Array<RemoteSolutionListEntry> {
+    return this.loadRemoteSolutionHistory()
+      .reverse()
+      .map((solutionUri: string) => {
+        return {
+          uri: solutionUri,
+          status: this.remoteSolutionHistoryStatus.get(solutionUri),
+        };
+      });
+  }
+
+  @computedFrom('availableDefaultRemoteSolutions.length', 'remoteSolutionHistoryWithStatus.length')
+  public get suggestedRemoteSolutions(): Array<RemoteSolutionListEntry> {
+    const filteredRemoteSolutionHistory: Array<RemoteSolutionListEntry> = this.remoteSolutionHistoryWithStatus.filter(
+      (remoteSolution: RemoteSolutionListEntry) => {
+        const remoteSolutionIsDefaultRemoteSolution: boolean = this.availableDefaultRemoteSolutions.some(
+          (defaultRemoteSolution: RemoteSolutionListEntry) => {
+            return defaultRemoteSolution.uri === remoteSolution.uri;
+          },
+        );
+
+        return !remoteSolutionIsDefaultRemoteSolution;
+      },
+    );
+
+    const suggestedRemoteSolutions: Array<RemoteSolutionListEntry> = [
+      ...this.availableDefaultRemoteSolutions,
+      ...filteredRemoteSolutionHistory,
+    ];
+
+    return suggestedRemoteSolutions;
+  }
+
+  @computedFrom('suggestedRemoteSolutions.length')
+  public get unconnectedSuggestedRemoteSolutions(): Array<RemoteSolutionListEntry> {
+    const connectedSolutions: Array<ISolutionEntry> = this.solutionService.getAllSolutionEntries();
+
+    const unconnectedSuggestedRemoteSolutions: Array<RemoteSolutionListEntry> = this.suggestedRemoteSolutions.filter(
+      (remoteSolution) => {
+        return !connectedSolutions.some((connectedSolution: ISolutionEntry) => {
+          return connectedSolution.uri === remoteSolution.uri;
+        });
+      },
+    );
+
+    return unconnectedSuggestedRemoteSolutions;
+  }
+
+  @computedFrom('unconnectedSuggestedRemoteSolutions.length')
+  public get unconnectedSuggestedRemoteSolutionsExist(): boolean {
+    return this.unconnectedSuggestedRemoteSolutions.length > 0;
+  }
+
+  public get uriOfRemoteSolution(): string {
+    return `${this.selectedProtocol}${this.uriOfRemoteSolutionWithoutProtocol}`;
+  }
+
+  public get uriIsEmpty(): boolean {
+    const uriIsEmtpy: boolean =
+      this.uriOfRemoteSolutionWithoutProtocol === undefined || this.uriOfRemoteSolutionWithoutProtocol.length === 0;
+
+    return uriIsEmtpy;
+  }
+
+  public get uriIsValid(): boolean {
+    /**
+     * This RegEx checks if the entered URI is valid or not.
+     */
+    // TODO Check if this still works
+    const urlRegEx: RegExp = /^(?:http(s)?:\/\/)+[\w.-]?[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/g;
+    const uriIsValid: boolean = urlRegEx.test(this.uriOfRemoteSolution);
+
+    return uriIsValid;
   }
 
   public async bind(): Promise<void> {
@@ -132,7 +217,7 @@ export class SolutionExplorerPanel {
   }
 
   public async attached(): Promise<void> {
-    if (this.canReadFromFileSystem()) {
+    if (isRunningInElectron()) {
       this.registerElectronHooks();
       document.addEventListener('drop', this.openDiagramOnDropBehaviour);
     }
@@ -157,7 +242,7 @@ export class SolutionExplorerPanel {
   }
 
   public detached(): void {
-    if (this.canReadFromFileSystem()) {
+    if (isRunningInElectron()) {
       this.removeElectronFileOpeningHooks();
       document.removeEventListener('drop', this.openDiagramOnDropBehaviour);
     }
@@ -224,63 +309,6 @@ export class SolutionExplorerPanel {
     this.closeRemoteSolutionModal();
   }
 
-  public get connectionErrorExists(): boolean {
-    return this.connectionError !== undefined;
-  }
-
-  public get remoteSolutionHistoryWithStatus(): Array<RemoteSolutionListEntry> {
-    return this.loadRemoteSolutionHistory()
-      .reverse()
-      .map((solutionUri: string) => {
-        return {
-          uri: solutionUri,
-          status: this.remoteSolutionHistoryStatus.get(solutionUri),
-        };
-      });
-  }
-
-  @computedFrom('suggestedRemoteSolutions.length')
-  public get unconnectedSuggestedRemoteSolutions(): Array<RemoteSolutionListEntry> {
-    const connectedSolutions: Array<ISolutionEntry> = this.solutionService.getAllSolutionEntries();
-
-    const unconnectedSuggestedRemoteSolutions: Array<RemoteSolutionListEntry> = this.suggestedRemoteSolutions.filter(
-      (remoteSolution) => {
-        return !connectedSolutions.some((connectedSolution: ISolutionEntry) => {
-          return connectedSolution.uri === remoteSolution.uri;
-        });
-      },
-    );
-
-    return unconnectedSuggestedRemoteSolutions;
-  }
-
-  @computedFrom('availableDefaultRemoteSolutions.length', 'remoteSolutionHistoryWithStatus.length')
-  public get suggestedRemoteSolutions(): Array<RemoteSolutionListEntry> {
-    const filteredRemoteSolutionHistory: Array<RemoteSolutionListEntry> = this.remoteSolutionHistoryWithStatus.filter(
-      (remoteSolution: RemoteSolutionListEntry) => {
-        const remoteSolutionIsDefaultRemoteSolution: boolean = this.availableDefaultRemoteSolutions.some(
-          (defaultRemoteSolution: RemoteSolutionListEntry) => {
-            return defaultRemoteSolution.uri === remoteSolution.uri;
-          },
-        );
-
-        return !remoteSolutionIsDefaultRemoteSolution;
-      },
-    );
-
-    const suggestedRemoteSolutions: Array<RemoteSolutionListEntry> = [
-      ...this.availableDefaultRemoteSolutions,
-      ...filteredRemoteSolutionHistory,
-    ];
-
-    return suggestedRemoteSolutions;
-  }
-
-  @computedFrom('unconnectedSuggestedRemoteSolutions.length')
-  public get unconnectedSuggestedRemoteSolutionsExist(): boolean {
-    return this.unconnectedSuggestedRemoteSolutions.length > 0;
-  }
-
   /**
    * Handles the file input for the FileSystem Solutions.
    * @param event A event that holds the files that were "uploaded" by the user.
@@ -306,7 +334,7 @@ export class SolutionExplorerPanel {
   }
 
   public async openDiagram(): Promise<void> {
-    const canNotReadFromFileSystem: boolean = !this.canReadFromFileSystem();
+    const canNotReadFromFileSystem: boolean = !isRunningInElectron();
     if (canNotReadFromFileSystem) {
       this.openDiagramInput.click();
 
@@ -327,30 +355,8 @@ export class SolutionExplorerPanel {
     });
   }
 
-  public get uriOfRemoteSolution(): string {
-    return `${this.selectedProtocol}${this.uriOfRemoteSolutionWithoutProtocol}`;
-  }
-
-  public get uriIsValid(): boolean {
-    /**
-     * This RegEx checks if the entered URI is valid or not.
-     */
-    // TODO Check if this still works
-    const urlRegEx: RegExp = /^(?:http(s)?:\/\/)+[\w.-]?[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/g;
-    const uriIsValid: boolean = urlRegEx.test(this.uriOfRemoteSolution);
-
-    return uriIsValid;
-  }
-
-  public get uriIsEmpty(): boolean {
-    const uriIsEmtpy: boolean =
-      this.uriOfRemoteSolutionWithoutProtocol === undefined || this.uriOfRemoteSolutionWithoutProtocol.length === 0;
-
-    return uriIsEmtpy;
-  }
-
   public async openSolution(): Promise<void> {
-    const canNotReadFromFileSystem: boolean = !this.canReadFromFileSystem();
+    const canNotReadFromFileSystem: boolean = !isRunningInElectron();
     if (canNotReadFromFileSystem) {
       this.solutionInput.click();
 
@@ -398,10 +404,6 @@ export class SolutionExplorerPanel {
       default:
         return 'Development';
     }
-  }
-
-  public canReadFromFileSystem(): boolean {
-    return (window as any).nodeRequire;
   }
 
   public selectRemoteSolution(remoteSolutionUri: string): void {
@@ -639,7 +641,7 @@ export class SolutionExplorerPanel {
     const activeSolution: ISolutionEntry = this.solutionService.getSolutionEntryForUri(activeSolutionUri);
 
     const activeSolutionCanCreateDiagrams: boolean =
-      activeSolution !== undefined && !activeSolution.uri.startsWith('http');
+      activeSolution !== undefined && !solutionIsRemoteSolution(activeSolution.uri);
 
     const uri: string = activeSolutionCanCreateDiagrams ? activeSolutionUri : 'about:open-diagrams';
 

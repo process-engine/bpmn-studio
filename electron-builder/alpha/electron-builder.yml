@@ -5,6 +5,7 @@ directories:
 extraFiles:
   - filter:
       - build/**
+      - config/**
 extraResources:
   - filter:
       - node_modules/@process-engine/process_engine_runtime/config/**/*

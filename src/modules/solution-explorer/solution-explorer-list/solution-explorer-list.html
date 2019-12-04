@@ -8,18 +8,18 @@
       <div repeat.for="solutionEntry of openedSolutionsToDisplay" class="solution-entry">
 
         <div class="solution-entry__header" title.bind="solutionEntry.processEngineVersion ? `${solutionEntry.uri} | Version: ${solutionEntry.processEngineVersion}` : solutionEntry.uri">
-             
+
         <div class="solution-entry__collapse-header" click.delegate="toggleSolution(solutionEntry)">
 
           <div class="solution-entry__left-icon_and_name">
 
             <i if.bind="solutionEntry.hidden" class="fas fa-angle-right collapse__icon" title="Expand Solution"></i>
             <i if.bind="!solutionEntry.hidden" class="fas fa-angle-down collapse__icon" title="Collapse Solution"></i>
-  
-            <i class="fa ${solutionEntry.fontAwesomeIconClass} solution-entry__solution-icon" title.bind="solutionEntry.fontAwesomeIconClass === 'fa-bolt' ? 'ProcessEngine Disconnected!' : ''"></i>
-    
-            <i if.bind="solutionEntry.uri.startsWith('http') && isProcessEngineNewerThanInternal(solutionEntry) & signal:'update-version-icon'" class="fas fa-info-circle version-info version-info--new" click.capture="showNewerModal($event)" title="ProcessEngine is newer. Click to show more information."></i>
-            <i if.bind="solutionEntry.uri.startsWith('http') && isProcessEngineOlderThanInternal(solutionEntry) & signal:'update-version-icon'" class="fas fa-info-circle version-info version-info--old" click.capture="showOlderModal($event)" title="ProcessEngine is outdated. Click to show more information."></i>
+
+            <i class="${solutionEntry.cssIconClass} solution-entry__solution-icon" title.bind="solutionEntry.tooltipText"></i>
+
+            <i if.bind="checkIfSolutionIsRemoteSolution(solutionEntry.uri) && isProcessEngineNewerThanInternal(solutionEntry) & signal:'update-version-icon'" class="fas fa-info-circle version-info version-info--new" click.capture="showNewerModal($event)" title="ProcessEngine is newer. Click to show more information."></i>
+            <i if.bind="checkIfSolutionIsRemoteSolution(solutionEntry.uri) && isProcessEngineOlderThanInternal(solutionEntry) & signal:'update-version-icon'" class="fas fa-info-circle version-info version-info--old" click.capture="showOlderModal($event)" title="ProcessEngine is outdated. Click to show more information."></i>
 
             <span class="solution-entry__solution-name" data-test-solution-entry-name="${getSolutionName(solutionEntry.uri)}" data-test-solution-is-internal="${solutionIsInternalSolution(solutionEntry)}">${getSolutionName(solutionEntry.uri)}</span>
           </div>
@@ -33,7 +33,7 @@
         </div>
 
 
-          <div class.bind="solutionEntry.uri.startsWith('http') ? 'solution-entry__actions_remote-solution' : 'solution-entry__actions'">
+          <div class.bind="checkIfSolutionIsRemoteSolution(solutionEntry.uri) ? 'solution-entry__actions_remote-solution' : 'solution-entry__actions'">
 
             <button class="button"
               if.bind="solutionIsInternalSolution(solutionEntry)"
@@ -61,8 +61,18 @@
               <i class="fa fa-times"></i>
             </button>
 
+
+            <button
+              class="button"
+              if.bind="solutionEntry.isOpenDiagram"
+              click.delegate="closeAllOpenDiagrams()"
+              title="Close all open diagrams">
+
+              <i class="fa fa-times"></i>
+            </button>
+
             <button class="button login-logout-button"
-              if.bind="solutionEntry.uri.startsWith('http') && !solutionEntry.isLoggedIn"
+              if.bind="checkIfSolutionIsRemoteSolution(solutionEntry.uri) && !solutionEntry.isLoggedIn"
               click.delegate="login(solutionEntry)"
               title="Login to remote solution">
 
@@ -86,7 +96,9 @@
           solution-service.bind="solutionEntry.service"
           open-diagram-service.bind="openDiagramService"
           view-model.ref="solutionEntryViewModels[solutionEntry.uri]"
-          font-awesome-icon-class.two-way="solutionEntry.fontAwesomeIconClass"
+          css-icon-class.two-way="solutionEntry.cssIconClass"
+          is-connected.two-way="solutionEntry.isConnected"
+          tooltip-text.two-way="solutionEntry.tooltipText"
           style.bind="solutionEntry.hidden ? 'display: none;' : 'display: inherit;'">
         </solution-explorer-solution>
       </div>

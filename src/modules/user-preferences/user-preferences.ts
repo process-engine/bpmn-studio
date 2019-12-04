@@ -1,18 +1,22 @@
 import {inject} from 'aurelia-framework';
 
+import {Router} from 'aurelia-router';
 import {NotificationService} from '../../services/notification-service/notification.service';
 import {NotificationType} from '../../contracts/index';
 import {UserConfigService} from '../../services/user-config-service/user-config.service';
 
-@inject('NotificationService', 'UserConfigService')
+@inject('NotificationService', 'UserConfigService', Router)
 export class Preferences {
   public preferences: string;
   private notificationService: NotificationService;
   private userConfigService: UserConfigService;
 
-  constructor(notificationService: NotificationService, userConfigService: UserConfigService) {
+  private router: Router;
+
+  constructor(notificationService: NotificationService, userConfigService: UserConfigService, router: Router) {
     this.notificationService = notificationService;
     this.userConfigService = userConfigService;
+    this.router = router;
   }
 
   public attached(): void {
@@ -34,6 +38,8 @@ export class Preferences {
       });
 
       this.userConfigService.persistUserConfig(customConfig);
+
+      this.router.navigateBack();
     } else {
       this.notificationService.showNotification(
         NotificationType.ERROR,

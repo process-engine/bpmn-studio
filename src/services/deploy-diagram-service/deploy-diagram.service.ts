@@ -8,18 +8,23 @@ import * as bundle from '@process-engine/bpmn-js-custom-bundle';
 import {IModdleElement} from '@process-engine/bpmn-elements_contracts';
 import environment from '../../environment';
 import {SolutionService} from '../solution-service/solution.service';
-import {SaveDiagramService} from '../save-diagram-service/save-diagram.service';
-import {IBpmnModdle, IBpmnModeler, IDefinition, ISolutionEntry, NotificationType} from '../../contracts/index';
+import {
+  DeployResult,
+  IBpmnModdle,
+  IBpmnModeler,
+  IDefinition,
+  ISolutionEntry,
+  NotificationType,
+} from '../../contracts/index';
 import {NotificationService} from '../notification-service/notification.service';
 
-@inject(EventAggregator, 'SolutionService', SaveDiagramService, Router, 'NotificationService')
+@inject(EventAggregator, 'SolutionService', Router, 'NotificationService')
 export class DeployDiagramService {
   private router: Router;
   private eventAggregator: EventAggregator;
   private notificationService: NotificationService;
 
   private solutionService: SolutionService;
-  private saveDiagramService: SaveDiagramService;
 
   private modeler: IBpmnModeler;
   private moddle: IBpmnModdle;
@@ -27,13 +32,11 @@ export class DeployDiagramService {
   constructor(
     eventAggregator: EventAggregator,
     solutionService: SolutionService,
-    saveDiagramService: SaveDiagramService,
     router: Router,
     notificationService: NotificationService,
   ) {
     this.eventAggregator = eventAggregator;
     this.solutionService = solutionService;
-    this.saveDiagramService = saveDiagramService;
     this.router = router;
     this.notificationService = notificationService;
 
@@ -47,7 +50,7 @@ export class DeployDiagramService {
     this.moddle = this.modeler.get('moddle');
   }
 
-  public async deployDiagram(solution: ISolutionEntry, diagram: IDiagram, xml?: string): Promise<void> {
+  public async deployDiagram(solution: ISolutionEntry, diagram: IDiagram, xml?: string): Promise<DeployResult> {
     const diagramHasChanges: boolean = xml !== undefined;
     if (diagramHasChanges) {
       diagram.xml = xml;
@@ -55,13 +58,13 @@ export class DeployDiagramService {
 
     const remoteSolutionToDeployTo: ISolutionEntry = await this.getRemoteSolutionToDeployTo();
     if (remoteSolutionToDeployTo === undefined) {
-      return;
+      return undefined;
     }
 
-    await this.uploadProcess(remoteSolutionToDeployTo, diagram);
+    return this.uploadProcess(remoteSolutionToDeployTo, diagram);
   }
 
-  private async uploadProcess(solutionToDeployTo: ISolutionEntry, diagram: IDiagram): Promise<void> {
+  private async uploadProcess(solutionToDeployTo: ISolutionEntry, diagram: IDiagram): Promise<DeployResult> {
     const processModelId: string = await this.getProcessModelIdForXml(diagram.xml);
 
     const diagramIsAlreadyDeployed: boolean = await this.diagramIsAlreadyDeployed(solutionToDeployTo, processModelId);
@@ -69,7 +72,7 @@ export class DeployDiagramService {
       const shouldOverwriteDiagram: boolean = await this.shouldOverwriteDiagram();
 
       if (!shouldOverwriteDiagram) {
-        return;
+        return undefined;
       }
     }
 
@@ -93,19 +96,21 @@ export class DeployDiagramService {
 
       const deployedDiagram: IDiagram = await solutionToDeployTo.service.loadDiagram(processModelId);
 
-      this.router.navigateToRoute('design', {
-        diagramName: deployedDiagram.name,
-        solutionUri: solutionToDeployTo.uri,
-      });
-
       this.notificationService.showNotification(
         NotificationType.SUCCESS,
         'Diagram was successfully uploaded to the connected ProcessEngine.',
       );
 
       this.eventAggregator.publish(environment.events.diagramDetail.onDiagramDeployed, processModelId);
+
+      return {
+        diagram: deployedDiagram,
+        solution: solutionToDeployTo,
+      };
     } catch (error) {
       this.notificationService.showNotification(NotificationType.ERROR, `Unable to update diagram: ${error}`);
+
+      return undefined;
     }
   }
 

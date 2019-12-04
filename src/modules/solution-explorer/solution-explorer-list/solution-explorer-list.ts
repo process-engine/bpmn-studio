@@ -23,6 +23,9 @@ import {SolutionExplorerServiceFactory} from '../../../services/solution-explore
 import {SolutionExplorerSolution} from '../solution-explorer-solution/solution-explorer-solution';
 import {exposeFunctionForTesting} from '../../../services/expose-functionality-module/expose-functionality.module';
 import {HttpFetchClient} from '../../fetch-http-client/http-fetch-client';
+import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
+import {isRunningInElectron} from '../../../services/is-running-in-electron-module/is-running-in-electron.module';
+import environment from '../../../environment';
 
 interface IUriToViewModelMap {
   [key: string]: SolutionExplorerSolution;
@@ -47,6 +50,8 @@ export class SolutionExplorerList {
    * This service is also put inside the map.
    */
   public openDiagramService: OpenDiagramsSolutionExplorerService;
+
+  public checkIfSolutionIsRemoteSolution: (solutionUri: string) => boolean = solutionIsRemoteSolution;
 
   /*
    * Keep a seperate map of all viewmodels for the solutions entries.
@@ -87,7 +92,7 @@ export class SolutionExplorerList {
     this.openDiagramService = openDiagramService;
     this.httpFetchClient = httpFetchClient;
 
-    const canReadFromFileSystem: boolean = (window as any).nodeRequire;
+    const canReadFromFileSystem: boolean = isRunningInElectron();
     if (canReadFromFileSystem) {
       this.createOpenDiagramServiceEntry();
     }
@@ -200,7 +205,7 @@ export class SolutionExplorerList {
   public async openSolution(uri: string, insertAtBeginning: boolean = false, identity?: IIdentity): Promise<void> {
     this.solutionsToOpen.push(uri);
 
-    const uriIsRemote: boolean = uri.startsWith('http');
+    const uriIsRemote: boolean = solutionIsRemoteSolution(uri);
 
     let solutionExplorer: ISolutionExplorerService;
 
@@ -447,7 +452,7 @@ export class SolutionExplorerList {
   }
 
   public getSolutionName(solutionUri: string): string {
-    const solutionIsRemote: boolean = solutionUri.startsWith('http');
+    const solutionIsRemote: boolean = solutionIsRemoteSolution(solutionUri);
     if (solutionIsRemote) {
       return solutionUri;
     }
@@ -472,7 +477,7 @@ export class SolutionExplorerList {
   }
 
   public solutionEntryIsRemote(solutionEntry: ISolutionEntry): boolean {
-    return solutionEntry.uri.startsWith('http');
+    return solutionIsRemoteSolution(solutionEntry.uri);
   }
 
   /*
@@ -491,21 +496,25 @@ export class SolutionExplorerList {
 
     const sortedEntries: Array<ISolutionEntry> = filteredEntries.sort(
       (solutionA: ISolutionEntry, solutionB: ISolutionEntry) => {
-        if (solutionA.isOpenDiagramService) {
+        if (solutionA.isOpenDiagram) {
           return -1;
         }
 
         const solutionAIsInternalProcessEngine: boolean =
           solutionA.uri === window.localStorage.getItem('InternalProcessEngineRoute');
-        if (solutionAIsInternalProcessEngine || solutionB.isOpenDiagramService) {
+        if (solutionAIsInternalProcessEngine || solutionB.isOpenDiagram) {
           return 1;
         }
 
-        return solutionA.uri.startsWith('http') && !solutionB.uri.startsWith('http') ? 1 : -1;
+        return solutionIsRemoteSolution(solutionA.uri) && !solutionIsRemoteSolution(solutionB.uri) ? 1 : -1;
       },
     );
 
     return sortedEntries;
+  }
+
+  public closeAllOpenDiagrams(): void {
+    this.eventAggregator.publish(environment.events.solutionExplorer.closeAllOpenDiagrams);
   }
 
   private openingSolutionWasCanceled(solutionUri: string): void {
@@ -539,28 +548,28 @@ export class SolutionExplorerList {
   }
 
   private getFontAwesomeIconForSolution(service: ISolutionExplorerService, uri: string): string {
-    const solutionIsOpenedFromRemote: boolean = uri.startsWith('http');
+    const solutionIsOpenedFromRemote: boolean = solutionIsRemoteSolution(uri);
     if (solutionIsOpenedFromRemote) {
-      return 'fa-database';
+      return 'fa fa-database';
     }
 
     const solutionIsOpenDiagrams: boolean = service === this.openDiagramService;
     if (solutionIsOpenDiagrams) {
-      return 'fa-copy';
+      return 'fa fa-copy';
     }
 
-    return 'fa-folder';
+    return 'fa fa-folder';
   }
 
   private canCreateNewDiagramsInSolution(service: ISolutionExplorerService, uri: string): boolean {
-    const solutionIsNotOpenedFromRemote: boolean = !uri.startsWith('http');
+    const solutionIsNotOpenedFromRemote: boolean = !solutionIsRemoteSolution(uri);
     const solutionIsNotOpenDiagrams: boolean = service !== this.openDiagramService;
 
     return solutionIsNotOpenedFromRemote && solutionIsNotOpenDiagrams;
   }
 
   private canCloseSolution(service: ISolutionExplorerService, uri: string): boolean {
-    const solutionIsNotOpenDiagrams: boolean = !this.isOpenDiagramService(service);
+    const solutionIsNotOpenDiagrams: boolean = !this.isOpenDiagram(service);
 
     const internalProcessEngineRoute: string = window.localStorage.getItem('InternalProcessEngineRoute');
     const solutionIsNotInternalSolution: boolean = uri !== internalProcessEngineRoute;
@@ -568,7 +577,7 @@ export class SolutionExplorerList {
     return solutionIsNotOpenDiagrams && solutionIsNotInternalSolution;
   }
 
-  private isOpenDiagramService(service: ISolutionExplorerService): boolean {
+  private isOpenDiagram(service: ISolutionExplorerService): boolean {
     return service === this.openDiagramService;
   }
 
@@ -605,12 +614,14 @@ export class SolutionExplorerList {
     insertAtBeginning: boolean,
     processEngineVersion?: string,
   ): Promise<void> {
-    const isOpenDiagramService: boolean = this.isOpenDiagramService(service);
-    const fontAwesomeIconClass: string = this.getFontAwesomeIconForSolution(service, uri);
+    const isOpenDiagram: boolean = this.isOpenDiagram(service);
+    const cssIconClass: string = this.getFontAwesomeIconForSolution(service, uri);
     const canCloseSolution: boolean = this.canCloseSolution(service, uri);
     const canCreateNewDiagramsInSolution: boolean = this.canCreateNewDiagramsInSolution(service, uri);
     const authority: string = await this.getAuthorityForSolution(uri);
     const hidden: boolean = this.getHiddenStateForSolutionUri(uri);
+    const tooltipText: string = '';
+    const isConnected: boolean = true;
 
     const authorityIsUndefined: boolean = authority === undefined;
 
@@ -628,10 +639,12 @@ export class SolutionExplorerList {
     const entry: ISolutionEntry = {
       uri,
       service,
-      fontAwesomeIconClass,
+      cssIconClass,
+      tooltipText,
+      isConnected,
       canCloseSolution,
       canCreateNewDiagramsInSolution,
-      isOpenDiagramService,
+      isOpenDiagram,
       identity,
       authority,
       isLoggedIn,
@@ -681,7 +694,7 @@ export class SolutionExplorerList {
   }
 
   private async getAuthorityForSolution(solutionUri: string): Promise<string> {
-    const solutionIsNotRemote: boolean = !solutionUri.startsWith('http');
+    const solutionIsNotRemote: boolean = !solutionIsRemoteSolution(solutionUri);
 
     if (solutionIsNotRemote) {
       return undefined;

@@ -11,7 +11,7 @@
         <div class="solution-explorer-panel__actions">
           <button
             class="button"
-            if.bind="canReadFromFileSystem()"
+            if.bind="canReadFromFileSystem"
             click.delegate="openDiagram()"
             title="Open a diagram">
 
@@ -20,7 +20,7 @@
 
           <button
             class="button"
-            if.bind="canReadFromFileSystem()"
+            if.bind="canReadFromFileSystem"
             click.delegate="openSolution()"
             title="Open a solution">
 
@@ -62,6 +62,11 @@
             </div>
           </div>
           <input type="text" class="form-control" class.bind="uriIsValid || uriIsEmpty ? '' : 'uri-input--invalid'" value.bind="origin.uriOfRemoteSolutionWithoutProtocol" placeholder="Please provide a URI for the remote ProcessEngine" autofocus>
+          <div class="solution-explorer-panel__card__alert alert alert-danger" if.bind="!uriIsValid && !uriIsEmpty" role="alert">
+            <div class="solution-explorer-panel__invalid-uri-message"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> The entered URI is invalid.
+              To make it valid make sure it only contains the following characters: a-Z 0-9 - . _ ~ : / ? # [ ] @ ! $ & ' ( ) * + , ; = .
+            </div>
+          </div>
         </div>
       </form>
       <div if.bind="!isConnecting" class="remote-solution-list" if.bind="unconnectedSuggestedRemoteSolutionsExist">
