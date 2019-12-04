@@ -2,12 +2,9 @@ name: Node CI
 
 on:
   push:
-    branches:    
-      - master      
-      - develop
-      - beta
-      - 'feature/**'
-      - 'release/**'
+    branches:
+      - "*"
+      - "*/*"
 
 jobs:
   prepare_version:
@@ -16,7 +13,7 @@ jobs:
     if: "!contains(github.actor, 'process-engine-ci') || contains(github.actor, 'admin')"
 
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v1
 
     - name: Use Node.js 12.x
       uses: actions/setup-node@v1
@@ -25,7 +22,7 @@ jobs:
 
     - name: Show Actor
       run: echo $ACTOR
-      env: 
+      env:
         ACTOR: ${{ github.actor }}
 
     - name: Install CI Tools
@@ -33,7 +30,7 @@ jobs:
     - name: Prepare version
       run: |
         ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir
-    
+
     - name: Stash package.json
       uses: actions/upload-artifact@master
       with:
@@ -45,8 +42,8 @@ jobs:
     needs: prepare_version
     runs-on: ubuntu-18.04
     steps:
-    - uses: actions/checkout@master
-    
+    - uses: actions/checkout@v1
+
     - name: Unstash package.json
       uses: actions/download-artifact@master
       with:
@@ -65,7 +62,7 @@ jobs:
     needs: prepare_version
     runs-on: ubuntu-18.04
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v1
 
     - name: Unstash package.json
       uses: actions/download-artifact@master
@@ -77,7 +74,7 @@ jobs:
       run: |
         npm ci
         ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
-    - name: Build the Web App 
+    - name: Build the Web App
       run: npm run build
 
     - name: Run the Tests
@@ -95,7 +92,7 @@ jobs:
         path: bpmn-studio.tar.gz
 
     - name: Bundle Web
-      run: | 
+      run: |
         mkdir -p dist_web/dist/web
         cp index.html dist_web/index.html
         cp -r dist/web dist_web/dist
@@ -114,7 +111,7 @@ jobs:
     needs: prepare_version
     runs-on: macOS-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v1
     - name: Use Node.js 12.x
       uses: actions/setup-node@v1
       with:
@@ -125,7 +122,7 @@ jobs:
       with:
         name: package_json
         path: "."
-    
+
     - name: Install npm Dependencies
       run: |
         npm ci
@@ -133,7 +130,7 @@ jobs:
 
     - name: Build the Electron App
       run: npm run electron-build-macos
-      env: 
+      env:
         CSC_LINK: ${{ secrets.CSC_LINK }}
 
     - name: Run the Tests
@@ -173,7 +170,7 @@ jobs:
     needs: prepare_version
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v1
     - name: Use Node.js 12.x
       uses: actions/setup-node@v1
       with:
@@ -184,7 +181,7 @@ jobs:
       with:
         name: package_json
         path: "."
-    
+
     - name: Install npm Dependencies
       run: |
         npm ci
@@ -236,7 +233,7 @@ jobs:
     needs: [build_and_test_linux, build_and_test_macos, build_and_test_windows]
     runs-on: ubuntu-18.04
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v1
     - name: Use Node.js 12.x
       uses: actions/setup-node@v1
       with:
@@ -250,12 +247,12 @@ jobs:
 
     - name: Install CI Tools
       run: npm i @process-engine/ci_tools
-      
+
     - name: Commit and Tag
       run: |
         ./node_modules/.bin/ci_tools commit-and-tag-version --only-on-primary-branches
         ./node_modules/.bin/ci_tools update-github-release --only-on-primary-branches --use-title-and-text-from-git-tag
-      env: 
+      env:
         GH_USER: ${{ secrets.GH_USER }}
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
@@ -264,24 +261,24 @@ jobs:
     needs: prepare_and_tag_version
     runs-on: ubuntu-18.04
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v1
     - name: Use Node.js 12.x
       uses: actions/setup-node@v1
       with:
         node-version: 12.x
-    
+
     - name: Unstash package.json
       uses: actions/download-artifact@master
       with:
         name: package_json
         path: "."
-   
+
     - name: Install CI Tools
       run: npm i @process-engine/ci_tools
 
     - name: Publish npm package
       run: ./node_modules/.bin/ci_tools publish-npm-package --create-tag-from-branch-name
-      env: 
+      env:
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   publish_github:
@@ -291,7 +288,7 @@ jobs:
     if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
 
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v1
 
     - name: Use Node.js 12.x
       uses: actions/setup-node@v1
@@ -351,7 +348,7 @@ jobs:
     if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
 
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v1
 
     - name: Unstash package.json
       uses: actions/download-artifact@master
