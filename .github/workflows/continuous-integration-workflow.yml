@@ -341,6 +341,12 @@ jobs:
         commit: true
         token: ${{ secrets.GH_TOKEN }}
 
+    - name: Publish Releasenotes
+      run: |
+        ./node_modules/.bin/ci_tools publish-releasenotes-on-slack
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_ANNOUNCER_WEBHOOK }}
+
   build_docker:
     name: "Build & Publish Docker Image"
     needs: prepare_and_tag_version
