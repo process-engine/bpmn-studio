@@ -102,8 +102,10 @@ export default {
       showInspectPanel: 'inspectCorrelation:inspectPanel:show',
       showTokenViewer: 'inspectCorrelation:tokenViewer:show',
       showLogViewer: 'inpsectCorrelation:logViewer:show',
+      showProcessInstanceList: 'inspectCorrelation:processInstanceList:show',
       noCorrelationsFound: 'inspectCorrelation:diagramViewer:noCorrelationsFound',
       updateProcessInstances: 'inspectCorrelation:updateProcessInstances',
+      updateCorrelations: 'inspectCorrelation:updateCorrelations',
     },
     solutionExplorer: {
       closeAllOpenDiagrams: 'solutionExplorer:openDiagrams:closeAll',

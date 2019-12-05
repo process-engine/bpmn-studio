@@ -12,16 +12,19 @@ import environment from '../../../environment';
 import {IInspectCorrelationService} from './contracts';
 import {DiagramViewer} from './components/diagram-viewer/diagram-viewer';
 import {InspectPanel} from './components/inspect-panel/inspect-panel';
-import {DEFAULT_PAGESIZE} from './components/inspect-panel/components/correlation-list/correlation-list';
+import {DEFAULT_PAGESIZE} from './components/inspect-panel/components/process-instance-list/process-instance-list';
 import {NotificationService} from '../../../services/notification-service/notification.service';
 
 @inject('InspectCorrelationService', EventAggregator, 'NotificationService')
 export class InspectCorrelation {
+  @bindable public correlations: Array<DataModels.Correlations.Correlation>;
+  @bindable public correlationToSelect: DataModels.Correlations.Correlation;
   @bindable public processInstanceIdToSelect: string;
   @bindable public processInstanceToSelect: DataModels.Correlations.ProcessInstance;
   @bindable public flowNodeToSelect: string;
   @bindable public activeDiagram: IDiagram;
   @bindable public activeSolutionEntry: ISolutionEntry;
+  @bindable public selectedCorrelation: DataModels.Correlations.Correlation;
   @bindable public selectedProcessInstance: DataModels.Correlations.ProcessInstance;
   @bindable public inspectPanelFullscreen: boolean = false;
   @observable public bottomPanelHeight: number = 250;
@@ -29,10 +32,13 @@ export class InspectCorrelation {
   @bindable public diagramViewer: DiagramViewer;
   @bindable public inspectPanel: InspectPanel;
   @bindable public inspectPanelTabToShow: InspectPanelTab;
-  @bindable public totalCount: number;
+  @bindable public totalCorrelationCount: number;
+  @bindable public totalProcessInstanceCount: number;
 
-  public offset: number = 0;
-  public limit: number = DEFAULT_PAGESIZE;
+  public correlationOffset: number = 0;
+  public correlationLimit: number = DEFAULT_PAGESIZE;
+  public processInstanceOffset: number = 0;
+  public processInstanceLimit: number = DEFAULT_PAGESIZE;
 
   public processInstances: Array<DataModels.Correlations.ProcessInstance>;
   public token: string;
@@ -49,7 +55,8 @@ export class InspectCorrelation {
   private notificationService: NotificationService;
   private subscriptions: Array<Subscription>;
 
-  private updatePromise: any;
+  private updateCorrelationPromise: any;
+  private updateProcessInstancePromise: any;
 
   constructor(
     inspectCorrelationService: IInspectCorrelationService,
@@ -63,6 +70,7 @@ export class InspectCorrelation {
 
   public async attached(): Promise<void> {
     this.updateProcessInstances();
+    this.updateCorrelations();
 
     this.eventAggregator.publish(environment.events.statusBar.showInspectCorrelationButtons, true);
 
@@ -82,10 +90,18 @@ export class InspectCorrelation {
 
       this.eventAggregator.subscribe(environment.events.inspectCorrelation.updateProcessInstances, async (payload) => {
         const {offset, limit} = payload;
-        this.offset = offset;
-        this.limit = limit;
+        this.processInstanceOffset = offset;
+        this.processInstanceLimit = limit;
 
         await this.updateProcessInstances();
+      }),
+
+      this.eventAggregator.subscribe(environment.events.inspectCorrelation.updateCorrelations, async (payload) => {
+        const {offset, limit} = payload;
+        this.correlationOffset = offset;
+        this.correlationLimit = limit;
+
+        await this.updateCorrelations();
       }),
     ];
 
@@ -143,6 +159,28 @@ export class InspectCorrelation {
     }
   }
 
+  private async updateCorrelations(): Promise<void> {
+    let correlationList: DataModels.Correlations.CorrelationList;
+
+    try {
+      correlationList = await this.getCorrelationsForProcessModel();
+    } catch (error) {
+      this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
+      this.correlations = [];
+      this.totalCorrelationCount = 0;
+    }
+
+    // https://github.com/process-engine/process_engine_runtime/issues/432
+    if (correlationList && correlationList.totalCount === 0) {
+      this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
+      this.correlations = [];
+      this.totalCorrelationCount = 0;
+    } else if (correlationList) {
+      this.correlations = correlationList.correlations;
+      this.totalCorrelationCount = correlationList.totalCount;
+    }
+  }
+
   private async updateProcessInstances(): Promise<void> {
     if (this.processInstanceIdToSelect) {
       try {
@@ -150,6 +188,11 @@ export class InspectCorrelation {
           this.activeSolutionEntry.identity,
           this.processInstanceIdToSelect,
           this.activeDiagram.id,
+        );
+
+        this.correlationToSelect = await this.inspectCorrelationService.getCorrelationById(
+          this.activeSolutionEntry.identity,
+          this.processInstanceToSelect.correlationId,
         );
       } catch (error) {
         this.notificationService.showNotification(
@@ -162,36 +205,46 @@ export class InspectCorrelation {
     let processInstanceList;
 
     try {
-      processInstanceList = await this.getProcessInstancesForProcessModel();
+      const noCorrelationSelected: boolean = this.selectedCorrelation === undefined;
+      if (noCorrelationSelected) {
+        this.processInstances = [];
+        this.totalProcessInstanceCount = 0;
+        this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
+
+        return;
+      }
+
+      processInstanceList = await this.getProcessInstancesForCorrelation();
     } catch (error) {
       this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
       this.processInstances = [];
-      this.totalCount = 0;
+      this.totalProcessInstanceCount = 0;
     }
 
     // https://github.com/process-engine/process_engine_runtime/issues/432
     if (processInstanceList && processInstanceList.totalCount === 0) {
       this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
       this.processInstances = [];
+      this.totalProcessInstanceCount = 0;
     } else if (processInstanceList) {
       this.processInstances = processInstanceList.processInstances;
-      this.totalCount = processInstanceList.totalCount;
+      this.totalProcessInstanceCount = processInstanceList.totalCount;
     }
   }
 
-  private getProcessInstancesForProcessModel(): Promise<DataModels.Correlations.ProcessInstanceList> {
-    if (this.updatePromise) {
-      this.updatePromise.cancel();
+  private getProcessInstancesForCorrelation(): Promise<DataModels.Correlations.ProcessInstanceList> {
+    if (this.updateProcessInstancePromise) {
+      this.updateProcessInstancePromise.cancel();
     }
 
-    this.updatePromise = new Bluebird.Promise(
+    this.updateProcessInstancePromise = new Bluebird.Promise(
       async (resolve: Function, reject: Function): Promise<any> => {
         try {
-          const processInstances = await this.inspectCorrelationService.getProcessInstancesForProcessModel(
+          const processInstances = await this.inspectCorrelationService.getProcessInstancesForCorrelation(
             this.activeSolutionEntry.identity,
-            this.activeDiagram.id,
-            this.offset,
-            this.limit,
+            this.selectedCorrelation.id,
+            this.processInstanceOffset,
+            this.processInstanceLimit,
           );
 
           resolve(processInstances);
@@ -201,7 +254,32 @@ export class InspectCorrelation {
       },
     );
 
-    return this.updatePromise;
+    return this.updateProcessInstancePromise;
+  }
+
+  private getCorrelationsForProcessModel(): Promise<DataModels.Correlations.CorrelationList> {
+    if (this.updateCorrelationPromise) {
+      this.updateCorrelationPromise.cancel();
+    }
+
+    this.updateCorrelationPromise = new Bluebird.Promise(
+      async (resolve: Function, reject: Function): Promise<any> => {
+        try {
+          const correlations = await this.inspectCorrelationService.getAllCorrelationsForProcessModelId(
+            this.activeSolutionEntry.identity,
+            this.activeDiagram.id,
+            this.correlationOffset,
+            this.correlationLimit,
+          );
+
+          resolve(correlations);
+        } catch (error) {
+          reject(error);
+        }
+      },
+    );
+
+    return this.updateCorrelationPromise;
   }
 
   public detached(): void {
@@ -214,11 +292,23 @@ export class InspectCorrelation {
 
   public async activeDiagramChanged(): Promise<void> {
     if (this.viewIsAttached) {
-      this.offset = 0;
-      this.limit = DEFAULT_PAGESIZE;
+      this.correlationOffset = 0;
+      this.processInstanceOffset = 0;
+
       this.processInstanceIdToSelect = undefined;
       this.processInstanceToSelect = undefined;
+      this.correlationToSelect = undefined;
 
+      this.selectedProcessInstance = undefined;
+      this.selectedCorrelation = undefined;
+
+      this.updateProcessInstances();
+      this.updateCorrelations();
+    }
+  }
+
+  public selectedCorrelationChanged(): void {
+    if (this.viewIsAttached) {
       this.updateProcessInstances();
     }
   }
