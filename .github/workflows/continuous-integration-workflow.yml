@@ -341,7 +341,7 @@ jobs:
         commit: true
         token: ${{ secrets.GH_TOKEN }}
 
-    - name: Publish Releasenotes
+    - name: Announce Releasenotes
       if: contains(github.ref, 'master') || contains(github.ref, 'beta')
       run: |
         ./node_modules/.bin/ci_tools publish-releasenotes-on-slack
