@@ -51,20 +51,24 @@ export class FeedbackModal {
   }
 
   public sendFeedback(): void {
-    const diagramsToAttach: Array<IDiagram> = Object.keys(this.selectedDiagrams).map((diagramUri: string) => {
-      for (const solution of this.solutions) {
-        const diagramSearchResult = solution.diagrams.find((diagram: IDiagram) => {
-          return diagram.uri === diagramUri;
-        });
+    const diagramsToAttach: Array<IDiagram> = Object.keys(this.selectedDiagrams)
+      .filter((diagramUri: string) => {
+        return this.selectedDiagrams[diagramUri];
+      })
+      .map((diagramUri: string) => {
+        for (const solution of this.solutions) {
+          const diagramSearchResult = solution.diagrams.find((diagram: IDiagram) => {
+            return diagram.uri === diagramUri;
+          });
 
-        const diagramFound: boolean = diagramSearchResult !== undefined;
-        if (diagramFound) {
-          return diagramSearchResult;
+          const diagramFound: boolean = diagramSearchResult !== undefined;
+          if (diagramFound) {
+            return diagramSearchResult;
+          }
         }
-      }
 
-      return undefined;
-    });
+        return undefined;
+      });
 
     const feedbackData: FeedbackData = {
       bugs: this.bugs,
