@@ -44,6 +44,10 @@ export class FeedbackModal {
     });
   }
 
+  public get disableSendButton(): boolean {
+    return this.bugs.trim() === '' && this.suggestions.trim() === '' && this.additionalDiagramInformation.trim() === '';
+  }
+
   public showFeedbackModalChanged(): void {
     if (this.showFeedbackModal) {
       this.updateSolutions();
