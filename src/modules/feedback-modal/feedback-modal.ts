@@ -93,23 +93,19 @@ export class FeedbackModal {
   private async updateSolutions(): Promise<void> {
     const solutionEntries: Array<ISolutionEntry> = this.solutionService.getAllSolutionEntries();
 
-    const solutionPromises = solutionEntries.map(
-      async (solutionEntry: ISolutionEntry): Promise<ISolution> => {
-        const loadedSolution: ISolution = await solutionEntry.service.loadSolution();
+    this.solutions = [];
 
-        this.showSolutionList[loadedSolution.name] = true;
+    solutionEntries.forEach(
+      async (solutionEntry: ISolutionEntry): Promise<void> => {
+        const solution: ISolution = await solutionEntry.service.loadSolution();
 
-        return loadedSolution;
+        const solutionContainsDiagrams: boolean = solution.diagrams.length > 0;
+        if (solutionContainsDiagrams) {
+          this.solutions.push(solution);
+          this.showSolutionList[solution.name] = true;
+        }
       },
     );
-
-    const solutions: Array<ISolution> = await Promise.all(solutionPromises);
-
-    const solutionsThatContainDiagrams = solutions.filter((solution: ISolution) => {
-      return solution.diagrams.length !== 0;
-    });
-
-    this.solutions = solutionsThatContainDiagrams;
   }
 
   private cleanupInputs(): void {
