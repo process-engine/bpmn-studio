@@ -27,7 +27,7 @@
 #        versionSpec: '10.x'
 #      displayName: 'Install Node.js'
 #
-#    - script: npm i @process-engine/ci_tools
+#    - script: npm ci
 #      displayName: 'Install CI Tools'
 #
 #    - script: |
@@ -217,7 +217,7 @@
 #        versionSpec: '10.x'
 #      displayName: 'Install Node.js'
 #
-#    - script: npm i @process-engine/ci_tools
+#    - script: npm ci
 #      displayName: 'Install CI Tools'
 #
 #    - download: current
@@ -250,7 +250,7 @@
 #        versionSpec: '10.x'
 #      displayName: 'Install Node.js'
 #
-#    - script: npm i @process-engine/ci_tools
+#    - script: npm ci
 #      displayName: 'Install CI Tools'
 #
 #    - download: current
@@ -280,7 +280,7 @@
 #        versionSpec: '10.x'
 #      displayName: 'Install Node.js'
 #
-#    - script: npm i @process-engine/ci_tools
+#    - script: npm ci
 #      displayName: 'Install CI Tools'
 #
 #    - download: current

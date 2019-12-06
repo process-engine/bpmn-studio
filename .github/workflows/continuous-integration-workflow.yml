@@ -26,7 +26,7 @@ jobs:
         ACTOR: ${{ github.actor }}
 
     - name: Install CI Tools
-      run: npm i @process-engine/ci_tools
+      run: npm ci
     - name: Prepare version
       run: |
         ./node_modules/.bin/ci_tools prepare-version --allow-dirty-workdir
@@ -246,7 +246,7 @@ jobs:
         path: "."
 
     - name: Install CI Tools
-      run: npm i @process-engine/ci_tools
+      run: npm ci
 
     - name: Commit and Tag
       run: |
@@ -274,7 +274,7 @@ jobs:
         path: "."
 
     - name: Install CI Tools
-      run: npm i @process-engine/ci_tools
+      run: npm ci
 
     - name: Publish npm package
       run: ./node_modules/.bin/ci_tools publish-npm-package --create-tag-from-branch-name
@@ -314,7 +314,7 @@ jobs:
         path: "dist/electron"
 
     - name: Install CI Tools
-      run: npm i @process-engine/ci_tools
+      run: npm ci
 
     - name: Upload to GitHub
       run: |
