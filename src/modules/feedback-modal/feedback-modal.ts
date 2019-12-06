@@ -15,7 +15,7 @@ interface ISelectedDiagramList {
   [diagramUri: string]: boolean;
 }
 
-@inject(EventAggregator, 'SolutionService')
+@inject('SolutionService')
 export class FeedbackModal {
   @bindable public showFeedbackModal: boolean;
 
@@ -32,16 +32,16 @@ export class FeedbackModal {
   private solutionService: SolutionService;
   private ipcRenderer: any;
 
-  constructor(eventAggregator: EventAggregator, solutionService: SolutionService) {
+  constructor(solutionService: SolutionService) {
     this.solutionService = solutionService;
 
     if (isRunningInElectron()) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
-    }
 
-    eventAggregator.subscribe(environment.events.showFeedbackModal, (show: boolean): void => {
-      this.showFeedbackModal = show;
-    });
+      this.ipcRenderer.on('show-feedback-modal', () => {
+        this.showFeedbackModal = true;
+      });
+    }
   }
 
   public get disableSendButton(): boolean {

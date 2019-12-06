@@ -33,7 +33,6 @@ export default {
     diagramNeedsToBeUpdated: 'diagramNeedsToBeUpdated',
     xmlChanged: 'xmlChanged',
     diagramWasSaved: 'diagramWasSaved',
-    showFeedbackModal: 'showFeedbackModal',
     deployModals: {
       showRemoteSolutionSelectionModal: 'deployModals:remoteSolutionSelectionModal:show',
       showOverwriteDiagramModal: 'deployModals:overwriteDiagramModal:show',

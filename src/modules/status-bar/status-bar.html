@@ -5,7 +5,6 @@
   -->
   <div class="status-bar status-bar--system-macos" id="statusBarContainer">
     <div class="status-bar__left-bar" id="statusBarLeft">
-      <i class="far fa-comment-dots" click.delegate="showFeedbackModal()"></i>
       <a if.bind="updateAvailable" class="status-bar__button update-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <img class="update-button-icon" src="src/resources/images/icon.png" title.bind="isDownloading ? updateProgressData.percent.toString() + '%' : 'Update available.'">
       </a>

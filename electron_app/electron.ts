@@ -779,6 +779,15 @@ function getHelpMenu(): MenuItem {
         },
       ],
     },
+    {
+      type: 'separator',
+    },
+    {
+      label: 'Feedback',
+      click: (): void => {
+        browserWindow.webContents.send('show-feedback-modal');
+      },
+    },
   ];
 
   const submenu: Menu = electron.Menu.buildFromTemplate(submenuOptions);
