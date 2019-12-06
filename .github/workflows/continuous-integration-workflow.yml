@@ -342,6 +342,7 @@ jobs:
         token: ${{ secrets.GH_TOKEN }}
 
     - name: Publish Releasenotes
+      if: contains(github.ref, 'master') || contains(github.ref, 'beta')
       run: |
         ./node_modules/.bin/ci_tools publish-releasenotes-on-slack
       env:
