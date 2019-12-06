@@ -8,30 +8,37 @@
          body-style="max-height: 80%; overflow: scroll;">
   <template replace-part="modal-body">
     <div>
-      What problems did you experience while working with the BPMN Studio?
-      <textarea type="text" class="props-input-textarea" aria-multiline="true" value.bind="bugs"></textarea>
+      <span class="feedback-modal__input-label">What problems did you experience while working with the BPMN Studio?</span>
+      <textarea type="text" class="props-input-textarea feedback-modal__text-input" aria-multiline="true" value.bind="bugs"></textarea>
     </div>
     <div>
-      Do you have any suggestions for improving the BPMN Studio?
-      <textarea type="text" class="props-input-textarea" aria-multiline="true" value.bind="suggestions"></textarea>
+      <span class="feedback-modal__input-label">Do you have any suggestions for improving the BPMN Studio?</span>
+      <textarea type="text" class="props-input-textarea feedback-modal__text-input" aria-multiline="true" value.bind="suggestions"></textarea>
     </div>
     <div>
-      <input type="checkbox" class="feedback-modal__checkbox" checked.bind="attachInternalDatabases"/> Attach the databases of the internal ProcessEngine <i class="fas fa-info-circle" title="If you have a problem with deployed diagrams, this is probably helpful."></i>
+      <input type="checkbox" class="feedback-modal__checkbox" checked.bind="attachInternalDatabases"/>
+      <span class="feedback-modal__checkbox-label">Attach the databases of the internal ProcessEngine</span>
+      <i class="fas fa-info-circle feedback-modal__help-icon" title="If you have a problem with deployed diagrams, attaching the databases is probably helpful."></i>
     </div>
     <div>
-      <input type="checkbox" class="feedback-modal__checkbox" checked.bind="showProcessModelSelection"/> Attach diagrams
-    </div>
-    <div if.bind="showProcessModelSelection">
-     <div repeat.for="solution of solutions">
-      <div class="feedback-modal__solution-title" click.delegate="toggleSolutionVisiblity(solution.name)">
-        <i class="fas" class.bind="showSolutionList[solution.name] ? 'fa-angle-down' : 'fa-angle-right'"></i> <i class.bind="solution.cssIconClass"></i> ${solution.name}
+      <input type="checkbox" class="feedback-modal__checkbox" checked.bind="showProcessModelSelection"/>
+      <span class="feedback-modal__checkbox-label">Attach diagrams</span>
+      <div if.bind="showProcessModelSelection" class="feedback-modal__diagram-selection">
+        <div repeat.for="solution of solutions" class="feedback-modal__solution">
+          <div class="feedback-modal__solution-title" click.delegate="toggleSolutionVisiblity(solution.name)">
+            <i class="fas feedback-modal__solution-hide-icon" class.bind="showSolutionList[solution.name] ? 'fa-angle-down' : 'fa-angle-right'"></i> <i class.bind="solution.cssIconClass"></i> ${solution.name}
+          </div>
+          <div class="feedback-modal__solution-diagram-list">
+            <div show.bind="showSolutionList[solution.name]" repeat.for="diagram of solution.diagrams" class="feedback-modal__diagram">
+              <input type="checkbox" class="feedback-modal__checkbox feedback-modal__diagram-checkbox" checked.bind="selectedDiagrams[diagram.uri]"/><span class="feedback-modal__diagram-name">${diagram.name}</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div show.bind="showSolutionList[solution.name]" repeat.for="diagram of solution.diagrams">
-        <input type="checkbox" class="feedback-modal__checkbox" checked.bind="selectedDiagrams[diagram.uri]"/> ${diagram.name}
+      <div show.bind="showProcessModelSelection">
+        <span class="feedback-modal__input-label">Is additional information required for the attached diagrams?</span>
+        <textarea type="text" class="props-input-textarea" aria-multiline="true" value.bind="additionalDiagramInformation"></textarea>
       </div>
-     </div>
-     Is additional information required for the attached diagrams?
-     <textarea type="text" class="props-input-textarea" aria-multiline="true" value.bind="additionalDiagramInformation"></textarea>
     </div>
   </template>
   <template replace-part="modal-footer">
