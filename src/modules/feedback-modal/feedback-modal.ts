@@ -5,6 +5,7 @@ import {SolutionService} from '../../services/solution-service/solution.service'
 import {FeedbackData, ISolutionEntry} from '../../contracts';
 import environment from '../../environment';
 import {isRunningInElectron} from '../../services/is-running-in-electron-module/is-running-in-electron.module';
+import {solutionIsRemoteSolution} from '../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 
 interface IShowSolutionList {
   [solutionName: string]: boolean;
@@ -102,11 +103,32 @@ export class FeedbackModal {
         const solutionContainsDiagrams: boolean = solution.diagrams.length > 0;
         if (solutionContainsDiagrams) {
           this.solutions.push(solution);
+
+          this.solutions.sort(this.sortSolutionFunction);
+
           this.showSolutionList[solution.name] = true;
         }
       },
     );
   }
+
+  private sortSolutionFunction = (solutionA: ISolution, solutionB: ISolution): number => {
+    if (solutionA.uri === 'about:open-diagrams') {
+      return -1;
+    }
+
+    if (solutionB.uri === 'about:open-diagrams') {
+      return 1;
+    }
+
+    const solutionAIsRemoteSolution: boolean = solutionIsRemoteSolution(solutionA.uri);
+    const solutionBIsRemoteSolution: boolean = solutionIsRemoteSolution(solutionB.uri);
+    if (solutionAIsRemoteSolution !== solutionBIsRemoteSolution) {
+      return solutionAIsRemoteSolution ? 1 : -1;
+    }
+
+    return solutionA.name < solutionB.name ? -1 : 1;
+  };
 
   private cleanupInputs(): void {
     this.attachInternalDatabases = false;
