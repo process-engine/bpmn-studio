@@ -8,18 +8,18 @@
          body-style="max-height: 80%; overflow: scroll;">
   <template replace-part="modal-body">
     <div>
-      What problems did you encounter while working with the BPMN Studio?
+      What problems did you experience while working with the BPMN Studio?
       <textarea type="text" class="props-input-textarea" aria-multiline="true" value.bind="bugs"></textarea>
     </div>
     <div>
-      Do you have any suggestions for improvements?
+      Do you have any suggestions for improving the BPMN Studio?
       <textarea type="text" class="props-input-textarea" aria-multiline="true" value.bind="suggestions"></textarea>
     </div>
     <div>
-      <input type="checkbox" class="feedback-modal__checkbox" checked.bind="attachInternalDatabases"/> Attach internal ProcessEngines databases (if you have a problem with deployed diagrams this is probably helpful)
+      <input type="checkbox" class="feedback-modal__checkbox" checked.bind="attachInternalDatabases"/> Attach the databases of the internal ProcessEngine (if you have a problem with provided diagrams, this is probably helpful).
     </div>
     <div>
-      <input type="checkbox" class="feedback-modal__checkbox" checked.bind="showProcessModelSelection"/> Attach any diagrams
+      <input type="checkbox" class="feedback-modal__checkbox" checked.bind="showProcessModelSelection"/> Attach diagrams
     </div>
     <div if.bind="showProcessModelSelection">
      <div repeat.for="solution of solutions">
@@ -30,7 +30,7 @@
         <input type="checkbox" class="feedback-modal__checkbox" checked.bind="selectedDiagrams[diagram.uri]"/> ${diagram.name}
       </div>
      </div>
-     Is there any additional information needed for the attached diagrams?
+     Is additional information required for the attached diagrams?
      <textarea type="text" class="props-input-textarea" aria-multiline="true" value.bind="additionalDiagramInformation"></textarea>
     </div>
   </template>
