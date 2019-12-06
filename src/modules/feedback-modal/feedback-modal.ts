@@ -44,7 +44,7 @@ export class FeedbackModal {
     }
   }
 
-  public get disableSendButton(): boolean {
+  public get disableCreateButton(): boolean {
     return this.bugs.trim() === '' && this.suggestions.trim() === '' && this.additionalDiagramInformation.trim() === '';
   }
 
@@ -54,7 +54,7 @@ export class FeedbackModal {
     }
   }
 
-  public sendFeedback(): void {
+  public createFeedback(): void {
     const diagramsToAttach: Array<IDiagram> = Object.keys(this.selectedDiagrams)
       .filter((diagramUri: string) => {
         return this.selectedDiagrams[diagramUri];
