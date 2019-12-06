@@ -99,6 +99,7 @@ export class FeedbackModal {
     solutionEntries.forEach(
       async (solutionEntry: ISolutionEntry): Promise<void> => {
         const solution: ISolution = await solutionEntry.service.loadSolution();
+        (solution as any).cssIconClass = solutionEntry.cssIconClass;
 
         const solutionContainsDiagrams: boolean = solution.diagrams.length > 0;
         if (solutionContainsDiagrams) {

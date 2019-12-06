@@ -22,7 +22,7 @@
     <div if.bind="showProcessModelSelection">
      <div repeat.for="solution of solutions">
       <div class="feedback-modal__solution-title" click.delegate="toggleSolutionVisiblity(solution.name)">
-        <i class="fas" class.bind="showSolutionList[solution.name] ? 'fa-angle-down' : 'fa-angle-right'"></i> ${solution.name}
+        <i class="fas" class.bind="showSolutionList[solution.name] ? 'fa-angle-down' : 'fa-angle-right'"></i> <i class.bind="solution.cssIconClass"></i> ${solution.name}
       </div>
       <div show.bind="showSolutionList[solution.name]" repeat.for="diagram of solution.diagrams">
         <input type="checkbox" class="feedback-modal__checkbox" checked.bind="selectedDiagrams[diagram.uri]"/> ${diagram.name}
