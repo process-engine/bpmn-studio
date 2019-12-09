@@ -40,8 +40,8 @@ export class ProcessInstanceList {
 
   public processInstanceListSortProperty: typeof ProcessInstanceListSortProperty = ProcessInstanceListSortProperty;
   public sortSettings: ProcessInstanceListSortSettings = {
-    ascending: false,
-    sortProperty: undefined,
+    ascending: true,
+    sortProperty: ProcessInstanceListSortProperty.StartedAt,
   };
 
   public selectedTableEntry: ProcessInstanceTableEntry;
@@ -74,6 +74,7 @@ export class ProcessInstanceList {
     }
 
     this.tableData = this.convertProcessInstancesIntoTableData(this.processInstances);
+    this.sortTableData();
 
     const tableDataIsExisiting: boolean = this.tableData.length > 0;
 
@@ -92,15 +93,6 @@ export class ProcessInstanceList {
           : firstTableEntry;
 
       this.selectProcessInstance(processInstanceToSelect);
-    }
-
-    const sortSettingsExisitng: boolean = this.sortSettings.sortProperty !== undefined;
-    if (sortSettingsExisitng) {
-      this.sortSettings.ascending = !this.sortSettings.ascending;
-
-      this.sortedTableData = this.sortList(this.sortSettings.sortProperty);
-    } else {
-      this.sortedTableData = this.tableData;
     }
 
     const processInstanceToSelectExists: boolean = this.processInstanceToSelect !== undefined;
@@ -169,6 +161,16 @@ export class ProcessInstanceList {
     this.eventAggregator.publish(environment.events.inspectCorrelation.updateProcessInstances, payload);
   }
 
+  public changeSortProperty(property: ProcessInstanceListSortProperty): void {
+    const isSameSortPropertyAsBefore: boolean = this.sortSettings.sortProperty === property;
+    const ascending: boolean = isSameSortPropertyAsBefore ? !this.sortSettings.ascending : true;
+
+    this.sortSettings.ascending = ascending;
+    this.sortSettings.sortProperty = property;
+
+    this.sortTableData();
+  }
+
   private convertProcessInstancesIntoTableData(
     processInstances: Array<DataModels.Correlations.ProcessInstance>,
   ): Array<ProcessInstanceTableEntry> {
@@ -187,24 +189,20 @@ export class ProcessInstanceList {
     });
   }
 
-  public sortList(property: ProcessInstanceListSortProperty): Array<ProcessInstanceTableEntry> {
-    const isSameSortPropertyAsBefore: boolean = this.sortSettings.sortProperty === property;
-    const ascending: boolean = isSameSortPropertyAsBefore ? !this.sortSettings.ascending : true;
-
-    this.sortSettings.ascending = ascending;
-    this.sortSettings.sortProperty = property;
-
-    const sortByDate: boolean = property === ProcessInstanceListSortProperty.StartedAt;
+  private sortTableData(): void {
+    const sortByDate: boolean = this.sortSettings.sortProperty === ProcessInstanceListSortProperty.StartedAt;
 
     const sortedTableData: Array<ProcessInstanceTableEntry> = sortByDate
-      ? this.sortListByStartDate()
-      : this.sortListByProperty(property);
+      ? this.sortTableDataByStartDate()
+      : this.sortTableDataByProperty(this.sortSettings.sortProperty);
 
-    return ascending ? sortedTableData : sortedTableData.reverse();
+    this.sortedTableData = this.sortSettings.sortProperty ? sortedTableData : sortedTableData.reverse();
   }
 
-  private sortListByProperty(property: ProcessInstanceListSortProperty): Array<ProcessInstanceTableEntry> {
-    const sortedTableData: Array<ProcessInstanceTableEntry> = this.tableData.sort(
+  private sortTableDataByProperty(property: ProcessInstanceListSortProperty): Array<ProcessInstanceTableEntry> {
+    const copyOfTableData: Array<ProcessInstanceTableEntry> = this.tableData.slice();
+
+    const sortedTableData: Array<ProcessInstanceTableEntry> = copyOfTableData.sort(
       (firstEntry: ProcessInstanceTableEntry, secondEntry: ProcessInstanceTableEntry) => {
         const firstEntryIsBigger: boolean = firstEntry[property] > secondEntry[property];
         if (firstEntryIsBigger) {
@@ -223,8 +221,10 @@ export class ProcessInstanceList {
     return sortedTableData;
   }
 
-  private sortListByStartDate(): Array<ProcessInstanceTableEntry> {
-    const sortedTableData: Array<ProcessInstanceTableEntry> = this.tableData.sort(
+  private sortTableDataByStartDate(): Array<ProcessInstanceTableEntry> {
+    const copyOfTableData: Array<ProcessInstanceTableEntry> = this.tableData.slice();
+
+    const sortedTableData: Array<ProcessInstanceTableEntry> = copyOfTableData.sort(
       (firstEntry: ProcessInstanceTableEntry, secondEntry: ProcessInstanceTableEntry) => {
         const firstProcessInstanceDate: Date = new Date(firstEntry.startedAt);
         const secondProcessInstanceDate: Date = new Date(secondEntry.startedAt);
