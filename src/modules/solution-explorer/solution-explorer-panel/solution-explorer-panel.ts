@@ -284,6 +284,20 @@ export class SolutionExplorerPanel {
     this.connectionError = undefined;
   }
 
+  public uriOfRemoteSolutionWithoutProtocolChanged(): void {
+    if (this.uriOfRemoteSolutionWithoutProtocol === undefined) {
+      return;
+    }
+
+    for (const protocol of Object.values(SupportedProtocols)) {
+      if (this.uriOfRemoteSolutionWithoutProtocol.startsWith(protocol)) {
+        this.uriOfRemoteSolutionWithoutProtocol = this.uriOfRemoteSolutionWithoutProtocol.replace(protocol, '');
+
+        this.selectProtocol(protocol);
+      }
+    }
+  }
+
   public async openRemoteSolution(): Promise<void> {
     if (!this.uriIsValid || this.uriIsEmpty) {
       return;
