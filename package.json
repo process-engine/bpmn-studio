@@ -52,7 +52,7 @@
     "@fortawesome/fontawesome-free": "^5.11.2",
     "@process-engine/bpmn-js-custom-bundle": "~2.7.0",
     "@process-engine/bpmn-lint_rules": "^1.6.2",
-    "@process-engine/ci_tools": "2.3.0-alpha.3",
+    "@process-engine/ci_tools": "2.4.0-alpha.1",
     "@process-engine/dynamic_ui_core": "1.6.0",
     "@process-engine/electron-updater": "1.1.0",
     "@process-engine/management_api_client": "6.2.0",
@@ -92,7 +92,7 @@
   },
   "peerDependencies": {},
   "devDependencies": {
-    "@essential-projects/eslint-config": "^1.1.5",
+    "@essential-projects/eslint-config": "^1.2.3",
     "@essential-projects/http_contracts": "^2.5.0",
     "@essential-projects/iam_contracts": "^3.6.3",
     "@process-engine/bpmn-elements_contracts": "^2.1.0",
@@ -152,7 +152,7 @@
     "through2": "^3.0.1",
     "toastr": "^2.1.4",
     "typescript": "^3.7.3",
-    "uglify-js": "^3.7.1",
+    "uglify-js": "^3.7.2",
     "velocity-animate": "^1.5.2",
     "vinyl-fs": "^3.0.3"
   }
