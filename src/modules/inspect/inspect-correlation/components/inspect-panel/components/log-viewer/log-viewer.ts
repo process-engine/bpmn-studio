@@ -26,8 +26,8 @@ export class LogViewer {
   public logSortProperty: typeof LogSortProperty = LogSortProperty;
   public sortedLog: Array<DataModels.Logging.LogEntry>;
   public sortSettings: ILogSortSettings = {
-    ascending: false,
-    sortProperty: undefined,
+    ascending: true,
+    sortProperty: LogSortProperty.Time,
   };
 
   private notificationService: NotificationService;
@@ -53,12 +53,7 @@ export class LogViewer {
 
       this.log = logList.logEntries;
 
-      this.sortSettings = {
-        ascending: false,
-        sortProperty: undefined,
-      };
-
-      this.sortList(LogSortProperty.Time);
+      this.sortLogs();
     }, 0);
   }
 
@@ -74,21 +69,24 @@ export class LogViewer {
     return dateString;
   }
 
-  public sortList(property: LogSortProperty): void {
-    this.sortedLog = [];
+  public changeSortProperty(property: LogSortProperty): void {
     const isSamePropertyAsPrevious: boolean = this.sortSettings.sortProperty === property;
     const ascending: boolean = isSamePropertyAsPrevious ? !this.sortSettings.ascending : true;
 
     this.sortSettings.ascending = ascending;
     this.sortSettings.sortProperty = property;
 
-    const sortPropertyIsTime: boolean = property === LogSortProperty.Time;
+    this.sortLogs();
+  }
+
+  private sortLogs(): void {
+    const sortPropertyIsTime: boolean = this.sortSettings.sortProperty === LogSortProperty.Time;
 
     const sortedLog: Array<DataModels.Logging.LogEntry> = sortPropertyIsTime
       ? this.getSortedLogByDate()
-      : this.getSortedLogByProperty(property);
+      : this.getSortedLogByProperty(this.sortSettings.sortProperty);
 
-    this.sortedLog = ascending ? sortedLog : sortedLog.reverse();
+    this.sortedLog = this.sortSettings.ascending ? sortedLog : sortedLog.reverse();
   }
 
   private getSortedLogByProperty(property: LogSortProperty): Array<DataModels.Logging.LogEntry> {
