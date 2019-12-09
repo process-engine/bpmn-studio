@@ -30,6 +30,11 @@ type RemoteSolutionListEntry = {
   version?: StudioVersion;
 };
 
+enum SupportedProtocols {
+  HTTPS = 'https://',
+  HTTP = 'http://',
+}
+
 /**
  * This component handels:
  *  - Opening files via drag and drop
@@ -54,6 +59,8 @@ export class SolutionExplorerPanel {
   public availableDefaultRemoteSolutions: Array<RemoteSolutionListEntry> = [];
   public isConnecting: boolean = false;
   public connectionError: string;
+
+  public supportedProtocols: typeof SupportedProtocols = SupportedProtocols;
 
   private eventAggregator: EventAggregator;
   private notificationService: NotificationService;
@@ -264,7 +271,7 @@ export class SolutionExplorerPanel {
     this.removeSolutionFromSolutionHistroy(solutionUri);
   }
 
-  public selectProtocol(protocol: string): void {
+  public selectProtocol(protocol: SupportedProtocols | string): void {
     this.selectedProtocol = protocol;
   }
 
