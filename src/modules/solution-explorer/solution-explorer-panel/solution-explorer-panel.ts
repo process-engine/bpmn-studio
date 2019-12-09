@@ -271,7 +271,7 @@ export class SolutionExplorerPanel {
     this.removeSolutionFromSolutionHistroy(solutionUri);
   }
 
-  public selectProtocol(protocol: SupportedProtocols | string): void {
+  public selectProtocol(protocol: SupportedProtocols): void {
     this.selectedProtocol = protocol;
   }
 
@@ -432,9 +432,13 @@ export class SolutionExplorerPanel {
     const protocolEndIndex: number = remoteSolutionUri.indexOf('//') + 2;
     const protocol: string = remoteSolutionUri.substring(0, protocolEndIndex);
 
+    const protocolKey = Object.keys(SupportedProtocols).find((supportedProtocolKey) => {
+      return SupportedProtocols[supportedProtocolKey] === protocol;
+    });
+
     const uri: string = remoteSolutionUri.substring(protocolEndIndex, remoteSolutionUri.length);
 
-    this.selectProtocol(protocol);
+    this.selectProtocol(SupportedProtocols[protocolKey]);
     this.uriOfRemoteSolutionWithoutProtocol = uri;
   }
 
