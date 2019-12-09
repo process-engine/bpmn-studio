@@ -6,13 +6,13 @@
     <table else class="table table-striped table-hover correlation-table">
       <thead>
         <tr class="correlation-table__headlines">
-          <th class="correlation-table__headline" click.delegate="sortList(correlationListSortProperty.StartedAt)">
+          <th class="correlation-table__headline" click.delegate="changeSortSettings(correlationListSortProperty.StartedAt)">
             Started at <i if.bind="sortSettings.sortProperty === correlationListSortProperty.StartedAt" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
-          <th class="correlation-table__headline" click.delegate="sortList(correlationListSortProperty.State)">
+          <th class="correlation-table__headline" click.delegate="changeSortSettings(correlationListSortProperty.State)">
             State <i if.bind="sortSettings.sortProperty == correlationListSortProperty.State" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
-          <th class="correlation-table__headline" click.delegate="sortList(correlationListSortProperty.CorrelationId)">
+          <th class="correlation-table__headline" click.delegate="changeSortSettings(correlationListSortProperty.CorrelationId)">
             Correlation ID <i if.bind="sortSettings.sortProperty === correlationListSortProperty.CorrelationId" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
         </tr>
