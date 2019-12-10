@@ -16,6 +16,10 @@ input:focus {
   cursor: pointer;
 }
 
+.btn:disabled {
+  cursor: default;
+}
+
 .form-control:focus {
   border-color: #ced4da;
   box-shadow: none;
