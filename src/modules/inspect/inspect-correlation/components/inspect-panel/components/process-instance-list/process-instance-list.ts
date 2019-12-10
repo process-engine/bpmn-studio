@@ -196,7 +196,7 @@ export class ProcessInstanceList {
       ? this.sortTableDataByStartDate()
       : this.sortTableDataByProperty(this.sortSettings.sortProperty);
 
-    this.sortedTableData = this.sortSettings.sortProperty ? sortedTableData : sortedTableData.reverse();
+    this.sortedTableData = this.sortSettings.ascending ? sortedTableData : sortedTableData.reverse();
   }
 
   private sortTableDataByProperty(property: ProcessInstanceListSortProperty): Array<ProcessInstanceTableEntry> {
