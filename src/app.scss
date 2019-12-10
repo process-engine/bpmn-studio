@@ -12,6 +12,10 @@ input:focus {
   outline: none !important;
 }
 
+.button:not(:disabled) {
+  cursor: pointer;
+}
+
 .form-control:focus {
   border-color: #ced4da;
   box-shadow: none;
