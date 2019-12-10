@@ -132,24 +132,3 @@ router-view {
 .checkbox-input__input {
   padding-left: 30px;
 }
-
-.props-input-textarea {
-  width: 100%;
-  height: 25px;
-  max-height: 200px;
-  min-height: 25px;
-  padding-bottom: 5px;
-  margin-top: 5px;
-  background: transparent;
-  border: none;
-  outline: none;
-  border-bottom: 1px solid #e9e9e9;
-  font-weight: 400;
-  color: #5c5c5c;
-  text-overflow: ellipsis;
-}
-
-.props-input-textarea:disabled {
-  pointer-events: none;
-  opacity: 0.5;
-}
