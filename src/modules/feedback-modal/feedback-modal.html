@@ -9,11 +9,11 @@
   <template replace-part="modal-body">
     <div>
       <span class="feedback-modal__input-label">What problems did you experience while working with the BPMN Studio?</span>
-      <textarea type="text" class="props-input-textarea feedback-modal__text-input" aria-multiline="true" value.bind="bugs"></textarea>
+      <textarea type="text" class="form-control input-field feedback-modal__text-input" aria-multiline="true" value.bind="bugs"></textarea>
     </div>
     <div>
       <span class="feedback-modal__input-label">Do you have any suggestions for improving the BPMN Studio?</span>
-      <textarea type="text" class="props-input-textarea feedback-modal__text-input" aria-multiline="true" value.bind="suggestions"></textarea>
+      <textarea type="text" class="form-control input-field feedback-modal__text-input" aria-multiline="true" value.bind="suggestions"></textarea>
     </div>
     <div>
       <input type="checkbox" class="feedback-modal__checkbox" checked.bind="attachInternalDatabases"/>
@@ -37,7 +37,7 @@
       </div>
       <div show.bind="showProcessModelSelection">
         <span class="feedback-modal__input-label">Is additional information required for the attached diagrams?</span>
-        <textarea type="text" class="props-input-textarea" aria-multiline="true" value.bind="additionalDiagramInformation"></textarea>
+        <textarea type="text" class="form-control input-field feedback-modal__textarea" aria-multiline="true" value.bind="additionalDiagramInformation"></textarea>
       </div>
     </div>
   </template>
