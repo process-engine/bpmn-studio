@@ -17,7 +17,7 @@
             Click here for release notes
           </a>
           <div class="update-dropdown-button-container">
-            <button class="btn btn-default update-dropdown-cancel-button" click.delegate="hideDropdown()" disabled.bind="updateStarted">Cancel</button>
+            <button class="btn-default update-dropdown-cancel-button" click.delegate="hideDropdown()" disabled.bind="updateStarted">Cancel</button>
             <button class="btn btn-primary update-dropdown-update-button" click.delegate="startUpdate()" disabled.bind="updateStarted">Update</button>
           </div>
         </template>
@@ -30,14 +30,14 @@
             <div class="progress update-dropdown-progressbar">
               <div class="progress-bar progress-bar-striped progress-bar-animated update-dropdown-progressbar-progress" role="progressbar" css="width: ${updateProgressData.percent}%;">${updateProgressData.percent.toFixed(1)}%</div>
             </div>
-            <button class="btn-default update-dropdown-cancel-download-button" title="Abort download." click.delegate="cancelUpdate()">Abort Download</button>
+            <button class="btn btn-default update-dropdown-cancel-download-button" title="Abort download." click.delegate="cancelUpdate()">Abort Download</button>
           </div>
         </template>
         <template if.bind="updateDownloadFinished">
           <div class="update-dropdown-title-container">
             <span class="update-dropdown-title">Update ready</span>
           </div>
-          <button class="btn-primary update-dropdown-install-button" click.delegate="installUpdate()">Install</button>
+          <button class="btn btn-primary update-dropdown-install-button" click.delegate="installUpdate()">Install</button>
           <span class="update-dropdown-install-text">Would you like to install the update now?<br>Otherwise it will be installed when restarting the BPMN Studio.</span>
         </template>
       </div>
