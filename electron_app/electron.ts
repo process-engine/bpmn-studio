@@ -487,10 +487,14 @@ function setOpenSolutionsListener(): void {
 }
 
 function setElectronMenubar(): void {
-  showMenuEntriesWithoutDiagramEntries();
+  showFilteredMenuEntries(false, false);
 
-  ipcMain.on('menu_hide-diagram-entries', () => {
-    showMenuEntriesWithoutDiagramEntries();
+  ipcMain.on('menu_hide-diagram-related-entries', () => {
+    showFilteredMenuEntries(false, false);
+  });
+
+  ipcMain.on('menu_hide-save-entries', () => {
+    showFilteredMenuEntries(false, true);
   });
 
   ipcMain.on('menu_show-all-menu-entries', () => {
@@ -504,15 +508,15 @@ function showAllMenuEntries(): void {
   electron.Menu.setApplicationMenu(electron.Menu.buildFromTemplate(template));
 }
 
-function showMenuEntriesWithoutDiagramEntries(): void {
-  const filteredFileMenu: MenuItem = getFilteredFileMenu();
+function showFilteredMenuEntries(showSaveButtons: boolean, showExportButton: boolean): void {
+  const filteredFileMenu: MenuItem = getFilteredFileMenu(showSaveButtons, showExportButton);
 
   const template = [getApplicationMenu(), filteredFileMenu, getEditMenu(), getWindowMenu(), getHelpMenu()];
 
   electron.Menu.setApplicationMenu(electron.Menu.buildFromTemplate(template));
 }
 
-function getFilteredFileMenu(): MenuItem {
+function getFilteredFileMenu(showSaveButtons: boolean, showExportButton: boolean): MenuItem {
   let previousEntryIsSeparator = false;
 
   const unfilteredFileMenu = getFileMenu();
@@ -529,7 +533,12 @@ function getFilteredFileMenu(): MenuItem {
     }
 
     const isSaveButton = submenuEntry.label !== undefined && submenuEntry.label.startsWith('Save');
-    if (isSaveButton) {
+    if (isSaveButton && !showSaveButtons) {
+      return false;
+    }
+
+    const isExportButton = submenuEntry.label !== undefined && submenuEntry.label.startsWith('Export');
+    if (isExportButton && !showExportButton) {
       return false;
     }
 
@@ -630,6 +639,9 @@ function getFileMenu(): MenuItem {
       click: (): void => {
         browserWindow.webContents.send('menubar__start_save_all_diagrams');
       },
+    },
+    {
+      type: 'separator',
     },
     {
       label: 'Export Diagram As...',

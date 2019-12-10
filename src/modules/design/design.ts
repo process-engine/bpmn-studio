@@ -122,7 +122,7 @@ export class Design {
 
       if (solutionIsRemoteSolution(this.activeSolutionEntry.uri)) {
         if (isRunningInElectron()) {
-          this.ipcRenderer.send('menu_hide-diagram-entries');
+          this.ipcRenderer.send('menu_hide-save-entries');
         }
 
         this.eventAggregator.publish(environment.events.configPanel.solutionEntryChanged, this.activeSolutionEntry);
@@ -227,7 +227,7 @@ export class Design {
     this.subscriptions.forEach((subscription: Subscription) => subscription.dispose());
 
     if (isRunningInElectron()) {
-      this.ipcRenderer.send('menu_hide-diagram-entries');
+      this.ipcRenderer.send('menu_hide-diagram-related-entries');
     }
   }
 
