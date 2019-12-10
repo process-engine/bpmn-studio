@@ -28,6 +28,7 @@ export class CorrelationList {
   @bindable public activeDiagram: IDiagram;
   @bindable public sortedTableData: Array<ICorrelationTableEntry>;
   @bindable public paginationShowsLoading: boolean;
+  @bindable public selectedTableEntry: ICorrelationTableEntry;
 
   public pagination: Pagination;
 
@@ -43,8 +44,6 @@ export class CorrelationList {
     ascending: true,
     sortProperty: CorrelationListSortProperty.StartedAt,
   };
-
-  public selectedTableEntry: ICorrelationTableEntry;
 
   private tableData: Array<ICorrelationTableEntry> = [];
   private eventAggregator: EventAggregator;
