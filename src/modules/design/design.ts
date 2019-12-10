@@ -213,6 +213,10 @@ export class Design {
 
     if (isRunningInElectron()) {
       this.ipcRenderer.send('menu_show-all-menu-entries');
+
+      this.ipcRenderer.on('menubar__epxort_diagram_as', (event, format) => {
+        this.eventAggregator.publish(`${environment.events.diagramDetail.exportDiagramAs}:${format}`);
+      });
     }
 
     this.eventAggregator.publish(environment.events.statusBar.showDiagramViewButtons);

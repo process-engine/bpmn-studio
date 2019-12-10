@@ -632,6 +632,35 @@ function getFileMenu(): MenuItem {
       },
     },
     {
+      label: 'Export Diagram As...',
+      submenu: [
+        {
+          label: 'BPMN',
+          click: (): void => {
+            browserWindow.webContents.send('menubar__epxort_diagram_as', 'BPMN');
+          },
+        },
+        {
+          label: 'SVG',
+          click: (): void => {
+            browserWindow.webContents.send('menubar__epxort_diagram_as', 'SVG');
+          },
+        },
+        {
+          label: 'PNG',
+          click: (): void => {
+            browserWindow.webContents.send('menubar__epxort_diagram_as', 'PNG');
+          },
+        },
+        {
+          label: 'JPEG',
+          click: (): void => {
+            browserWindow.webContents.send('menubar__epxort_diagram_as', 'JPEG');
+          },
+        },
+      ],
+    },
+    {
       type: 'separator',
     },
     {
