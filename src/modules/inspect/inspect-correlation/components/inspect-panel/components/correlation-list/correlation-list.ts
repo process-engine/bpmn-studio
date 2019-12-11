@@ -28,6 +28,7 @@ export class CorrelationList {
   @bindable public activeDiagram: IDiagram;
   @bindable public sortedTableData: Array<ICorrelationTableEntry>;
   @bindable public paginationShowsLoading: boolean;
+  @bindable public selectedTableEntry: ICorrelationTableEntry;
 
   public pagination: Pagination;
 
@@ -40,11 +41,9 @@ export class CorrelationList {
 
   public correlationListSortProperty: typeof CorrelationListSortProperty = CorrelationListSortProperty;
   public sortSettings: ICorrelationSortSettings = {
-    ascending: false,
-    sortProperty: undefined,
+    ascending: true,
+    sortProperty: CorrelationListSortProperty.StartedAt,
   };
-
-  public selectedTableEntry: ICorrelationTableEntry;
 
   private tableData: Array<ICorrelationTableEntry> = [];
   private eventAggregator: EventAggregator;
@@ -74,22 +73,13 @@ export class CorrelationList {
     }
 
     this.tableData = this.convertCorrelationsIntoTableData(this.correlations);
+    this.sortTableData();
 
     const tableDataIsExisiting: boolean = this.tableData.length > 0;
-
     if (tableDataIsExisiting) {
       const latestCorelationTableEntry: ICorrelationTableEntry = this.tableData[this.tableData.length - 1];
 
       this.selectCorrelation(latestCorelationTableEntry);
-    }
-
-    const sortSettingsExisitng: boolean = this.sortSettings.sortProperty !== undefined;
-    if (sortSettingsExisitng) {
-      this.sortSettings.ascending = !this.sortSettings.ascending;
-
-      this.sortedTableData = this.sortList(this.sortSettings.sortProperty);
-    } else {
-      this.sortedTableData = this.tableData;
     }
 
     const correlationToSelectExists: boolean = this.correlationToSelect !== undefined;
@@ -174,24 +164,30 @@ export class CorrelationList {
     });
   }
 
-  public sortList(property: CorrelationListSortProperty): Array<ICorrelationTableEntry> {
+  public changeSortSettings(property: CorrelationListSortProperty): void {
     const isSameSortPropertyAsBefore: boolean = this.sortSettings.sortProperty === property;
     const ascending: boolean = isSameSortPropertyAsBefore ? !this.sortSettings.ascending : true;
 
     this.sortSettings.ascending = ascending;
     this.sortSettings.sortProperty = property;
 
-    const sortByDate: boolean = property === CorrelationListSortProperty.StartedAt;
-
-    const sortedTableData: Array<ICorrelationTableEntry> = sortByDate
-      ? this.sortListByStartDate()
-      : this.sortListByProperty(property);
-
-    return ascending ? sortedTableData : sortedTableData.reverse();
+    this.sortTableData();
   }
 
-  private sortListByProperty(property: CorrelationListSortProperty): Array<ICorrelationTableEntry> {
-    const sortedTableData: Array<ICorrelationTableEntry> = this.tableData.sort(
+  private sortTableData(): void {
+    const sortByDate: boolean = this.sortSettings.sortProperty === CorrelationListSortProperty.StartedAt;
+
+    const sortedTableData: Array<ICorrelationTableEntry> = sortByDate
+      ? this.sortTableDataByStartDate()
+      : this.sortTableDataByProperty(this.sortSettings.sortProperty);
+
+    this.sortedTableData = this.sortSettings.ascending ? sortedTableData : sortedTableData.reverse();
+  }
+
+  private sortTableDataByProperty(property: CorrelationListSortProperty): Array<ICorrelationTableEntry> {
+    const copyOfTableData: Array<ICorrelationTableEntry> = this.tableData.slice();
+
+    const sortedTableData: Array<ICorrelationTableEntry> = copyOfTableData.sort(
       (firstEntry: ICorrelationTableEntry, secondEntry: ICorrelationTableEntry) => {
         const firstEntryIsBigger: boolean = firstEntry[property] > secondEntry[property];
         if (firstEntryIsBigger) {
@@ -210,8 +206,10 @@ export class CorrelationList {
     return sortedTableData;
   }
 
-  private sortListByStartDate(): Array<ICorrelationTableEntry> {
-    const sortedTableData: Array<ICorrelationTableEntry> = this.tableData.sort(
+  private sortTableDataByStartDate(): Array<ICorrelationTableEntry> {
+    const copyOfTableData: Array<ICorrelationTableEntry> = this.tableData.slice();
+
+    const sortedTableData: Array<ICorrelationTableEntry> = copyOfTableData.sort(
       (firstEntry: ICorrelationTableEntry, secondEntry: ICorrelationTableEntry) => {
         const firstProcessInstanceDate: Date = new Date(firstEntry.startedAt);
         const secondProcessInstanceDate: Date = new Date(secondEntry.startedAt);
