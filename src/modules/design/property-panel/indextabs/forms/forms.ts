@@ -18,6 +18,10 @@ export class Forms implements IIndextab {
   }
 
   public activate(model: IPageModel): void {
+    if (model === undefined) {
+      return;
+    }
+
     this.elementInPanel = model.elementInPanel;
     this.modeler = model.modeler;
   }
