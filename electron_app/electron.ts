@@ -28,8 +28,10 @@ import {version as ProcessEngineVersion} from '@process-engine/process_engine_ru
 import electronOidc from './electron-oidc';
 import oidcConfig from './oidc-config';
 import ReleaseChannel from '../src/services/release-channel-service/release-channel.service';
+import {solutionIsRemoteSolution} from '../src/services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 import {version as CurrentStudioVersion} from '../package.json';
 import {getPortListByVersion} from '../src/services/default-ports-module/default-ports.module';
+import {FeedbackData} from '../src/contracts';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import electron = require('electron');
@@ -123,6 +125,10 @@ function initializeApplication(): void {
 
   ipcMain.on('isDevelop', (event) => {
     event.sender.send('isDevelop', releaseChannel.isDev());
+  });
+
+  ipcMain.on('create-feedback-zip', async (event, feedbackData: FeedbackData) => {
+    createFeedbackZip(feedbackData);
   });
 
   if (!releaseChannel.isDev() && !process.env.SPECTRON_TESTS) {
@@ -773,6 +779,15 @@ function getHelpMenu(): MenuItem {
         },
       ],
     },
+    {
+      type: 'separator',
+    },
+    {
+      label: 'Feedback',
+      click: (): void => {
+        browserWindow.webContents.send('show-feedback-modal');
+      },
+    },
   ];
 
   const submenu: Menu = electron.Menu.buildFromTemplate(submenuOptions);
@@ -1037,23 +1052,113 @@ function bringExistingInstanceToForeground(): void {
 async function exportDatabases(): Promise<void> {
   const zip = new JSZip();
 
-  const img = zip.folder(getProcessEngineDatabaseFolderName());
-
-  const foldername: string = getDatabaseFolder();
-
-  const files: Array<string> = await getFilenamesOfFilesInFolder(foldername);
-
-  files.forEach((filename: string) => {
-    const filePath: string = `${foldername}/${filename}`;
-
-    img.file(filename, fs.readFileSync(filePath), {base64: true});
-  });
+  await addDatabaseToZip(zip);
 
   // eslint-disable-next-line newline-per-chained-call
   const now = new Date().toISOString().replace(/:/g, '-');
+  const defaultFilename = `database-backup-${now}.zip`;
 
+  const pathToSaveTo: string = await getPathToSaveTo(defaultFilename);
+
+  if (!pathToSaveTo) {
+    return;
+  }
+
+  zip.generateAsync({type: 'nodebuffer'}).then((content) => {
+    fs.writeFileSync(pathToSaveTo, content);
+  });
+}
+
+async function createFeedbackZip(feedbackData: FeedbackData): Promise<void> {
+  const zip = new JSZip();
+
+  const zipFolder = zip.folder('feedback');
+
+  if (feedbackData.attachInternalDatabases) {
+    await addDatabaseToZip(zipFolder);
+  }
+
+  const bugsProvided: boolean = feedbackData.bugs.trim() !== '';
+  if (bugsProvided) {
+    zipFolder.file('Bugs.txt', feedbackData.bugs);
+  }
+
+  const suggestionsProvided: boolean = feedbackData.suggestions.trim() !== '';
+  if (suggestionsProvided) {
+    zipFolder.file('Suggestions.txt', feedbackData.suggestions);
+  }
+
+  const diagramsProvided: boolean = feedbackData.diagrams.length > 0;
+  if (diagramsProvided) {
+    const diagramFolder = zipFolder.folder('diagrams');
+
+    feedbackData.diagrams.forEach((diagram) => {
+      let diagramSolution: string = '';
+
+      if (solutionIsRemoteSolution(diagram.uri)) {
+        const diagramUriWithoutProtocol = diagram.uri.substring(diagram.uri.indexOf('/') + 2);
+        const diagramUriWithoutProtocolAndLocation = diagramUriWithoutProtocol.substring(
+          0,
+          diagramUriWithoutProtocol.indexOf('/'),
+        );
+        const diagramUriWithoutProtocolAndLocationWithEscapedPort = diagramUriWithoutProtocolAndLocation.replace(
+          ':',
+          '__',
+        );
+
+        diagramSolution = diagramUriWithoutProtocolAndLocationWithEscapedPort;
+      } else {
+        const escapedDiagramUri = diagram.uri.substring(0, diagram.uri.lastIndexOf('/')).replace(/[/\\]/g, '__');
+
+        diagramSolution = escapedDiagramUri.startsWith('__') ? escapedDiagramUri.replace('__', '') : escapedDiagramUri;
+      }
+
+      const solutionFolder = diagramFolder.folder(diagramSolution);
+      const diagramName: string = `${diagram.name}${
+        diagram.name.endsWith('.bpmn') || diagram.name.endsWith('.xml') ? '' : '.bpmn'
+      }`;
+
+      solutionFolder.file(diagramName, diagram.xml);
+    });
+
+    const additionalDiagramInformationProvided: boolean = feedbackData.additionalDiagramInformation.trim() !== '';
+    if (additionalDiagramInformationProvided) {
+      diagramFolder.file('Additional Diagram Information.txt', feedbackData.additionalDiagramInformation);
+    }
+  }
+
+  // eslint-disable-next-line newline-per-chained-call
+  const now = new Date().toISOString().replace(/:/g, '-');
+  const defaultFilename = `feedback-${now}.zip`;
+
+  const pathToSaveTo: string = await getPathToSaveTo(defaultFilename);
+
+  if (!pathToSaveTo) {
+    return;
+  }
+
+  zip.generateAsync({type: 'nodebuffer'}).then((content) => {
+    fs.writeFileSync(pathToSaveTo, content);
+  });
+}
+
+function getFilenamesOfFilesInFolder(foldername): Promise<Array<string>> {
+  return new Promise((resolve: Function, reject: Function): void => {
+    fs.readdir(foldername, (error: Error, fileNames: Array<string>): void => {
+      if (error) {
+        reject(new Error(`Unable to scan directory: ${error}`));
+
+        return;
+      }
+
+      resolve(fileNames);
+    });
+  });
+}
+
+async function getPathToSaveTo(defaultFilename): Promise<string> {
   const downloadPath = electron.app.getPath('downloads');
-  const defaultPath = path.join(downloadPath, `database-backup-${now}.zip`);
+  const defaultPath = path.join(downloadPath, defaultFilename);
 
   const saveDialogResult = await dialog.showSaveDialog({
     defaultPath: defaultPath,
@@ -1070,25 +1175,23 @@ async function exportDatabases(): Promise<void> {
   });
 
   if (saveDialogResult.canceled) {
-    return;
+    return undefined;
   }
 
-  zip.generateAsync({type: 'nodebuffer'}).then((content) => {
-    fs.writeFileSync(saveDialogResult.filePath, content);
-  });
+  return saveDialogResult.filePath;
 }
 
-function getFilenamesOfFilesInFolder(foldername): Promise<Array<string>> {
-  return new Promise((resolve: Function, reject: Function): void => {
-    fs.readdir(foldername, (error: Error, fileNames: Array<string>): void => {
-      if (error) {
-        reject(new Error(`Unable to scan directory: ${error}`));
+async function addDatabaseToZip(zipFolder): Promise<void> {
+  const databaseZipFolder = zipFolder.folder(getProcessEngineDatabaseFolderName());
 
-        return;
-      }
+  const databaseFolderName: string = getDatabaseFolder();
 
-      resolve(fileNames);
-    });
+  const databaseFiles: Array<string> = await getFilenamesOfFilesInFolder(databaseFolderName);
+
+  databaseFiles.forEach((filename: string) => {
+    const filePath: string = `${databaseFolderName}/${filename}`;
+
+    databaseZipFolder.file(filename, fs.readFileSync(filePath), {base64: true});
   });
 }
 
