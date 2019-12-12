@@ -348,6 +348,14 @@ jobs:
       env:
         SLACK_WEBHOOK: ${{ secrets.SLACK_ANNOUNCER_WEBHOOK }}
 
+    - name: Trigger Deployment of ProcessEngine.io
+      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta'
+      uses: peter-evans/repository-dispatch@v1
+      with:
+        token: ${{ secrets.GH_TOKEN }}
+        repository: process-engine/process-engine.github.io
+        event-type: release_was_published
+
   build_docker:
     name: "Build & Publish Docker Image"
     needs: prepare_and_tag_version
