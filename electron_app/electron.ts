@@ -783,6 +783,15 @@ function getHelpMenu(): MenuItem {
       },
     },
     {
+      label: 'BPMN Element Documentation',
+      click: (): void => {
+        const currentVersionBranch = getBranchOfCurrentVersion();
+        const elementDocumentationUrl = `https://github.com/process-engine/bpmn-studio/blob/${currentVersionBranch}/doc/bpmn-elements.md`;
+
+        electron.shell.openExternal(elementDocumentationUrl);
+      },
+    },
+    {
       label: 'Release Notes',
       click: (): void => {
         const currentVersion = app.getVersion();
@@ -1065,6 +1074,23 @@ function getConfigPathSuffix(): string {
   }
 
   throw new Error('Could not get config path suffix for internal process engine');
+}
+
+function getBranchOfCurrentVersion(): string {
+  if (releaseChannel.isDev()) {
+    return 'develop';
+  }
+  if (releaseChannel.isAlpha()) {
+    return 'develop';
+  }
+  if (releaseChannel.isBeta()) {
+    return 'beta';
+  }
+  if (releaseChannel.isStable()) {
+    return 'master';
+  }
+
+  throw new Error('Could not get the branch of the current version.');
 }
 
 function getUserConfigFolder(): string {
