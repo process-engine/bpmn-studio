@@ -76,16 +76,16 @@ export class ProcessInstanceList {
     this.tableData = this.convertProcessInstancesIntoTableData(this.processInstances);
     this.sortTableData();
 
-    const tableDataIsExisiting: boolean = this.tableData.length > 0;
+    const tableDataIsExisiting: boolean = this.sortedTableData.length > 0;
 
     if (tableDataIsExisiting) {
-      const firstProcessInstanceFromCorrectProcessModel = this.tableData.find(
+      const firstProcessInstanceFromCorrectProcessModel = this.sortedTableData.find(
         (processInstance: ProcessInstanceTableEntry) => {
           return processInstance.processModelId === this.activeDiagram.id;
         },
       );
 
-      const firstTableEntry: ProcessInstanceTableEntry = this.tableData[0];
+      const firstTableEntry: ProcessInstanceTableEntry = this.sortedTableData[0];
 
       const processInstanceToSelect: ProcessInstanceTableEntry =
         firstProcessInstanceFromCorrectProcessModel !== undefined
