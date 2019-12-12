@@ -149,7 +149,7 @@ export class TaskList {
       return;
     }
 
-    if (this.updatePromise) {
+    if (this.updatePromise && this.isAttached) {
       this.updatePromise.cancel();
     }
 
