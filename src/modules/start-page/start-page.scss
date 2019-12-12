@@ -28,10 +28,6 @@
   padding: 0 250px;
 }
 
-.start-page__quick-start:hover {
-  cursor: default;
-}
-
 .quick-start__item {
   display: flex;
   flex-direction: row;
@@ -49,7 +45,6 @@
 }
 
 .quick-start__topic:hover {
-  cursor: pointer;
   text-decoration: underline;
 }
 

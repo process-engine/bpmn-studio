@@ -34,16 +34,11 @@
   height: 100%;
 }
 
-.let__overlay-button {
-  cursor: pointer;
-}
-
 .let__overlay-button-icon {
   position: absolute;
   top: 9px;
   left: 14px;
   pointer-events: none;
-  cursor: pointer;
   opacity: 0.4;
 }
 
@@ -74,7 +69,6 @@
 .let__close-modal-button {
   position: absolute;
   right: 20px;
-  cursor: pointer;
 }
 
 .let__close-dynamic-ui-modal-button {
@@ -109,7 +103,6 @@
   margin: 0 5px;
   opacity: 0.5;
   text-align: center;
-  cursor: default
 }
 
 .let__tool:hover {

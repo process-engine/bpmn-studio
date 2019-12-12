@@ -71,7 +71,6 @@ button {
 }
 
 .menu-tabbed-link:hover {
-  cursor: default;
   text-decoration: inherit;
   -webkit-user-drag: none;
   color: inherit;
@@ -85,7 +84,6 @@ button {
 .menu-bar__dashboard-dropdown {
   top: 40px;
   padding: 0;
-  cursor: pointer;
   background-color: #f7f7f7;
   border-top: none;
   border-top-left-radius: 0;
@@ -96,10 +94,6 @@ button {
 .menu-bar__menu-center--action-button {
   background-color: inherit;
   border: none;
-}
-
-.menu-bar__menu-center--action-button:disabled {
-  cursor: default;
 }
 
 .process-details-dropdown-menu {

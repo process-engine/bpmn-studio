@@ -1,14 +1,9 @@
-.feedback-modal__checkbox {
-  cursor: pointer;
-}
-
 .feedback-modal__checkbox-label {
   margin-left: 5px;
 }
 
 .feedback-modal__solution-title {
   user-select: none;
-  cursor: pointer;
 }
 
 .feedback-modal__text-input {
@@ -54,8 +49,4 @@
 
 .feedback-modal__solution-hide-icon {
   width: 10px;
-}
-
-.feedback-modal__help-icon {
-  cursor: help;
 }
