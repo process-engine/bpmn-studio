@@ -71,6 +71,7 @@ button {
 }
 
 .menu-tabbed-link:hover {
+  cursor: default;
   text-decoration: inherit;
   -webkit-user-drag: none;
   color: inherit;

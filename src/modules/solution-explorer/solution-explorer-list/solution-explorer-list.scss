@@ -33,6 +33,10 @@
   border: none;
 }
 
+.solution-entry__header button:hover {
+  cursor: default;
+}
+
 .solution-entry__solution-icon {
   flex: 0;
   margin-top: 3px;
@@ -63,7 +67,7 @@
 }
 
 .solution-entry__actions_remote-solution {
-  display: none;
+  display: none;  
 }
 
 .login-logout-button {
@@ -112,6 +116,9 @@
   border: none;
 }
 
+.solution-entry__actions button:hover {
+  cursor: default;
+}
 
 .solution-entry__collapse-header {
   max-width: 240px;
