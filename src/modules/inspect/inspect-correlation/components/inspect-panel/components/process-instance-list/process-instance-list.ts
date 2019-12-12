@@ -106,9 +106,9 @@ export class ProcessInstanceList {
       if (instanceAlreadyExistInList) {
         this.processInstanceToSelectTableEntry = undefined;
       } else {
-        const processInstanceToSelectTableEntry: Array<
-          ProcessInstanceTableEntry
-        > = this.convertProcessInstancesIntoTableData([this.processInstanceToSelect]);
+        const processInstanceToSelectTableEntry: Array<ProcessInstanceTableEntry> = this.convertProcessInstancesIntoTableData(
+          [this.processInstanceToSelect],
+        );
 
         this.processInstanceToSelectTableEntry = processInstanceToSelectTableEntry[0];
         this.selectProcessInstance(this.processInstanceToSelectTableEntry);
