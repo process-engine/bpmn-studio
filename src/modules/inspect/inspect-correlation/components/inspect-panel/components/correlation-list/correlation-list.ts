@@ -75,11 +75,11 @@ export class CorrelationList {
     this.tableData = this.convertCorrelationsIntoTableData(this.correlations);
     this.sortTableData();
 
-    const tableDataIsExisiting: boolean = this.tableData.length > 0;
+    const tableDataIsExisiting: boolean = this.sortedTableData.length > 0;
     if (tableDataIsExisiting) {
-      const latestCorelationTableEntry: ICorrelationTableEntry = this.tableData[this.tableData.length - 1];
+      const firstTableEntry: ICorrelationTableEntry = this.sortedTableData[0];
 
-      this.selectCorrelation(latestCorelationTableEntry);
+      this.selectCorrelation(firstTableEntry);
     }
 
     const correlationToSelectExists: boolean = this.correlationToSelect !== undefined;
