@@ -81,11 +81,11 @@ jobs:
       run: npm test
 
     - name: Create Tarball
-      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
       run: npm run create-tarball
 
     - name: Stash Tarball
-      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
       uses: actions/upload-artifact@master
       with:
         name: bpmn-studio_tar
@@ -143,7 +143,7 @@ jobs:
         cp dist/electron/bpmn-studio-setup**.dmg dist_electron_macos
 
     - name: Prepare macOS Bundle for GitHub Release
-      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
       run: |
         cp dist/electron/bpmn-studio-setup**.dmg.blockmap dist_electron_macos
         cp dist/electron/latest-mac.yml dist_electron_macos
@@ -205,7 +205,7 @@ jobs:
       shell: powershell
 
     - name: Prepare Windows Bundle for GitHub Release
-      if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
       run: |
         copy-item .\dist\electron\bpmn-studio-setup-**.exe.blockmap .\dist_electron_windows\
         copy-item .\dist\electron\latest.yml .\dist_electron_windows\
@@ -285,7 +285,7 @@ jobs:
     name: "Publish GitHub Release"
     needs: prepare_and_tag_version
     runs-on: ubuntu-18.04
-    if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
 
     steps:
     - uses: actions/checkout@v1
@@ -342,7 +342,7 @@ jobs:
         token: ${{ secrets.GH_TOKEN }}
 
     - name: Announce Releasenotes
-      if: contains(github.ref, 'master') || contains(github.ref, 'beta')
+      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta'
       run: |
         ./node_modules/.bin/ci_tools publish-releasenotes-on-slack
       env:
@@ -352,7 +352,7 @@ jobs:
     name: "Build & Publish Docker Image"
     needs: prepare_and_tag_version
     runs-on: ubuntu-18.04
-    if: contains(github.ref, 'master') || contains(github.ref, 'develop') || contains(github.ref, 'beta')
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
 
     steps:
     - uses: actions/checkout@v1
