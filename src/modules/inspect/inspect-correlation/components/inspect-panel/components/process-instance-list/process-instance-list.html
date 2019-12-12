@@ -1,0 +1,57 @@
+<template>
+  <require from="./process-instance-list.css"></require>
+  <require from="../../../../../../pagination/pagination"></require>
+  <div class="process-instance-container">
+    <h3 if.bind="processInstances.length === 0" class="process-instance-table__empty-message">No Process Instances found.</h3>
+     <table else class="table table-striped table-hover process-instance-table">
+      <thead>
+        <tr class="process-instance-table__headlines">
+          <th class="process-instance-table__headline" click.delegate="changeSortProperty(processInstanceListSortProperty.StartedAt)">
+            Started at <i if.bind="sortSettings.sortProperty === processInstanceListSortProperty.StartedAt" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
+          </th>
+          <th class="process-instance-table__headline" click.delegate="changeSortProperty(processInstanceListSortProperty.State)">
+            State <i if.bind="sortSettings.sortProperty == processInstanceListSortProperty.State" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
+          </th>
+          <th class="process-instance-table__headline" click.delegate="changeSortProperty(processInstanceListSortProperty.User)">
+            User <i if.bind="sortSettings.sortProperty === processInstanceListSortProperty.User" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
+          </th>
+          <th class="process-instance-table__headline" click.delegate="changeSortProperty(processInstanceListSortProperty.ProcessModelId)">
+            Process Model ID <i if.bind="sortSettings.sortProperty === processInstanceListSortProperty.ProcessModelId" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
+          </th>
+          <th class="process-instance-table__headline" click.delegate="changeSortProperty(processInstanceListSortProperty.ProcessInstanceId)">
+            Process Instance ID <i if.bind="sortSettings.sortProperty === processInstanceListSortProperty.ProcessInstanceId" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
+          </th>
+        </tr>
+      </thead>
+      <tbody class="process-instance-table__body">
+        <tr if.bind="processInstanceToSelectTableEntry" dblclick.delegate="showLogViewer()" class="process-instance-table__table-row process-instance-table__table-row--instance-to-select" class.bind="processInstanceToSelectTableEntry.processInstanceId === selectedTableEntry.processInstanceId ? 'process-instance-table__selected-entry': ''" click.delegate="selectProcessInstance(processInstanceToSelectTableEntry)">
+          <td class="process-instance-table__table-entry">${processInstanceToSelectTableEntry.startedAt}</td>
+          <td class="process-instance-table__table-entry process-instance-table__table-entry--state">${processInstanceToSelectTableEntry.state}</td>
+          <td if.bind="false" class="process-instance-table__table-entry">${processInstanceToSelectTableEntry.user}</td>
+          <td class="process-instance-table__table-entry">${processInstanceToSelectTableEntry.processInstanceId}</td>
+        </tr>
+        <tr dblclick.delegate="showLogViewer()" class="process-instance-table__table-row" repeat.for="tableEntry of sortedTableData" class.bind="tableEntry.processInstanceId === selectedTableEntry.processInstanceId ? 'process-instance-table__selected-entry': ''" click.delegate="selectProcessInstance(tableEntry)">
+          <td class="process-instance-table__table-entry">${tableEntry.startedAt}</td>
+          <td class="process-instance-table__table-entry process-instance-table__table-entry--state">${tableEntry.state}</td>
+          <td class="process-instance-table__table-entry">${tableEntry.user}</td>
+          <td class="process-instance-table__table-entry">${tableEntry.processModelId}</td>
+          <td class="process-instance-table__table-entry">${tableEntry.processInstanceId}</td>
+        </tr>
+        <tr if.bind="totalCount > minPageSize" class="process-instance-table__table-row">
+          <td>
+            <div class="process-instance-table__pagesize-entry">
+              Page size: 
+            </div>
+            <select class="form-control process-instance-table__pagesize-entry--select" value.bind="pageSize">
+              <option model.bind="size" repeat.for="size of pageSizes">${size}</option>
+              <option model.bind="0">All</option>
+            </select>
+          </td>
+          <td class="process-instance-table__pagination-entry">
+            <pagination show.bind="pageSize < totalCount && pageSize > 0" view-model.ref="pagination" current-page.two-way="currentPage" per-page.to-view="pageSize" items.to-view="totalCount" max-pages-to-display.to-view="paginationSize" content-is-async.bind="true" is-loading.two-way="paginationShowsLoading"></pagination>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</template>

@@ -7,11 +7,12 @@ import {
 
 export interface IInspectCorrelationService {
   getAllCorrelationsForProcessModelId(
-    processModelId: string,
     identity: IIdentity,
+    processModelId: string,
     offset?: number,
     limit?: number,
   ): Promise<DataModels.Correlations.CorrelationList>;
+  getCorrelationById(identity: IIdentity, correlationId: string): Promise<DataModels.Correlations.Correlation>;
   getLogsForCorrelation(
     correlation: DataModels.Correlations.Correlation,
     identity: IIdentity,
@@ -51,4 +52,10 @@ export interface IInspectCorrelationService {
     processInstanceId: string,
     processModelId?: string,
   ): Promise<ProcessInstance>;
+  getProcessInstancesForCorrelation(
+    identity: IIdentity,
+    correlationId: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<ProcessInstanceList>;
 }

@@ -5,19 +5,19 @@
     <table else class="table table-striped table-hover log-table">
       <thead>
         <tr class="log-table__headlines">
-          <th class="log-table__headline log-table__time-column" click.delegate="sortList(logSortProperty.Time)">
+          <th class="log-table__headline log-table__time-column" click.delegate="changeSortProperty(logSortProperty.Time)">
             Time <i if.bind="sortSettings.sortProperty === logSortProperty.Time" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
-          <th class="log-table__headline log-table__flow-node-id-column" click.delegate="sortList(logSortProperty.FlowNodeId)">
+          <th class="log-table__headline log-table__flow-node-id-column" click.delegate="changeSortProperty(logSortProperty.FlowNodeId)">
             FlowNodeId <i if.bind="sortSettings.sortProperty === logSortProperty.FlowNodeId" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
-          <th class="log-table__headline log-table__flow-node-instance-id-column" click.delegate="sortList(logSortProperty.FlowNodeInstanceId)">
+          <th class="log-table__headline log-table__flow-node-instance-id-column" click.delegate="changeSortProperty(logSortProperty.FlowNodeInstanceId)">
             FlowNodeInstanceId <i if.bind="sortSettings.sortProperty === logSortProperty.FlowNodeInstanceId" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
-          <th class="log-table__headline log-table__log-level-column" click.delegate="sortList(logSortProperty.LogLevel)">
+          <th class="log-table__headline log-table__log-level-column" click.delegate="changeSortProperty(logSortProperty.LogLevel)">
             Level <i if.bind="sortSettings.sortProperty === logSortProperty.LogLevel" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
-          <th class="log-table__headline log-table__message-column" click.delegate="sortList(logSortProperty.Message)">
+          <th class="log-table__headline log-table__message-column" click.delegate="changeSortProperty(logSortProperty.Message)">
             Message <i if.bind="sortSettings.sortProperty === logSortProperty.Message" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
         </tr>

@@ -2,6 +2,7 @@ import path from 'path';
 import {TestClient} from '../TestClient';
 import {callExposedFunction} from '../../../src/services/expose-functionality-module/expose-functionality.module';
 
+const VISIBLE_TIMEOUT = 40000;
 export class SolutionExplorer {
   private testClient: TestClient;
 
@@ -17,9 +18,9 @@ export class SolutionExplorer {
       return;
     }
 
-    await this.testClient.ensureVisible('[data-test-toggle-solution-explorer]');
+    await this.testClient.ensureVisible('[data-test-toggle-solution-explorer]', VISIBLE_TIMEOUT);
     await this.testClient.clickOn('[data-test-toggle-solution-explorer]');
-    await this.testClient.ensureVisible('[data-test-solution-explorer-panel]');
+    await this.testClient.ensureVisible('[data-test-solution-explorer-panel]', VISIBLE_TIMEOUT);
   }
 
   public async hide(): Promise<void> {
@@ -31,13 +32,13 @@ export class SolutionExplorer {
       return;
     }
 
-    await this.testClient.ensureVisible('[data-test-toggle-solution-explorer]');
+    await this.testClient.ensureVisible('[data-test-toggle-solution-explorer]', VISIBLE_TIMEOUT);
     await this.testClient.clickOn('[data-test-toggle-solution-explorer]');
     await this.testClient.ensureNotVisible('[data-test-solution-explorer-panel]');
   }
 
   public async assertInternalProcessEngineIsOpenedAsSolution(): Promise<void> {
-    await this.testClient.ensureVisible('[data-test-solution-is-internal=true]');
+    await this.testClient.ensureVisible('[data-test-solution-is-internal=true]', VISIBLE_TIMEOUT);
   }
 
   public async openDirectoryAsSolution(dir: string, diagramName?: string): Promise<void> {
@@ -51,11 +52,11 @@ export class SolutionExplorer {
       this.testClient.getDefaultIdentity(),
     );
 
-    await this.testClient.ensureVisible(`[data-test-solution-entry-name=${dir}]`);
+    await this.testClient.ensureVisible(`[data-test-solution-entry-name=${dir}]`, VISIBLE_TIMEOUT);
 
     if (diagramName) {
       const diagramUri = this.getUriForSelector(pathToSolution, diagramName);
-      await this.testClient.ensureVisible(`[data-test-open-diagram-with-uri*="${diagramUri}"]`);
+      await this.testClient.ensureVisible(`[data-test-open-diagram-with-uri*="${diagramUri}"]`, VISIBLE_TIMEOUT);
       await this.testClient.clickOn(`[data-test-open-diagram-with-uri*="${diagramUri}"]`);
     }
   }

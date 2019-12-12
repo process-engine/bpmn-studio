@@ -11,8 +11,8 @@ import {InspectCorrelationRepository} from './inspect-correlation.repository';
 export class InspectCorrelationPaginationRepository extends InspectCorrelationRepository
   implements IInspectCorrelationRepository {
   public async getAllCorrelationsForProcessModelId(
-    processModelId: string,
     identity: IIdentity,
+    processModelId: string,
     offset?: number,
     limit?: number,
   ): Promise<DataModels.Correlations.CorrelationList> {
@@ -89,6 +89,15 @@ export class InspectCorrelationPaginationRepository extends InspectCorrelationRe
     limit?: number,
   ): Promise<ProcessInstanceList> {
     return this.managementApiClient.getProcessInstancesForProcessModel(identity, processModelId, offset, limit);
+  }
+
+  public async getProcessInstancesForCorrelation(
+    identity: IIdentity,
+    correlationId: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<ProcessInstanceList> {
+    return this.managementApiClient.getProcessInstancesForCorrelation(identity, correlationId, offset, limit);
   }
 
   public getProcessInstancesById(identity: IIdentity, processInstanceId: string): Promise<ProcessInstance> {

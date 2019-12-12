@@ -9,16 +9,22 @@ import environment from '../../../../../environment';
 
 @inject(EventAggregator)
 export class InspectPanel {
+  @bindable public correlationToSelect: DataModels.Correlations.Correlation;
+  @bindable public correlations: Array<DataModels.Correlations.Correlation>;
+  @bindable public selectedCorrelation: DataModels.Correlations.Correlation;
   @bindable public processInstanceToSelect: DataModels.Correlations.ProcessInstance;
   @bindable public processInstances: Array<DataModels.Correlations.ProcessInstance>;
   @bindable public selectedProcessInstance: DataModels.Correlations.ProcessInstance;
   @bindable public fullscreen: boolean = false;
   @bindable public activeDiagram: IDiagram;
   @bindable public activeSolutionEntry: ISolutionEntry;
-  @bindable public totalCount: number;
+  @bindable public totalCorrelationCount: number;
+  @bindable public totalProcessInstanceCount: number;
 
   public inspectPanelTab: typeof InspectPanelTab = InspectPanelTab;
   public showCorrelationList: boolean = true;
+  public showProcessInstanceList: boolean = true;
+
   public showLogViewer: boolean = false;
 
   private eventAggregator: EventAggregator;
@@ -32,6 +38,9 @@ export class InspectPanel {
     this.subscriptions = [
       this.eventAggregator.subscribe(environment.events.inspectCorrelation.showLogViewer, () => {
         this.changeTab(InspectPanelTab.LogViewer);
+      }),
+      this.eventAggregator.subscribe(environment.events.inspectCorrelation.showProcessInstanceList, () => {
+        this.changeTab(InspectPanelTab.ProcessInstanceList);
       }),
     ];
   }
@@ -51,25 +60,30 @@ export class InspectPanel {
   public activeDiagramChanged(): void {
     this.selectedProcessInstance = undefined;
     this.processInstanceToSelect = undefined;
+    this.selectedCorrelation = undefined;
+    this.correlationToSelect = undefined;
 
     this.showLogViewer = false;
     this.showCorrelationList = true;
+    this.showProcessInstanceList = false;
   }
 
   public changeTab(inspectPanelTab: InspectPanelTab): void {
     const shouldShowCorrelationList: boolean = inspectPanelTab === InspectPanelTab.CorrelationList;
+    const shouldShowProcessInstanceList: boolean = inspectPanelTab === InspectPanelTab.ProcessInstanceList;
     const shouldShowLogViewer: boolean = inspectPanelTab === InspectPanelTab.LogViewer;
 
     this.showCorrelationList = shouldShowCorrelationList;
     this.showLogViewer = shouldShowLogViewer;
+    this.showProcessInstanceList = shouldShowProcessInstanceList;
   }
 
   public processInstancesChanged(
-    newCorrelation: DataModels.Correlations.Correlation,
-    oldCorrelation: DataModels.Correlations.Correlation,
+    newProcessInstance: DataModels.Correlations.ProcessInstance,
+    oldProcessInstance: DataModels.Correlations.ProcessInstance,
   ): void {
-    const firstCorrelationGotSelected: boolean = oldCorrelation !== undefined;
-    const shouldEnableTokenViewerButton: boolean = !(firstCorrelationGotSelected || this.fullscreen);
+    const firstProcessInstanceGotSelected: boolean = oldProcessInstance !== undefined;
+    const shouldEnableTokenViewerButton: boolean = !(firstProcessInstanceGotSelected || this.fullscreen);
 
     if (shouldEnableTokenViewerButton) {
       this.eventAggregator.publish(environment.events.inspect.shouldDisableTokenViewerButton, false);

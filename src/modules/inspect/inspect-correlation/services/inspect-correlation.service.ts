@@ -38,10 +38,24 @@ export class InspectCorrelationService implements IInspectCorrelationService {
   }
 
   public async getAllCorrelationsForProcessModelId(
-    processModelId: string,
     identity: IIdentity,
+    processModelId: string,
+    offset?: number,
+    limit?: number,
   ): Promise<DataModels.Correlations.CorrelationList> {
-    return this.inspectCorrelationRepository.getAllCorrelationsForProcessModelId(processModelId, identity);
+    return this.inspectCorrelationRepository.getAllCorrelationsForProcessModelId(
+      identity,
+      processModelId,
+      offset,
+      limit,
+    );
+  }
+
+  public async getCorrelationById(
+    identity: IIdentity,
+    correlationId: string,
+  ): Promise<DataModels.Correlations.Correlation> {
+    return this.inspectCorrelationRepository.getCorrelationById(identity, correlationId);
   }
 
   public async getLogsForCorrelation(
@@ -109,6 +123,15 @@ export class InspectCorrelationService implements IInspectCorrelationService {
       offset,
       limit,
     );
+  }
+
+  public getProcessInstancesForCorrelation(
+    identity: IIdentity,
+    correlationId: string,
+    offset?: number,
+    limit?: number,
+  ): Promise<ProcessInstanceList> {
+    return this.inspectCorrelationRepository.getProcessInstancesForCorrelation(identity, correlationId, offset, limit);
   }
 
   public getProcessInstanceById(
