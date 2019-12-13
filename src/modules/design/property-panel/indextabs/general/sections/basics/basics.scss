@@ -1,10 +1,10 @@
 .validation_error {
-  position: relative;	
+  position: relative;
   display: inline-block;
-  margin-left: 5px;	
+  margin-left: 5px;
   margin-top: 5px;
-  z-index: 0;	
-  opacity: 1;	  
+  z-index: 0;
+  opacity: 1;
   color: red;
   font-size: 16px;
 }
@@ -58,4 +58,14 @@
 
 .docs-enlarge-text:hover {
   text-decoration: underline;
+}
+
+.hint-unsupported-bpmn-element {
+  display: inline-block;
+  margin: 0 10px;
+  padding: 0 2px;
+  font-size: 12px;
+
+  background: #FFEB3B;
+  border-bottom: 1px solid #FDD835;
 }
