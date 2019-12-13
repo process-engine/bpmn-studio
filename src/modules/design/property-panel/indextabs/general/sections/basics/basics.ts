@@ -150,6 +150,15 @@ export class BasicsSection implements ISection {
         return false;
       }
 
+      const currentElementHasUnsupportedVariable: boolean = supportedBPMNElement.unsupportedVariables.some(
+        (unsupportedVariable: string) => {
+          return Object.keys(this.elementInPanel.businessObject).includes(unsupportedVariable);
+        },
+      );
+
+      if (currentElementHasUnsupportedVariable) {
+        return false;
+      }
 
       if (this.businessObjInPanel.eventDefinitions === undefined) {
         return supportedBPMNElement.supportedEventDefinitions.some((supportedEventDefinition: string) => {
