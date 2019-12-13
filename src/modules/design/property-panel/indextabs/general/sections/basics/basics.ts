@@ -2,7 +2,7 @@ import {EventAggregator} from 'aurelia-event-aggregator';
 import {inject} from 'aurelia-framework';
 import {ValidateEvent, ValidationController, ValidationRules} from 'aurelia-validation';
 
-import {IModdleElement, IShape} from '@process-engine/bpmn-elements_contracts';
+import {IEventDefinition, IModdleElement, IShape} from '@process-engine/bpmn-elements_contracts';
 
 import {
   IBpmnModdle,
@@ -20,7 +20,7 @@ import environment from '../../../../../../../environment';
 export class BasicsSection implements ISection {
   public path: string = '/sections/basics/basics';
   public canHandleElement: boolean = true;
-  public businessObjInPanel: IModdleElement;
+  public businessObjInPanel: IModdleElement & {eventDefinitions?: Array<IEventDefinition>};
   public elementDocumentation: string;
   public validationError: boolean = false;
   public showModal: boolean = false;
