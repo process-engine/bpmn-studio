@@ -11,7 +11,8 @@ import {
   IModeling,
   IPageModel,
   ISection,
-  SupportedBPMNElementsWithEventDefinitions,
+  SupportedBPMNElement,
+  SupportedBPMNElements,
 } from '../../../../../../../contracts/index';
 import environment from '../../../../../../../environment';
 
@@ -142,26 +143,23 @@ export class BasicsSection implements ISection {
   }
 
   private isCurrentBPMNElementSupported(): boolean {
-    const supportedBPMNElements: Array<string> = Object.keys(SupportedBPMNElementsWithEventDefinitions);
     const typeOfSelectedElement: string = this.businessObjInPanel.$type;
 
-    return supportedBPMNElements.some((supportedBPMNElement: string) => {
-      if (typeOfSelectedElement !== supportedBPMNElement) {
+    return SupportedBPMNElements.some((supportedBPMNElement: SupportedBPMNElement) => {
+      if (typeOfSelectedElement !== supportedBPMNElement.type) {
         return false;
       }
 
-      const supportedEventDefinitionsForBPMNElement: Array<string> =
-        SupportedBPMNElementsWithEventDefinitions[supportedBPMNElement];
 
       if (this.businessObjInPanel.eventDefinitions === undefined) {
-        return supportedEventDefinitionsForBPMNElement.some((supportedEventDefinition: string) => {
+        return supportedBPMNElement.supportedEventDefinitions.some((supportedEventDefinition: string) => {
           return supportedEventDefinition === '';
         });
       }
 
       const eventDefinition: string = this.businessObjInPanel.eventDefinitions[0].$type;
 
-      return supportedEventDefinitionsForBPMNElement.some((supportedEventDefinition: string) => {
+      return supportedBPMNElement.supportedEventDefinitions.some((supportedEventDefinition: string) => {
         return supportedEventDefinition === eventDefinition;
       });
     });

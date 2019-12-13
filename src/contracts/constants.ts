@@ -5,54 +5,126 @@ export enum StudioVersion {
   Stable = 'stable',
 }
 
-export interface ISupportedBPMNElementWithEventDefinitionsList {
-  [name: string]: Array<string>;
-}
-
-export const SupportedBPMNElementsWithEventDefinitions: ISupportedBPMNElementWithEventDefinitionsList = {
-  'bpmn:StartEvent': ['', 'bpmn:MessageEventDefinition', 'bpmn:TimerEventDefinition', 'bpmn:SignalEventDefinition'],
-  'bpmn:Task': [''],
-  'bpmn:UserTask': [''],
-  'bpmn:ManualTask': [''],
-  'bpmn:ReceiveTask': [''],
-  'bpmn:SendTask': [''],
-  'bpmn:ScriptTask': [''],
-  'bpmn:ServiceTask': [''],
-  'bpmn:EndEvent': [
-    '',
-    'bpmn:MessageEventDefinition',
-    'bpmn:SignalEventDefinition',
-    'bpmn:ErrorEventDefinition',
-    'bpmn:TerminateEventDefinition',
-  ],
-  'bpmn:CallActivity': [''],
-  'bpmn:Lane': [''],
-  'bpmn:Participant': [''],
-  'bpmn:BoundaryEvent': [
-    '',
-    'bpmn:MessageEventDefinition',
-    'bpmn:TimerEventDefinition',
-    'bpmn:SignalEventDefinition',
-    'bpmn:ErrorEventDefinition',
-  ],
-  'bpmn:IntermediateThrowEvent': [
-    '',
-    'bpmn:MessageEventDefinition',
-    'bpmn:LinkEventDefinition',
-    'bpmn:SignalEventDefinition',
-  ],
-  'bpmn:IntermediateCatchEvent': [
-    '',
-    'bpmn:MessageEventDefinition',
-    'bpmn:LinkEventDefinition',
-    'bpmn:SignalEventDefinition',
-    'bpmn:TimerEventDefinition',
-  ],
-  'bpmn:ExclusiveGateway': [''],
-  'bpmn:ParallelGateway': [''],
-  'bpmn:SequenceFlow': [''],
-  'bpmn:SubProcess': [''],
-  'bpmn:Association': [''],
-  'bpmn:TextAnnotation': [''],
-  label: [''],
+export type SupportedBPMNElement = {
+  type: string;
+  supportedEventDefinitions: Array<string>;
 };
+
+export const SupportedBPMNElements: Array<SupportedBPMNElement> = [
+  {
+    type: 'bpmn:StartEvent',
+    supportedEventDefinitions: [
+      '',
+      'bpmn:MessageEventDefinition',
+      'bpmn:TimerEventDefinition',
+      'bpmn:SignalEventDefinition',
+    ],
+  },
+  {
+    type: 'bpmn:Task',
+    supportedEventDefinitions: [''],
+  },
+  {
+    type: 'bpmn:UserTask',
+    supportedEventDefinitions: [''],
+  },
+  {
+    type: 'bpmn:ManualTask',
+    supportedEventDefinitions: [''],
+  },
+  {
+    type: 'bpmn:ReceiveTask',
+    supportedEventDefinitions: [''],
+  },
+  {
+    type: 'bpmn:SendTask',
+    supportedEventDefinitions: [''],
+  },
+  {
+    type: 'bpmn:ScriptTask',
+    supportedEventDefinitions: [''],
+  },
+  {
+    type: 'bpmn:ServiceTask',
+    supportedEventDefinitions: [''],
+  },
+  {
+    type: 'bpmn:EndEvent',
+    supportedEventDefinitions: [
+      '',
+      'bpmn:MessageEventDefinition',
+      'bpmn:SignalEventDefinition',
+      'bpmn:ErrorEventDefinition',
+      'bpmn:TerminateEventDefinition',
+    ],
+  },
+  {
+    type: 'bpmn:CallActivity',
+    supportedEventDefinitions: [''],
+  },
+  {
+    type: 'bpmn:Lane',
+    supportedEventDefinitions: [''],
+  },
+  {
+    type: 'bpmn:Participant',
+    supportedEventDefinitions: [''],
+  },
+  {
+    type: 'bpmn:BoundaryEvent',
+    supportedEventDefinitions: [
+      '',
+      'bpmn:MessageEventDefinition',
+      'bpmn:TimerEventDefinition',
+      'bpmn:SignalEventDefinition',
+      'bpmn:ErrorEventDefinition',
+    ],
+  },
+  {
+    type: 'bpmn:IntermediateThrowEvent',
+    supportedEventDefinitions: [
+      '',
+      'bpmn:MessageEventDefinition',
+      'bpmn:LinkEventDefinition',
+      'bpmn:SignalEventDefinition',
+    ],
+  },
+  {
+    type: 'bpmn:IntermediateCatchEvent',
+    supportedEventDefinitions: [
+      '',
+      'bpmn:MessageEventDefinition',
+      'bpmn:LinkEventDefinition',
+      'bpmn:SignalEventDefinition',
+      'bpmn:TimerEventDefinition',
+    ],
+  },
+  {
+    type: 'bpmn:ExclusiveGateway',
+    supportedEventDefinitions: [''],
+  },
+  {
+    type: 'bpmn:ParallelGateway',
+    supportedEventDefinitions: [''],
+  },
+  {
+    type: 'bpmn:SequenceFlow',
+    supportedEventDefinitions: [''],
+  },
+  {
+    type: 'bpmn:SubProcess',
+    supportedEventDefinitions: [''],
+  },
+  {
+    type: 'bpmn:Association',
+    supportedEventDefinitions: [''],
+  },
+  {
+    type: 'bpmn:TextAnnotation',
+    supportedEventDefinitions: [''],
+  },
+  {
+    type: 'label',
+    supportedEventDefinitions: [''],
+  },
+];
