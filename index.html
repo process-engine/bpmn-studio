@@ -7,8 +7,15 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
   </head>
 
-  <body aurelia-app="main" style="height: 100%;">
-    <div>
+  <img src="src/resources/images/gears.svg" class="loading-spinner" style="
+  display: inline-block;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+  position: absolute;">
+
+  <body aurelia-app="main" style="height: 100%; background-color: #f7f7f7">
+    <div class="aurelia-main-app">
       <script>
         // if we're in the browser, we need to add <base href="/" /> to enable push state
         if (!window.require) {
