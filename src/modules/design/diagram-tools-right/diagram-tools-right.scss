@@ -15,20 +15,8 @@
   text-align: center;
 }
 
-.tool--disabled {
-  cursor: default;
-}
-
-.tool--disabled:hover {
-  cursor: default;
-}
-
 .open .tool {
   box-shadow: none !important; //Overwrite Bootstrap btn-group class combination
-}
-
-.color-dropdown {
-  cursor: default;
 }
 
 /*
@@ -62,7 +50,6 @@
   display: inline-block;
   margin: 0;
   overflow: hidden;
-  cursor: pointer;
   background: 0;
   border: 0;
   color: #333;

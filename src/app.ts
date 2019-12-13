@@ -22,6 +22,7 @@ Bluebird.Promise.config({cancellation: true});
 @inject(OpenIdConnect, 'NotificationService', EventAggregator)
 export class App {
   public showSolutionExplorer: boolean = false;
+  public isRunningInElectron: boolean = isRunningInElectron();
 
   private openIdConnect: OpenIdConnect | any;
   private notificationService: NotificationService;
