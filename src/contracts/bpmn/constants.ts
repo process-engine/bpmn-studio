@@ -139,4 +139,9 @@ export const SupportedBPMNElements: Array<SupportedBPMNElementListEntry> = [
     supportedEventDefinitions: [''],
     unsupportedVariables: [],
   },
+  {
+    type: 'bpmn:Collaboration',
+    supportedEventDefinitions: [''],
+    unsupportedVariables: [],
+  },
 ];
