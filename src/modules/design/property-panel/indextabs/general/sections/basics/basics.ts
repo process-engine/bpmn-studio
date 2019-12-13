@@ -11,7 +11,7 @@ import {
   IModeling,
   IPageModel,
   ISection,
-  SupportedBPMNElement,
+  SupportedBPMNElementListEntry,
   SupportedBPMNElements,
 } from '../../../../../../../contracts/index';
 import environment from '../../../../../../../environment';
@@ -145,7 +145,7 @@ export class BasicsSection implements ISection {
   private isCurrentBPMNElementSupported(): boolean {
     const typeOfSelectedElement: string = this.businessObjInPanel.$type;
 
-    return SupportedBPMNElements.some((supportedBPMNElement: SupportedBPMNElement) => {
+    return SupportedBPMNElements.some((supportedBPMNElement: SupportedBPMNElementListEntry) => {
       if (typeOfSelectedElement !== supportedBPMNElement.type) {
         return false;
       }
