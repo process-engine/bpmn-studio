@@ -11,7 +11,8 @@ import {
   IModeling,
   IPageModel,
   ISection,
-} from '../../../../../../../contracts';
+  SupportedBPMNElementsWithEventDefinitions,
+} from '../../../../../../../contracts/index';
 import environment from '../../../../../../../environment';
 
 @inject(ValidationController, EventAggregator)
@@ -23,6 +24,7 @@ export class BasicsSection implements ISection {
   public validationError: boolean = false;
   public showModal: boolean = false;
   public elementType: string;
+  public showUnsupportedFlag: boolean = false;
 
   public docsInput: HTMLElement;
 
@@ -122,7 +124,10 @@ export class BasicsSection implements ISection {
       return;
     }
 
-    this.elementType = this.humanizeElementType(this.businessObjInPanel.$type);
+    const typeOfSelectedElement: string = this.businessObjInPanel.$type;
+    this.elementType = this.humanizeElementType(typeOfSelectedElement);
+
+    this.showUnsupportedFlag = !this.isCurrentBPMNElementSupported();
 
     const documentationExists: boolean =
       this.businessObjInPanel.documentation !== undefined &&
@@ -134,6 +139,32 @@ export class BasicsSection implements ISection {
     } else {
       this.elementDocumentation = '';
     }
+  }
+
+  private isCurrentBPMNElementSupported(): boolean {
+    const supportedBPMNElements: Array<string> = Object.keys(SupportedBPMNElementsWithEventDefinitions);
+    const typeOfSelectedElement: string = this.businessObjInPanel.$type;
+
+    return supportedBPMNElements.some((supportedBPMNElement: string) => {
+      if (typeOfSelectedElement !== supportedBPMNElement) {
+        return false;
+      }
+
+      const supportedEventDefinitionsForBPMNElement: Array<string> =
+        SupportedBPMNElementsWithEventDefinitions[supportedBPMNElement];
+
+      if (this.businessObjInPanel.eventDefinitions === undefined) {
+        return supportedEventDefinitionsForBPMNElement.some((supportedEventDefinition: string) => {
+          return supportedEventDefinition === '';
+        });
+      }
+
+      const eventDefinition: string = this.businessObjInPanel.eventDefinitions[0].$type;
+
+      return supportedEventDefinitionsForBPMNElement.some((supportedEventDefinition: string) => {
+        return supportedEventDefinition === eventDefinition;
+      });
+    });
   }
 
   private humanizeElementType(type: string): string {

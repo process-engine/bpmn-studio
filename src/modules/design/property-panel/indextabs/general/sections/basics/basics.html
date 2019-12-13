@@ -2,7 +2,7 @@
   <require from="./basics.css"></require>
   <require from="../../../../styles/sections.css"></require>
   <div class="section-panel panel--general" id="js-general-basics-section">
-    <div class="panel__heading">${elementType}</div>
+    <div class="panel__heading">${elementType} <span if.bind="showUnsupportedFlag">[Unsupported]</span></div>
     <div class="panel__content">
       <table class="props-table">
         <tr>
