@@ -2,7 +2,7 @@ import {EventAggregator} from 'aurelia-event-aggregator';
 import {inject} from 'aurelia-framework';
 import {ValidateEvent, ValidationController, ValidationRules} from 'aurelia-validation';
 
-import {IModdleElement, IShape} from '@process-engine/bpmn-elements_contracts';
+import {IEventDefinition, IModdleElement, IShape} from '@process-engine/bpmn-elements_contracts';
 
 import {
   IBpmnModdle,
@@ -11,18 +11,21 @@ import {
   IModeling,
   IPageModel,
   ISection,
-} from '../../../../../../../contracts';
+  SupportedBPMNElementListEntry,
+  SupportedBPMNElements,
+} from '../../../../../../../contracts/index';
 import environment from '../../../../../../../environment';
 
 @inject(ValidationController, EventAggregator)
 export class BasicsSection implements ISection {
   public path: string = '/sections/basics/basics';
   public canHandleElement: boolean = true;
-  public businessObjInPanel: IModdleElement;
+  public businessObjInPanel: IModdleElement & {eventDefinitions?: Array<IEventDefinition>};
   public elementDocumentation: string;
   public validationError: boolean = false;
   public showModal: boolean = false;
   public elementType: string;
+  public showUnsupportedFlag: boolean = false;
 
   public docsInput: HTMLElement;
 
@@ -122,7 +125,10 @@ export class BasicsSection implements ISection {
       return;
     }
 
-    this.elementType = this.humanizeElementType(this.businessObjInPanel.$type);
+    const typeOfSelectedElement: string = this.businessObjInPanel.$type;
+    this.elementType = this.humanizeElementType(typeOfSelectedElement);
+
+    this.showUnsupportedFlag = !this.isCurrentBPMNElementSupported();
 
     const documentationExists: boolean =
       this.businessObjInPanel.documentation !== undefined &&
@@ -134,6 +140,38 @@ export class BasicsSection implements ISection {
     } else {
       this.elementDocumentation = '';
     }
+  }
+
+  private isCurrentBPMNElementSupported(): boolean {
+    const typeOfSelectedElement: string = this.businessObjInPanel.$type;
+
+    return SupportedBPMNElements.some((supportedBPMNElement: SupportedBPMNElementListEntry) => {
+      if (typeOfSelectedElement !== supportedBPMNElement.type) {
+        return false;
+      }
+
+      const currentElementHasUnsupportedVariable: boolean = supportedBPMNElement.unsupportedVariables.some(
+        (unsupportedVariable: string) => {
+          return Object.keys(this.elementInPanel.businessObject).includes(unsupportedVariable);
+        },
+      );
+
+      if (currentElementHasUnsupportedVariable) {
+        return false;
+      }
+
+      if (this.businessObjInPanel.eventDefinitions === undefined) {
+        return supportedBPMNElement.supportedEventDefinitions.some((supportedEventDefinition: string) => {
+          return supportedEventDefinition === '';
+        });
+      }
+
+      const eventDefinition: string = this.businessObjInPanel.eventDefinitions[0].$type;
+
+      return supportedBPMNElement.supportedEventDefinitions.some((supportedEventDefinition: string) => {
+        return supportedEventDefinition === eventDefinition;
+      });
+    });
   }
 
   private humanizeElementType(type: string): string {
