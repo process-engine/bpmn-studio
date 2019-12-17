@@ -5,16 +5,12 @@
     <title>BPMN Studio</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="stylesheet" href="index-styles.css">
   </head>
 
-  <img src="src/resources/images/gears.svg" class="loading-spinner" style="
-  display: inline-block;
-  transform: translate(-50%, -50%);
-  top: 50%;
-  left: 50%;
-  position: absolute;">
+  <img src="src/resources/images/gears.svg" class="loading-spinner loading-spinner--index">
 
-  <body aurelia-app="main" style="height: 100%; background-color: #f7f7f7">
+  <body aurelia-app="main" class="aurelia-app--body">
     <div class="aurelia-main-app">
       <script>
         // if we're in the browser, we need to add <base href="/" /> to enable push state
