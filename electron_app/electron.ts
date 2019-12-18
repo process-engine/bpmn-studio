@@ -355,6 +355,8 @@ function createMainWindow(): void {
     title: getProductName(),
     minWidth: 1300,
     minHeight: 800,
+    show: false,
+    backgroundColor: '#f7f7f7',
     icon: path.join(__dirname, '../build/icon.png'), // only for windows
     titleBarStyle: 'hiddenInset',
     webPreferences: {
@@ -363,6 +365,10 @@ function createMainWindow(): void {
   });
 
   mainWindowState.manage(browserWindow);
+
+  browserWindow.on('ready-to-show', () => {
+    browserWindow.show();
+  });
 
   browserWindow.loadURL(`file://${__dirname}/../../../index.html`);
   // We need to navigate to "/" because something in the push state seems to be
