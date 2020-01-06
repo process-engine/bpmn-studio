@@ -55,7 +55,7 @@ export class ProcessInstanceList {
   }
 
   public showLogViewer(): void {
-    this.eventAggregator.publish(environment.events.inspectCorrelation.showLogViewer);
+    this.eventAggregator.publish(environment.events.inspectProcessInstance.showLogViewer);
   }
 
   public selectProcessInstance(selectedTableEntry: ProcessInstanceTableEntry): void {
@@ -137,7 +137,7 @@ export class ProcessInstanceList {
         offset: 0,
         limit: this.pageSize,
       };
-      this.eventAggregator.publish(environment.events.inspectCorrelation.updateProcessInstances, payload);
+      this.eventAggregator.publish(environment.events.inspectProcessInstance.updateProcessInstances, payload);
 
       return;
     }
@@ -158,7 +158,7 @@ export class ProcessInstanceList {
       limit: this.pageSize,
     };
 
-    this.eventAggregator.publish(environment.events.inspectCorrelation.updateProcessInstances, payload);
+    this.eventAggregator.publish(environment.events.inspectProcessInstance.updateProcessInstances, payload);
   }
 
   public changeSortProperty(property: ProcessInstanceListSortProperty): void {

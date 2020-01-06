@@ -3,16 +3,16 @@ import {EventAggregator} from 'aurelia-event-aggregator';
 
 import {IManagementApiClient} from '@process-engine/management_api_contracts';
 
-import {InspectCorrelationService} from './services/inspect-correlation.service';
+import {InspectProcessInstanceService} from './services/inspect-process-instance.service';
 
 export function configure(config: FrameworkConfiguration): void {
   const eventAggregator: EventAggregator = config.container.get(EventAggregator);
   const managementApiClient: IManagementApiClient = config.container.get('ManagementApiClientService');
 
-  const inspectCorrelationService: InspectCorrelationService = new InspectCorrelationService(
+  const inspectProcessInstanceService: InspectProcessInstanceService = new InspectProcessInstanceService(
     eventAggregator,
     managementApiClient,
   );
 
-  config.container.registerInstance('InspectCorrelationService', inspectCorrelationService);
+  config.container.registerInstance('InspectProcessInstanceService', inspectProcessInstanceService);
 }

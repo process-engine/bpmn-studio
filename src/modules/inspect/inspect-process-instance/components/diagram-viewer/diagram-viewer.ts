@@ -132,7 +132,7 @@ export class DiagramViewer {
       }),
 
       this.eventAggregator.subscribe(
-        environment.events.inspectCorrelation.noCorrelationsFound,
+        environment.events.inspectProcessInstance.noCorrelationsFound,
         (noCorrelationsFound: boolean) => {
           this.noCorrelationsFound = noCorrelationsFound;
         },
