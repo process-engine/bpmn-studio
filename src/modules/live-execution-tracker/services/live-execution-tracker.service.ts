@@ -94,11 +94,7 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
     processInstanceId: string,
     callback: Function,
   ): Promise<Subscription> {
-    return this.liveExecutionTrackerRepository.createProcessErrorEventListener(
-      identity,
-      processInstanceId,
-      callback,
-    );
+    return this.liveExecutionTrackerRepository.createProcessErrorEventListener(identity, processInstanceId, callback);
   }
 
   public createProcessTerminatedEventListener(
