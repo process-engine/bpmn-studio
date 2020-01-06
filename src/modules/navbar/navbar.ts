@@ -21,14 +21,14 @@ export class NavBar {
   public solutionExplorerIsActive: boolean = true;
   public showTools: boolean = false;
   public showInspectTools: boolean = false;
-  public showExportOnInspectCorrelation: boolean = false;
+  public showExportOnInspectProcessInstance: boolean = false;
   public disableStartButton: boolean = true;
   public validationError: boolean = false;
   public showProcessName: boolean = false;
   public disableDiagramUploadButton: boolean = true;
   public disableHeatmapButton: boolean = true;
   public disableDashboardButton: boolean = false;
-  public disableInspectCorrelationButton: boolean = false;
+  public disableInspectProcessInstanceButton: boolean = false;
   public diagramContainsUnsavedChanges: boolean = false;
   public savingTargetIsRemoteSolution: boolean = false;
   public showLeftMarginInNavbar: boolean = false;
@@ -121,19 +121,19 @@ export class NavBar {
       this.eventAggregator.subscribe(environment.events.navBar.toggleHeatmapView, () => {
         this.disableHeatmapButton = true;
         this.disableDashboardButton = false;
-        this.disableInspectCorrelationButton = false;
+        this.disableInspectProcessInstanceButton = false;
       }),
 
       this.eventAggregator.subscribe(environment.events.navBar.toggleDashboardView, () => {
         this.disableHeatmapButton = false;
         this.disableDashboardButton = true;
-        this.disableInspectCorrelationButton = false;
+        this.disableInspectProcessInstanceButton = false;
       }),
 
-      this.eventAggregator.subscribe(environment.events.navBar.toggleInspectCorrelationView, () => {
+      this.eventAggregator.subscribe(environment.events.navBar.toggleInspectProcessInstanceView, () => {
         this.disableHeatmapButton = false;
         this.disableDashboardButton = false;
-        this.disableInspectCorrelationButton = true;
+        this.disableInspectProcessInstanceButton = true;
       }),
     ];
 
@@ -207,7 +207,7 @@ export class NavBar {
   public showDashboard(): void {
     this.disableDashboardButton = true;
     this.disableHeatmapButton = false;
-    this.disableInspectCorrelationButton = false;
+    this.disableInspectProcessInstanceButton = false;
 
     this.inspectView = 'dashboard';
 
@@ -217,19 +217,19 @@ export class NavBar {
   public showHeatmap(): void {
     this.disableHeatmapButton = true;
     this.disableDashboardButton = false;
-    this.disableInspectCorrelationButton = false;
+    this.disableInspectProcessInstanceButton = false;
 
     this.inspectView = 'heatmap';
 
     this.routerNavigate(this.router.currentInstruction.config.name, this.inspectView);
   }
 
-  public showInspectCorrelation(): void {
+  public showInspectProcessInstance(): void {
     this.disableHeatmapButton = false;
     this.disableDashboardButton = false;
-    this.disableInspectCorrelationButton = true;
+    this.disableInspectProcessInstanceButton = true;
 
-    this.inspectView = 'inspect-correlation';
+    this.inspectView = 'inspect-process-instance';
 
     this.routerNavigate(this.router.currentInstruction.config.name, this.inspectView);
   }
@@ -264,7 +264,7 @@ export class NavBar {
   }
 
   public exportDiagram(exportAs: string): void {
-    const eventToPublish: string = this.showExportOnInspectCorrelation
+    const eventToPublish: string = this.showExportOnInspectProcessInstance
       ? environment.events.inspect.exportDiagramAs
       : environment.events.diagramDetail.exportDiagramAs;
 
@@ -349,29 +349,29 @@ export class NavBar {
     if (activeRouteIsDiagramDetail) {
       this.showTools = true;
       this.showInspectTools = false;
-      this.showExportOnInspectCorrelation = false;
+      this.showExportOnInspectProcessInstance = false;
     } else if (activeRouteIsInspect) {
       const inspectView: string = this.router.currentInstruction.params.view;
       const inspectViewIsDashboard: boolean = inspectView === 'dashboard';
       const inspectViewIsHeatmap: boolean = inspectView === 'heatmap';
-      const inspectViewIsInspectCorrelation: boolean = inspectView === 'inspect-correlation';
+      const inspectViewIsInspectProcessInstance: boolean = inspectView === 'inspect-process-instance';
 
       this.showInspectTools = true;
 
       this.disableDashboardButton = inspectViewIsDashboard;
       this.disableHeatmapButton = inspectViewIsHeatmap;
-      this.disableInspectCorrelationButton = inspectViewIsInspectCorrelation;
+      this.disableInspectProcessInstanceButton = inspectViewIsInspectProcessInstance;
 
-      this.showExportOnInspectCorrelation = inspectViewIsInspectCorrelation || false;
+      this.showExportOnInspectProcessInstance = inspectViewIsInspectProcessInstance || false;
 
       this.showTools = false;
     } else if (activeRouteIsLET) {
       this.showTools = false;
       this.showInspectTools = false;
-      this.showExportOnInspectCorrelation = false;
+      this.showExportOnInspectProcessInstance = false;
     } else {
       this.showInspectTools = false;
-      this.showExportOnInspectCorrelation = false;
+      this.showExportOnInspectProcessInstance = false;
     }
   }
 

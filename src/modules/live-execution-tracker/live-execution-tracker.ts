@@ -565,7 +565,7 @@ export class LiveExecutionTracker {
     const elementId: string = this.getElementIdByOverlayHtmlId(overlayHtmlId);
 
     this.router.navigateToRoute('inspect', {
-      view: 'inspect-correlation',
+      view: 'inspect-process-instance',
       diagramName: this.activeDiagram.name,
       solutionUri: this.activeSolutionEntry.uri,
       processInstanceToSelect: this.processInstanceId,
