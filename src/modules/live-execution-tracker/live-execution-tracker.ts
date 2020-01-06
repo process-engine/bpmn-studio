@@ -465,14 +465,14 @@ export class LiveExecutionTracker {
     if (overlayHtmlId.endsWith('empty-activity')) {
       return this.handleEmptyActivityClick;
     }
+    if (overlayHtmlId.endsWith('inactive-call-activity')) {
+      return this.handleInactiveCallActivityClick;
+    }
     if (overlayHtmlId.endsWith('active-call-activity')) {
       return this.handleActiveCallActivityClick;
     }
     if (overlayHtmlId.endsWith('error-element')) {
       return this.handleErrorElementClick;
-    }
-    if (overlayHtmlId.endsWith('inactive-call-activity')) {
-      return this.handleInactiveCallActivityClick;
     }
 
     return undefined;
