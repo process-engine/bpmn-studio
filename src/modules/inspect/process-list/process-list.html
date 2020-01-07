@@ -5,7 +5,7 @@
     <div class="process-list-container" id="processListContainer">
       <h4 class="process-list-header">Processes</h4>
       <template if.bind="processInstancesToDisplay && processInstancesToDisplay.length > 0 && initialLoadingFinished">
-        <h6 class="process-list-total-count">Total: ${totalItems}</h6>
+        <h6 class="process-list-total-count">Total: ${activeProcessInstanceCount}</h6>
         <table class="table table-striped table-bordered">
           <tr>
             <th>Started At</th>

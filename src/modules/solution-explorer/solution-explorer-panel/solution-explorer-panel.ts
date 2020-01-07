@@ -30,6 +30,11 @@ type RemoteSolutionListEntry = {
   version?: StudioVersion;
 };
 
+enum SupportedProtocols {
+  HTTPS = 'https://',
+  HTTP = 'http://',
+}
+
 /**
  * This component handels:
  *  - Opening files via drag and drop
@@ -54,6 +59,8 @@ export class SolutionExplorerPanel {
   public availableDefaultRemoteSolutions: Array<RemoteSolutionListEntry> = [];
   public isConnecting: boolean = false;
   public connectionError: string;
+
+  public supportedProtocols: typeof SupportedProtocols = SupportedProtocols;
 
   private eventAggregator: EventAggregator;
   private notificationService: NotificationService;
@@ -264,7 +271,7 @@ export class SolutionExplorerPanel {
     this.removeSolutionFromSolutionHistroy(solutionUri);
   }
 
-  public selectProtocol(protocol: string): void {
+  public selectProtocol(protocol: SupportedProtocols): void {
     this.selectedProtocol = protocol;
   }
 
@@ -275,6 +282,20 @@ export class SolutionExplorerPanel {
     this.showOpenRemoteSolutionModal = false;
     this.uriOfRemoteSolutionWithoutProtocol = undefined;
     this.connectionError = undefined;
+  }
+
+  public uriOfRemoteSolutionWithoutProtocolChanged(): void {
+    if (this.uriOfRemoteSolutionWithoutProtocol === undefined) {
+      return;
+    }
+
+    for (const protocol of Object.values(SupportedProtocols)) {
+      if (this.uriOfRemoteSolutionWithoutProtocol.startsWith(protocol)) {
+        this.uriOfRemoteSolutionWithoutProtocol = this.uriOfRemoteSolutionWithoutProtocol.replace(protocol, '');
+
+        this.selectProtocol(protocol);
+      }
+    }
   }
 
   public async openRemoteSolution(): Promise<void> {
@@ -411,9 +432,13 @@ export class SolutionExplorerPanel {
     const protocolEndIndex: number = remoteSolutionUri.indexOf('//') + 2;
     const protocol: string = remoteSolutionUri.substring(0, protocolEndIndex);
 
+    const protocolKey = Object.keys(SupportedProtocols).find((supportedProtocolKey) => {
+      return SupportedProtocols[supportedProtocolKey] === protocol;
+    });
+
     const uri: string = remoteSolutionUri.substring(protocolEndIndex, remoteSolutionUri.length);
 
-    this.selectProtocol(protocol);
+    this.selectProtocol(SupportedProtocols[protocolKey]);
     this.uriOfRemoteSolutionWithoutProtocol = uri;
   }
 

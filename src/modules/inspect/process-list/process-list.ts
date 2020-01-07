@@ -23,6 +23,7 @@ export class ProcessList {
   @bindable() public activeSolutionEntry: ISolutionEntry;
   public pageSize: number = 10;
   public totalItems: number;
+  public activeProcessInstanceCount: number;
   public paginationSize: number = 10;
   public initialLoadingFinished: boolean = false;
   public processInstancesToDisplay: Array<DataModels.Correlations.ProcessInstance> = [];
@@ -276,6 +277,7 @@ export class ProcessList {
         JSON.stringify(processInstanceList.processInstances) !== JSON.stringify(this.processInstances);
 
       this.totalItems = processInstanceList.totalCount + this.stoppedProcessInstances.length;
+      this.activeProcessInstanceCount = processInstanceList.totalCount;
 
       if (processInstanceListWasUpdated) {
         this.processInstances = processInstanceList.processInstances;

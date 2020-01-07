@@ -18,6 +18,14 @@ export class Forms implements IIndextab {
   }
 
   public activate(model: IPageModel): void {
+    /*
+     * This is necessary because since v1.12.0 of aurelia-templating-resources there is a bug
+     * which triggers the activate function although the form section is already detached.
+     */
+    if (model === undefined) {
+      return;
+    }
+
     this.elementInPanel = model.elementInPanel;
     this.modeler = model.modeler;
   }

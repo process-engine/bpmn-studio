@@ -1,0 +1,61 @@
+.feedback-modal__checkbox {
+  cursor: pointer;
+}
+
+.feedback-modal__checkbox-label {
+  margin-left: 5px;
+}
+
+.feedback-modal__solution-title {
+  user-select: none;
+  cursor: pointer;
+}
+
+.feedback-modal__text-input {
+  margin-top: 0px;
+  margin-bottom: 5px;
+}
+
+.feedback-modal__input-label {
+  display: inline-block;
+  margin-top: 5px;
+}
+
+.feedback-modal__solution {
+  margin-bottom: 5px;
+}
+
+.feedback-modal__solution-diagram-list {
+  margin-left: 10px;
+}
+
+.feedback-modal__diagram-selection {
+  margin: 5px 20px;
+}
+
+.feedback-modal__diagram {
+  position: relative;
+  height: 20px;
+}
+
+.feedback-modal__diagram-checkbox {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.feedback-modal__diagram-name {
+  position: absolute;
+  top: 50%;
+  left: 20px;
+  transform: translateY(-50%);
+  line-height: 14px;
+}
+
+.feedback-modal__solution-hide-icon {
+  width: 10px;
+}
+
+.feedback-modal__help-icon {
+  cursor: help;
+}

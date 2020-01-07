@@ -57,8 +57,8 @@
           <div class="input-group-prepend">
             <button class="btn btn-default solution-explorer-panel__protocol-selector dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${selectedProtocol}</button>
             <div class="dropdown-menu">
-              <a class="dropdown-item" click.delegate="selectProtocol('http://')">http://</a>
-              <a class="dropdown-item" click.delegate="selectProtocol('https://')">https://</a>
+              <a class="dropdown-item" click.delegate="selectProtocol(supportedProtocols.HTTP)">http://</a>
+              <a class="dropdown-item" click.delegate="selectProtocol(supportedProtocols.HTTPS)">https://</a>
             </div>
           </div>
           <input type="text" class="form-control" class.bind="uriIsValid || uriIsEmpty ? '' : 'uri-input--invalid'" value.bind="origin.uriOfRemoteSolutionWithoutProtocol" placeholder="Please provide a URI for the remote ProcessEngine" autofocus>
