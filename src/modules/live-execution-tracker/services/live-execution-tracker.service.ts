@@ -94,11 +94,7 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
     processInstanceId: string,
     callback: Function,
   ): Promise<Subscription> {
-    return this.liveExecutionTrackerRepository.createProcessErrorEventListener(
-      identity,
-      processInstanceId,
-      callback,
-    );
+    return this.liveExecutionTrackerRepository.createProcessErrorEventListener(identity, processInstanceId, callback);
   }
 
   public createProcessTerminatedEventListener(
@@ -438,7 +434,8 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
       (currentProcessInstance: DataModels.Correlations.ProcessInstance): boolean => {
         const targetProcessModelFound: boolean =
           currentProcessInstance.parentProcessInstanceId === processInstanceIdOfOrigin &&
-          currentProcessInstance.processModelId === callActivityTargetId;
+          currentProcessInstance.processModelId === callActivityTargetId &&
+          currentProcessInstance.state === DataModels.Correlations.CorrelationState.running;
 
         return targetProcessModelFound;
       },

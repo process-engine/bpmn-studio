@@ -20,9 +20,10 @@ export class LiveExecutionTrackerRepository implements ILiveExecutionTrackerRepo
     identity: IIdentity,
     processInstanceId: string,
   ): Promise<DataModels.FlowNodeInstances.FlowNodeInstanceList> {
-    const flowNodeInstances: Array<
-      DataModels.FlowNodeInstances.FlowNodeInstance
-    > = (await this.managementApiClient.getFlowNodeInstancesForProcessInstance(identity, processInstanceId)) as any;
+    const flowNodeInstances: Array<DataModels.FlowNodeInstances.FlowNodeInstance> = (await this.managementApiClient.getFlowNodeInstancesForProcessInstance(
+      identity,
+      processInstanceId,
+    )) as any;
 
     const flowNodeInstanceList: DataModels.FlowNodeInstances.FlowNodeInstanceList = {
       flowNodeInstances: flowNodeInstances,
@@ -136,9 +137,10 @@ export class LiveExecutionTrackerRepository implements ILiveExecutionTrackerRepo
   ): Promise<DataModels.Kpi.ActiveTokenList | null> {
     for (let retries: number = 0; retries < this.maxRetries; retries++) {
       try {
-        const activeTokens: Array<
-          DataModels.Kpi.ActiveToken
-        > = (await this.managementApiClient.getActiveTokensForProcessInstance(identity, processInstanceId)) as any;
+        const activeTokens: Array<DataModels.Kpi.ActiveToken> = (await this.managementApiClient.getActiveTokensForProcessInstance(
+          identity,
+          processInstanceId,
+        )) as any;
 
         const activeTokenList: DataModels.Kpi.ActiveTokenList = {
           activeTokens: activeTokens,
