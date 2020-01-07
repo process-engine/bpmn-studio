@@ -994,78 +994,78 @@ export class LiveExecutionTracker {
       this.handleElementColorization();
     };
 
-    const processEndedSubscriptionPromise: Promise<Subscription> = this.liveExecutionTrackerService.createProcessEndedEventListener(
+    const processEndedSubscriptionPromise = this.liveExecutionTrackerService.createProcessEndedEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       processEndedCallback,
     );
-    const processErrorSubscriptionPromise: Promise<Subscription> = this.liveExecutionTrackerService.createProcessErrorEventListener(
+    const processErrorSubscriptionPromise = this.liveExecutionTrackerService.createProcessErrorEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       processEndedCallback,
     );
-    const processTerminatedSubscriptionPromise: Promise<Subscription> = this.liveExecutionTrackerService.createProcessTerminatedEventListener(
+    const processTerminatedSubscriptionPromise = this.liveExecutionTrackerService.createProcessTerminatedEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       processEndedCallback,
     );
 
-    const userTaskWaitingSubscriptionPromise: Promise<Subscription> = this.liveExecutionTrackerService.createUserTaskWaitingEventListener(
+    const userTaskWaitingSubscriptionPromise = this.liveExecutionTrackerService.createUserTaskWaitingEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       colorizationCallback,
     );
-    const userTaskFinishedSubscriptionPromise: Promise<Subscription> = this.liveExecutionTrackerService.createUserTaskFinishedEventListener(
+    const userTaskFinishedSubscriptionPromise = this.liveExecutionTrackerService.createUserTaskFinishedEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       colorizationCallback,
     );
-    const manualTaskWaitingSubscriptionPromise: Promise<Subscription> = this.liveExecutionTrackerService.createManualTaskWaitingEventListener(
+    const manualTaskWaitingSubscriptionPromise = this.liveExecutionTrackerService.createManualTaskWaitingEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       colorizationCallback,
     );
-    const manualTaskFinishedSubscriptionPromise: Promise<Subscription> = this.liveExecutionTrackerService.createManualTaskFinishedEventListener(
+    const manualTaskFinishedSubscriptionPromise = this.liveExecutionTrackerService.createManualTaskFinishedEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       colorizationCallback,
     );
-    const emptyActivityWaitingSubscriptionPromise: Promise<Subscription> = this.liveExecutionTrackerService.createEmptyActivityWaitingEventListener(
+    const emptyActivityWaitingSubscriptionPromise = this.liveExecutionTrackerService.createEmptyActivityWaitingEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       colorizationCallback,
     );
-    const emptyActivityFinishedSubscriptionPromise: Promise<Subscription> = this.liveExecutionTrackerService.createEmptyActivityFinishedEventListener(
+    const emptyActivityFinishedSubscriptionPromise = this.liveExecutionTrackerService.createEmptyActivityFinishedEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       colorizationCallback,
     );
-    const activityReachedSubscriptionPromise: Promise<Subscription> = this.liveExecutionTrackerService.createActivityReachedEventListener(
+    const activityReachedSubscriptionPromise = this.liveExecutionTrackerService.createActivityReachedEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       colorizationCallback,
     );
-    const activityFinishedSubscriptionPromise: Promise<Subscription> = this.liveExecutionTrackerService.createActivityFinishedEventListener(
+    const activityFinishedSubscriptionPromise = this.liveExecutionTrackerService.createActivityFinishedEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       colorizationCallback,
     );
-    const boundaryEventTriggeredSubscriptionPromise: Promise<Subscription> = this.liveExecutionTrackerService.createBoundaryEventTriggeredEventListener(
+    const boundaryEventTriggeredSubscriptionPromise = this.liveExecutionTrackerService.createBoundaryEventTriggeredEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       colorizationCallback,
     );
-    const intermediateThrowEventTriggeredSubscriptionPromise: Promise<Subscription> = this.liveExecutionTrackerService.createIntermediateThrowEventTriggeredEventListener(
+    const intermediateThrowEventTriggeredSubscriptionPromise = this.liveExecutionTrackerService.createIntermediateThrowEventTriggeredEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       colorizationCallback,
     );
-    const intermediateCatchEventReachedSubscriptionPromise: Promise<Subscription> = this.liveExecutionTrackerService.createIntermediateCatchEventReachedEventListener(
+    const intermediateCatchEventReachedSubscriptionPromise = this.liveExecutionTrackerService.createIntermediateCatchEventReachedEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       colorizationCallback,
     );
-    const intermediateCatchEventFinishedSubscriptionPromise: Promise<Subscription> = this.liveExecutionTrackerService.createIntermediateCatchEventFinishedEventListener(
+    const intermediateCatchEventFinishedSubscriptionPromise = this.liveExecutionTrackerService.createIntermediateCatchEventFinishedEventListener(
       this.activeSolutionEntry.identity,
       this.processInstanceId,
       colorizationCallback,
