@@ -131,9 +131,9 @@ function initializeApplication(): void {
     createFeedbackZip(feedbackData);
   });
 
-  if (!releaseChannel.isDev() && !process.env.SPECTRON_TESTS) {
-    initializeAutoUpdater();
-  }
+  // if (!releaseChannel.isDev() && !process.env.SPECTRON_TESTS) {
+  initializeAutoUpdater();
+  // }
 
   initializeFileOpenFeature();
   initializeOidc();
@@ -146,9 +146,9 @@ function initializeAutoUpdater(): void {
     const currentVersion = app.getVersion();
     const currentReleaseChannel = new ReleaseChannel(currentVersion);
 
-    const currentVersionIsPrerelease = currentReleaseChannel.isAlpha() || currentReleaseChannel.isBeta();
+    const currentVersionIsPrerelease = currentReleaseChannel.isAlpha() || currentReleaseChannel.isBeta() || true;
     autoUpdater.allowPrerelease = currentVersionIsPrerelease;
-    autoUpdater.channel = currentReleaseChannel.getName();
+    autoUpdater.channel = 'alpha';
 
     const updateCheckResult = await autoUpdater.checkForUpdates();
 
