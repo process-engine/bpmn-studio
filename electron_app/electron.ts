@@ -31,7 +31,7 @@ import ReleaseChannel from '../src/services/release-channel-service/release-chan
 import {solutionIsRemoteSolution} from '../src/services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 import {version as CurrentStudioVersion} from '../package.json';
 import {getPortListByVersion} from '../src/services/default-ports-module/default-ports.module';
-import {FeedbackData} from '../src/contracts';
+import {FeedbackData, ITokenObject} from '../src/contracts';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import electron = require('electron');
@@ -241,7 +241,12 @@ function initializeOidc(): void {
 
   ipcMain.on('oidc-login', (event, authorityUrl) => {
     electronOidcInstance.getTokenObject(authorityUrl).then(
-      (token) => {
+      async (token) => {
+        const refreshCallback: Function = (tokenObject: ITokenObject) => {
+          event.sender.send(`oidc-silent_refresh-${authorityUrl}`, tokenObject);
+        };
+
+        electronOidcInstance.startSilentRefreshing(authorityUrl, token, refreshCallback);
         event.sender.send('oidc-login-reply', token);
       },
       (err) => {
