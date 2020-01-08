@@ -2,10 +2,10 @@
 import fs from 'fs';
 import path from 'path';
 import {homedir} from 'os';
+import {ChildProcess, fork} from 'child_process';
+
 import windowStateKeeper from 'electron-window-state';
-
 import JSZip from 'jszip';
-
 import {
   App,
   BrowserWindow,
@@ -22,7 +22,6 @@ import getPort from 'get-port';
 import open from 'open';
 
 import {CancellationToken, autoUpdater} from '@process-engine/electron-updater';
-import * as pe from '@process-engine/process_engine_runtime';
 import {version as ProcessEngineVersion} from '@process-engine/process_engine_runtime/package.json';
 
 import electronOidc from './electron-oidc';
@@ -976,18 +975,8 @@ async function startInternalProcessEngine(): Promise<any> {
     event.returnValue = ProcessEngineVersion;
   });
 
-  // TODO: Check if the ProcessEngine instance is now run on the UI thread.
-  // See issue https://github.com/process-engine/bpmn-studio/issues/312
   try {
-    const sqlitePath = getProcessEngineDatabaseFolder();
-    const logFilepath = getProcessEngineLogFolder();
-
-    const startupArgs = {
-      sqlitePath: sqlitePath,
-      logFilePath: logFilepath,
-    };
-
-    pe.startRuntime(startupArgs);
+    const childProcess = await startRuntime();
 
     console.log('Internal ProcessEngine started successfully.');
     internalProcessEngineStatus = 'success';
@@ -1010,7 +999,36 @@ async function startInternalProcessEngine(): Promise<any> {
   }
 }
 
-function getProcessEngineLogFolder(): string {
+async function startRuntime(): Promise<ChildProcess> {
+  return new Promise((resolve: Function, reject: Function): void => {
+    const sqlitePath = getDatabaseFolder();
+    const logFilepath = getLogFolder();
+
+    const childProcess = fork(
+      './node_modules/@process-engine/process_engine_runtime/bin/index.js',
+      [`--sqlitePath=${sqlitePath}`, `--logFilePath=${logFilepath}`],
+      {stdio: 'inherit'},
+    );
+
+    childProcess.on('message', (message) => {
+      if (message === 'started') {
+        resolve(childProcess);
+      }
+    });
+
+    childProcess.on('close', (code) => {
+      const error = new Error(`Runtime exited with code ${code}`);
+      reject(error);
+    });
+
+    childProcess.on('error', (err) => {
+      const error = new Error(`Failed to start subprocess. \nError: ${err.toString()}`);
+      reject(error);
+    });
+  });
+}
+
+function getLogFolder(): string {
   return path.join(getConfigFolder(), getProcessEngineLogFolderName());
 }
 
