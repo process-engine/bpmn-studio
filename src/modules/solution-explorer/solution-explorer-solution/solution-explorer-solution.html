@@ -116,11 +116,13 @@
   </modal>
 
   <modal if.bind="showErrorLogs"
-          body-style="min-height: 230px"
+          body-style="min-height: 320px"
+          modal-style="max-width: 900px; top: 10%;"
+          content-style="height: 600px;"
           header-text="ProcessEngine Error Log"
           origin.bind="solutionExplorerSolution">
     <template replace-part="modal-body">
-      <textarea ref="origin.errorLogArea" class="form-control error-log" value.bind="processEngineErrorLog"></textarea>
+      <textarea ref="origin.errorLogArea" class="form-control error-log" value.bind="processEngineErrorLog" readonly></textarea>
     </template>
     <template replace-part="modal-footer">
       <button type="button" class="btn btn-default" click.delegate="copyToClipboard()">Copy</button>
