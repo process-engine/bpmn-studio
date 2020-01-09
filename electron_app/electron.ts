@@ -53,6 +53,14 @@ let isInitialized: boolean = false;
  */
 let fileOpenMainEvent: IpcMainEvent;
 
+let runtimeProcess: ChildProcess;
+
+process.on('exit', () => {
+  if (runtimeProcess) {
+    runtimeProcess.kill('SIGTERM');
+  }
+});
+
 function execute(): void {
   /**
    * Makes Main application a Single Instance Application.
@@ -976,7 +984,16 @@ async function startInternalProcessEngine(): Promise<any> {
   });
 
   try {
-    const childProcess = await startRuntime();
+    await startRuntime();
+
+    runtimeProcess.on('close', (code) => {
+      const error = new Error(`Runtime exited with code ${code}`);
+    });
+
+    runtimeProcess.on('error', (err) => {
+      const error = new Error(err.toString());
+      console.error('Internal ProcessEngine Error: ', error);
+    });
 
     console.log('Internal ProcessEngine started successfully.');
     internalProcessEngineStatus = 'success';
@@ -999,31 +1016,35 @@ async function startInternalProcessEngine(): Promise<any> {
   }
 }
 
-async function startRuntime(): Promise<ChildProcess> {
+async function startRuntime(): Promise<void> {
   return new Promise((resolve: Function, reject: Function): void => {
     const sqlitePath = getDatabaseFolder();
     const logFilepath = getLogFolder();
 
-    const childProcess = fork(
+    runtimeProcess = fork(
       './node_modules/@process-engine/process_engine_runtime/bin/index.js',
       [`--sqlitePath=${sqlitePath}`, `--logFilePath=${logFilepath}`],
-      {stdio: 'inherit'},
+      {stdio: 'pipe'},
     );
 
-    childProcess.on('message', (message) => {
+    runtimeProcess.stdout.on('data', (data) => process.stdout.write(data));
+    runtimeProcess.stderr.on('data', (data) => {
+      process.stderr.write(data);
+      peErrors += data.toString();
+    });
+    runtimeProcess.on('message', (message) => {
       if (message === 'started') {
-        resolve(childProcess);
+        resolve();
       }
     });
 
-    childProcess.on('close', (code) => {
+    runtimeProcess.on('close', (code) => {
       const error = new Error(`Runtime exited with code ${code}`);
       reject(error);
     });
 
-    childProcess.on('error', (err) => {
-      const error = new Error(`Failed to start subprocess. \nError: ${err.toString()}`);
-      reject(error);
+    runtimeProcess.on('error', (err) => {
+      reject(err);
     });
   });
 }
