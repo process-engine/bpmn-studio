@@ -6,4 +6,5 @@ export type FeedbackData = {
   diagrams: Array<IDiagram>;
   additionalDiagramInformation: string;
   attachInternalDatabases: boolean;
+  attachProcessEngineLogs: boolean;
 };

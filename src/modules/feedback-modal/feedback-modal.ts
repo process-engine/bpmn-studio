@@ -1,9 +1,7 @@
 import {bindable, inject} from 'aurelia-framework';
 import {IDiagram, ISolution} from '@process-engine/solutionexplorer.contracts';
-import {EventAggregator} from 'aurelia-event-aggregator';
 import {SolutionService} from '../../services/solution-service/solution.service';
 import {FeedbackData, ISolutionEntry} from '../../contracts';
-import environment from '../../environment';
 import {isRunningInElectron} from '../../services/is-running-in-electron-module/is-running-in-electron.module';
 import {solutionIsRemoteSolution} from '../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 
@@ -24,6 +22,7 @@ export class FeedbackModal {
   public selectedDiagrams: ISelectedDiagramList = {};
   public additionalDiagramInformation: string = '';
   public attachInternalDatabases: boolean = false;
+  public attachProcessEngineLogs: boolean = false;
 
   public solutions: Array<ISolution>;
   public showSolutionList: IShowSolutionList = {};
@@ -45,7 +44,14 @@ export class FeedbackModal {
   }
 
   public get disableCreateButton(): boolean {
-    return this.bugs.trim() === '' && this.suggestions.trim() === '' && this.additionalDiagramInformation.trim() === '';
+    return (
+      this.bugs.trim() === '' &&
+      this.suggestions.trim() === '' &&
+      this.additionalDiagramInformation.trim() === '' &&
+      !this.attachInternalDatabases &&
+      !this.attachProcessEngineLogs &&
+      Object.keys(this.selectedDiagrams).length === 0
+    );
   }
 
   public showFeedbackModalChanged(): void {
@@ -80,6 +86,7 @@ export class FeedbackModal {
       diagrams: diagramsToAttach,
       additionalDiagramInformation: this.additionalDiagramInformation,
       attachInternalDatabases: this.attachInternalDatabases,
+      attachProcessEngineLogs: this.attachProcessEngineLogs,
     };
 
     this.ipcRenderer.send('create-feedback-zip', feedbackData);

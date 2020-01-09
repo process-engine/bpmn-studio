@@ -974,8 +974,8 @@ async function startInternalProcessEngine(): Promise<any> {
   // TODO: Check if the ProcessEngine instance is now run on the UI thread.
   // See issue https://github.com/process-engine/bpmn-studio/issues/312
   try {
-    const sqlitePath = getDatabaseFolder();
-    const logFilepath = getLogFolder();
+    const sqlitePath = getProcessEngineDatabaseFolder();
+    const logFilepath = getProcessEngineLogFolder();
 
     const startupArgs = {
       sqlitePath: sqlitePath,
@@ -1005,7 +1005,7 @@ async function startInternalProcessEngine(): Promise<any> {
   }
 }
 
-function getLogFolder(): string {
+function getProcessEngineLogFolder(): string {
   return path.join(getConfigFolder(), getProcessEngineLogFolderName());
 }
 
@@ -1013,7 +1013,7 @@ function getProcessEngineLogFolderName(): string {
   return 'process_engine_logs';
 }
 
-function getDatabaseFolder(): string {
+function getProcessEngineDatabaseFolder(): string {
   return path.join(getConfigFolder(), getProcessEngineDatabaseFolderName());
 }
 
@@ -1125,7 +1125,7 @@ function bringExistingInstanceToForeground(): void {
 async function exportDatabases(): Promise<void> {
   const zip = new JSZip();
 
-  await addDatabaseToZip(zip);
+  addFolderToZip(zip, getProcessEngineDatabaseFolderName(), getProcessEngineDatabaseFolder());
 
   // eslint-disable-next-line newline-per-chained-call
   const now = new Date().toISOString().replace(/:/g, '-');
@@ -1145,25 +1145,33 @@ async function exportDatabases(): Promise<void> {
 async function createFeedbackZip(feedbackData: FeedbackData): Promise<void> {
   const zip = new JSZip();
 
-  const zipFolder = zip.folder('feedback');
+  const feedbackFolder = zip.folder('feedback');
 
   if (feedbackData.attachInternalDatabases) {
-    await addDatabaseToZip(zipFolder);
+    const processEngineFolder = feedbackFolder.folder('InternalProcessEngine');
+
+    addFolderToZip(processEngineFolder, getProcessEngineDatabaseFolderName(), getProcessEngineDatabaseFolder());
+  }
+
+  if (feedbackData.attachProcessEngineLogs) {
+    const processEngineFolder = feedbackFolder.folder('InternalProcessEngine');
+
+    addFolderToZip(processEngineFolder, getProcessEngineLogFolderName(), getProcessEngineLogFolder());
   }
 
   const bugsProvided: boolean = feedbackData.bugs.trim() !== '';
   if (bugsProvided) {
-    zipFolder.file('Bugs.txt', feedbackData.bugs);
+    feedbackFolder.file('Bugs.txt', feedbackData.bugs);
   }
 
   const suggestionsProvided: boolean = feedbackData.suggestions.trim() !== '';
   if (suggestionsProvided) {
-    zipFolder.file('Suggestions.txt', feedbackData.suggestions);
+    feedbackFolder.file('Suggestions.txt', feedbackData.suggestions);
   }
 
   const diagramsProvided: boolean = feedbackData.diagrams.length > 0;
   if (diagramsProvided) {
-    const diagramFolder = zipFolder.folder('diagrams');
+    const diagramFolder = feedbackFolder.folder('diagrams');
 
     feedbackData.diagrams.forEach((diagram) => {
       let diagramSolution: string = '';
@@ -1215,18 +1223,8 @@ async function createFeedbackZip(feedbackData: FeedbackData): Promise<void> {
   });
 }
 
-function getFilenamesOfFilesInFolder(foldername): Promise<Array<string>> {
-  return new Promise((resolve: Function, reject: Function): void => {
-    fs.readdir(foldername, (error: Error, fileNames: Array<string>): void => {
-      if (error) {
-        reject(new Error(`Unable to scan directory: ${error}`));
-
-        return;
-      }
-
-      resolve(fileNames);
-    });
-  });
+function getNamesOfFilesAndFoldersInFolder(foldername): Array<fs.Dirent> {
+  return fs.readdirSync(foldername, {withFileTypes: true});
 }
 
 async function getPathToSaveTo(defaultFilename): Promise<string> {
@@ -1254,18 +1252,30 @@ async function getPathToSaveTo(defaultFilename): Promise<string> {
   return saveDialogResult.filePath;
 }
 
-async function addDatabaseToZip(zipFolder): Promise<void> {
-  const databaseZipFolder = zipFolder.folder(getProcessEngineDatabaseFolderName());
+function addFolderToZip(zipFolder, folderName, folderPath): void {
+  if (!fs.existsSync(folderPath)) {
+    zipFolder.file(`${folderName} does not exist.`, '', {base64: true});
 
-  const databaseFolderName: string = getDatabaseFolder();
+    return;
+  }
 
-  const databaseFiles: Array<string> = await getFilenamesOfFilesInFolder(databaseFolderName);
+  const folderInZip = zipFolder.folder(folderName);
 
-  databaseFiles.forEach((filename: string) => {
-    const filePath: string = `${databaseFolderName}/${filename}`;
+  const filesAndFoldersInFolder: Array<fs.Dirent> = getNamesOfFilesAndFoldersInFolder(folderPath);
 
-    databaseZipFolder.file(filename, fs.readFileSync(filePath), {base64: true});
+  filesAndFoldersInFolder.forEach((fileOrFolder: fs.Dirent) => {
+    const currentElementsPath: string = `${folderPath}/${fileOrFolder.name}`;
+
+    if (fileOrFolder.isDirectory()) {
+      addFolderToZip(folderInZip, fileOrFolder.name, currentElementsPath);
+    } else {
+      addFileToZip(folderInZip, fileOrFolder.name, currentElementsPath);
+    }
   });
+}
+
+function addFileToZip(zipFolder, filename, filePath): void {
+  zipFolder.file(filename, fs.readFileSync(filePath), {base64: true});
 }
 
 execute();

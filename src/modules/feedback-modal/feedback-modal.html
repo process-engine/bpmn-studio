@@ -21,6 +21,11 @@
       <i class="fas fa-info-circle feedback-modal__help-icon" title="If you have a problem with deployed diagrams, attaching the databases is probably helpful."></i>
     </div>
     <div>
+      <input type="checkbox" class="feedback-modal__checkbox" checked.bind="attachProcessEngineLogs"/>
+      <span class="feedback-modal__checkbox-label">Attach the logs of the internal ProcessEngine</span>
+      <i class="fas fa-info-circle feedback-modal__help-icon" title="If you have a problem with the internal ProcessEngine, attaching its logs is probable helpful."></i>
+    </div>
+    <div>
       <input type="checkbox" class="feedback-modal__checkbox" checked.bind="showProcessModelSelection"/>
       <span class="feedback-modal__checkbox-label">Attach diagrams</span>
       <div if.bind="showProcessModelSelection" class="feedback-modal__diagram-selection">
