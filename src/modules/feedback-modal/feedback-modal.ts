@@ -24,6 +24,7 @@ export class FeedbackModal {
   public selectedDiagrams: ISelectedDiagramList = {};
   public additionalDiagramInformation: string = '';
   public attachInternalDatabases: boolean = false;
+  public attachProcessEngineLogs: boolean = false;
 
   public solutions: Array<ISolution>;
   public showSolutionList: IShowSolutionList = {};
@@ -80,6 +81,7 @@ export class FeedbackModal {
       diagrams: diagramsToAttach,
       additionalDiagramInformation: this.additionalDiagramInformation,
       attachInternalDatabases: this.attachInternalDatabases,
+      attachProcessEngineLogs: this.attachProcessEngineLogs,
     };
 
     this.ipcRenderer.send('create-feedback-zip', feedbackData);
