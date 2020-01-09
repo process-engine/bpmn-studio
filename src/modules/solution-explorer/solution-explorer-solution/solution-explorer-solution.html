@@ -115,4 +115,16 @@
     </template>
   </modal>
 
+  <modal if.bind="showErrorLogs"
+          body-style="min-height: 230px"
+          header-text="ProcessEngine Error Log"
+          origin.bind="solutionExplorerSolution">
+    <template replace-part="modal-body">
+      <textarea ref="origin.errorLogArea" class="form-control error-log" value.bind="processEngineErrorLog"></textarea>
+    </template>
+    <template replace-part="modal-footer">
+      <button type="button" class="btn btn-default" click.delegate="copyToClipboard()">Copy</button>
+      <button type="button" class="btn btn-default" click.delegate="showErrorLogs = false">Close</button>
+    </template>
+  </modal>
 </template>
