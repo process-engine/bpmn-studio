@@ -37,6 +37,7 @@ export class StatusBar {
   public updateVersion: string;
   public updateAvailable: boolean = false;
   public updateDropdown: HTMLElement;
+  public updateDropdownToggle: HTMLElement;
   public updateDownloadFinished: boolean = false;
   public updateStarted: boolean = false;
 
@@ -75,7 +76,18 @@ export class StatusBar {
         const message: string =
           'A new update is available.\nPlease click on the BPMN Studio icon in the statusbar to start the download.';
 
-        this.notificationService.showNonDisappearingNotification(NotificationType.INFO, message);
+        const toastrOptions: ToastrOptions = {
+          onclick: (notificationClickEvent: Event) => {
+            notificationClickEvent.stopPropagation();
+
+            const updateDropdownIsHidden: boolean = $(this.updateDropdown).is(':hidden');
+            if (updateDropdownIsHidden) {
+              this.updateDropdownToggle.click();
+            }
+          },
+        };
+
+        this.notificationService.showNonDisappearingNotification(NotificationType.INFO, message, toastrOptions);
       });
 
       this.ipcRenderer.on('update_download_progress', (event: Event, updateProgressData: UpdateProgressData) => {

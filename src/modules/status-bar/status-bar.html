@@ -5,7 +5,7 @@
   -->
   <div class="status-bar status-bar--system-macos" id="statusBarContainer">
     <div class="status-bar__left-bar" id="statusBarLeft">
-      <a if.bind="updateAvailable" class="update-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <a if.bind="updateAvailable" ref="updateDropdownToggle" class="update-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <img class="update-button-icon" src="src/resources/images/icon.png" title.bind="isDownloading ? updateProgressData.percent.toString() + '%' : 'Update available.'">
       </a>
       <div class="dropdown-menu update-dropdown" ref="updateDropdown">
@@ -17,7 +17,7 @@
             Click here for release notes
           </a>
           <div class="update-dropdown-button-container">
-            <button class="btn-default update-dropdown-cancel-button" click.delegate="hideDropdown()" disabled.bind="updateStarted">Cancel</button>
+            <button class="btn btn-default update-dropdown-cancel-button" click.delegate="hideDropdown()" disabled.bind="updateStarted">Cancel</button>
             <button class="btn btn-primary update-dropdown-update-button" click.delegate="startUpdate()" disabled.bind="updateStarted">Update</button>
           </div>
         </template>
