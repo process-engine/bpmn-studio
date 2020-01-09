@@ -175,14 +175,7 @@ function logout(
 
   const endSessionUrl = `${authorityUrl}connect/endsession?${queryString.stringify(urlParams)}`;
 
-  if (refreshTimeouts.has(authorityUrl)) {
-    refreshTimeouts.get(authorityUrl).cancel();
-    refreshTimeouts.delete(authorityUrl);
-  }
-  if (authoritiesToRefresh.includes(authorityUrl)) {
-    const authorityToRemove = authoritiesToRefresh.findIndex((authority) => authority === authorityUrl);
-    authoritiesToRefresh.splice(authorityToRemove, 0);
-  }
+  stopSilentRefreshing(authorityUrl);
 
   return new Promise(
     async (resolve: Function): Promise<void> => {
@@ -218,6 +211,17 @@ function startSilentRefreshing(
   authoritiesToRefresh.push(authorityUrl);
 
   silentRefresh(authorityUrl, config, windowParams, tokenObject, refreshCallback);
+}
+
+function stopSilentRefreshing(authorityUrl: string): void {
+  if (refreshTimeouts.has(authorityUrl)) {
+    refreshTimeouts.get(authorityUrl).cancel();
+    refreshTimeouts.delete(authorityUrl);
+  }
+  if (authoritiesToRefresh.includes(authorityUrl)) {
+    const authorityToRemove = authoritiesToRefresh.findIndex((authority) => authority === authorityUrl);
+    authoritiesToRefresh.splice(authorityToRemove, 0);
+  }
 }
 
 function wait(ms: number): Promise<void> {
