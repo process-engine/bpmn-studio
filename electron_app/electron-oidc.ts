@@ -207,36 +207,6 @@ function logout(
   );
 }
 
-function startSilentRefreshing(
-  authorityUrl: string,
-  config: IOidcConfig,
-  tokenObject: ITokenObject,
-  refreshCallback: Function,
-): void {
-  authoritiesToRefresh.push(authorityUrl);
-
-  silentRefresh(authorityUrl, config, tokenObject, refreshCallback);
-}
-
-function stopSilentRefreshing(authorityUrl: string): void {
-  if (refreshTimeouts.has(authorityUrl)) {
-    refreshTimeouts.get(authorityUrl).cancel();
-    refreshTimeouts.delete(authorityUrl);
-  }
-  if (authoritiesToRefresh.includes(authorityUrl)) {
-    const authorityToRemove = authoritiesToRefresh.findIndex((authority) => authority === authorityUrl);
-    authoritiesToRefresh.splice(authorityToRemove, 0);
-  }
-}
-
-function wait(ms: number): Promise<void> {
-  return new Bluebird.Promise((resolve: Function) => {
-    setTimeout(() => {
-      resolve();
-    }, ms);
-  });
-}
-
 async function silentRefresh(
   authorityUrl: string,
   config: IOidcConfig,
@@ -308,6 +278,36 @@ async function silentRefresh(
     };
 
     redirectCallback(url, authWindow, config, redirectCallbackResolved, redirectCallbackRejected);
+  });
+}
+
+function startSilentRefreshing(
+  authorityUrl: string,
+  config: IOidcConfig,
+  tokenObject: ITokenObject,
+  refreshCallback: Function,
+): void {
+  authoritiesToRefresh.push(authorityUrl);
+
+  silentRefresh(authorityUrl, config, tokenObject, refreshCallback);
+}
+
+function stopSilentRefreshing(authorityUrl: string): void {
+  if (refreshTimeouts.has(authorityUrl)) {
+    refreshTimeouts.get(authorityUrl).cancel();
+    refreshTimeouts.delete(authorityUrl);
+  }
+  if (authoritiesToRefresh.includes(authorityUrl)) {
+    const authorityToRemove = authoritiesToRefresh.findIndex((authority) => authority === authorityUrl);
+    authoritiesToRefresh.splice(authorityToRemove, 0);
+  }
+}
+
+function wait(ms: number): Promise<void> {
+  return new Bluebird.Promise((resolve: Function) => {
+    setTimeout(() => {
+      resolve();
+    }, ms);
   });
 }
 
