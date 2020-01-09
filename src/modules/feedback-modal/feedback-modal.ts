@@ -44,7 +44,14 @@ export class FeedbackModal {
   }
 
   public get disableCreateButton(): boolean {
-    return this.bugs.trim() === '' && this.suggestions.trim() === '' && this.additionalDiagramInformation.trim() === '';
+    return (
+      this.bugs.trim() === '' &&
+      this.suggestions.trim() === '' &&
+      this.additionalDiagramInformation.trim() === '' &&
+      !this.attachInternalDatabases &&
+      !this.attachProcessEngineLogs &&
+      Object.keys(this.selectedDiagrams).length === 0
+    );
   }
 
   public showFeedbackModalChanged(): void {
