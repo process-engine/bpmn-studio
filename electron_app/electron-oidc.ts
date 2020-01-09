@@ -35,7 +35,7 @@ export default (
     tokenObject: ITokenObject,
     refreshCallback: Function,
   ): void {
-    return startSilentRefreshing(authorityUrl, config, windowParams, tokenObject, refreshCallback);
+    return startSilentRefreshing(authorityUrl, config, tokenObject, refreshCallback);
   }
 
   return {
@@ -210,13 +210,12 @@ function logout(
 function startSilentRefreshing(
   authorityUrl: string,
   config: IOidcConfig,
-  windowParams: BrowserWindowConstructorOptions,
   tokenObject: ITokenObject,
   refreshCallback: Function,
 ): void {
   authoritiesToRefresh.push(authorityUrl);
 
-  silentRefresh(authorityUrl, config, windowParams, tokenObject, refreshCallback);
+  silentRefresh(authorityUrl, config, tokenObject, refreshCallback);
 }
 
 function stopSilentRefreshing(authorityUrl: string): void {
@@ -241,7 +240,6 @@ function wait(ms: number): Promise<void> {
 async function silentRefresh(
   authorityUrl: string,
   config: IOidcConfig,
-  windowParams: BrowserWindowConstructorOptions,
   tokenObject: ITokenObject,
   refreshCallback: Function,
 ): Promise<void> {
@@ -296,7 +294,7 @@ async function silentRefresh(
     const redirectCallbackResolved = (token: ITokenObject): void => {
       refreshCallback(token);
 
-      silentRefresh(authorityUrl, config, windowParams, tokenObject, refreshCallback);
+      silentRefresh(authorityUrl, config, tokenObject, refreshCallback);
     };
 
     const redirectCallbackRejected = (error: Error): void => {
