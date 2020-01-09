@@ -22,6 +22,10 @@
   color: darkgray;
 }
 
+.solution-entry__header--error {
+  background-color: #fde7e7;
+}
+
 .solution-entry__header:hover {
   background-color: rgba(230, 230, 230, 0.6);
 }
