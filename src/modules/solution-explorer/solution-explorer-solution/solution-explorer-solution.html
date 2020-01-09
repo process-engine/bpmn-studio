@@ -4,8 +4,13 @@
 
   <div class="solution-explorer-solution">
 
-    <div class="solution-loading" if.bind="solutionIsNotLoaded">
+    <div class="solution-loading" if.bind="solutionIsNotLoaded && !processEngineStartupError">
       <i class="fa fa-spinner fa-spin"></i>
+    </div>
+
+    <div class="solution-loading" if.bind="solutionIsNotLoaded && processEngineStartupError">
+      <span>ProcessEngine Startup Error</span><br>
+      <small class="startup-error" click.delegate="showErrorLogs = true">Click here for more information</small>
     </div>
 
     <div class="diagram-contextmenu" ref="diagramContextMenu" show.bind="showContextMenu">
@@ -98,6 +103,7 @@
       <button type="button" class="btn btn-primary" data-dismiss="modal" id="saveButtonCloseView">Save</button>
     </template>
   </modal>
+  
   <modal if.bind="isSavingDiagrams"
          body-style="min-height: 230px"
          header-text="Saving Diagrams">
