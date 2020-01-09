@@ -125,7 +125,7 @@ function redirectCallback(
    * - Close the window.
    */
   if (href === null) {
-    reject(`Could not parse url: ${url}`);
+    reject(new Error(`Could not parse url: ${url}`));
 
     authWindow.removeAllListeners('closed');
 
@@ -137,6 +137,12 @@ function redirectCallback(
   } else if (href.includes(config.redirectUri)) {
     const identityParameter = urlParts.hash;
     const parameterAsArray = identityParameter.split('&');
+
+    if (parameterAsArray[0].includes('login_required')) {
+      reject(new Error('User is no longer logged in.'));
+
+      return;
+    }
 
     const idToken = parameterAsArray[0].split('=')[1];
     const accessToken = parameterAsArray[1].split('=')[1];
@@ -294,6 +300,12 @@ async function silentRefresh(
     };
 
     const redirectCallbackRejected = (error: Error): void => {
+      if (error.message === 'User is no longer logged in.') {
+        stopSilentRefreshing(authorityUrl);
+
+        return;
+      }
+
       throw error;
     };
 
