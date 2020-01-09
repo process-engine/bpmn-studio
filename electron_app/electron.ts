@@ -1145,25 +1145,25 @@ async function exportDatabases(): Promise<void> {
 async function createFeedbackZip(feedbackData: FeedbackData): Promise<void> {
   const zip = new JSZip();
 
-  const zipFolder = zip.folder('feedback');
+  const feedbackFolder = zip.folder('feedback');
 
   if (feedbackData.attachInternalDatabases) {
-    addFolderToZip(zipFolder, getProcessEngineDatabaseFolderName(), getProcessEngineDatabaseFolder());
+    addFolderToZip(feedbackFolder, getProcessEngineDatabaseFolderName(), getProcessEngineDatabaseFolder());
   }
 
   const bugsProvided: boolean = feedbackData.bugs.trim() !== '';
   if (bugsProvided) {
-    zipFolder.file('Bugs.txt', feedbackData.bugs);
+    feedbackFolder.file('Bugs.txt', feedbackData.bugs);
   }
 
   const suggestionsProvided: boolean = feedbackData.suggestions.trim() !== '';
   if (suggestionsProvided) {
-    zipFolder.file('Suggestions.txt', feedbackData.suggestions);
+    feedbackFolder.file('Suggestions.txt', feedbackData.suggestions);
   }
 
   const diagramsProvided: boolean = feedbackData.diagrams.length > 0;
   if (diagramsProvided) {
-    const diagramFolder = zipFolder.folder('diagrams');
+    const diagramFolder = feedbackFolder.folder('diagrams');
 
     feedbackData.diagrams.forEach((diagram) => {
       let diagramSolution: string = '';
