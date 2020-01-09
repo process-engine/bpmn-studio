@@ -47,6 +47,8 @@ const releaseChannel: ReleaseChannel = new ReleaseChannel(CurrentStudioVersion);
 let fileAssociationFilePath: string;
 let isInitialized: boolean = false;
 
+let peErrors: string = '';
+
 /**
  * This variable gets set when BPMN Studio is ready to work with Files that are
  * openend via double click.
@@ -988,6 +990,7 @@ async function startInternalProcessEngine(): Promise<any> {
 
     runtimeProcess.on('close', (code) => {
       const error = new Error(`Runtime exited with code ${code}`);
+      console.error(error);
     });
 
     runtimeProcess.on('error', (err) => {
@@ -1006,7 +1009,8 @@ async function startInternalProcessEngine(): Promise<any> {
   } catch (error) {
     console.error('Failed to start internal ProcessEngine: ', error);
     internalProcessEngineStatus = 'error';
-    internalProcessEngineStartupError = error;
+    // eslint-disable-next-line no-multi-assign
+    internalProcessEngineStartupError = peErrors += error;
 
     publishProcessEngineStatus(
       processEngineStatusListeners,
@@ -1032,6 +1036,7 @@ async function startRuntime(): Promise<void> {
       process.stderr.write(data);
       peErrors += data.toString();
     });
+
     runtimeProcess.on('message', (message) => {
       if (message === 'started') {
         resolve();
@@ -1071,14 +1076,18 @@ function sendInternalProcessEngineStatus(
   internalProcessEngineStartupError,
 ): any {
   let serializedStartupError;
-  const processEngineStartSuccessful =
+  const processEngineStartHasFailed =
     internalProcessEngineStartupError !== undefined && internalProcessEngineStartupError !== null;
 
-  if (processEngineStartSuccessful) {
-    serializedStartupError = JSON.stringify(
-      internalProcessEngineStartupError,
-      Object.getOwnPropertyNames(internalProcessEngineStartupError),
-    );
+  if (processEngineStartHasFailed) {
+    if (typeof internalProcessEngineStartupError === 'string') {
+      serializedStartupError = internalProcessEngineStartupError;
+    } else {
+      serializedStartupError = JSON.stringify(
+        internalProcessEngineStartupError,
+        Object.getOwnPropertyNames(internalProcessEngineStartupError),
+      );
+    }
   } else {
     serializedStartupError = undefined;
   }
