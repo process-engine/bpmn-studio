@@ -1253,6 +1253,12 @@ async function getPathToSaveTo(defaultFilename): Promise<string> {
 }
 
 function addFolderToZip(zipFolder, folderName, folderPath): void {
+  if (!fs.existsSync(folderPath)) {
+    zipFolder.file(`${folderName} does not exist.`, '', {base64: true});
+
+    return;
+  }
+
   const folderInZip = zipFolder.folder(folderName);
 
   const filesAndFoldersInFolder: Array<fs.Dirent> = getNamesOfFilesAndFoldersInFolder(folderPath);
