@@ -1148,10 +1148,14 @@ async function createFeedbackZip(feedbackData: FeedbackData): Promise<void> {
   const feedbackFolder = zip.folder('feedback');
 
   if (feedbackData.attachInternalDatabases) {
+    const processEngineFolder = feedbackFolder.folder('InternalProcessEngine');
+
     addFolderToZip(processEngineFolder, getProcessEngineDatabaseFolderName(), getProcessEngineDatabaseFolder());
   }
 
   if (feedbackData.attachProcessEngineLogs) {
+    const processEngineFolder = feedbackFolder.folder('InternalProcessEngine');
+
     addFolderToZip(processEngineFolder, getProcessEngineLogFolderName(), getProcessEngineLogFolder());
   }
 
