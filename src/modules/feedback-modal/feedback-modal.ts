@@ -1,9 +1,7 @@
 import {bindable, inject} from 'aurelia-framework';
 import {IDiagram, ISolution} from '@process-engine/solutionexplorer.contracts';
-import {EventAggregator} from 'aurelia-event-aggregator';
 import {SolutionService} from '../../services/solution-service/solution.service';
 import {FeedbackData, ISolutionEntry} from '../../contracts';
-import environment from '../../environment';
 import {isRunningInElectron} from '../../services/is-running-in-electron-module/is-running-in-electron.module';
 import {solutionIsRemoteSolution} from '../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 
