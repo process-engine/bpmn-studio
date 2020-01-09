@@ -87,6 +87,8 @@ export class SolutionExplorerSolution {
   public isSavingDiagrams: boolean = false;
   public currentlySavingDiagramName: string = '';
 
+  public processEngineStartupError: boolean = false;
+  public processEngineErrorLog: string;
   private router: Router;
   private eventAggregator: EventAggregator;
   private validationController: ValidationController;
@@ -164,9 +166,35 @@ export class SolutionExplorerSolution {
   }
 
   public async attached(): Promise<void> {
+    const solutionIsInternalProcessEngine: boolean =
+      this.displayedSolutionEntry.uri === window.localStorage.getItem('InternalProcessEngineRoute');
+
     this.isAttached = true;
     if (isRunningInElectron()) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
+
+      if (solutionIsInternalProcessEngine) {
+        this.ipcRenderer.send('add_internal_processengine_status_listener');
+
+        // wait for status to be reported
+        this.ipcRenderer.on('internal_processengine_status', async (event: any, status: string, errorLog: string) => {
+          if (status === 'success') {
+            this.processEngineRunning = true;
+            await this.updateSolution();
+
+            this.solutionEventListenerId = this.displayedSolutionEntry.service.watchSolution(() => {
+              this.updateSolution();
+            });
+          } else {
+            this.processEngineErrorLog = errorLog;
+            this.processEngineStartupError = true;
+            this.processEngineRunning = false;
+            this.isConnected = false;
+            this.cssIconClass = 'fa fa-bolt';
+            console.error(errorLog);
+          }
+        });
+      }
     }
 
     this.originalIconClass = this.cssIconClass;
