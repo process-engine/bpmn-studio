@@ -209,9 +209,13 @@ async function silentRefresh(
   tokenObject: ITokenObject,
   refreshCallback: Function,
 ): Promise<void> {
-  const timeout = wait(tokenObject.expiresIn * 0.5 * 1000);
-  refreshTimeouts.set(authorityUrl, timeout);
+  // Token refresh factor is set as described at https://github.com/manfredsteyer/angular-oauth2-oidc/blob/master/docs-src/silent-refresh.md#automatically-refreshing-a-token-when-before-it-expires-code-flow-and-implicit-flow
+  const tokenRefreshFactor = 0.75;
+  const secondsInMilisecondsFactor = 1000;
+  const tokenRefreshInterval = tokenObject.expiresIn * tokenRefreshFactor * secondsInMilisecondsFactor;
 
+  const timeout = wait(tokenRefreshInterval);
+  refreshTimeouts.set(authorityUrl, timeout);
   await timeout;
 
   if (!authoritiesToRefresh.includes(authorityUrl)) {
