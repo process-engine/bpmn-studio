@@ -147,11 +147,7 @@ function redirectCallback(
     const idToken = parameterAsArray[0].split('=')[1];
     const accessToken = parameterAsArray[1].split('=')[1];
 
-    const expiresIn = parameterAsArray
-      .find((parameter) => {
-        return parameter.startsWith('expires_in=');
-      })
-      .split('=')[1];
+    const expiresIn = parameterAsArray.find((parameter) => parameter.startsWith('expires_in=')).split('=')[1];
 
     const tokenObject = {
       idToken,
@@ -268,13 +264,11 @@ async function silentRefresh(
     };
 
     const redirectCallbackRejected = (error: Error): void => {
-      if (error.message === 'User is no longer logged in.') {
-        stopSilentRefreshing(authorityUrl);
-
-        return;
+      if (error.message !== 'User is no longer logged in.') {
+        throw error;
       }
 
-      throw error;
+      stopSilentRefreshing(authorityUrl);
     };
 
     redirectCallback(url, authWindow, config, redirectCallbackResolved, redirectCallbackRejected);
