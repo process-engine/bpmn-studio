@@ -1125,7 +1125,7 @@ function bringExistingInstanceToForeground(): void {
 async function exportDatabases(): Promise<void> {
   const zip = new JSZip();
 
-  await addDatabaseToZip(zip);
+  addFolderToZip(zip, getProcessEngineDatabaseFolderName(), getProcessEngineDatabaseFolder());
 
   // eslint-disable-next-line newline-per-chained-call
   const now = new Date().toISOString().replace(/:/g, '-');
@@ -1148,7 +1148,7 @@ async function createFeedbackZip(feedbackData: FeedbackData): Promise<void> {
   const zipFolder = zip.folder('feedback');
 
   if (feedbackData.attachInternalDatabases) {
-    await addDatabaseToZip(zipFolder);
+    addFolderToZip(zipFolder, getProcessEngineDatabaseFolderName(), getProcessEngineDatabaseFolder());
   }
 
   const bugsProvided: boolean = feedbackData.bugs.trim() !== '';
@@ -1215,18 +1215,8 @@ async function createFeedbackZip(feedbackData: FeedbackData): Promise<void> {
   });
 }
 
-function getFilenamesOfFilesInFolder(foldername): Promise<Array<string>> {
-  return new Promise((resolve: Function, reject: Function): void => {
-    fs.readdir(foldername, (error: Error, fileNames: Array<string>): void => {
-      if (error) {
-        reject(new Error(`Unable to scan directory: ${error}`));
-
-        return;
-      }
-
-      resolve(fileNames);
-    });
-  });
+function getNamesOfFilesAndFoldersInFolder(foldername): Array<fs.Dirent> {
+  return fs.readdirSync(foldername, {withFileTypes: true});
 }
 
 async function getPathToSaveTo(defaultFilename): Promise<string> {
@@ -1254,18 +1244,24 @@ async function getPathToSaveTo(defaultFilename): Promise<string> {
   return saveDialogResult.filePath;
 }
 
-async function addDatabaseToZip(zipFolder): Promise<void> {
-  const databaseZipFolder = zipFolder.folder(getProcessEngineDatabaseFolderName());
+function addFolderToZip(zipFolder, folderName, folderPath): void {
+  const folderInZip = zipFolder.folder(folderName);
 
-  const databaseFolderName: string = getProcessEngineDatabaseFolder();
+  const filesAndFoldersInFolder: Array<fs.Dirent> = getNamesOfFilesAndFoldersInFolder(folderPath);
 
-  const databaseFiles: Array<string> = await getFilenamesOfFilesInFolder(databaseFolderName);
+  filesAndFoldersInFolder.forEach((fileOrFolder: fs.Dirent) => {
+    const currentElementsPath: string = `${folderPath}/${fileOrFolder.name}`;
 
-  databaseFiles.forEach((filename: string) => {
-    const filePath: string = `${databaseFolderName}/${filename}`;
-
-    databaseZipFolder.file(filename, fs.readFileSync(filePath), {base64: true});
+    if (fileOrFolder.isDirectory()) {
+      addFolderToZip(folderInZip, fileOrFolder.name, currentElementsPath);
+    } else {
+      addFileToZip(folderInZip, fileOrFolder.name, currentElementsPath);
+    }
   });
+}
+
+function addFileToZip(zipFolder, filename, filePath): void {
+  zipFolder.file(filename, fs.readFileSync(filePath), {base64: true});
 }
 
 execute();
