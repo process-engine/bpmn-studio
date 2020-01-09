@@ -67,6 +67,7 @@ interface IDiagramCreationState extends IDiagramNameInputState {
   'HttpFetchClient',
 )
 export class SolutionExplorerSolution {
+  public solutionExplorerSolution = this;
   public activeDiagram: IDiagram;
   public showCloseModal: boolean = false;
   @bindable public renameDiagramInput: HTMLInputElement;
@@ -89,6 +90,8 @@ export class SolutionExplorerSolution {
 
   public processEngineStartupError: boolean = false;
   public processEngineErrorLog: string;
+  public errorLogArea: HTMLTextAreaElement;
+
   private router: Router;
   private eventAggregator: EventAggregator;
   private validationController: ValidationController;
@@ -243,6 +246,10 @@ export class SolutionExplorerSolution {
     }
 
     if (solutionIsRemoteSolution(this.displayedSolutionEntry.uri)) {
+      if (solutionIsInternalProcessEngine) {
+        return;
+      }
+
       await this.waitForProcessEngine();
     } else {
       this.processEngineRunning = true;
@@ -338,6 +345,11 @@ export class SolutionExplorerSolution {
       await this.updateSolution();
       this.refreshDisplayedDiagrams();
     }
+  }
+
+  public copyToClipboard(): void {
+    this.errorLogArea.select();
+    document.execCommand('copy');
   }
 
   /**
