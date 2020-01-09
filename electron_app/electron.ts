@@ -974,8 +974,8 @@ async function startInternalProcessEngine(): Promise<any> {
   // TODO: Check if the ProcessEngine instance is now run on the UI thread.
   // See issue https://github.com/process-engine/bpmn-studio/issues/312
   try {
-    const sqlitePath = getDatabaseFolder();
-    const logFilepath = getLogFolder();
+    const sqlitePath = getProcessEngineDatabaseFolder();
+    const logFilepath = getProcessEngineLogFolder();
 
     const startupArgs = {
       sqlitePath: sqlitePath,
@@ -1005,7 +1005,7 @@ async function startInternalProcessEngine(): Promise<any> {
   }
 }
 
-function getLogFolder(): string {
+function getProcessEngineLogFolder(): string {
   return path.join(getConfigFolder(), getProcessEngineLogFolderName());
 }
 
@@ -1013,7 +1013,7 @@ function getProcessEngineLogFolderName(): string {
   return 'process_engine_logs';
 }
 
-function getDatabaseFolder(): string {
+function getProcessEngineDatabaseFolder(): string {
   return path.join(getConfigFolder(), getProcessEngineDatabaseFolderName());
 }
 
@@ -1257,7 +1257,7 @@ async function getPathToSaveTo(defaultFilename): Promise<string> {
 async function addDatabaseToZip(zipFolder): Promise<void> {
   const databaseZipFolder = zipFolder.folder(getProcessEngineDatabaseFolderName());
 
-  const databaseFolderName: string = getDatabaseFolder();
+  const databaseFolderName: string = getProcessEngineDatabaseFolder();
 
   const databaseFiles: Array<string> = await getFilenamesOfFilesInFolder(databaseFolderName);
 
