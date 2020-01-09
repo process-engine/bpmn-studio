@@ -240,7 +240,7 @@ async function silentRefresh(
 
   authWindow.loadURL(urlToLoad);
 
-  // Reject the Promise when the user closes the new window.
+  // Throw an error, if the user closes the new window.
   authWindow.on('closed', (): void => {
     throw new Error('window was closed by user');
   });
