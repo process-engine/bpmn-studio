@@ -21,7 +21,7 @@ export class WebOidcAuthenticationService implements IAuthenticationService {
    * of this. We need the access them when changing the authority while the application
    * is running.
    */
-  private openIdConnect: OpenIdConnect | any;
+  private openIdConnect: OpenIdConnect;
   private notificationService: NotificationService;
 
   constructor(
@@ -149,9 +149,9 @@ export class WebOidcAuthenticationService implements IAuthenticationService {
     oidcConfig.userManagerSettings.authority = authority;
 
     // This dirty way to update the settings is the only way during runtime
-    this.openIdConnect.configuration.userManagerSettings.authority = authority;
+    (this.openIdConnect as any).configuration.userManagerSettings.authority = authority;
     // eslint-disable-next-line no-underscore-dangle
-    this.openIdConnect.userManager._settings._authority = authority;
+    (this.openIdConnect.userManager as any)._settings._authority = authority;
   }
 
   // TODO: The dummy token needs to be removed in the future!!
