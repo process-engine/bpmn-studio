@@ -97,23 +97,25 @@ export class ProcessInstanceList {
 
     const processInstanceToSelectExists: boolean = this.processInstanceToSelect !== undefined;
     if (processInstanceToSelectExists) {
-      const instanceAlreadyExistInList: ProcessInstanceTableEntry = this.sortedTableData.find(
+      const processInstanceFromTableData: ProcessInstanceTableEntry = this.sortedTableData.find(
         (processInstance: ProcessInstanceTableEntry) => {
           return processInstance.processInstanceId === this.processInstanceToSelect.processInstanceId;
         },
       );
 
-      if (instanceAlreadyExistInList) {
-        this.processInstanceToSelectTableEntry = undefined;
+      const procesInstanceAlreadyExistsInTableData = processInstanceFromTableData;
+
+      if (procesInstanceAlreadyExistsInTableData) {
+        this.processInstanceToSelectTableEntry = processInstanceFromTableData;
       } else {
         const processInstanceToSelectTableEntry: Array<ProcessInstanceTableEntry> = this.convertProcessInstancesIntoTableData(
           [this.processInstanceToSelect],
         );
 
         this.processInstanceToSelectTableEntry = processInstanceToSelectTableEntry[0];
-        this.selectProcessInstance(this.processInstanceToSelectTableEntry);
       }
 
+      this.selectProcessInstance(this.processInstanceToSelectTableEntry);
       this.processInstanceToSelect = undefined;
     }
 

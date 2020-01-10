@@ -184,7 +184,7 @@ export class InspectCorrelation {
   private async updateProcessInstances(): Promise<void> {
     if (this.processInstanceIdToSelect) {
       try {
-        this.processInstanceToSelect = await this.inspectCorrelationService.getProcessInstanceById(
+        const processInstanceToSelect = await this.inspectCorrelationService.getProcessInstanceById(
           this.activeSolutionEntry.identity,
           this.processInstanceIdToSelect,
           this.activeDiagram.id,
@@ -192,8 +192,10 @@ export class InspectCorrelation {
 
         this.correlationToSelect = await this.inspectCorrelationService.getCorrelationById(
           this.activeSolutionEntry.identity,
-          this.processInstanceToSelect.correlationId,
+          processInstanceToSelect.correlationId,
         );
+
+        this.processInstanceToSelect = processInstanceToSelect;
       } catch (error) {
         this.notificationService.showNotification(
           NotificationType.ERROR,
