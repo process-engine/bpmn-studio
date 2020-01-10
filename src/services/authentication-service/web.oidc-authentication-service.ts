@@ -6,13 +6,7 @@ import {User} from 'oidc-client';
 
 import {IIdentity} from '@essential-projects/iam_contracts';
 
-import {
-  AuthenticationStateEvent,
-  IAuthenticationService,
-  ILoginResult,
-  IUserIdentity,
-  NotificationType,
-} from '../../contracts/index';
+import {IAuthenticationService, ILoginResult, IUserIdentity, NotificationType} from '../../contracts/index';
 import {oidcConfig} from '../../open-id-connect-configuration';
 import {NotificationService} from '../notification-service/notification.service';
 
