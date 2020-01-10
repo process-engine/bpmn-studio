@@ -62,16 +62,21 @@ export class WebOidcAuthenticationService implements IAuthenticationService {
     }
 
     await this.setAuthority(authority);
-    await this.openIdConnect.login();
+
+    const signinResult: User = await this.openIdConnect.userManager.signinPopup();
+
     window.localStorage.setItem('openIdRoute', authority);
 
-    this.eventAggregator.publish(AuthenticationStateEvent.LOGIN);
+    const iamIdentity: IIdentity = {
+      token: signinResult.access_token,
+      userId: signinResult.id_token,
+    };
+    const identity: IUserIdentity = await this.getUserIdentity(authority, iamIdentity);
 
     const loginResult: ILoginResult = {
-      identity: await this.getUserIdentity(authority),
-      accessToken: await this.getAccessToken(authority),
-      // The idToken is provided by the oidc service when making requests and therefore not set here.
-      idToken: '',
+      identity: identity,
+      accessToken: iamIdentity.token,
+      idToken: iamIdentity.userId,
     };
 
     return loginResult;
@@ -88,10 +93,10 @@ export class WebOidcAuthenticationService implements IAuthenticationService {
     await this.openIdConnect.logout();
   }
 
-  public async getUserIdentity(authority: string): Promise<IUserIdentity | null> {
+  public async getUserIdentity(authority: string, identity?: IIdentity): Promise<IUserIdentity | null> {
     authority = this.formAuthority(authority);
 
-    const accessToken: string = await this.getAccessToken(authority);
+    const accessToken: string = identity === undefined ? await this.getAccessToken(authority) : identity.token;
     const accessTokenIsDummyToken: boolean = accessToken === this.getDummyAccessToken();
 
     if (accessTokenIsDummyToken) {
