@@ -90,7 +90,7 @@ export class WebOidcAuthenticationService implements IAuthenticationService {
     }
 
     await this.setAuthority(authority);
-    await this.openIdConnect.logout();
+    await this.openIdConnect.userManager.signoutPopup();
   }
 
   public async getUserIdentity(authority: string, identity?: IIdentity): Promise<IUserIdentity | null> {

@@ -247,6 +247,12 @@ export class App {
         name: 'signin-popup-redirect',
         moduleId: 'modules/signin-popup-redirect/signin-popup-redirect',
       },
+      {
+        route: 'signout-popup-redirect',
+        title: 'Signout Popup Redirect',
+        name: 'signout-popup-redirect',
+        moduleId: 'modules/signout-popup-redirect/signout-popup-redirect',
+      },
     ]);
 
     this.openIdConnect.configure(config);

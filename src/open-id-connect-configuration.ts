@@ -18,6 +18,7 @@ export const oidcConfig: OpenIdConnectConfiguration = {
     loadUserInfo: false,
     post_logout_redirect_uri: `${environment.appHost}/signout-oidc`,
     popup_redirect_uri: `${environment.appHost}/signin-popup-redirect`,
+    popup_post_logout_redirect_uri: `${environment.appHost}/signout-popup-redirect`,
     redirect_uri: `${environment.appHost}/signin-oidc`,
     response_type: 'id_token token',
     scope: 'openid profile test_resource',
