@@ -49,7 +49,7 @@
   "license": "MIT",
   "dependencies": {
     "@essential-projects/errors_ts": "^1.6.1",
-    "@fortawesome/fontawesome-free": "^5.11.2",
+    "@fortawesome/fontawesome-free": "5.11.2",
     "@process-engine/bpmn-js-custom-bundle": "~2.7.0",
     "@process-engine/bpmn-lint_rules": "^1.6.2",
     "@process-engine/ci_tools": "2.4.0-beta.1",
@@ -124,7 +124,7 @@
     "debounce": "^1.2.0",
     "debug": "^4.1.1",
     "downloadjs": "1.4.7",
-    "electron": "~7.1.3",
+    "electron": "7.1.8",
     "electron-builder": "21.2.0",
     "electron-rebuild": "^1.8.8",
     "eslint": "^6.7.2",
