@@ -66,7 +66,7 @@
         </div>
       </template>
       <template if.bind="showInspectTools">
-        <button class="button menu-bar__menu-center--action-button" class.bind="disableInspectProcessInstanceButton ? 'button--active' : ''" click.delegate="showInspectProcessInstance()" disabled.bind="disableInspectProcessInstanceButton" title.bind="disableInspectProcessInstanceButton ? 'You are on the inspect correlation view' : 'Show Inspect Correlation'">
+        <button class="button menu-bar__menu-center--action-button" class.bind="disableInspectProcessInstanceButton ? 'button--active' : ''" click.delegate="showInspectProcessInstance()" disabled.bind="disableInspectProcessInstanceButton" title.bind="disableInspectProcessInstanceButton ? 'You are on the inspect process instance view' : 'Show Inspect Process Instance'">
           <i class="fas fa-search"></i>
         </button>
         <button class="button menu-bar__menu-center--action-button" class.bind="disableDashboardButton ? 'button--active' : ''" click.delegate="showDashboard()" disabled.bind="disableDashboardButton" title.bind="disableDashboardButton ? 'You are on the dashboard' : 'Show Dashboard'">

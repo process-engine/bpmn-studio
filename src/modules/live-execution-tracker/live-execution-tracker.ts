@@ -492,7 +492,7 @@ export class LiveExecutionTracker {
           left: this.getOverlayLeftPositionForElement(element.width),
           top: this.getOverlayTopPositionForElement(element.height),
         },
-        html: `<div class="let__overlay-button" id="${overlayHtmlId}" style="width: ${OVERLAY_WIDTH}px; height: ${OVERLAY_HEIGHT}px;" title="Open process instance in Inspect Correlation."><i class="fas fa-bug let__overlay-button-icon overlay__error-element"></i></div>`,
+        html: `<div class="let__overlay-button" id="${overlayHtmlId}" style="width: ${OVERLAY_WIDTH}px; height: ${OVERLAY_HEIGHT}px;" title="Open process instance in Inspect Process Instance."><i class="fas fa-bug let__overlay-button-icon overlay__error-element"></i></div>`,
       });
 
       this.addEventListenerToOverlay(overlayHtmlId);

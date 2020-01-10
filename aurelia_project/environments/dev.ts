@@ -101,7 +101,7 @@ export default {
     inspectProcessInstance: {
       showInspectPanel: 'inspectProcessInstance:inspectPanel:show',
       showTokenViewer: 'inspectProcessInstance:tokenViewer:show',
-      showLogViewer: 'inpsectCorrelation:logViewer:show',
+      showLogViewer: 'inspectProcessInstance:logViewer:show',
       showProcessInstanceList: 'inspectProcessInstance:processInstanceList:show',
       noCorrelationsFound: 'inspectProcessInstance:diagramViewer:noCorrelationsFound',
       updateProcessInstances: 'inspectProcessInstance:updateProcessInstances',
