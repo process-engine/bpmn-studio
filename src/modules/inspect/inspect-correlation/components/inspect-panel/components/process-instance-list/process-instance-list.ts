@@ -59,6 +59,7 @@ export class ProcessInstanceList {
 
   public selectProcessInstance(selectedTableEntry: ProcessInstanceTableEntry): void {
     this.selectedProcessInstance = this.getProcessInstanceForTableEntry(selectedTableEntry);
+
     this.selectedTableEntry = selectedTableEntry;
   }
 
