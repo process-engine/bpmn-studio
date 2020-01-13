@@ -126,7 +126,6 @@ export class ProcessInstanceList {
       }
 
       this.selectProcessInstance(this.processInstanceToSelectTableEntry);
-      this.processInstanceToSelect = undefined;
     }
 
     this.paginationShowsLoading = false;
