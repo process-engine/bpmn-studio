@@ -139,17 +139,19 @@ export class CorrelationList {
   private convertCorrelationsIntoTableData(
     correlations: Array<DataModels.Correlations.Correlation>,
   ): Array<ICorrelationTableEntry> {
-    return correlations.map((correlation: DataModels.Correlations.Correlation) => {
-      const formattedStartedDate: string = getBeautifiedDate(correlation.createdAt);
+    return correlations.map(this.convertCorrelationIntoTableData);
+  }
 
-      const tableEntry: ICorrelationTableEntry = {
-        startedAt: formattedStartedDate,
-        state: correlation.state,
-        correlationId: correlation.id,
-      };
+  private convertCorrelationIntoTableData(correlation: DataModels.Correlations.Correlation): ICorrelationTableEntry {
+    const formattedStartedDate: string = getBeautifiedDate(correlation.createdAt);
 
-      return tableEntry;
-    });
+    const tableEntry: ICorrelationTableEntry = {
+      startedAt: formattedStartedDate,
+      state: correlation.state,
+      correlationId: correlation.id,
+    };
+
+    return tableEntry;
   }
 
   public changeSortSettings(property: CorrelationListSortProperty): void {
@@ -173,7 +175,7 @@ export class CorrelationList {
 
     this.correlationToSelectTableEntry = correlationAlreadyExistInList
       ? correlationFromTableData
-      : this.convertCorrelationsIntoTableData([this.correlationToSelect])[0];
+      : this.convertCorrelationIntoTableData(this.correlationToSelect);
 
     this.selectCorrelation(this.correlationToSelectTableEntry);
   }
