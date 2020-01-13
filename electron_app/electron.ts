@@ -180,8 +180,8 @@ function initializeAutoUpdater(): void {
 
     console.log(`CurrentVersion: ${currentVersion}, CurrentVersionIsPrerelease: ${currentVersionIsPrerelease}`);
 
-    autoUpdater.addListener('error', () => {
-      appReadyEvent.sender.send('update_error');
+    autoUpdater.addListener('error', (error) => {
+      appReadyEvent.sender.send('update_error', error.message);
     });
 
     autoUpdater.addListener('download-progress', (progressObj) => {
