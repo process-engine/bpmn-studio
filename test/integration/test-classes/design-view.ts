@@ -47,6 +47,7 @@ export class DesignViewClient {
 
   public async deployDiagram(): Promise<void> {
     await this.testClient.ensureVisible('[data-test-deploy-diagram-button]', VISIBLE_TIMEOUT);
+    await this.testClient.solutionExplorer.assertInternalProcessEngineIsOpenedAsSolution();
     await this.testClient.clickOn('[data-test-deploy-diagram-button]');
   }
 
