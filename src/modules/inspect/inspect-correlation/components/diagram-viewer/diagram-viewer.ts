@@ -233,7 +233,6 @@ export class DiagramViewer {
 
   public activeDiagramChanged(): void {
     const diagramViewerIsNotSet: boolean = this.diagramViewer === undefined;
-
     if (diagramViewerIsNotSet) {
       return;
     }
