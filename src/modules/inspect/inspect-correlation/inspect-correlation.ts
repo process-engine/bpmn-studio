@@ -292,20 +292,22 @@ export class InspectCorrelation {
   }
 
   public async activeDiagramChanged(): Promise<void> {
-    if (this.viewIsAttached) {
-      this.correlationOffset = 0;
-      this.processInstanceOffset = 0;
-
-      this.processInstanceIdToSelect = undefined;
-      this.processInstanceToSelect = undefined;
-      this.correlationToSelect = undefined;
-
-      this.selectedProcessInstance = undefined;
-      this.selectedCorrelation = undefined;
-
-      this.updateProcessInstances();
-      this.updateCorrelations();
+    if (!this.viewIsAttached) {
+      return;
     }
+
+    this.correlationOffset = 0;
+    this.processInstanceOffset = 0;
+
+    this.processInstanceIdToSelect = undefined;
+    this.processInstanceToSelect = undefined;
+    this.correlationToSelect = undefined;
+
+    this.selectedProcessInstance = undefined;
+    this.selectedCorrelation = undefined;
+
+    this.updateProcessInstances();
+    this.updateCorrelations();
   }
 
   public selectedCorrelationChanged(): void {
