@@ -67,37 +67,12 @@ export class CorrelationList {
     this.correlationToSelectTableEntry = undefined;
   }
 
-  public correlationToSelectChanged(
-    newValue: DataModels.Correlations.Correlation,
-    oldValue: DataModels.Correlations.Correlation,
-  ): void {
-    if (this.correlationToSelect === undefined) {
+  public correlationToSelectChanged(): void {
+    if (this.correlationToSelect === undefined || this.sortedTableData === undefined) {
       return;
     }
 
-    const correlationToSelectDidNotChange = oldValue && newValue && newValue.id === oldValue.id;
-    if (correlationToSelectDidNotChange) {
-      return;
-    }
-
-    const correlationFromTableData: ICorrelationTableEntry = this.sortedTableData.find(
-      (correlation: ICorrelationTableEntry) => {
-        return correlation.correlationId === this.correlationToSelect.id;
-      },
-    );
-
-    const correlationAlreadyExistInList = correlationFromTableData !== undefined;
-    if (correlationAlreadyExistInList) {
-      this.correlationToSelectTableEntry = correlationFromTableData;
-    } else {
-      const correlationToSelectTableEntry: Array<ICorrelationTableEntry> = this.convertCorrelationsIntoTableData([
-        this.correlationToSelect,
-      ]);
-
-      this.correlationToSelectTableEntry = correlationToSelectTableEntry[0];
-    }
-
-    this.selectCorrelation(this.correlationToSelectTableEntry);
+    this.selectCorrelationToSelect();
   }
 
   public correlationsChanged(): void {
@@ -109,7 +84,9 @@ export class CorrelationList {
     this.sortTableData();
 
     const tableDataIsExisiting: boolean = this.sortedTableData.length > 0;
-    if (tableDataIsExisiting) {
+    if (tableDataIsExisiting && this.correlationToSelect) {
+      this.selectCorrelationToSelect();
+    } else if (tableDataIsExisiting) {
       const firstTableEntry: ICorrelationTableEntry = this.sortedTableData[0];
 
       this.selectCorrelation(firstTableEntry);
@@ -183,6 +160,22 @@ export class CorrelationList {
     this.sortSettings.sortProperty = property;
 
     this.sortTableData();
+  }
+
+  private selectCorrelationToSelect(): void {
+    const correlationFromTableData: ICorrelationTableEntry = this.sortedTableData.find(
+      (correlation: ICorrelationTableEntry) => {
+        return correlation.correlationId === this.correlationToSelect.id;
+      },
+    );
+
+    const correlationAlreadyExistInList = correlationFromTableData !== undefined;
+
+    this.correlationToSelectTableEntry = correlationAlreadyExistInList
+      ? correlationFromTableData
+      : this.convertCorrelationsIntoTableData([this.correlationToSelect])[0];
+
+    this.selectCorrelation(this.correlationToSelectTableEntry);
   }
 
   private sortTableData(): void {
