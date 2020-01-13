@@ -157,6 +157,28 @@ export class InspectCorrelation {
     if (shouldDisplaySpecificInspectPanelTab) {
       this.inspectPanel.changeTab(this.inspectPanelTabToShow);
     }
+
+    if (this.processInstanceIdToSelect) {
+      try {
+        const processInstanceToSelect = await this.inspectCorrelationService.getProcessInstanceById(
+          this.activeSolutionEntry.identity,
+          this.processInstanceIdToSelect,
+          this.activeDiagram.id,
+        );
+
+        this.correlationToSelect = await this.inspectCorrelationService.getCorrelationById(
+          this.activeSolutionEntry.identity,
+          processInstanceToSelect.correlationId,
+        );
+
+        this.processInstanceToSelect = processInstanceToSelect;
+      } catch (error) {
+        this.notificationService.showNotification(
+          NotificationType.ERROR,
+          'The requested ProcessInstance to select could not be found.',
+        );
+      }
+    }
   }
 
   private async updateCorrelations(): Promise<void> {
@@ -182,28 +204,6 @@ export class InspectCorrelation {
   }
 
   private async updateProcessInstances(): Promise<void> {
-    if (this.processInstanceIdToSelect) {
-      try {
-        const processInstanceToSelect = await this.inspectCorrelationService.getProcessInstanceById(
-          this.activeSolutionEntry.identity,
-          this.processInstanceIdToSelect,
-          this.activeDiagram.id,
-        );
-
-        this.correlationToSelect = await this.inspectCorrelationService.getCorrelationById(
-          this.activeSolutionEntry.identity,
-          processInstanceToSelect.correlationId,
-        );
-
-        this.processInstanceToSelect = processInstanceToSelect;
-      } catch (error) {
-        this.notificationService.showNotification(
-          NotificationType.ERROR,
-          'The requested ProcessInstance to select could not be found.',
-        );
-      }
-    }
-
     let processInstanceList;
 
     try {
