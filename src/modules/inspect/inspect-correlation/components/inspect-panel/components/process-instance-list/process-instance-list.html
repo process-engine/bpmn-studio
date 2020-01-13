@@ -24,7 +24,7 @@
         </tr>
       </thead>
       <tbody class="process-instance-table__body">
-        <tr if.bind="processInstanceToSelectTableEntry" dblclick.delegate="showLogViewer()" class="process-instance-table__table-row process-instance-table__table-row--instance-to-select" class.bind="processInstanceToSelectTableEntry.processInstanceId === selectedTableEntry.processInstanceId ? 'process-instance-table__selected-entry': ''" click.delegate="selectProcessInstance(processInstanceToSelectTableEntry)">
+        <tr if.bind="showProcessInstanceToSelect" dblclick.delegate="showLogViewer()" class="process-instance-table__table-row process-instance-table__table-row--instance-to-select" class.bind="processInstanceToSelectTableEntry.processInstanceId === selectedTableEntry.processInstanceId ? 'process-instance-table__selected-entry': ''" click.delegate="selectProcessInstance(processInstanceToSelectTableEntry)">
           <td class="process-instance-table__table-entry">${processInstanceToSelectTableEntry.startedAt}</td>
           <td class="process-instance-table__table-entry process-instance-table__table-entry--state">${processInstanceToSelectTableEntry.state}</td>
           <td class="process-instance-table__table-entry">${processInstanceToSelectTableEntry.user}</td>

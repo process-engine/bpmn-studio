@@ -28,6 +28,7 @@ export class ProcessInstanceList {
   @bindable public activeDiagram: IDiagram;
   @bindable public sortedTableData: Array<ProcessInstanceTableEntry>;
   @bindable public paginationShowsLoading: boolean;
+  @bindable public selectedCorrelation: DataModels.Correlations.Correlation;
 
   public pagination: Pagination;
 
@@ -61,6 +62,14 @@ export class ProcessInstanceList {
     this.selectedProcessInstance = this.getProcessInstanceForTableEntry(selectedTableEntry);
 
     this.selectedTableEntry = selectedTableEntry;
+  }
+
+  public get showProcessInstanceToSelect(): boolean {
+    return (
+      this.processInstanceToSelect !== undefined &&
+      this.processInstanceToSelectTableEntry !== undefined &&
+      this.selectedCorrelation.id === this.processInstanceToSelect.correlationId
+    );
   }
 
   public activeDiagramChanged(): void {
