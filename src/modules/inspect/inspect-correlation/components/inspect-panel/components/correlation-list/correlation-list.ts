@@ -143,10 +143,8 @@ export class CorrelationList {
   }
 
   private convertCorrelationIntoTableData(correlation: DataModels.Correlations.Correlation): ICorrelationTableEntry {
-    const formattedStartedDate: string = getBeautifiedDate(correlation.createdAt);
-
     const tableEntry: ICorrelationTableEntry = {
-      startedAt: formattedStartedDate,
+      startedAt: getBeautifiedDate(correlation.createdAt),
       state: correlation.state,
       correlationId: correlation.id,
     };
