@@ -44,7 +44,7 @@ export class WebOidcAuthenticationService implements IAuthenticationService {
     return userIsAuthorized;
   }
 
-  public async login(authority: string): Promise<ILoginResult> {
+  public async login(authority: string, refreshCallback: Function): Promise<ILoginResult> {
     authority = this.formAuthority(authority);
 
     const isAuthorityUnReachable: boolean = !(await this.isAuthorityReachable(authority));
@@ -72,6 +72,23 @@ export class WebOidcAuthenticationService implements IAuthenticationService {
       accessToken: iamIdentity.token,
       idToken: iamIdentity.userId,
     };
+
+    this.openIdConnect.observeUser(async (user: User) => {
+      console.log(user);
+      const refreshedIamIdentity: IIdentity = {
+        token: user.access_token,
+        userId: signinResult.id_token,
+      };
+      const refreshedIdentity: IUserIdentity = await this.getUserIdentity(authority, refreshedIamIdentity);
+
+      const refreshResult: ILoginResult = {
+        identity: refreshedIdentity,
+        accessToken: refreshedIamIdentity.token,
+        idToken: refreshedIamIdentity.userId,
+      };
+
+      refreshCallback(refreshResult);
+    });
 
     return loginResult;
   }
