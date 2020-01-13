@@ -116,7 +116,7 @@ export class ProcessInstanceList {
       const processInstanceAlreadyExistsInTableData = processInstanceFromTableData;
       this.processInstanceToSelectTableEntry = processInstanceAlreadyExistsInTableData
         ? processInstanceFromTableData
-        : this.convertProcessInstancesIntoTableData([this.processInstanceToSelect])[0];
+        : this.convertProcessInstanceIntoTableData(this.processInstanceToSelect);
 
       this.selectProcessInstance(this.processInstanceToSelectTableEntry);
     }
@@ -178,19 +178,21 @@ export class ProcessInstanceList {
   private convertProcessInstancesIntoTableData(
     processInstances: Array<DataModels.Correlations.ProcessInstance>,
   ): Array<ProcessInstanceTableEntry> {
-    return processInstances.map((processInstance: DataModels.Correlations.ProcessInstance) => {
-      const formattedStartedDate: string = getBeautifiedDate(processInstance.createdAt);
+    return processInstances.map(this.convertProcessInstanceIntoTableData);
+  }
 
-      const tableEntry: ProcessInstanceTableEntry = {
-        startedAt: formattedStartedDate,
-        state: processInstance.state,
-        user: processInstance.identity.userId,
-        processModelId: processInstance.processModelId,
-        processInstanceId: processInstance.processInstanceId,
-      };
+  private convertProcessInstanceIntoTableData(
+    processInstance: DataModels.Correlations.ProcessInstance,
+  ): ProcessInstanceTableEntry {
+    const tableEntry: ProcessInstanceTableEntry = {
+      startedAt: getBeautifiedDate(processInstance.createdAt),
+      state: processInstance.state,
+      user: processInstance.identity.userId,
+      processModelId: processInstance.processModelId,
+      processInstanceId: processInstance.processInstanceId,
+    };
 
-      return tableEntry;
-    });
+    return tableEntry;
   }
 
   private sortTableData(): void {
