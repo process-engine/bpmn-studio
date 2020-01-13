@@ -67,6 +67,7 @@ interface IDiagramCreationState extends IDiagramNameInputState {
   'HttpFetchClient',
 )
 export class SolutionExplorerSolution {
+  public solutionExplorerSolution = this;
   public activeDiagram: IDiagram;
   public showCloseModal: boolean = false;
   @bindable public renameDiagramInput: HTMLInputElement;
@@ -86,6 +87,10 @@ export class SolutionExplorerSolution {
 
   public isSavingDiagrams: boolean = false;
   public currentlySavingDiagramName: string = '';
+
+  public processEngineStartupError: boolean = false;
+  public processEngineErrorLog: string;
+  public errorLogArea: HTMLTextAreaElement;
 
   private router: Router;
   private eventAggregator: EventAggregator;
@@ -164,9 +169,35 @@ export class SolutionExplorerSolution {
   }
 
   public async attached(): Promise<void> {
+    const solutionIsInternalProcessEngine: boolean =
+      this.displayedSolutionEntry.uri === window.localStorage.getItem('InternalProcessEngineRoute');
+
     this.isAttached = true;
     if (isRunningInElectron()) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
+
+      if (solutionIsInternalProcessEngine) {
+        this.ipcRenderer.send('add_internal_processengine_status_listener');
+
+        // wait for status to be reported
+        this.ipcRenderer.on('internal_processengine_status', async (event: any, status: string, errorLog: string) => {
+          if (status === 'success') {
+            this.processEngineRunning = true;
+            await this.updateSolution();
+
+            this.solutionEventListenerId = this.displayedSolutionEntry.service.watchSolution(() => {
+              this.updateSolution();
+            });
+          } else {
+            this.processEngineErrorLog = errorLog;
+            this.processEngineStartupError = true;
+            this.processEngineRunning = false;
+            this.isConnected = false;
+            this.cssIconClass = 'fa fa-bolt';
+            console.error(errorLog);
+          }
+        });
+      }
     }
 
     this.originalIconClass = this.cssIconClass;
@@ -215,6 +246,10 @@ export class SolutionExplorerSolution {
     }
 
     if (solutionIsRemoteSolution(this.displayedSolutionEntry.uri)) {
+      if (solutionIsInternalProcessEngine) {
+        return;
+      }
+
       await this.waitForProcessEngine();
     } else {
       this.processEngineRunning = true;
@@ -310,6 +345,11 @@ export class SolutionExplorerSolution {
       await this.updateSolution();
       this.refreshDisplayedDiagrams();
     }
+  }
+
+  public copyToClipboard(): void {
+    this.errorLogArea.select();
+    document.execCommand('copy');
   }
 
   /**

@@ -174,3 +174,12 @@
   margin-top: 5px;
   bottom: 10px;
 }
+
+.startup-error:hover {
+  text-decoration: underline;
+}
+
+.error-log {
+  min-height: 440px;
+  resize: none;
+}

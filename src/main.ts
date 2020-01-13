@@ -1,9 +1,7 @@
 import {Aurelia} from 'aurelia-framework';
 
 import process from 'process';
-import {NotificationType} from './contracts/index';
 import environment from './environment';
-import {NotificationService} from './services/notification-service/notification.service';
 
 import {oidcConfig} from './open-id-connect-configuration';
 import {isRunningInElectron} from './services/is-running-in-electron-module/is-running-in-electron.module';
@@ -76,29 +74,7 @@ export function configure(aurelia: Aurelia): void {
 
     if (isRunningInElectron()) {
       const ipcRenderer: any = (window as any).nodeRequire('electron').ipcRenderer;
-      // subscribe to processengine status
-      ipcRenderer.send('add_internal_processengine_status_listener');
-
       ipcRenderer.send('app_ready');
-
-      // wait for status to be reported
-      ipcRenderer.on('internal_processengine_status', (event: any, status: string, error: string) => {
-        if (status !== 'error') {
-          return;
-        }
-        /* This is the URL to an issue in GitHub, describing
-         * what the user can do about this failure.
-         *
-         * TODO: Implement a proper FAQ section and link to that.
-         */
-        const targetHref: string =
-          "<a href=\"javascript:nodeRequire('open')('https://github.com/process-engine/bpmn-studio/issues/316')\">click here</a>";
-
-        const errorMessage: string = `Failed to start ProcessEngine. For further information ${targetHref}.`;
-        const notificationService: NotificationService = aurelia.container.get('NotificationService');
-
-        notificationService.showNonDisappearingNotification(NotificationType.ERROR, errorMessage);
-      });
     }
   });
 }

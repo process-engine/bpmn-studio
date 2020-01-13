@@ -2,10 +2,10 @@
 import fs from 'fs';
 import path from 'path';
 import {homedir} from 'os';
+import {ChildProcess, fork} from 'child_process';
+
 import windowStateKeeper from 'electron-window-state';
-
 import JSZip from 'jszip';
-
 import {
   App,
   BrowserWindow,
@@ -22,7 +22,6 @@ import getPort from 'get-port';
 import open from 'open';
 
 import {CancellationToken, autoUpdater} from '@process-engine/electron-updater';
-import * as pe from '@process-engine/process_engine_runtime';
 import {version as ProcessEngineVersion} from '@process-engine/process_engine_runtime/package.json';
 
 import electronOidc from './electron-oidc';
@@ -48,11 +47,21 @@ const releaseChannel: ReleaseChannel = new ReleaseChannel(CurrentStudioVersion);
 let fileAssociationFilePath: string;
 let isInitialized: boolean = false;
 
+let peErrors: string = '';
+
 /**
  * This variable gets set when BPMN Studio is ready to work with Files that are
  * openend via double click.
  */
 let fileOpenMainEvent: IpcMainEvent;
+
+let runtimeProcess: ChildProcess;
+
+process.on('exit', () => {
+  if (runtimeProcess) {
+    runtimeProcess.kill('SIGTERM');
+  }
+});
 
 function execute(): void {
   /**
@@ -976,18 +985,18 @@ async function startInternalProcessEngine(): Promise<any> {
     event.returnValue = ProcessEngineVersion;
   });
 
-  // TODO: Check if the ProcessEngine instance is now run on the UI thread.
-  // See issue https://github.com/process-engine/bpmn-studio/issues/312
   try {
-    const sqlitePath = getProcessEngineDatabaseFolder();
-    const logFilepath = getProcessEngineLogFolder();
+    await startRuntime();
 
-    const startupArgs = {
-      sqlitePath: sqlitePath,
-      logFilePath: logFilepath,
-    };
+    runtimeProcess.on('close', (code) => {
+      const error = new Error(`Runtime exited with code ${code}`);
+      console.error(error);
+    });
 
-    pe.startRuntime(startupArgs);
+    runtimeProcess.on('error', (err) => {
+      const error = new Error(err.toString());
+      console.error('Internal ProcessEngine Error: ', error);
+    });
 
     console.log('Internal ProcessEngine started successfully.');
     internalProcessEngineStatus = 'success';
@@ -1000,7 +1009,8 @@ async function startInternalProcessEngine(): Promise<any> {
   } catch (error) {
     console.error('Failed to start internal ProcessEngine: ', error);
     internalProcessEngineStatus = 'error';
-    internalProcessEngineStartupError = error;
+    // eslint-disable-next-line no-multi-assign
+    internalProcessEngineStartupError = peErrors += error;
 
     publishProcessEngineStatus(
       processEngineStatusListeners,
@@ -1008,6 +1018,40 @@ async function startInternalProcessEngine(): Promise<any> {
       internalProcessEngineStartupError,
     );
   }
+}
+
+async function startRuntime(): Promise<void> {
+  return new Promise((resolve: Function, reject: Function): void => {
+    const sqlitePath = getProcessEngineDatabaseFolder();
+    const logFilepath = getProcessEngineLogFolder();
+
+    runtimeProcess = fork(
+      './node_modules/@process-engine/process_engine_runtime/bin/index.js',
+      [`--sqlitePath=${sqlitePath}`, `--logFilePath=${logFilepath}`],
+      {stdio: 'pipe'},
+    );
+
+    runtimeProcess.stdout.on('data', (data) => process.stdout.write(data));
+    runtimeProcess.stderr.on('data', (data) => {
+      process.stderr.write(data);
+      peErrors += data.toString();
+    });
+
+    runtimeProcess.on('message', (message) => {
+      if (message === 'started') {
+        resolve();
+      }
+    });
+
+    runtimeProcess.on('close', (code) => {
+      const error = new Error(`Runtime exited with code ${code}`);
+      reject(error);
+    });
+
+    runtimeProcess.on('error', (err) => {
+      reject(err);
+    });
+  });
 }
 
 function getProcessEngineLogFolder(): string {
@@ -1032,14 +1076,18 @@ function sendInternalProcessEngineStatus(
   internalProcessEngineStartupError,
 ): any {
   let serializedStartupError;
-  const processEngineStartSuccessful =
+  const processEngineStartHasFailed =
     internalProcessEngineStartupError !== undefined && internalProcessEngineStartupError !== null;
 
-  if (processEngineStartSuccessful) {
-    serializedStartupError = JSON.stringify(
-      internalProcessEngineStartupError,
-      Object.getOwnPropertyNames(internalProcessEngineStartupError),
-    );
+  if (processEngineStartHasFailed) {
+    if (typeof internalProcessEngineStartupError === 'string') {
+      serializedStartupError = internalProcessEngineStartupError;
+    } else {
+      serializedStartupError = JSON.stringify(
+        internalProcessEngineStartupError,
+        Object.getOwnPropertyNames(internalProcessEngineStartupError),
+      );
+    }
   } else {
     serializedStartupError = undefined;
   }
