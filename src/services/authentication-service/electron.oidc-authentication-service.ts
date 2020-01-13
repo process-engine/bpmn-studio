@@ -7,7 +7,6 @@ import {
   AuthenticationStateEvent,
   IAuthenticationService,
   ILoginResult,
-  ITokenObject,
   IUserIdentity,
   NotificationType,
 } from '../../contracts/index';
@@ -43,20 +42,35 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
     return userIdentityIsDefined;
   }
 
-  public async login(authority: string): Promise<ILoginResult> {
+  public async login(authority: string, refreshCallback: Function): Promise<ILoginResult> {
     authority = this.formAuthority(authority);
 
     const identityServerIsNotReachable: boolean = !(await this.isAuthorityReachable(authority));
-
     if (identityServerIsNotReachable) {
       return undefined;
     }
 
     const loginResultPromise: Promise<ILoginResult> = new Promise(
-      async (resolve: Function, reject: Function): Promise<void> => {
+      async (resolve: Function): Promise<void> => {
         const ipcRenderer: any = (window as any).nodeRequire('electron').ipcRenderer;
 
-        ipcRenderer.on('oidc-login-reply', async (event: any, tokenObject: ITokenObject) => {
+        ipcRenderer.on(`oidc-silent_refresh-${authority}`, async (event, tokenObject) => {
+          const iamIdentity: IIdentity = {
+            token: tokenObject.accessToken,
+            userId: tokenObject.idToken,
+          };
+          const identity: IUserIdentity = await this.getUserIdentity(authority, iamIdentity);
+
+          const silentRefreshResult: ILoginResult = {
+            identity: identity,
+            accessToken: tokenObject.accessToken,
+            idToken: tokenObject.idToken,
+          };
+
+          refreshCallback(silentRefreshResult);
+        });
+
+        ipcRenderer.on('oidc-login-reply', async (event, tokenObject) => {
           const iamIdentity: IIdentity = {
             token: tokenObject.accessToken,
             userId: tokenObject.idToken,
@@ -90,6 +104,8 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
       if (logoutWasSuccessful) {
         this.eventAggregator.publish(AuthenticationStateEvent.LOGOUT);
       }
+
+      ipcRenderer.removeAllListeners(`oidc-silent_refresh-${authority}`);
     });
 
     ipcRenderer.send('oidc-logout', identity, authority);
