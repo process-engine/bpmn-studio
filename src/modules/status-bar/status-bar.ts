@@ -65,8 +65,8 @@ export class StatusBar {
     if (isRunningInElectron()) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
 
-      this.ipcRenderer.on('update_error', () => {
-        notificationService.showNotification(NotificationType.INFO, 'Update Error!');
+      this.ipcRenderer.on('update_error', (event: Event, message: string) => {
+        console.error('Update Error:', message);
       });
 
       this.ipcRenderer.on('update_available', (event: Event, version: string) => {
