@@ -113,17 +113,10 @@ export class ProcessInstanceList {
         },
       );
 
-      const procesInstanceAlreadyExistsInTableData = processInstanceFromTableData;
-
-      if (procesInstanceAlreadyExistsInTableData) {
-        this.processInstanceToSelectTableEntry = processInstanceFromTableData;
-      } else {
-        const processInstanceToSelectTableEntry: Array<ProcessInstanceTableEntry> = this.convertProcessInstancesIntoTableData(
-          [this.processInstanceToSelect],
-        );
-
-        this.processInstanceToSelectTableEntry = processInstanceToSelectTableEntry[0];
-      }
+      const processInstanceAlreadyExistsInTableData = processInstanceFromTableData;
+      this.processInstanceToSelectTableEntry = processInstanceAlreadyExistsInTableData
+        ? processInstanceFromTableData
+        : this.convertProcessInstancesIntoTableData([this.processInstanceToSelect])[0];
 
       this.selectProcessInstance(this.processInstanceToSelectTableEntry);
     }
