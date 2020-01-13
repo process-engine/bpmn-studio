@@ -237,10 +237,6 @@ export class DiagramViewer {
       return;
     }
 
-    if (!this.activeDiagram) {
-      this.noCorrelationsFound = true;
-    }
-
     this.diagramViewer.clear();
     this.xmlIsNotSelected = true;
     this.noCorrelationsFound = false;
