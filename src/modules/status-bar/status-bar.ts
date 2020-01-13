@@ -67,6 +67,12 @@ export class StatusBar {
 
       this.ipcRenderer.on('update_error', (event: Event, message: string) => {
         console.error('Update Error:', message);
+
+        const targetHref: string = `<a href="javascript:nodeRequire('open')('https://github.com/process-engine/bpmn-studio/releases/tag/v${this.updateVersion}')" style="text-decoration: underline;">click here</a>`;
+        notificationService.showNonDisappearingNotification(
+          NotificationType.WARNING,
+          `<h4>Update Error!</h4> The error log can be found on the DevTools console tab. <br>To update the BPMN Studio manually ${targetHref}.`,
+        );
       });
 
       this.ipcRenderer.on('update_available', (event: Event, version: string) => {
