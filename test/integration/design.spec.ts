@@ -40,8 +40,10 @@ describe('Design View', function foo() {
     await testClient.assertDiagramIsSaved();
   });
 
-  it('should deploy a diagram', async () => {
+  it.only('should deploy a diagram', async () => {
     // Arrange
+    // testClient.browserWindow.capturePage();
+    // testClient.webdriverClient.startRecordingScreen();
     const diagramName = 'receive_task_wait_test';
     await testClient.startPageLoaded();
     await testClient.solutionExplorer.openDirectoryAsSolution('fixtures', diagramName);
@@ -51,9 +53,12 @@ describe('Design View', function foo() {
     // Assert
     await testClient.assertNavbarTitleIs(diagramName);
     await testClient.assertDiagramIsOnProcessEngine();
+
+    // testClient.webdriverClient.saveRecordingScreen('test.mp4');
+    // testClient.rendererProcess.startRecordingScreen('test.mp4');
   });
 
-  it('should start a process', async () => {
+  it.only('should start a process', async () => {
     const diagramName = 'receive_task_wait_test';
     await testClient.startPageLoaded();
     await testClient.solutionExplorer.openDirectoryAsSolution('fixtures', diagramName);

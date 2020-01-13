@@ -1,3 +1,4 @@
+import {BrowserWindow} from 'electron';
 /* eslint-disable no-useless-escape */
 /* eslint-disable no-empty-function */
 import path from 'path';
@@ -126,6 +127,10 @@ export class TestClient {
 
   public get webdriverClient(): any {
     return this.app.client;
+  }
+
+  public get browserWindow(): BrowserWindow {
+    return this.app.browserWindow;
   }
 
   public async clickOn(selector: string): Promise<any> {
