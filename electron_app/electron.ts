@@ -1022,8 +1022,8 @@ async function startInternalProcessEngine(): Promise<any> {
 
 async function startRuntime(): Promise<void> {
   return new Promise((resolve: Function, reject: Function): void => {
-    const sqlitePath = getDatabaseFolder();
-    const logFilepath = getLogFolder();
+    const sqlitePath = getProcessEngineDatabaseFolder();
+    const logFilepath = getProcessEngineLogFolder();
 
     runtimeProcess = fork(
       './node_modules/@process-engine/process_engine_runtime/bin/index.js',
@@ -1054,7 +1054,7 @@ async function startRuntime(): Promise<void> {
   });
 }
 
-function getLogFolder(): string {
+function getProcessEngineLogFolder(): string {
   return path.join(getConfigFolder(), getProcessEngineLogFolderName());
 }
 
