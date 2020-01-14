@@ -136,6 +136,12 @@ jobs:
     - name: Run the Tests
       run: npm test
 
+    - uses: actions/upload-artifact@master
+      name: Upload Test Videos
+      with:
+        name: test_videos
+        path: test-videos
+
     - name: Prepare macOS Bundle
       run: |
         mkdir dist_electron_macos
