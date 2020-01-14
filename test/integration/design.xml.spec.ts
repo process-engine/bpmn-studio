@@ -56,7 +56,7 @@ describe('XML View', function foo() {
     await testClient.removeTestsFolder();
   });
 
-  it('should have content', async () => {
+  it.skip('should have content', async () => {
     await testClient.createAndOpenNewDiagram();
     await testClient.designView.openXmlView('Untitled-1', 'about:open-diagrams/Untitled-1.bpmn', 'about:open-diagrams');
     await assertXmlViewHasContent();

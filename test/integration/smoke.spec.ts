@@ -58,7 +58,7 @@ describe('Application launch', function foo() {
     await testClient.assertWindowTitleIs('Design | BPMN Studio');
   });
 
-  it('should create and open a second diagram', async () => {
+  it.skip('should create and open a second diagram', async () => {
     await testClient.createAndOpenNewDiagram();
 
     await testClient.assertNavbarTitleIs('Untitled-1');
@@ -70,7 +70,7 @@ describe('Application launch', function foo() {
     await testClient.assertNavbarTitleIs('Untitled-2');
   });
 
-  it('should open the detail view', async () => {
+  it.skip('should open the detail view', async () => {
     await testClient.createAndOpenNewDiagram();
     await testClient.openStartPage();
 
@@ -83,13 +83,13 @@ describe('Application launch', function foo() {
     await testClient.assertCanvasModelIsVisible();
   });
 
-  it('should open the XML view', async () => {
+  it.skip('should open the XML view', async () => {
     await testClient.createAndOpenNewDiagram();
     await testClient.designView.openXmlView('Untitled-1', 'about:open-diagrams/Untitled-1.bpmn', 'about:open-diagrams');
     await testClient.designView.assertXmlViewIsVisible();
   });
 
-  it('should open the diff view', async () => {
+  it.skip('should open the diff view', async () => {
     await testClient.createAndOpenNewDiagram();
 
     await testClient.designView.openDiffView(
@@ -101,7 +101,7 @@ describe('Application launch', function foo() {
     await testClient.assertDiffViewHasRenderedAllContainer();
   });
 
-  it('should open the Think view', async () => {
+  it.skip('should open the Think view', async () => {
     await testClient.createAndOpenNewDiagram();
 
     await testClient.openThinkView('Untitled-1', 'about:open-diagrams/Untitled-1.bpmn', 'about:open-diagrams');
@@ -112,7 +112,6 @@ describe('Application launch', function foo() {
     await testClient.createAndOpenNewDiagram();
 
     await testClient.openThinkViewFromNavbar();
-
     await testClient.assertWindowTitleIs('Think | BPMN Studio');
   });
 
