@@ -6,13 +6,7 @@ import {User} from 'oidc-client';
 
 import {IIdentity} from '@essential-projects/iam_contracts';
 
-import {
-  AuthenticationStateEvent,
-  IAuthenticationService,
-  ILoginResult,
-  IUserIdentity,
-  NotificationType,
-} from '../../contracts/index';
+import {IAuthenticationService, ILoginResult, IUserIdentity, NotificationType} from '../../contracts/index';
 import {oidcConfig} from '../../open-id-connect-configuration';
 import {NotificationService} from '../notification-service/notification.service';
 
@@ -27,7 +21,7 @@ export class WebOidcAuthenticationService implements IAuthenticationService {
    * of this. We need the access them when changing the authority while the application
    * is running.
    */
-  private openIdConnect: OpenIdConnect | any;
+  private openIdConnect: OpenIdConnect;
   private notificationService: NotificationService;
 
   constructor(
@@ -62,16 +56,21 @@ export class WebOidcAuthenticationService implements IAuthenticationService {
     }
 
     await this.setAuthority(authority);
-    await this.openIdConnect.login();
+
+    const signinResult: User = await this.openIdConnect.userManager.signinPopup();
+
     window.localStorage.setItem('openIdRoute', authority);
 
-    this.eventAggregator.publish(AuthenticationStateEvent.LOGIN);
+    const iamIdentity: IIdentity = {
+      token: signinResult.access_token,
+      userId: signinResult.id_token,
+    };
+    const identity: IUserIdentity = await this.getUserIdentity(authority, iamIdentity);
 
     const loginResult: ILoginResult = {
-      identity: await this.getUserIdentity(authority),
-      accessToken: await this.getAccessToken(authority),
-      // The idToken is provided by the oidc service when making requests and therefore not set here.
-      idToken: '',
+      identity: identity,
+      accessToken: iamIdentity.token,
+      idToken: iamIdentity.userId,
     };
 
     return loginResult;
@@ -85,13 +84,13 @@ export class WebOidcAuthenticationService implements IAuthenticationService {
     }
 
     await this.setAuthority(authority);
-    await this.openIdConnect.logout();
+    await this.openIdConnect.userManager.signoutPopup();
   }
 
-  public async getUserIdentity(authority: string): Promise<IUserIdentity | null> {
+  public async getUserIdentity(authority: string, identity?: IIdentity): Promise<IUserIdentity | null> {
     authority = this.formAuthority(authority);
 
-    const accessToken: string = await this.getAccessToken(authority);
+    const accessToken: string = identity === undefined ? await this.getAccessToken(authority) : identity.token;
     const accessTokenIsDummyToken: boolean = accessToken === this.getDummyAccessToken();
 
     if (accessTokenIsDummyToken) {
@@ -150,9 +149,9 @@ export class WebOidcAuthenticationService implements IAuthenticationService {
     oidcConfig.userManagerSettings.authority = authority;
 
     // This dirty way to update the settings is the only way during runtime
-    this.openIdConnect.configuration.userManagerSettings.authority = authority;
+    (this.openIdConnect as any).configuration.userManagerSettings.authority = authority;
     // eslint-disable-next-line no-underscore-dangle
-    this.openIdConnect.userManager._settings._authority = authority;
+    (this.openIdConnect.userManager as any)._settings._authority = authority;
   }
 
   // TODO: The dummy token needs to be removed in the future!!
