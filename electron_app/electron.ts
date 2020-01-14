@@ -1025,11 +1025,20 @@ async function startRuntime(): Promise<void> {
     const sqlitePath = getProcessEngineDatabaseFolder();
     const logFilepath = getProcessEngineLogFolder();
 
-    runtimeProcess = fork(
-      './node_modules/@process-engine/process_engine_runtime/bin/index.js',
-      [`--sqlitePath=${sqlitePath}`, `--logFilePath=${logFilepath}`],
-      {stdio: 'pipe'},
+    const pathToRuntime = path.join(
+      __dirname,
+      '..',
+      '..',
+      '..',
+      'node_modules',
+      '@process-engine',
+      'process_engine_runtime',
+      'bin',
+      'index.js',
     );
+    runtimeProcess = fork(pathToRuntime, [`--sqlitePath=${sqlitePath}`, `--logFilePath=${logFilepath}`], {
+      stdio: 'pipe',
+    });
 
     runtimeProcess.stdout.on('data', (data) => process.stdout.write(data));
     runtimeProcess.stderr.on('data', (data) => {
