@@ -141,7 +141,7 @@ jobs:
       if: always()
       with:
         name: test_videos
-        path: test-videos
+        path: test-results
 
     - name: Prepare macOS Bundle
       run: |

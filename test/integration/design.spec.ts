@@ -23,7 +23,7 @@ describe('Design View', function foo() {
         const fileName = this.ctx.currentTest.title.replace(/\s/g, '-');
 
         if (this.ctx.currentTest.state === 'failed') {
-          await testClient.stopRecordingAndSave(`test-videos/${fileName}.webm`);
+          await testClient.stopRecordingAndSave(`test-results/${fileName}.webm`);
         } else {
           await testClient.stopRecording();
         }
