@@ -21,7 +21,7 @@
             <i if.bind="checkIfSolutionIsRemoteSolution(solutionEntry.uri) && isProcessEngineNewerThanInternal(solutionEntry) & signal:'update-version-icon'" class="fas fa-info-circle version-info version-info--new" click.capture="showNewerModal($event)" title="ProcessEngine is newer. Click to show more information."></i>
             <i if.bind="checkIfSolutionIsRemoteSolution(solutionEntry.uri) && isProcessEngineOlderThanInternal(solutionEntry) & signal:'update-version-icon'" class="fas fa-info-circle version-info version-info--old" click.capture="showOlderModal($event)" title="ProcessEngine is outdated. Click to show more information."></i>
 
-            <span class="solution-entry__solution-name" data-test-solution-entry-name="${getSolutionName(solutionEntry.uri)}" data-test-solution-is-internal="${solutionIsInternalSolution(solutionEntry)}" data-test-solution-is-connected="${processEngineRunning ? 'true' : 'false'}">${getSolutionName(solutionEntry.uri)}</span>
+            <span class="solution-entry__solution-name" data-test-solution-entry-name="${getSolutionName(solutionEntry.uri)}" data-test-solution-is-internal="${solutionIsInternalSolution(solutionEntry)}" data-test-solution-is-connected="${peHasStarted ? 'true' : 'false'}">${getSolutionName(solutionEntry.uri)}</span>
           </div>
           <div class="solution-entry__solution-path">
             <span
@@ -99,7 +99,7 @@
           css-icon-class.two-way="solutionEntry.cssIconClass"
           is-connected.two-way="solutionEntry.isConnected"
           tooltip-text.two-way="solutionEntry.tooltipText"
-          process-engine-running.two-way="processEngineRunning"
+          pe-has-started.two-way="peHasStarted"
           style.bind="solutionEntry.hidden ? 'display: none;' : 'display: inherit;'">
         </solution-explorer-solution>
       </div>
