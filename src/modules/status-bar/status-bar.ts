@@ -71,7 +71,7 @@ export class StatusBar {
         const targetHref: string = `<a href="javascript:nodeRequire('open')('https://github.com/process-engine/bpmn-studio/releases/tag/v${this.updateVersion}')" style="text-decoration: underline;">click here</a>`;
         notificationService.showNonDisappearingNotification(
           NotificationType.WARNING,
-          `<h4>Update Error!</h4> The error log can be found on the DevTools console tab. <br>To update the BPMN Studio manually ${targetHref}.`,
+          `<h4>Update Error!</h4>The automatic update has failed!<br>To update BPMN Studio manually, ${targetHref}.`,
         );
       });
 
