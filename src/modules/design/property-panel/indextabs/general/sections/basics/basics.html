@@ -9,7 +9,7 @@
         <tr>
           <th>ID</th>
           <td>
-            <input type="text" class="props-input" value.bind="businessObjInPanel.id & validateOnChange" change.delegate="updateId()" disabled.bind="!isEditable" data-test-property-panel-element-id>
+            <input type="text" class="props-input" value.bind="businessObjInPanelId & validateOnChange" change.delegate="updateId()" disabled.bind="!isEditable" data-test-property-panel-element-id>
           </td>
           <td>
             <template if.bind="validationError">

@@ -1,5 +1,5 @@
 import {EventAggregator} from 'aurelia-event-aggregator';
-import {inject} from 'aurelia-framework';
+import {BindingEngine, Disposable, inject} from 'aurelia-framework';
 import {ValidateEvent, ValidationController, ValidationRules} from 'aurelia-validation';
 
 import {IEventDefinition, IModdleElement, IShape} from '@process-engine/bpmn-elements_contracts';
@@ -16,11 +16,12 @@ import {
 } from '../../../../../../../contracts/index';
 import environment from '../../../../../../../environment';
 
-@inject(ValidationController, EventAggregator)
+@inject(ValidationController, EventAggregator, BindingEngine)
 export class BasicsSection implements ISection {
   public path: string = '/sections/basics/basics';
   public canHandleElement: boolean = true;
   public businessObjInPanel: IModdleElement & {eventDefinitions?: Array<IEventDefinition>};
+  public businessObjInPanelId: string;
   public elementDocumentation: string;
   public validationError: boolean = false;
   public showModal: boolean = false;
@@ -36,21 +37,36 @@ export class BasicsSection implements ISection {
   private previousProcessRefId: string;
   private validationController: ValidationController;
   private eventAggregator: EventAggregator;
+  private bindingEngine: BindingEngine;
+  private businessObjInPanelIdObserver: Disposable;
 
-  constructor(controller?: ValidationController, eventAggregator?: EventAggregator) {
+  constructor(controller?: ValidationController, eventAggregator?: EventAggregator, bindingEngine?: BindingEngine) {
     this.validationController = controller;
     this.eventAggregator = eventAggregator;
+    this.bindingEngine = bindingEngine;
   }
 
   public activate(model: IPageModel): void {
     if (this.validationError) {
-      this.businessObjInPanel.id = this.previousProcessRefId;
+      this.businessObjInPanelId = this.previousProcessRefId;
       this.validationController.validate();
     }
 
     this.elementInPanel = model.elementInPanel;
     this.businessObjInPanel = model.elementInPanel.businessObject;
+    this.businessObjInPanelId = this.businessObjInPanel.id;
     this.previousProcessRefId = model.elementInPanel.businessObject.id;
+
+    if (this.businessObjInPanelIdObserver !== undefined) {
+      this.businessObjInPanelIdObserver.dispose();
+      this.businessObjInPanelIdObserver = undefined;
+    }
+
+    this.businessObjInPanelIdObserver = this.bindingEngine
+      .propertyObserver(this.businessObjInPanel, 'id')
+      .subscribe((newId: string) => {
+        this.businessObjInPanelId = newId;
+      });
 
     this.modeling = model.modeler.get('modeling');
     this.bpmnModdle = model.modeler.get('moddle');
@@ -78,7 +94,7 @@ export class BasicsSection implements ISection {
       return;
     }
 
-    this.businessObjInPanel.id = this.previousProcessRefId;
+    this.businessObjInPanelId = this.previousProcessRefId;
     this.validationController.validate();
   }
 
@@ -115,7 +131,7 @@ export class BasicsSection implements ISection {
       return;
     }
 
-    const updateProperty: object = {id: this.businessObjInPanel.id};
+    const updateProperty: object = {id: this.businessObjInPanelId};
     this.modeling.updateProperties(this.elementInPanel, updateProperty);
     this.publishDiagramChange();
   }
@@ -215,7 +231,7 @@ export class BasicsSection implements ISection {
         return false;
       }
 
-      const elementHasSameId: boolean = element.businessObject.id === this.businessObjInPanel.id;
+      const elementHasSameId: boolean = element.businessObject.id === this.businessObjInPanelId;
 
       return elementHasSameId;
     });
