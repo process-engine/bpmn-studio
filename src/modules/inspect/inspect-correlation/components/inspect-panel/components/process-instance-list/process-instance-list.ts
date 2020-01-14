@@ -28,6 +28,7 @@ export class ProcessInstanceList {
   @bindable public activeDiagram: IDiagram;
   @bindable public sortedTableData: Array<ProcessInstanceTableEntry>;
   @bindable public paginationShowsLoading: boolean;
+  @bindable public selectedCorrelation: DataModels.Correlations.Correlation;
 
   public pagination: Pagination;
 
@@ -59,7 +60,16 @@ export class ProcessInstanceList {
 
   public selectProcessInstance(selectedTableEntry: ProcessInstanceTableEntry): void {
     this.selectedProcessInstance = this.getProcessInstanceForTableEntry(selectedTableEntry);
+
     this.selectedTableEntry = selectedTableEntry;
+  }
+
+  public get showProcessInstanceToSelect(): boolean {
+    return (
+      this.processInstanceToSelect !== undefined &&
+      this.processInstanceToSelectTableEntry !== undefined &&
+      this.selectedCorrelation.id === this.processInstanceToSelect.correlationId
+    );
   }
 
   public activeDiagramChanged(): void {
@@ -88,33 +98,23 @@ export class ProcessInstanceList {
       const firstTableEntry: ProcessInstanceTableEntry = this.sortedTableData[0];
 
       const processInstanceToSelect: ProcessInstanceTableEntry =
-        firstProcessInstanceFromCorrectProcessModel !== undefined
-          ? firstProcessInstanceFromCorrectProcessModel
-          : firstTableEntry;
+        firstProcessInstanceFromCorrectProcessModel || firstTableEntry;
 
       this.selectProcessInstance(processInstanceToSelect);
     }
 
     const processInstanceToSelectExists: boolean = this.processInstanceToSelect !== undefined;
     if (processInstanceToSelectExists) {
-      const instanceAlreadyExistInList: ProcessInstanceTableEntry = this.sortedTableData.find(
+      const processInstanceFromTableData: ProcessInstanceTableEntry = this.sortedTableData.find(
         (processInstance: ProcessInstanceTableEntry) => {
           return processInstance.processInstanceId === this.processInstanceToSelect.processInstanceId;
         },
       );
 
-      if (instanceAlreadyExistInList) {
-        this.processInstanceToSelectTableEntry = undefined;
-      } else {
-        const processInstanceToSelectTableEntry: Array<ProcessInstanceTableEntry> = this.convertProcessInstancesIntoTableData(
-          [this.processInstanceToSelect],
-        );
+      this.processInstanceToSelectTableEntry =
+        processInstanceFromTableData || this.convertProcessInstanceIntoTableData(this.processInstanceToSelect);
 
-        this.processInstanceToSelectTableEntry = processInstanceToSelectTableEntry[0];
-        this.selectProcessInstance(this.processInstanceToSelectTableEntry);
-      }
-
-      this.processInstanceToSelect = undefined;
+      this.selectProcessInstance(this.processInstanceToSelectTableEntry);
     }
 
     this.paginationShowsLoading = false;
@@ -174,19 +174,21 @@ export class ProcessInstanceList {
   private convertProcessInstancesIntoTableData(
     processInstances: Array<DataModels.Correlations.ProcessInstance>,
   ): Array<ProcessInstanceTableEntry> {
-    return processInstances.map((processInstance: DataModels.Correlations.ProcessInstance) => {
-      const formattedStartedDate: string = getBeautifiedDate(processInstance.createdAt);
+    return processInstances.map(this.convertProcessInstanceIntoTableData);
+  }
 
-      const tableEntry: ProcessInstanceTableEntry = {
-        startedAt: formattedStartedDate,
-        state: processInstance.state,
-        user: processInstance.identity.userId,
-        processModelId: processInstance.processModelId,
-        processInstanceId: processInstance.processInstanceId,
-      };
+  private convertProcessInstanceIntoTableData(
+    processInstance: DataModels.Correlations.ProcessInstance,
+  ): ProcessInstanceTableEntry {
+    const tableEntry: ProcessInstanceTableEntry = {
+      startedAt: getBeautifiedDate(processInstance.createdAt),
+      state: processInstance.state,
+      user: processInstance.identity.userId,
+      processModelId: processInstance.processModelId,
+      processInstanceId: processInstance.processInstanceId,
+    };
 
-      return tableEntry;
-    });
+    return tableEntry;
   }
 
   private sortTableData(): void {

@@ -184,19 +184,26 @@ export class Inspect {
 
     const diagramIsSet: boolean = diagramName !== undefined;
     if (diagramIsSet) {
+      let newActiveDiagram: IDiagram;
+
       const activeSolutionIsOpenSolution: boolean = solutionUriToUse === 'about:open-diagrams';
       if (activeSolutionIsOpenSolution) {
         const persistedDiagrams: Array<IDiagram> = this.solutionService.getOpenDiagrams();
 
-        this.activeDiagram = persistedDiagrams.find((diagram: IDiagram) => {
+        newActiveDiagram = persistedDiagrams.find((diagram: IDiagram) => {
           return diagram.name === diagramName;
         });
       } else {
         try {
-          this.activeDiagram = await this.activeSolutionEntry.service.loadDiagram(diagramName);
+          newActiveDiagram = await this.activeSolutionEntry.service.loadDiagram(diagramName);
         } catch {
           // If loading the diagram failed, do nothing
         }
+      }
+
+      const activeDiagramChanged: boolean = this.activeDiagram?.uri !== newActiveDiagram.uri;
+      if (activeDiagramChanged) {
+        this.activeDiagram = newActiveDiagram;
       }
     }
   }

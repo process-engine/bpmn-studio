@@ -233,13 +233,8 @@ export class DiagramViewer {
 
   public activeDiagramChanged(): void {
     const diagramViewerIsNotSet: boolean = this.diagramViewer === undefined;
-
     if (diagramViewerIsNotSet) {
       return;
-    }
-
-    if (!this.activeDiagram) {
-      this.noCorrelationsFound = true;
     }
 
     this.diagramViewer.clear();
