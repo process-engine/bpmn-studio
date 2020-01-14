@@ -83,7 +83,7 @@ export class SolutionExplorerSolution {
   public diagramContextMenu: HTMLElement;
   public showContextMenu: boolean = false;
   public deleteDiagramModal: DeleteDiagramModal;
-  public processEngineRunning: boolean = false;
+  @bindable public processEngineRunning: boolean = false;
 
   public isSavingDiagrams: boolean = false;
   public currentlySavingDiagramName: string = '';
@@ -161,7 +161,6 @@ export class SolutionExplorerSolution {
     this.saveDiagramService = saveDiagramService;
     this.signaler = bindingSignaler;
     this.httpFetchClient = httpFetchClient;
-
     this.updateDiagramStateList();
     this.diagramStatesChangedCallbackId = this.openDiagramStateService.onDiagramStatesChanged(() => {
       this.updateDiagramStateList();
@@ -252,7 +251,6 @@ export class SolutionExplorerSolution {
 
       await this.waitForProcessEngine();
     } else {
-      this.processEngineRunning = true;
       this.setValidationRules();
 
       setTimeout(async () => {
@@ -282,8 +280,6 @@ export class SolutionExplorerSolution {
                 throw error;
               }
             }
-
-            this.processEngineRunning = true;
 
             await this.updateSolution();
 
