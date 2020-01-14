@@ -138,6 +138,7 @@ jobs:
 
     - uses: actions/upload-artifact@master
       name: Upload Test Videos
+      if: always()
       with:
         name: test_videos
         path: test-videos
