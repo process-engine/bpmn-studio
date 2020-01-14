@@ -4,7 +4,7 @@ ARG NODE_IMAGE_VERSION
 FROM node:${NODE_IMAGE_VERSION}
 
 RUN apk update && apk upgrade && \
-    apk add --no-cache make g++ git supervisor
+    apk add --no-cache make g++ git supervisor python2
 
 COPY Docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
