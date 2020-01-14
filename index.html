@@ -27,6 +27,13 @@
         if (window.require) {
           window.nodeRequire = require;
           delete window.require;
+
+          try {
+            const screenRecorder = window.nodeRequire('./dist/test-integration/test/integration/modules/screen-recorder.js')
+            new screenRecorder.ScreenRecorder();
+          } catch {
+            // if the file does not exist, do nothing
+          }
         }
 
         // in an electron-environment, we musn't try to load umd-modules via window.module
@@ -34,7 +41,7 @@
           delete window.module;
         }
       </script>
-      <script src="./captureVideo.js"></script>
+      <!-- <script src="./captureVideo.js"></script> -->
       <script src="./dist/web/dynamic_ui_core/dist/webcomponent/dynamic-task-components.js"></script>
       <script src="./dist/web/vendor-bundle.js" data-main="aurelia-bootstrapper"></script>
     </div>
