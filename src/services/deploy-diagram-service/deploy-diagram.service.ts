@@ -101,8 +101,6 @@ export class DeployDiagramService {
         'Diagram was successfully uploaded to the connected ProcessEngine.',
       );
 
-      await this.waitForNavigation();
-
       this.eventAggregator.publish(environment.events.diagramDetail.onDiagramDeployed, processModelId);
 
       this.eventAggregator.publish(environment.events.tutorial.diagramDeployed);
@@ -116,14 +114,6 @@ export class DeployDiagramService {
 
       return undefined;
     }
-  }
-
-  private waitForNavigation(): Promise<void> {
-    return new Promise((resolve: Function): void => {
-      this.eventAggregator.subscribeOnce(environment.events.updatingNavbarDone, () => {
-        resolve();
-      });
-    });
   }
 
   private async getProcessModelIdForXml(xml: string): Promise<string> {

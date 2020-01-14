@@ -110,12 +110,15 @@ export class LoadDeployStartTutorial extends Tutorial {
     this.driver.reset();
     await this.waitUntilOverlayIsGone();
 
+    this.activePromise = this.waitForElementToBecomeVisible(startDiagramElementId);
+    await this.activePromise;
+
     this.driver.highlight({
       element: startDiagramElementId,
       popover: {
         title: 'Start the diagram',
         description:
-          'As soon as the diagram is deployed to the remote solution, it can be started. Click on this button to start the diagram.',
+          'As soon as a diagram from a remote solution is opened, it can be started.<br>Click on this button to start the diagram.',
         position: 'left',
       },
     });

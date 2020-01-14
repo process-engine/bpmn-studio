@@ -196,4 +196,16 @@ export abstract class Tutorial {
       );
     });
   }
+
+  protected waitForElementToBecomeVisible(elementId: string): Promise<void> {
+    return new Promise((resolve: Function) => {
+      setInterval(() => {
+        const elementIdWithoutHashtag = elementId.startsWith('#') ? elementId.replace('#', '') : elementId;
+
+        if (document.getElementById(elementIdWithoutHashtag) !== null) {
+          resolve();
+        }
+      }, 100);
+    });
+  }
 }
