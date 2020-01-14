@@ -12,6 +12,7 @@ import {IIdentity} from '@essential-projects/iam_contracts';
 
 import {SolutionExplorer} from './test-classes/solution-explorer';
 import {DesignViewClient} from './test-classes/design-view';
+import {callExposedFunction} from '../../src/services/expose-functionality-module/expose-functionality.module';
 
 function getUserConfigFolder(): string {
   const userHomeDir = os.homedir();
@@ -50,6 +51,18 @@ export class TestClient {
   public async awaitReadiness(): Promise<void> {
     await this.app.client.waitUntilWindowLoaded();
     await this.app.browserWindow.isVisible();
+  }
+
+  public async startRecording(): Promise<void> {
+    await callExposedFunction(this.webdriverClient, 'startRecording');
+  }
+
+  public async stopRecording(): Promise<void> {
+    await callExposedFunction(this.webdriverClient, 'stopRecording');
+  }
+
+  public async stopRecordingAndSave(filename: string): Promise<void> {
+    await callExposedFunction(this.webdriverClient, 'stopRecordingAndSave', filename);
   }
 
   public async startPageLoaded(): Promise<void> {
