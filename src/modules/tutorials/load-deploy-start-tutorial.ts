@@ -7,7 +7,7 @@ import {NotificationService} from '../../services/notification-service/notificat
 import {Tutorial} from './tutorial';
 import {NotificationType} from '../../contracts/index';
 
-const name: string = 'Load, Deploy & Start';
+const name: string = 'Load, Deploy and Start';
 
 export class LoadDeployStartTutorial extends Tutorial {
   private activePromise: any;
