@@ -12,11 +12,20 @@ describe('SolutionExplorer', function foo() {
 
     await testClient.startSpectronApp();
     await testClient.awaitReadiness();
+    await testClient.startRecording();
   });
 
   afterEach(
     async (): Promise<void> => {
       if (await testClient.isSpectronAppRunning()) {
+        const fileName = this.ctx.currentTest.title.replace(/\s/g, '-');
+
+        if (this.ctx.currentTest.state === 'failed') {
+          await testClient.stopRecordingAndSave(`test-videos/${fileName}.webm`);
+        } else {
+          await testClient.stopRecording();
+        }
+
         await testClient.stopSpectronApp();
         await testClient.clearDatabase();
         await testClient.clearSavedDiagrams();

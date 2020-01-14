@@ -96,6 +96,7 @@ export class TestClient {
 
   public async assertDiagramIsSaved(): Promise<void> {
     await this.ensureNotVisible('[data-test-edited-label]');
+    assert.equal(true, false);
   }
 
   public async assertDiagramIsUnsaved(): Promise<void> {

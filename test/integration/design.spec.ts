@@ -14,11 +14,20 @@ describe('Design View', function foo() {
     testClient.creatingFirstDiagram = true;
     await testClient.startSpectronApp();
     await testClient.awaitReadiness();
+    await testClient.startRecording();
   });
 
   afterEach(
     async (): Promise<void> => {
       if (await testClient.isSpectronAppRunning()) {
+        const fileName = this.ctx.currentTest.title.replace(/\s/g, '-');
+
+        if (this.ctx.currentTest.state === 'failed') {
+          await testClient.stopRecordingAndSave(`test-videos/${fileName}.webm`);
+        } else {
+          await testClient.stopRecording();
+        }
+
         await testClient.stopSpectronApp();
         await testClient.clearDatabase();
         await testClient.clearSavedDiagrams();
@@ -40,10 +49,8 @@ describe('Design View', function foo() {
     await testClient.assertDiagramIsSaved();
   });
 
-  it.only('should deploy a diagram', async () => {
+  it('should deploy a diagram', async () => {
     // Arrange
-    // testClient.browserWindow.capturePage();
-    // testClient.webdriverClient.startRecordingScreen();
     const diagramName = 'receive_task_wait_test';
     await testClient.startPageLoaded();
     await testClient.solutionExplorer.openDirectoryAsSolution('fixtures', diagramName);
@@ -53,12 +60,9 @@ describe('Design View', function foo() {
     // Assert
     await testClient.assertNavbarTitleIs(diagramName);
     await testClient.assertDiagramIsOnProcessEngine();
-
-    // testClient.webdriverClient.saveRecordingScreen('test.mp4');
-    // testClient.rendererProcess.startRecordingScreen('test.mp4');
   });
 
-  it.only('should start a process', async () => {
+  it('should start a process', async () => {
     const diagramName = 'receive_task_wait_test';
     await testClient.startPageLoaded();
     await testClient.solutionExplorer.openDirectoryAsSolution('fixtures', diagramName);
