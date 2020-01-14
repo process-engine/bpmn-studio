@@ -84,7 +84,7 @@ export class SolutionExplorerSolution {
   public diagramContextMenu: HTMLElement;
   public showContextMenu: boolean = false;
   public deleteDiagramModal: DeleteDiagramModal;
-  public processEngineRunning: boolean = false;
+  @bindable public processEngineRunning: boolean = false;
 
   public isSavingDiagrams: boolean = false;
   public currentlySavingDiagramName: string = '';
