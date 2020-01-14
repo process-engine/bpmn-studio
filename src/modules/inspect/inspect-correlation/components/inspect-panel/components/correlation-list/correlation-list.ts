@@ -169,11 +169,8 @@ export class CorrelationList {
       },
     );
 
-    const correlationAlreadyExistInList = correlationFromTableData !== undefined;
-
-    this.correlationToSelectTableEntry = correlationAlreadyExistInList
-      ? correlationFromTableData
-      : this.convertCorrelationIntoTableData(this.correlationToSelect);
+    this.correlationToSelectTableEntry =
+      correlationFromTableData || this.convertCorrelationIntoTableData(this.correlationToSelect);
 
     this.selectCorrelation(this.correlationToSelectTableEntry);
   }

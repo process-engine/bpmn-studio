@@ -98,9 +98,7 @@ export class ProcessInstanceList {
       const firstTableEntry: ProcessInstanceTableEntry = this.sortedTableData[0];
 
       const processInstanceToSelect: ProcessInstanceTableEntry =
-        firstProcessInstanceFromCorrectProcessModel !== undefined
-          ? firstProcessInstanceFromCorrectProcessModel
-          : firstTableEntry;
+        firstProcessInstanceFromCorrectProcessModel || firstTableEntry;
 
       this.selectProcessInstance(processInstanceToSelect);
     }
@@ -113,10 +111,8 @@ export class ProcessInstanceList {
         },
       );
 
-      const processInstanceAlreadyExistsInTableData = processInstanceFromTableData;
-      this.processInstanceToSelectTableEntry = processInstanceAlreadyExistsInTableData
-        ? processInstanceFromTableData
-        : this.convertProcessInstanceIntoTableData(this.processInstanceToSelect);
+      this.processInstanceToSelectTableEntry =
+        processInstanceFromTableData || this.convertProcessInstanceIntoTableData(this.processInstanceToSelect);
 
       this.selectProcessInstance(this.processInstanceToSelectTableEntry);
     }
