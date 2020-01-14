@@ -1030,7 +1030,11 @@ async function startRuntime(): Promise<void> {
       '..',
       '..',
       '..',
-      './node_modules/@process-engine/process_engine_runtime/bin/index.js',
+      'node_modules',
+      '@process-engine',
+      'process_engine_runtime',
+      'bin',
+      'index.js',
     );
     runtimeProcess = fork(pathToRuntime, [`--sqlitePath=${sqlitePath}`, `--logFilePath=${logFilepath}`], {
       stdio: 'pipe',
