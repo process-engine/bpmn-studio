@@ -383,7 +383,6 @@ export class SolutionExplorerSolution {
       this.cssIconClass = this.originalIconClass;
       this.tooltipText = '';
       this.processEngineRunning = true;
-      this.displayedSolutionEntry.state = 'connected';
     } catch (error) {
       // In the future we can maybe display a small icon indicating the error.
       if (isError(error, UnauthorizedError)) {
@@ -404,7 +403,6 @@ export class SolutionExplorerSolution {
         this.sortedDiagramsOfSolutions = [];
 
         this.cssIconClass = 'fa fa-bolt';
-        this.displayedSolutionEntry.state = 'disconnected';
         this.isConnected = false;
         if (solutionIsRemoteSolution(this.displayedSolutionEntry.uri)) {
           this.tooltipText = 'ProcessEngine is disconnected!';

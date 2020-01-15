@@ -673,7 +673,6 @@ export class SolutionExplorerList {
       userName,
       processEngineVersion,
       hidden,
-      state,
     };
 
     this.solutionService.addSolutionEntry(entry);
