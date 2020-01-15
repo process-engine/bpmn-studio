@@ -231,7 +231,7 @@ export class BasicsSection implements ISection {
         return false;
       }
 
-      const elementHasSameId: boolean = element.businessObject.id === this.businessObjInPanelId;
+      const elementHasSameId: boolean = element.businessObject.id === id;
 
       return elementHasSameId;
     });
@@ -252,14 +252,14 @@ export class BasicsSection implements ISection {
   }
 
   private setValidationRules(): void {
-    ValidationRules.ensure((businessObject: IModdleElement) => businessObject.id)
+    ValidationRules.ensure((basicsSection: BasicsSection) => basicsSection.businessObjInPanelId)
       .displayName('elementId')
       .required()
       .withMessage('ID cannot be blank.')
       .then()
       .satisfies((id: string) => this.formIdIsUnique(id) && this.isProcessIdUnique(id))
       .withMessage('ID already exists.')
-      .on(this.businessObjInPanel);
+      .on(this);
   }
 
   private saveInputHeightOnChange(): void {
