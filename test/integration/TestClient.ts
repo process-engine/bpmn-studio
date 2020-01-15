@@ -52,16 +52,16 @@ export class TestClient {
     await this.app.browserWindow.isVisible();
   }
 
-  public async startRecording(): Promise<void> {
-    await callExposedFunction(this.webdriverClient, 'startRecording');
+  public async startRecording(filepath: string): Promise<void> {
+    await callExposedFunction(this.webdriverClient, 'startRecording', filepath);
   }
 
   public async stopRecording(): Promise<void> {
     await callExposedFunction(this.webdriverClient, 'stopRecording');
   }
 
-  public async stopRecordingAndSave(filename: string): Promise<void> {
-    await callExposedFunction(this.webdriverClient, 'stopRecordingAndSave', filename);
+  public async stopRecordingAndSave(): Promise<void> {
+    await callExposedFunction(this.webdriverClient, 'stopRecordingAndSave');
   }
 
   public async startPageLoaded(): Promise<void> {
