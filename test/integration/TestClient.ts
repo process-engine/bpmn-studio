@@ -1,6 +1,7 @@
 /* eslint-disable no-useless-escape */
 /* eslint-disable no-empty-function */
 import path from 'path';
+import os from 'os';
 import {exec} from 'child_process';
 import fs from 'fs';
 
@@ -11,9 +12,22 @@ import {IIdentity} from '@essential-projects/iam_contracts';
 import {SolutionExplorer} from './test-classes/solution-explorer';
 import {DesignViewClient} from './test-classes/design-view';
 
+function getUserConfigFolder(): string {
+  const userHomeDir = os.homedir();
+  switch (process.platform) {
+    case 'darwin':
+      return path.join(userHomeDir, 'Library', 'Application Support');
+    case 'win32':
+      return path.join(userHomeDir, 'AppData', 'Roaming');
+    default:
+      return path.join(userHomeDir, '.config');
+  }
+}
+
 const APP_BASE_URL = `file://${__dirname}/../../../../index.html`;
-const DATABASE_PATH = path.join(getUserConfigFolder(), 'bpmn-studio-tests', 'process_engine_databases');
-const SAVE_DIAGRAM_DIR = path.join(getUserConfigFolder(), 'bpmn-studio-tests', 'saved_diagrams');
+const TESTS_FOLDER_PATH = path.join(getUserConfigFolder(), 'bpmn-studio-tests');
+const DATABASE_PATH = path.join(TESTS_FOLDER_PATH, 'process_engine_databases');
+const SAVE_DIAGRAM_DIR = path.join(TESTS_FOLDER_PATH, 'saved_diagrams');
 const VISIBLE_TIMEOUT = 40000;
 const REMOVE_COMMAND = process.platform === 'win32' ? 'rmdir /s /q' : 'rm -rf';
 
