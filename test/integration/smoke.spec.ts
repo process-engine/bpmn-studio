@@ -20,16 +20,16 @@ describe('Application launch', function foo() {
     testClient.creatingFirstDiagram = true;
     await testClient.startSpectronApp();
     await testClient.awaitReadiness();
-    await testClient.startRecording();
+
+    const fileName = this.ctx.currentTest.title.replace(/\s/g, '-');
+    await testClient.startRecording(`test-results/${new Date().toISOString()}-${fileName}.webm`);
   });
 
   afterEach(
     async (): Promise<void> => {
       if (await testClient.isSpectronAppRunning()) {
-        const fileName = this.ctx.currentTest.title.replace(/\s/g, '-');
-
         if (this.ctx.currentTest.state === 'failed') {
-          await testClient.stopRecordingAndSave(`test-results/${fileName}.webm`);
+          await testClient.stopRecordingAndSave();
         } else {
           await testClient.stopRecording();
         }
