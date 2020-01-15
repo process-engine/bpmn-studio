@@ -71,7 +71,6 @@ export class TestClient {
 
   public async assertDiagramIsOnProcessEngine(): Promise<void> {
     await this.ensureVisible('[data-test-navbar-icon-remote-solution]', VISIBLE_TIMEOUT);
-    await this.ensureVisible('[data-test-solution-entry-state="connected"]', VISIBLE_TIMEOUT);
   }
 
   public async assertNavbarTitleIs(name): Promise<void> {
