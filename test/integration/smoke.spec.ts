@@ -115,7 +115,6 @@ describe('Application launch', function foo() {
     await testClient.solutionExplorer.openDirectoryAsSolution('fixtures', diagramName);
     await testClient.assertDiagramIsOnFileSystem();
     await testClient.solutionExplorer.assertInternalProcessEngineIsOpenedAsSolution();
-    await testClient.pause(1000);
     await testClient.designView.deployDiagram();
     await testClient.assertNavbarTitleIs(diagramName);
     await testClient.assertDiagramIsOnProcessEngine();
