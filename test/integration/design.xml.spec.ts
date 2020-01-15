@@ -23,7 +23,7 @@ let testClient: TestClient;
 
 describe('XML View', function foo() {
   this.slow(10000);
-  this.timeout(40000);
+  this.timeout(15000);
 
   beforeEach(async () => {
     testClient = new TestClient(applicationArgs);
