@@ -3,12 +3,13 @@
   <require from="../../../../styles/sections.css"></require>
   <div class="section-panel panel--general" id="js-general-basics-section">
     <div class="panel__heading">${elementType}</div>
+    <div if.bind="showUnsupportedFlag" class="hint-unsupported-bpmn-element">Not supported by internal ProcessEngine</div>
     <div class="panel__content">
       <table class="props-table">
         <tr>
           <th>ID</th>
           <td>
-            <input type="text" class="props-input" value.bind="businessObjInPanel.id & validateOnChange" change.delegate="updateId()" disabled.bind="!isEditable" data-test-property-panel-element-id>
+            <input type="text" class="props-input" value.bind="businessObjInPanelId & validateOnChange" change.delegate="updateId()" disabled.bind="!isEditable" data-test-property-panel-element-id>
           </td>
           <td>
             <template if.bind="validationError">

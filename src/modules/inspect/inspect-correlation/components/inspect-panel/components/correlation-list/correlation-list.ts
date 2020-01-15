@@ -67,6 +67,14 @@ export class CorrelationList {
     this.correlationToSelectTableEntry = undefined;
   }
 
+  public correlationToSelectChanged(): void {
+    if (this.correlationToSelect === undefined || this.sortedTableData === undefined) {
+      return;
+    }
+
+    this.selectCorrelationToSelect();
+  }
+
   public correlationsChanged(): void {
     if (!this.activeDiagram) {
       return;
@@ -76,32 +84,12 @@ export class CorrelationList {
     this.sortTableData();
 
     const tableDataIsExisiting: boolean = this.sortedTableData.length > 0;
-    if (tableDataIsExisiting) {
+    if (tableDataIsExisiting && this.correlationToSelect) {
+      this.selectCorrelationToSelect();
+    } else if (tableDataIsExisiting) {
       const firstTableEntry: ICorrelationTableEntry = this.sortedTableData[0];
 
       this.selectCorrelation(firstTableEntry);
-    }
-
-    const correlationToSelectExists: boolean = this.correlationToSelect !== undefined;
-    if (correlationToSelectExists) {
-      const instanceAlreadyExistInList: ICorrelationTableEntry = this.sortedTableData.find(
-        (correlation: ICorrelationTableEntry) => {
-          return correlation.correlationId === this.correlationToSelect.id;
-        },
-      );
-
-      if (instanceAlreadyExistInList) {
-        this.correlationToSelectTableEntry = undefined;
-      } else {
-        const correlationToSelectTableEntry: Array<ICorrelationTableEntry> = this.convertCorrelationsIntoTableData([
-          this.correlationToSelect,
-        ]);
-
-        this.correlationToSelectTableEntry = correlationToSelectTableEntry[0];
-        this.selectCorrelation(this.correlationToSelectTableEntry);
-      }
-
-      this.correlationToSelect = undefined;
     }
 
     this.paginationShowsLoading = false;
@@ -151,17 +139,17 @@ export class CorrelationList {
   private convertCorrelationsIntoTableData(
     correlations: Array<DataModels.Correlations.Correlation>,
   ): Array<ICorrelationTableEntry> {
-    return correlations.map((correlation: DataModels.Correlations.Correlation) => {
-      const formattedStartedDate: string = getBeautifiedDate(correlation.createdAt);
+    return correlations.map(this.convertCorrelationIntoTableData);
+  }
 
-      const tableEntry: ICorrelationTableEntry = {
-        startedAt: formattedStartedDate,
-        state: correlation.state,
-        correlationId: correlation.id,
-      };
+  private convertCorrelationIntoTableData(correlation: DataModels.Correlations.Correlation): ICorrelationTableEntry {
+    const tableEntry: ICorrelationTableEntry = {
+      startedAt: getBeautifiedDate(correlation.createdAt),
+      state: correlation.state,
+      correlationId: correlation.id,
+    };
 
-      return tableEntry;
-    });
+    return tableEntry;
   }
 
   public changeSortSettings(property: CorrelationListSortProperty): void {
@@ -172,6 +160,19 @@ export class CorrelationList {
     this.sortSettings.sortProperty = property;
 
     this.sortTableData();
+  }
+
+  private selectCorrelationToSelect(): void {
+    const correlationFromTableData: ICorrelationTableEntry = this.sortedTableData.find(
+      (correlation: ICorrelationTableEntry) => {
+        return correlation.correlationId === this.correlationToSelect.id;
+      },
+    );
+
+    this.correlationToSelectTableEntry =
+      correlationFromTableData || this.convertCorrelationIntoTableData(this.correlationToSelect);
+
+    this.selectCorrelation(this.correlationToSelectTableEntry);
   }
 
   private sortTableData(): void {

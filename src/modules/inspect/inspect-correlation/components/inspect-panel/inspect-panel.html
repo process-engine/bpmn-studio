@@ -32,7 +32,7 @@
     </div>
     <div class="inspect-panel__body">
       <correlation-list show.bind="showCorrelationList" active-diagram.bind="activeDiagram" correlations.to-view="correlations"  selected-correlation.from-view="selectedCorrelation" correlation-to-select.to-view="correlationToSelect" total-count.bind="totalCorrelationCount"></correlation-list>
-      <process-instance-list show.bind="showProcessInstanceList" active-diagram.bind="activeDiagram" process-instances.to-view="processInstances" selected-process-instance.from-view="selectedProcessInstance" process-instance-to-select.to-view="processInstanceToSelect" total-count.bind="totalProcessInstanceCount"></process-instance-list>
+      <process-instance-list show.bind="showProcessInstanceList" active-diagram.bind="activeDiagram" process-instances.to-view="processInstances" selected-correlation.to-view="selectedCorrelation" selected-process-instance.from-view="selectedProcessInstance" process-instance-to-select.to-view="processInstanceToSelect" total-count.bind="totalProcessInstanceCount"></process-instance-list>
       <log-viewer if.bind="showLogViewer" active-solution-entry.bind="activeSolutionEntry" process-instance.to-view="selectedProcessInstance"></log-viewer>
     </div>
   </div>

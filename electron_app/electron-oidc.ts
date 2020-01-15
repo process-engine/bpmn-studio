@@ -3,6 +3,7 @@ import fetch from 'node-fetch';
 import nodeUrl from 'url';
 import {BrowserWindowConstructorOptions, Event as ElectronEvent} from 'electron';
 import crypto from 'crypto';
+import Bluebird from 'bluebird';
 
 import {IOidcConfig, ITokenObject} from '../src/contracts/index';
 
@@ -10,6 +11,8 @@ import {IOidcConfig, ITokenObject} from '../src/contracts/index';
 import electron = require('electron');
 
 const BrowserWindow = electron.BrowserWindow || electron.remote.BrowserWindow;
+const authoritiesToRefresh: Array<string> = [];
+const refreshTimeouts: Map<string, any> = new Map();
 
 export default (
   config: IOidcConfig,
@@ -17,6 +20,7 @@ export default (
 ): {
   getTokenObject: (authorityUrl: string) => Promise<ITokenObject>;
   logout: (tokenObject: ITokenObject, authorityUrl: string) => Promise<boolean>;
+  startSilentRefreshing: (authorityUrl: string, tokenObject: ITokenObject, refreshCallback: Function) => void;
 } => {
   function getTokenObjectForAuthorityUrl(authorityUrl): Promise<any> {
     return getTokenObject(authorityUrl, config, windowParams);
@@ -26,9 +30,18 @@ export default (
     return logout(tokenObject, authorityUrl, config, windowParams);
   }
 
+  function refreshTokenViaSilentRefresh(
+    authorityUrl: string,
+    tokenObject: ITokenObject,
+    refreshCallback: Function,
+  ): void {
+    return startSilentRefreshing(authorityUrl, config, tokenObject, refreshCallback);
+  }
+
   return {
     getTokenObject: getTokenObjectForAuthorityUrl,
     logout: logoutViaTokenObjectAndAuthorityUrl,
+    startSilentRefreshing: refreshTokenViaSilentRefresh,
   };
 };
 
@@ -112,7 +125,7 @@ function redirectCallback(
    * - Close the window.
    */
   if (href === null) {
-    reject(`Could not parse url: ${url}`);
+    reject(new Error(`Could not parse url: ${url}`));
 
     authWindow.removeAllListeners('closed');
 
@@ -125,12 +138,21 @@ function redirectCallback(
     const identityParameter = urlParts.hash;
     const parameterAsArray = identityParameter.split('&');
 
+    if (parameterAsArray[0].includes('login_required')) {
+      reject(new Error('User is no longer logged in.'));
+
+      return;
+    }
+
     const idToken = parameterAsArray[0].split('=')[1];
     const accessToken = parameterAsArray[1].split('=')[1];
+
+    const expiresIn = parameterAsArray.find((parameter) => parameter.startsWith('expires_in=')).split('=')[1];
 
     const tokenObject = {
       idToken,
       accessToken,
+      expiresIn,
     };
 
     resolve(tokenObject);
@@ -155,6 +177,8 @@ function logout(
 
   const endSessionUrl = `${authorityUrl}connect/endsession?${queryString.stringify(urlParams)}`;
 
+  stopSilentRefreshing(authorityUrl);
+
   return new Promise(
     async (resolve: Function): Promise<void> => {
       const response: fetch.Response = await fetch(endSessionUrl);
@@ -177,6 +201,112 @@ function logout(
       logoutWindow.show();
     },
   );
+}
+
+async function silentRefresh(
+  authorityUrl: string,
+  config: IOidcConfig,
+  tokenObject: ITokenObject,
+  refreshCallback: Function,
+): Promise<void> {
+  // Token refresh factor is set as described at https://github.com/manfredsteyer/angular-oauth2-oidc/blob/master/docs-src/silent-refresh.md#automatically-refreshing-a-token-when-before-it-expires-code-flow-and-implicit-flow
+  const tokenRefreshFactor = 0.75;
+  const secondsInMilisecondsFactor = 1000;
+  const tokenRefreshInterval = tokenObject.expiresIn * tokenRefreshFactor * secondsInMilisecondsFactor;
+
+  const timeout = wait(tokenRefreshInterval);
+  refreshTimeouts.set(authorityUrl, timeout);
+  await timeout;
+
+  if (!authoritiesToRefresh.includes(authorityUrl)) {
+    return;
+  }
+
+  // Build the Url Params from the Config.
+  const urlParams = {
+    client_id: config.clientId,
+    redirect_uri: config.redirectUri,
+    response_type: config.responseType,
+    scope: config.scope,
+    state: getRandomString(16),
+    nonce: getRandomString(16),
+    prompt: 'none',
+  };
+
+  const urlToLoad: string = `${authorityUrl}connect/authorize?${queryString.stringify(urlParams)}`;
+
+  // Open a new browser window and load the previously constructed url.
+  const authWindow = new BrowserWindow({show: false});
+
+  authWindow.loadURL(urlToLoad);
+
+  // Throw an error, if the user closes the new window.
+  authWindow.on('closed', (): void => {
+    throw new Error('window was closed by user');
+  });
+
+  /**
+   * This will trigger everytime the new window will redirect.
+   * Important: Not AFTER it redirects but BEFORE.
+   * This gives us the possibility to intercept the redirect to
+   * the specified redirect uri, which would lead to faulty behaviour
+   * due to security aspects in chromium.
+   *
+   * If that redirect would start we stop it by preventing the default
+   * behaviour and instead parse its parameters in the
+   * "onCallback"-function.
+   */
+  authWindow.webContents.on('will-redirect', (event: ElectronEvent, url: string): void => {
+    if (url.includes(config.redirectUri)) {
+      event.preventDefault();
+    }
+
+    const redirectCallbackResolved = (token: ITokenObject): void => {
+      refreshCallback(token);
+
+      silentRefresh(authorityUrl, config, tokenObject, refreshCallback);
+    };
+
+    const redirectCallbackRejected = (error: Error): void => {
+      if (error.message !== 'User is no longer logged in.') {
+        throw error;
+      }
+
+      stopSilentRefreshing(authorityUrl);
+    };
+
+    redirectCallback(url, authWindow, config, redirectCallbackResolved, redirectCallbackRejected);
+  });
+}
+
+function startSilentRefreshing(
+  authorityUrl: string,
+  config: IOidcConfig,
+  tokenObject: ITokenObject,
+  refreshCallback: Function,
+): void {
+  authoritiesToRefresh.push(authorityUrl);
+
+  silentRefresh(authorityUrl, config, tokenObject, refreshCallback);
+}
+
+function stopSilentRefreshing(authorityUrl: string): void {
+  if (refreshTimeouts.has(authorityUrl)) {
+    refreshTimeouts.get(authorityUrl).cancel();
+    refreshTimeouts.delete(authorityUrl);
+  }
+  if (authoritiesToRefresh.includes(authorityUrl)) {
+    const authorityToRemove = authoritiesToRefresh.findIndex((authority) => authority === authorityUrl);
+    authoritiesToRefresh.splice(authorityToRemove, 0);
+  }
+}
+
+function wait(ms: number): Promise<void> {
+  return new Bluebird.Promise((resolve: Function) => {
+    setTimeout(() => {
+      resolve();
+    }, ms);
+  });
 }
 
 function getRandomString(length: number): string {

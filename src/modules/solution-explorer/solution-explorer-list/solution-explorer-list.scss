@@ -20,7 +20,10 @@
   padding: 2.5px 5px;
   padding-bottom: 2px;
   color: darkgray;
-  cursor: pointer;
+}
+
+.solution-entry__header--error {
+  background-color: #fde7e7;
 }
 
 .solution-entry__header:hover {
@@ -111,7 +114,6 @@
   background: transparent;
   border: none;
 }
-
 
 .solution-entry__collapse-header {
   max-width: 240px;

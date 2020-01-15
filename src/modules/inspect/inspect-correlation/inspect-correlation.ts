@@ -157,6 +157,28 @@ export class InspectCorrelation {
     if (shouldDisplaySpecificInspectPanelTab) {
       this.inspectPanel.changeTab(this.inspectPanelTabToShow);
     }
+
+    if (this.processInstanceIdToSelect) {
+      try {
+        const processInstanceToSelect = await this.inspectCorrelationService.getProcessInstanceById(
+          this.activeSolutionEntry.identity,
+          this.processInstanceIdToSelect,
+          this.activeDiagram.id,
+        );
+
+        this.correlationToSelect = await this.inspectCorrelationService.getCorrelationById(
+          this.activeSolutionEntry.identity,
+          processInstanceToSelect.correlationId,
+        );
+
+        this.processInstanceToSelect = processInstanceToSelect;
+      } catch (error) {
+        this.notificationService.showNotification(
+          NotificationType.ERROR,
+          'The requested ProcessInstance to select could not be found.',
+        );
+      }
+    }
   }
 
   private async updateCorrelations(): Promise<void> {
@@ -182,26 +204,6 @@ export class InspectCorrelation {
   }
 
   private async updateProcessInstances(): Promise<void> {
-    if (this.processInstanceIdToSelect) {
-      try {
-        this.processInstanceToSelect = await this.inspectCorrelationService.getProcessInstanceById(
-          this.activeSolutionEntry.identity,
-          this.processInstanceIdToSelect,
-          this.activeDiagram.id,
-        );
-
-        this.correlationToSelect = await this.inspectCorrelationService.getCorrelationById(
-          this.activeSolutionEntry.identity,
-          this.processInstanceToSelect.correlationId,
-        );
-      } catch (error) {
-        this.notificationService.showNotification(
-          NotificationType.ERROR,
-          'The requested ProcessInstance to select could not be found.',
-        );
-      }
-    }
-
     let processInstanceList;
 
     try {
@@ -209,7 +211,6 @@ export class InspectCorrelation {
       if (noCorrelationSelected) {
         this.processInstances = [];
         this.totalProcessInstanceCount = 0;
-        this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
 
         return;
       }
@@ -291,20 +292,22 @@ export class InspectCorrelation {
   }
 
   public async activeDiagramChanged(): Promise<void> {
-    if (this.viewIsAttached) {
-      this.correlationOffset = 0;
-      this.processInstanceOffset = 0;
-
-      this.processInstanceIdToSelect = undefined;
-      this.processInstanceToSelect = undefined;
-      this.correlationToSelect = undefined;
-
-      this.selectedProcessInstance = undefined;
-      this.selectedCorrelation = undefined;
-
-      this.updateProcessInstances();
-      this.updateCorrelations();
+    if (!this.viewIsAttached) {
+      return;
     }
+
+    this.correlationOffset = 0;
+    this.processInstanceOffset = 0;
+
+    this.processInstanceIdToSelect = undefined;
+    this.processInstanceToSelect = undefined;
+    this.correlationToSelect = undefined;
+
+    this.selectedProcessInstance = undefined;
+    this.selectedCorrelation = undefined;
+
+    this.updateProcessInstances();
+    this.updateCorrelations();
   }
 
   public selectedCorrelationChanged(): void {

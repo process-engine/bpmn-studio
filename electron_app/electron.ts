@@ -2,10 +2,10 @@
 import fs from 'fs';
 import path from 'path';
 import {homedir} from 'os';
+import {ChildProcess, fork} from 'child_process';
+
 import windowStateKeeper from 'electron-window-state';
-
 import JSZip from 'jszip';
-
 import {
   App,
   BrowserWindow,
@@ -22,7 +22,6 @@ import getPort from 'get-port';
 import open from 'open';
 
 import {CancellationToken, autoUpdater} from '@process-engine/electron-updater';
-import * as pe from '@process-engine/process_engine_runtime';
 import {version as ProcessEngineVersion} from '@process-engine/process_engine_runtime/package.json';
 
 import electronOidc from './electron-oidc';
@@ -31,7 +30,7 @@ import ReleaseChannel from '../src/services/release-channel-service/release-chan
 import {solutionIsRemoteSolution} from '../src/services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 import {version as CurrentStudioVersion} from '../package.json';
 import {getPortListByVersion} from '../src/services/default-ports-module/default-ports.module';
-import {FeedbackData} from '../src/contracts';
+import {FeedbackData, ITokenObject} from '../src/contracts';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import electron = require('electron');
@@ -48,11 +47,21 @@ const releaseChannel: ReleaseChannel = new ReleaseChannel(CurrentStudioVersion);
 let fileAssociationFilePath: string;
 let isInitialized: boolean = false;
 
+let peErrors: string = '';
+
 /**
  * This variable gets set when BPMN Studio is ready to work with Files that are
  * openend via double click.
  */
 let fileOpenMainEvent: IpcMainEvent;
+
+let runtimeProcess: ChildProcess;
+
+process.on('exit', () => {
+  if (runtimeProcess) {
+    runtimeProcess.kill('SIGTERM');
+  }
+});
 
 function execute(): void {
   /**
@@ -171,8 +180,8 @@ function initializeAutoUpdater(): void {
 
     console.log(`CurrentVersion: ${currentVersion}, CurrentVersionIsPrerelease: ${currentVersionIsPrerelease}`);
 
-    autoUpdater.addListener('error', () => {
-      appReadyEvent.sender.send('update_error');
+    autoUpdater.addListener('error', (error) => {
+      appReadyEvent.sender.send('update_error', error.message);
     });
 
     autoUpdater.addListener('download-progress', (progressObj) => {
@@ -241,7 +250,12 @@ function initializeOidc(): void {
 
   ipcMain.on('oidc-login', (event, authorityUrl) => {
     electronOidcInstance.getTokenObject(authorityUrl).then(
-      (token) => {
+      async (token) => {
+        const refreshCallback: Function = (tokenObject: ITokenObject) => {
+          event.sender.send(`oidc-silent_refresh-${authorityUrl}`, tokenObject);
+        };
+
+        electronOidcInstance.startSilentRefreshing(authorityUrl, token, refreshCallback);
         event.sender.send('oidc-login-reply', token);
       },
       (err) => {
@@ -355,6 +369,8 @@ function createMainWindow(): void {
     title: getProductName(),
     minWidth: 1300,
     minHeight: 800,
+    show: false,
+    backgroundColor: '#f7f7f7',
     icon: path.join(__dirname, '../build/icon.png'), // only for windows
     titleBarStyle: 'hiddenInset',
     webPreferences: {
@@ -363,6 +379,10 @@ function createMainWindow(): void {
   });
 
   mainWindowState.manage(browserWindow);
+
+  browserWindow.on('ready-to-show', () => {
+    browserWindow.show();
+  });
 
   browserWindow.loadURL(`file://${__dirname}/../../../index.html`);
   // We need to navigate to "/" because something in the push state seems to be
@@ -783,6 +803,15 @@ function getHelpMenu(): MenuItem {
       },
     },
     {
+      label: 'BPMN Element Documentation',
+      click: (): void => {
+        const currentVersionBranch = getBranchOfCurrentVersion();
+        const elementDocumentationUrl = `https://github.com/process-engine/bpmn-studio/blob/${currentVersionBranch}/doc/bpmn-elements.md`;
+
+        electron.shell.openExternal(elementDocumentationUrl);
+      },
+    },
+    {
       label: 'Release Notes',
       click: (): void => {
         const currentVersion = app.getVersion();
@@ -956,18 +985,18 @@ async function startInternalProcessEngine(): Promise<any> {
     event.returnValue = ProcessEngineVersion;
   });
 
-  // TODO: Check if the ProcessEngine instance is now run on the UI thread.
-  // See issue https://github.com/process-engine/bpmn-studio/issues/312
   try {
-    const sqlitePath = getDatabaseFolder();
-    const logFilepath = getLogFolder();
+    await startRuntime();
 
-    const startupArgs = {
-      sqlitePath: sqlitePath,
-      logFilePath: logFilepath,
-    };
+    runtimeProcess.on('close', (code) => {
+      const error = new Error(`Runtime exited with code ${code}`);
+      console.error(error);
+    });
 
-    pe.startRuntime(startupArgs);
+    runtimeProcess.on('error', (err) => {
+      const error = new Error(err.toString());
+      console.error('Internal ProcessEngine Error: ', error);
+    });
 
     console.log('Internal ProcessEngine started successfully.');
     internalProcessEngineStatus = 'success';
@@ -980,7 +1009,8 @@ async function startInternalProcessEngine(): Promise<any> {
   } catch (error) {
     console.error('Failed to start internal ProcessEngine: ', error);
     internalProcessEngineStatus = 'error';
-    internalProcessEngineStartupError = error;
+    // eslint-disable-next-line no-multi-assign
+    internalProcessEngineStartupError = peErrors += error;
 
     publishProcessEngineStatus(
       processEngineStatusListeners,
@@ -990,7 +1020,50 @@ async function startInternalProcessEngine(): Promise<any> {
   }
 }
 
-function getLogFolder(): string {
+async function startRuntime(): Promise<void> {
+  return new Promise((resolve: Function, reject: Function): void => {
+    const sqlitePath = getProcessEngineDatabaseFolder();
+    const logFilepath = getProcessEngineLogFolder();
+
+    const pathToRuntime = path.join(
+      __dirname,
+      '..',
+      '..',
+      '..',
+      'node_modules',
+      '@process-engine',
+      'process_engine_runtime',
+      'bin',
+      'index.js',
+    );
+    runtimeProcess = fork(pathToRuntime, [`--sqlitePath=${sqlitePath}`, `--logFilePath=${logFilepath}`], {
+      stdio: 'pipe',
+    });
+
+    runtimeProcess.stdout.on('data', (data) => process.stdout.write(data));
+    runtimeProcess.stderr.on('data', (data) => {
+      process.stderr.write(data);
+      peErrors += data.toString();
+    });
+
+    runtimeProcess.on('message', (message) => {
+      if (message === 'started') {
+        resolve();
+      }
+    });
+
+    runtimeProcess.on('close', (code) => {
+      const error = new Error(`Runtime exited with code ${code}`);
+      reject(error);
+    });
+
+    runtimeProcess.on('error', (err) => {
+      reject(err);
+    });
+  });
+}
+
+function getProcessEngineLogFolder(): string {
   return path.join(getConfigFolder(), getProcessEngineLogFolderName());
 }
 
@@ -998,7 +1071,7 @@ function getProcessEngineLogFolderName(): string {
   return 'process_engine_logs';
 }
 
-function getDatabaseFolder(): string {
+function getProcessEngineDatabaseFolder(): string {
   return path.join(getConfigFolder(), getProcessEngineDatabaseFolderName());
 }
 
@@ -1012,14 +1085,18 @@ function sendInternalProcessEngineStatus(
   internalProcessEngineStartupError,
 ): any {
   let serializedStartupError;
-  const processEngineStartSuccessful =
+  const processEngineStartHasFailed =
     internalProcessEngineStartupError !== undefined && internalProcessEngineStartupError !== null;
 
-  if (processEngineStartSuccessful) {
-    serializedStartupError = JSON.stringify(
-      internalProcessEngineStartupError,
-      Object.getOwnPropertyNames(internalProcessEngineStartupError),
-    );
+  if (processEngineStartHasFailed) {
+    if (typeof internalProcessEngineStartupError === 'string') {
+      serializedStartupError = internalProcessEngineStartupError;
+    } else {
+      serializedStartupError = JSON.stringify(
+        internalProcessEngineStartupError,
+        Object.getOwnPropertyNames(internalProcessEngineStartupError),
+      );
+    }
   } else {
     serializedStartupError = undefined;
   }
@@ -1067,6 +1144,23 @@ function getConfigPathSuffix(): string {
   throw new Error('Could not get config path suffix for internal process engine');
 }
 
+function getBranchOfCurrentVersion(): string {
+  if (releaseChannel.isDev()) {
+    return 'develop';
+  }
+  if (releaseChannel.isAlpha()) {
+    return 'develop';
+  }
+  if (releaseChannel.isBeta()) {
+    return 'beta';
+  }
+  if (releaseChannel.isStable()) {
+    return 'master';
+  }
+
+  throw new Error('Could not get the branch of the current version.');
+}
+
 function getUserConfigFolder(): string {
   const userHomeDir = homedir();
 
@@ -1093,7 +1187,7 @@ function bringExistingInstanceToForeground(): void {
 async function exportDatabases(): Promise<void> {
   const zip = new JSZip();
 
-  await addDatabaseToZip(zip);
+  addFolderToZip(zip, getProcessEngineDatabaseFolderName(), getProcessEngineDatabaseFolder());
 
   // eslint-disable-next-line newline-per-chained-call
   const now = new Date().toISOString().replace(/:/g, '-');
@@ -1113,25 +1207,33 @@ async function exportDatabases(): Promise<void> {
 async function createFeedbackZip(feedbackData: FeedbackData): Promise<void> {
   const zip = new JSZip();
 
-  const zipFolder = zip.folder('feedback');
+  const feedbackFolder = zip.folder('feedback');
 
   if (feedbackData.attachInternalDatabases) {
-    await addDatabaseToZip(zipFolder);
+    const processEngineFolder = feedbackFolder.folder('InternalProcessEngine');
+
+    addFolderToZip(processEngineFolder, getProcessEngineDatabaseFolderName(), getProcessEngineDatabaseFolder());
+  }
+
+  if (feedbackData.attachProcessEngineLogs) {
+    const processEngineFolder = feedbackFolder.folder('InternalProcessEngine');
+
+    addFolderToZip(processEngineFolder, getProcessEngineLogFolderName(), getProcessEngineLogFolder());
   }
 
   const bugsProvided: boolean = feedbackData.bugs.trim() !== '';
   if (bugsProvided) {
-    zipFolder.file('Bugs.txt', feedbackData.bugs);
+    feedbackFolder.file('Bugs.txt', feedbackData.bugs);
   }
 
   const suggestionsProvided: boolean = feedbackData.suggestions.trim() !== '';
   if (suggestionsProvided) {
-    zipFolder.file('Suggestions.txt', feedbackData.suggestions);
+    feedbackFolder.file('Suggestions.txt', feedbackData.suggestions);
   }
 
   const diagramsProvided: boolean = feedbackData.diagrams.length > 0;
   if (diagramsProvided) {
-    const diagramFolder = zipFolder.folder('diagrams');
+    const diagramFolder = feedbackFolder.folder('diagrams');
 
     feedbackData.diagrams.forEach((diagram) => {
       let diagramSolution: string = '';
@@ -1183,18 +1285,8 @@ async function createFeedbackZip(feedbackData: FeedbackData): Promise<void> {
   });
 }
 
-function getFilenamesOfFilesInFolder(foldername): Promise<Array<string>> {
-  return new Promise((resolve: Function, reject: Function): void => {
-    fs.readdir(foldername, (error: Error, fileNames: Array<string>): void => {
-      if (error) {
-        reject(new Error(`Unable to scan directory: ${error}`));
-
-        return;
-      }
-
-      resolve(fileNames);
-    });
-  });
+function getNamesOfFilesAndFoldersInFolder(foldername): Array<fs.Dirent> {
+  return fs.readdirSync(foldername, {withFileTypes: true});
 }
 
 async function getPathToSaveTo(defaultFilename): Promise<string> {
@@ -1222,18 +1314,30 @@ async function getPathToSaveTo(defaultFilename): Promise<string> {
   return saveDialogResult.filePath;
 }
 
-async function addDatabaseToZip(zipFolder): Promise<void> {
-  const databaseZipFolder = zipFolder.folder(getProcessEngineDatabaseFolderName());
+function addFolderToZip(zipFolder, folderName, folderPath): void {
+  if (!fs.existsSync(folderPath)) {
+    zipFolder.file(`${folderName} does not exist.`, '', {base64: true});
 
-  const databaseFolderName: string = getDatabaseFolder();
+    return;
+  }
 
-  const databaseFiles: Array<string> = await getFilenamesOfFilesInFolder(databaseFolderName);
+  const folderInZip = zipFolder.folder(folderName);
 
-  databaseFiles.forEach((filename: string) => {
-    const filePath: string = `${databaseFolderName}/${filename}`;
+  const filesAndFoldersInFolder: Array<fs.Dirent> = getNamesOfFilesAndFoldersInFolder(folderPath);
 
-    databaseZipFolder.file(filename, fs.readFileSync(filePath), {base64: true});
+  filesAndFoldersInFolder.forEach((fileOrFolder: fs.Dirent) => {
+    const currentElementsPath: string = `${folderPath}/${fileOrFolder.name}`;
+
+    if (fileOrFolder.isDirectory()) {
+      addFolderToZip(folderInZip, fileOrFolder.name, currentElementsPath);
+    } else {
+      addFileToZip(folderInZip, fileOrFolder.name, currentElementsPath);
+    }
   });
+}
+
+function addFileToZip(zipFolder, filename, filePath): void {
+  zipFolder.file(filename, fs.readFileSync(filePath), {base64: true});
 }
 
 execute();
