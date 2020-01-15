@@ -9,14 +9,14 @@ import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 
 import {IEventFunction, ISolutionEntry, InspectPanelTab, NotificationType} from '../../../contracts/index';
 import environment from '../../../environment';
-import {IInspectCorrelationService} from './contracts';
+import {IInspectProcessInstanceService} from './contracts';
 import {DiagramViewer} from './components/diagram-viewer/diagram-viewer';
 import {InspectPanel} from './components/inspect-panel/inspect-panel';
 import {DEFAULT_PAGESIZE} from './components/inspect-panel/components/process-instance-list/process-instance-list';
 import {NotificationService} from '../../../services/notification-service/notification.service';
 
-@inject('InspectCorrelationService', EventAggregator, 'NotificationService')
-export class InspectCorrelation {
+@inject('InspectProcessInstanceService', EventAggregator, 'NotificationService')
+export class InspectProcessInstance {
   @bindable public correlations: Array<DataModels.Correlations.Correlation>;
   @bindable public correlationToSelect: DataModels.Correlations.Correlation;
   @bindable public processInstanceIdToSelect: string;
@@ -50,7 +50,7 @@ export class InspectCorrelation {
 
   public viewIsAttached: boolean = false;
 
-  private inspectCorrelationService: IInspectCorrelationService;
+  private inspectProcessInstanceService: IInspectProcessInstanceService;
   private eventAggregator: EventAggregator;
   private notificationService: NotificationService;
   private subscriptions: Array<Subscription>;
@@ -59,11 +59,11 @@ export class InspectCorrelation {
   private updateProcessInstancePromise: any;
 
   constructor(
-    inspectCorrelationService: IInspectCorrelationService,
+    InspectProcessInstanceService: IInspectProcessInstanceService,
     eventAggregator: EventAggregator,
     notificationService: NotificationService,
   ) {
-    this.inspectCorrelationService = inspectCorrelationService;
+    this.inspectProcessInstanceService = InspectProcessInstanceService;
     this.eventAggregator = eventAggregator;
     this.notificationService = notificationService;
   }
@@ -72,31 +72,34 @@ export class InspectCorrelation {
     this.updateProcessInstances();
     this.updateCorrelations();
 
-    this.eventAggregator.publish(environment.events.statusBar.showInspectCorrelationButtons, true);
+    this.eventAggregator.publish(environment.events.statusBar.showInspectProcessInstanceButtons, true);
 
     this.subscriptions = [
       this.eventAggregator.subscribe(
-        environment.events.inspectCorrelation.showInspectPanel,
+        environment.events.inspectProcessInstance.showInspectPanel,
         (showInspectPanel: boolean) => {
           this.showInspectPanel = showInspectPanel;
         },
       ),
       this.eventAggregator.subscribe(
-        environment.events.inspectCorrelation.showTokenViewer,
+        environment.events.inspectProcessInstance.showTokenViewer,
         (showTokenViewer: boolean) => {
           this.showTokenViewer = showTokenViewer;
         },
       ),
 
-      this.eventAggregator.subscribe(environment.events.inspectCorrelation.updateProcessInstances, async (payload) => {
-        const {offset, limit} = payload;
-        this.processInstanceOffset = offset;
-        this.processInstanceLimit = limit;
+      this.eventAggregator.subscribe(
+        environment.events.inspectProcessInstance.updateProcessInstances,
+        async (payload) => {
+          const {offset, limit} = payload;
+          this.processInstanceOffset = offset;
+          this.processInstanceLimit = limit;
 
-        await this.updateProcessInstances();
-      }),
+          await this.updateProcessInstances();
+        },
+      ),
 
-      this.eventAggregator.subscribe(environment.events.inspectCorrelation.updateCorrelations, async (payload) => {
+      this.eventAggregator.subscribe(environment.events.inspectProcessInstance.updateCorrelations, async (payload) => {
         const {offset, limit} = payload;
         this.correlationOffset = offset;
         this.correlationLimit = limit;
@@ -160,13 +163,13 @@ export class InspectCorrelation {
 
     if (this.processInstanceIdToSelect) {
       try {
-        const processInstanceToSelect = await this.inspectCorrelationService.getProcessInstanceById(
+        const processInstanceToSelect = await this.inspectProcessInstanceService.getProcessInstanceById(
           this.activeSolutionEntry.identity,
           this.processInstanceIdToSelect,
           this.activeDiagram.id,
         );
 
-        this.correlationToSelect = await this.inspectCorrelationService.getCorrelationById(
+        this.correlationToSelect = await this.inspectProcessInstanceService.getCorrelationById(
           this.activeSolutionEntry.identity,
           processInstanceToSelect.correlationId,
         );
@@ -187,14 +190,14 @@ export class InspectCorrelation {
     try {
       correlationList = await this.getCorrelationsForProcessModel();
     } catch (error) {
-      this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
+      this.eventAggregator.publish(environment.events.inspectProcessInstance.noCorrelationsFound, true);
       this.correlations = [];
       this.totalCorrelationCount = 0;
     }
 
     // https://github.com/process-engine/process_engine_runtime/issues/432
     if (correlationList && correlationList.totalCount === 0) {
-      this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
+      this.eventAggregator.publish(environment.events.inspectProcessInstance.noCorrelationsFound, true);
       this.correlations = [];
       this.totalCorrelationCount = 0;
     } else if (correlationList) {
@@ -217,14 +220,14 @@ export class InspectCorrelation {
 
       processInstanceList = await this.getProcessInstancesForCorrelation();
     } catch (error) {
-      this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
+      this.eventAggregator.publish(environment.events.inspectProcessInstance.noCorrelationsFound, true);
       this.processInstances = [];
       this.totalProcessInstanceCount = 0;
     }
 
     // https://github.com/process-engine/process_engine_runtime/issues/432
     if (processInstanceList && processInstanceList.totalCount === 0) {
-      this.eventAggregator.publish(environment.events.inspectCorrelation.noCorrelationsFound, true);
+      this.eventAggregator.publish(environment.events.inspectProcessInstance.noCorrelationsFound, true);
       this.processInstances = [];
       this.totalProcessInstanceCount = 0;
     } else if (processInstanceList) {
@@ -241,7 +244,7 @@ export class InspectCorrelation {
     this.updateProcessInstancePromise = new Bluebird.Promise(
       async (resolve: Function, reject: Function): Promise<any> => {
         try {
-          const processInstances = await this.inspectCorrelationService.getProcessInstancesForCorrelation(
+          const processInstances = await this.inspectProcessInstanceService.getProcessInstancesForCorrelation(
             this.activeSolutionEntry.identity,
             this.selectedCorrelation.id,
             this.processInstanceOffset,
@@ -266,7 +269,7 @@ export class InspectCorrelation {
     this.updateCorrelationPromise = new Bluebird.Promise(
       async (resolve: Function, reject: Function): Promise<any> => {
         try {
-          const correlations = await this.inspectCorrelationService.getAllCorrelationsForProcessModelId(
+          const correlations = await this.inspectProcessInstanceService.getAllCorrelationsForProcessModelId(
             this.activeSolutionEntry.identity,
             this.activeDiagram.id,
             this.correlationOffset,
@@ -284,7 +287,7 @@ export class InspectCorrelation {
   }
 
   public detached(): void {
-    this.eventAggregator.publish(environment.events.statusBar.showInspectCorrelationButtons, false);
+    this.eventAggregator.publish(environment.events.statusBar.showInspectProcessInstanceButtons, false);
 
     for (const subscription of this.subscriptions) {
       subscription.dispose();
@@ -320,8 +323,8 @@ export class InspectCorrelation {
     const mouseYPosition: number = mouseEvent.clientY;
 
     const menuBarHeight: number = 40;
-    const inspectCorrelation: HTMLElement = this.bottomPanelResizeDiv.parentElement.parentElement;
-    const inspectPanelHeightWithStatusBar: number = inspectCorrelation.clientHeight + menuBarHeight;
+    const inspectProcessInstance: HTMLElement = this.bottomPanelResizeDiv.parentElement.parentElement;
+    const inspectPanelHeightWithStatusBar: number = inspectProcessInstance.clientHeight + menuBarHeight;
 
     const minInspectPanelHeight: number = 250;
 
@@ -333,14 +336,14 @@ export class InspectCorrelation {
   private resizeTokenViewer(mouseEvent: MouseEvent): void {
     const mouseXPosition: number = mouseEvent.clientX;
 
-    const inspectCorrelation: HTMLElement = this.bottomPanelResizeDiv.parentElement.parentElement;
+    const inspectProcessInstance: HTMLElement = this.bottomPanelResizeDiv.parentElement.parentElement;
     const minSpaceForDiagramViewer: number = 300;
 
     const windowWidth: number = window.innerWidth;
     const rightToolbarWidth: number = 36;
 
     const minTokenViewerWidth: number = 250;
-    const maxTokenViewerWidth: number = inspectCorrelation.clientWidth - minSpaceForDiagramViewer;
+    const maxTokenViewerWidth: number = inspectProcessInstance.clientWidth - minSpaceForDiagramViewer;
 
     const newTokenViewerWidth: number = windowWidth - mouseXPosition - rightToolbarWidth;
 

@@ -25,7 +25,7 @@ export class StatusBar {
   public diffIsShown: boolean = false;
   public currentDiffMode: DiffMode;
   public xmlIsShown: boolean = false;
-  public showInspectCorrelationButtons: boolean = false;
+  public showInspectProcessInstanceButtons: boolean = false;
   public showChangeList: boolean = false;
   public currentXmlIdentifier: string = 'New';
   public previousXmlIdentifier: string = 'Old';
@@ -125,9 +125,9 @@ export class StatusBar {
       }),
 
       this.eventAggregator.subscribe(
-        environment.events.statusBar.showInspectCorrelationButtons,
-        (showInspectCorrelation: boolean) => {
-          this.showInspectCorrelationButtons = showInspectCorrelation;
+        environment.events.statusBar.showInspectProcessInstanceButtons,
+        (showInspectProcessInstance: boolean) => {
+          this.showInspectProcessInstanceButtons = showInspectProcessInstance;
         },
       ),
 
@@ -204,7 +204,7 @@ export class StatusBar {
   public toggleInspectPanel(): void {
     this.showInspectPanel = !this.showInspectPanel;
 
-    this.eventAggregator.publish(environment.events.inspectCorrelation.showInspectPanel, this.showInspectPanel);
+    this.eventAggregator.publish(environment.events.inspectProcessInstance.showInspectPanel, this.showInspectPanel);
   }
 
   public showReleaseNotes(): void {

@@ -5,7 +5,7 @@ import {
   ProcessInstanceList,
 } from '@process-engine/management_api_contracts/dist/data_models/correlation';
 
-export interface IInspectCorrelationService {
+export interface IInspectProcessInstanceService {
   getAllCorrelationsForProcessModelId(
     identity: IIdentity,
     processModelId: string,
