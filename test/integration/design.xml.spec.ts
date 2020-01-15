@@ -28,8 +28,6 @@ describe('XML View', function foo() {
   beforeEach(async () => {
     testClient = new TestClient(applicationArgs);
 
-    await testClient.clearDatabase();
-    await testClient.clearSavedDiagrams();
     testClient.creatingFirstDiagram = true;
     await testClient.startSpectronApp();
     await testClient.awaitReadiness();
@@ -39,13 +37,13 @@ describe('XML View', function foo() {
     async (): Promise<void> => {
       if (await testClient.isSpectronAppRunning()) {
         await testClient.stopSpectronApp();
+        await testClient.clearDatabase();
+        await testClient.clearSavedDiagrams();
       }
     },
   );
 
   this.afterAll(async () => {
-    await testClient.clearDatabase();
-    await testClient.clearSavedDiagrams();
     await testClient.removeTestsFolder();
   });
 

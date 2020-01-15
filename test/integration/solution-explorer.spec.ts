@@ -10,8 +10,6 @@ describe('SolutionExplorer', function foo() {
   beforeEach(async () => {
     testClient = new TestClient(applicationArgs);
 
-    await testClient.clearDatabase();
-    await testClient.clearSavedDiagrams();
     await testClient.startSpectronApp();
     await testClient.awaitReadiness();
   });
@@ -20,13 +18,13 @@ describe('SolutionExplorer', function foo() {
     async (): Promise<void> => {
       if (await testClient.isSpectronAppRunning()) {
         await testClient.stopSpectronApp();
+        await testClient.clearDatabase();
+        await testClient.clearSavedDiagrams();
       }
     },
   );
 
   this.afterAll(async () => {
-    await testClient.clearDatabase();
-    await testClient.clearSavedDiagrams();
     await testClient.removeTestsFolder();
   });
 
