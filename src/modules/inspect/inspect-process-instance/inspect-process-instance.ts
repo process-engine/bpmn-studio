@@ -163,13 +163,13 @@ export class InspectProcessInstance {
 
     if (this.processInstanceIdToSelect) {
       try {
-        const processInstanceToSelect = await this.inspectCorrelationService.getProcessInstanceById(
+        const processInstanceToSelect = await this.inspectProcessInstanceService.getProcessInstanceById(
           this.activeSolutionEntry.identity,
           this.processInstanceIdToSelect,
           this.activeDiagram.id,
         );
 
-        this.correlationToSelect = await this.inspectCorrelationService.getCorrelationById(
+        this.correlationToSelect = await this.inspectProcessInstanceService.getCorrelationById(
           this.activeSolutionEntry.identity,
           processInstanceToSelect.correlationId,
         );
