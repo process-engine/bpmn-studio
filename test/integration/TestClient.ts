@@ -3,6 +3,7 @@
 import path from 'path';
 import os from 'os';
 import {exec} from 'child_process';
+import fs from 'fs';
 
 import {AppConstructorOptions, Application} from 'spectron';
 import assert from 'assert';
@@ -24,9 +25,12 @@ function getUserConfigFolder(): string {
 }
 
 const APP_BASE_URL = `file://${__dirname}/../../../../index.html`;
-const DATABASE_PATH = path.join(getUserConfigFolder(), 'bpmn-studio-tests', 'process_engine_databases');
-const SAVE_DIAGRAM_DIR = path.join(getUserConfigFolder(), 'bpmn-studio-tests', 'saved_diagrams');
+const TESTS_FOLDER_PATH = path.join(getUserConfigFolder(), 'bpmn-studio-tests');
+const DATABASE_PATH = path.join(TESTS_FOLDER_PATH, 'process_engine_databases');
+const SAVE_DIAGRAM_DIR = path.join(TESTS_FOLDER_PATH, 'saved_diagrams');
 const VISIBLE_TIMEOUT = 40000;
+const REMOVE_COMMAND = process.platform === 'win32' ? 'rmdir /s /q' : 'rm -rf';
+
 export class TestClient {
   public solutionExplorer: SolutionExplorer = new SolutionExplorer(this);
   public designView: DesignViewClient = new DesignViewClient(this, SAVE_DIAGRAM_DIR);
@@ -88,12 +92,28 @@ export class TestClient {
     return this.webdriverClient.waitForVisible(selector, timeout);
   }
 
+  public async removeTestsFolder(): Promise<void> {
+    await this.execCommand(`${REMOVE_COMMAND} ${TESTS_FOLDER_PATH.replace(/\s/g, '\\ ')}`);
+  }
+
   public async clearDatabase(): Promise<void> {
-    await this.execCommand(`rm -rf ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
+    if (fs.existsSync(DATABASE_PATH)) {
+      try {
+        await this.execCommand(`${REMOVE_COMMAND} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
+      } catch (error) {
+        console.error(error);
+      }
+    }
   }
 
   public async clearSavedDiagrams(): Promise<void> {
-    await this.execCommand(`rm -rf ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
+    if (fs.existsSync(SAVE_DIAGRAM_DIR)) {
+      try {
+        await this.execCommand(`${REMOVE_COMMAND} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
+      } catch (error) {
+        console.error(error);
+      }
+    }
   }
 
   public async isSpectronAppRunning(): Promise<boolean> {
@@ -162,12 +182,14 @@ export class TestClient {
   }
 
   public async assertSelectedBpmnElementHasName(name): Promise<void> {
+    await this.ensureVisible('[data-test-property-panel-element-name]', VISIBLE_TIMEOUT);
     const selectedElementText = await this.getValueFromElement('[data-test-property-panel-element-name]');
 
     assert.equal(selectedElementText, name);
   }
 
   public async rejectSelectedBpmnElementHasName(name): Promise<void> {
+    await this.ensureVisible('[data-test-property-panel-element-name]', VISIBLE_TIMEOUT);
     const selectedElementText = await this.getValueFromElement('[data-test-property-panel-element-name]');
 
     assert.notEqual(selectedElementText, name);

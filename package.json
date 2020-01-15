@@ -30,7 +30,7 @@
     "start_dev": "au run --watch",
     "test": "npm run test-electron",
     "test-electron-macos": "mocha -r choma dist/test-integration/test/**/*.spec.js",
-    "test-electron-windows": "echo 'There are no Electron tests for Windows. Exiting with 0'",
+    "test-electron-windows": "mocha -r choma dist/test-integration/test/**/*.spec.js",
     "test-electron-linux": "echo 'There are no Electron tests for Linux. Exiting with 0'",
     "test-electron": "npm run build-tests && node dist/test-integration/test/integration/modules/get-path-and-run-tests.js"
   },
