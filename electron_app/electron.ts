@@ -1162,10 +1162,6 @@ function getBranchOfCurrentVersion(): string {
 }
 
 function getUserConfigFolder(): string {
-  // if (process.env.SPECTRON_TESTS) {
-  //   return process.cwd();
-  // }
-
   const userHomeDir = homedir();
 
   switch (process.platform) {

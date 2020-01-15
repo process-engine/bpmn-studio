@@ -46,28 +46,13 @@ describe('Design View', function foo() {
     // Arrange
     const diagramName = 'receive_task_wait_test';
     await testClient.startPageLoaded();
-    console.log('startpage loaded');
     await testClient.solutionExplorer.openDirectoryAsSolution('fixtures', diagramName);
-    console.log('solution opened');
-
     await testClient.assertDiagramIsOnFileSystem();
-    console.log('diagram is on filesstem');
-
-    await testClient.solutionExplorer.assertInternalProcessEngineIsOpenedAsSolution();
-    console.log('sinternal pe is opened');
-
-    await testClient.pause(1000);
-
     // Act
     await testClient.designView.deployDiagram();
-    console.log('deploy diagram');
-
     // Assert
     await testClient.assertNavbarTitleIs(diagramName);
-    console.log('navbartitle is ');
-
     await testClient.assertDiagramIsOnProcessEngine();
-    console.log('diagram is on PE');
   });
 
   it('should start a process', async () => {
@@ -75,7 +60,6 @@ describe('Design View', function foo() {
     await testClient.startPageLoaded();
     await testClient.solutionExplorer.openDirectoryAsSolution('fixtures', diagramName);
     await testClient.assertDiagramIsOnFileSystem();
-    await testClient.solutionExplorer.assertInternalProcessEngineIsOpenedAsSolution();
 
     await testClient.designView.deployDiagram();
     await testClient.assertNavbarTitleIs(diagramName);

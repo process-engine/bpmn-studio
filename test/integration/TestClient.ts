@@ -182,14 +182,14 @@ export class TestClient {
   }
 
   public async assertSelectedBpmnElementHasName(name): Promise<void> {
-    await this.ensureVisible('[data-test-property-panel-element-name]', 40000);
+    await this.ensureVisible('[data-test-property-panel-element-name]', VISIBLE_TIMEOUT);
     const selectedElementText = await this.getValueFromElement('[data-test-property-panel-element-name]');
 
     assert.equal(selectedElementText, name);
   }
 
   public async rejectSelectedBpmnElementHasName(name): Promise<void> {
-    await this.ensureVisible('[data-test-property-panel-element-name]', 40000);
+    await this.ensureVisible('[data-test-property-panel-element-name]', VISIBLE_TIMEOUT);
     const selectedElementText = await this.getValueFromElement('[data-test-property-panel-element-name]');
 
     assert.notEqual(selectedElementText, name);

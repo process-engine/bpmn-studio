@@ -649,8 +649,6 @@ export class SolutionExplorerList {
       ? false
       : await this.authenticationService.isLoggedIn(authority, identity);
 
-    const state: string = 'disconnected';
-
     let userName: string;
 
     if (isLoggedIn) {
