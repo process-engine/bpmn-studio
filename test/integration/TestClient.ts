@@ -79,7 +79,7 @@ export class TestClient {
     return this.webdriverClient.waitForVisible(selector, timeout);
   }
 
-  public async rmeoveTestsFolder(): Promise<void> {
+  public async removeTestsFolder(): Promise<void> {
     await this.execCommand(`${REMOVE_COMMAND} ${TESTS_FOLDER_PATH.replace(/\s/g, '\\ ')}`);
   }
 

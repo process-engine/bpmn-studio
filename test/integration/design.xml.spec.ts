@@ -46,7 +46,7 @@ describe('XML View', function foo() {
   this.afterAll(async () => {
     await testClient.clearDatabase();
     await testClient.clearSavedDiagrams();
-    await testClient.rmeoveTestsFolder();
+    await testClient.removeTestsFolder();
   });
 
   it('should have content', async () => {
