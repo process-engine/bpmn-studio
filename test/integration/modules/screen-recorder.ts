@@ -10,28 +10,55 @@ const media = {
   },
 };
 
+const LOCALSTORAGE_ISRECORDING = 'tests:screen-recorder:is-recording';
+const LOCALSTORAGE_FILEPATH = 'test:screen-recorder:file-path';
+
 export class ScreenRecorder {
   private mediaRecorder: any;
   private recordedBlobs: Array<Blob> = [];
+  private isRecording: boolean = false;
+  private filepath: string;
 
   constructor() {
-    exposeFunctionForTesting('startRecording', () => {
-      this.startRecording();
+    window.onbeforeunload = (): void => {
+      if (this.isRecording) {
+        window.localStorage.setItem(LOCALSTORAGE_FILEPATH, JSON.stringify(this.filepath));
+        this.stopRecordingAndSave();
+        window.localStorage.setItem(LOCALSTORAGE_ISRECORDING, JSON.stringify(true));
+      }
+    };
+
+    exposeFunctionForTesting('startRecording', (filepath: string) => {
+      this.startRecording(filepath);
     });
 
     exposeFunctionForTesting('stopRecording', () => {
       this.stopRecording();
     });
 
-    exposeFunctionForTesting('stopRecordingAndSave', (filename: string) => {
-      this.stopRecordingAndSave(filename);
+    exposeFunctionForTesting('stopRecordingAndSave', () => {
+      this.stopRecordingAndSave();
     });
+    const item = JSON.parse(window.localStorage.getItem(LOCALSTORAGE_ISRECORDING));
+
+    if (item !== null) {
+      this.isRecording = item;
+    }
+
+    if (this.isRecording) {
+      this.filepath = JSON.parse(window.localStorage.getItem(LOCALSTORAGE_FILEPATH));
+      this.startRecording(this.filepath);
+    }
   }
 
   /**
    * Records the BPMN Studio window
    */
-  public async startRecording(): Promise<void> {
+  public async startRecording(filepath: string): Promise<void> {
+    this.filepath = filepath;
+    this.isRecording = true;
+    window.localStorage.setItem(LOCALSTORAGE_ISRECORDING, JSON.stringify(this.isRecording));
+
     const bpmnStudioWindow = await this.getBpmnStudioWindow();
 
     console.log(bpmnStudioWindow);
@@ -54,28 +81,42 @@ export class ScreenRecorder {
       .catch(this.handleUserMediaError);
   }
 
-  public async stopRecordingAndSave(filepath: string): Promise<void> {
+  public async stopRecordingAndSave(): Promise<void> {
+    if (this.isRecording) {
+      window.localStorage.removeItem(LOCALSTORAGE_ISRECORDING);
+    }
+    this.isRecording = false;
     this.mediaRecorder.stop();
 
     const blob = new Blob(this.recordedBlobs, {type: media.video.type});
     const arrayBuffer = await (blob as any).arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    if (!fs.existsSync(filepath)) {
-      fs.mkdirSync(path.dirname(filepath), {recursive: true});
+    if (!fs.existsSync(this.filepath)) {
+      fs.mkdirSync(path.dirname(this.filepath), {recursive: true});
+    } else {
+      const newString = `${`${path.dirname(this.filepath)}/${new Date().toISOString()}-${path.basename(
+        this.filepath,
+        '.webm',
+      )}`}.webm`;
+      this.filepath = newString;
     }
 
-    fs.writeFile(filepath, buffer, (error) => {
+    fs.writeFile(this.filepath, buffer, (error) => {
       if (error) {
         console.error(`Failed to save video ${error}`);
       } else {
-        console.log(`Saved video: ${filepath}`);
+        console.log(`Saved video: ${this.filepath}`);
       }
     });
   }
 
   public stopRecording(): void {
     this.mediaRecorder.stop();
+    if (this.isRecording) {
+      window.localStorage.removeItem(LOCALSTORAGE_ISRECORDING);
+    }
+    this.isRecording = false;
   }
 
   private async getBpmnStudioWindow(): Promise<Electron.DesktopCapturerSource> {
