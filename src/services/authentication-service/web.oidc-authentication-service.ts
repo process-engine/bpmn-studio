@@ -74,7 +74,6 @@ export class WebOidcAuthenticationService implements IAuthenticationService {
     };
 
     this.openIdConnect.observeUser(async (user: User) => {
-      console.log(user);
       const refreshedIamIdentity: IIdentity = {
         token: user.access_token,
         userId: signinResult.id_token,
