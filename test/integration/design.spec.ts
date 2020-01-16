@@ -16,7 +16,8 @@ describe('Design View', function foo() {
     await testClient.awaitReadiness();
 
     const fileName = this.ctx.currentTest.title.replace(/\s/g, '-');
-    await testClient.startRecording(`test-results/${new Date().toISOString()}-${fileName}.webm`);
+    // eslint-disable-next-line newline-per-chained-call
+    await testClient.startRecording(`test-results/${new Date().toISOString().replace(/:/g, '-')}-${fileName}.webm`);
   });
 
   afterEach(

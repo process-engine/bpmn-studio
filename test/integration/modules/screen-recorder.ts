@@ -95,10 +95,9 @@ export class ScreenRecorder {
     if (!fs.existsSync(this.filepath)) {
       fs.mkdirSync(path.dirname(this.filepath), {recursive: true});
     } else {
-      const newString = `${`${path.dirname(this.filepath)}/${new Date().toISOString()}-${path.basename(
-        this.filepath,
-        '.webm',
-      )}`}.webm`;
+      const newString = `${`${path.dirname(this.filepath)}/${new Date()
+        .toISOString()
+        .replace(/:/g, '-')}-${path.basename(this.filepath, '.webm')}`}.webm`;
       this.filepath = newString;
     }
 
