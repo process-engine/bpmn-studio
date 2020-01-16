@@ -36,11 +36,14 @@ export class TestClient {
   public solutionExplorer: SolutionExplorer = new SolutionExplorer(this);
   public designView: DesignViewClient = new DesignViewClient(this, SAVE_DIAGRAM_DIR);
   public creatingFirstDiagram: boolean = true;
+  public startDate: string;
 
   private app: Application;
 
   constructor(applicationArgs: AppConstructorOptions) {
     this.app = new Application(applicationArgs);
+    // eslint-disable-next-line newline-per-chained-call
+    this.startDate = new Date().toISOString().replace(/:/g, '-');
   }
 
   public async startSpectronApp(): Promise<any> {
