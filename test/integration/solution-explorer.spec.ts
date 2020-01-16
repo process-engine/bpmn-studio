@@ -13,9 +13,9 @@ describe('SolutionExplorer', function foo() {
     await testClient.startSpectronApp();
     await testClient.awaitReadiness();
 
-    const fileName = this.ctx.currentTest.title.replace(/\s/g, '-');
-    // eslint-disable-next-line newline-per-chained-call
-    await testClient.startRecording(`test-results/${new Date().toISOString().replace(/:/g, '-')}-${fileName}.webm`);
+    const testName = this.ctx.currentTest.title.replace(/\s/g, '-');
+    const suiteName = this.ctx.currentTest.parent.title.replace(/\s/g, '-');
+    await testClient.startRecording(`test-results/${testClient.startDate}_${suiteName}_${testName}.webm`);
   });
 
   afterEach(
