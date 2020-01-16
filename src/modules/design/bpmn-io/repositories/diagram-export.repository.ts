@@ -1,4 +1,4 @@
-import download from 'downloadjs';
+import {download} from '../../../../services/download-service/download.service';
 import {IDiagramExportRepositoryContracts} from '../../../../contracts/exportRepository';
 
 export class DiagramExportRepository implements IDiagramExportRepositoryContracts {
