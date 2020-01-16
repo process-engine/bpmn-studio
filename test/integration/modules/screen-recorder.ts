@@ -22,7 +22,6 @@ export class ScreenRecorder {
   constructor() {
     window.onbeforeunload = (): void => {
       if (this.isRecording) {
-        window.localStorage.setItem(LOCALSTORAGE_FILEPATH, JSON.stringify(this.filepath));
         this.stopRecordingAndSave();
         window.localStorage.setItem(LOCALSTORAGE_ISRECORDING, JSON.stringify(true));
       }
@@ -61,8 +60,6 @@ export class ScreenRecorder {
 
     const bpmnStudioWindow = await this.getBpmnStudioWindow();
 
-    console.log(bpmnStudioWindow);
-
     navigator.mediaDevices
       .getUserMedia({
         audio: false,
@@ -92,13 +89,18 @@ export class ScreenRecorder {
     const arrayBuffer = await (blob as any).arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    if (!fs.existsSync(this.filepath)) {
+    if (!fs.existsSync(path.dirname(this.filepath))) {
       fs.mkdirSync(path.dirname(this.filepath), {recursive: true});
+    } else if (this.filepath.match(/-\d+.webm/)) {
+      const baseName = path.basename(this.filepath, '.webm');
+
+      const lastIndexOfMinus = baseName.lastIndexOf('-');
+      let number = JSON.parse(baseName.substr(lastIndexOfMinus + 1));
+      number++;
+
+      this.filepath = `${`${path.dirname(this.filepath)}/${baseName.substr(0, lastIndexOfMinus)}-${number}`}.webm`;
     } else {
-      const newString = `${`${path.dirname(this.filepath)}/${new Date()
-        .toISOString()
-        .replace(/:/g, '-')}-${path.basename(this.filepath, '.webm')}`}.webm`;
-      this.filepath = newString;
+      this.filepath = `${`${path.dirname(this.filepath)}/${path.basename(this.filepath, '.webm')}-1`}.webm`;
     }
 
     fs.writeFile(this.filepath, buffer, (error) => {
@@ -108,6 +110,8 @@ export class ScreenRecorder {
         console.log(`Saved video: ${this.filepath}`);
       }
     });
+
+    window.localStorage.setItem(LOCALSTORAGE_FILEPATH, JSON.stringify(this.filepath));
   }
 
   public stopRecording(): void {
