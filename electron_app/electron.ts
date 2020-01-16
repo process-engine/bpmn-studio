@@ -418,16 +418,14 @@ function createMainWindow(): void {
 
   const platformIsWindows = process.platform === 'win32';
   if (platformIsWindows) {
-    browserWindow.webContents.session.on('will-download', async (event, downloadItem) => {
+    browserWindow.webContents.session.on('will-download', (event, downloadItem) => {
       const defaultFilename = downloadItem.getFilename();
 
-      const fileTypeIndex = defaultFilename.lastIndexOf('.') + 1;
-      const fileExtension = defaultFilename.substring(fileTypeIndex);
-
+      const fileExtension = path.extname(defaultFilename);
       const fileExtensionIsBPMN = fileExtension === 'bpmn';
-      const fileType = fileExtensionIsBPMN ? 'BPMN (.bpmn)' : `Image (.${fileExtension})`;
+      const fileType = fileExtensionIsBPMN ? 'BPMN (.bpmn)' : `Image (${fileExtension})`;
 
-      const saveDialogResult = await dialog.showSaveDialog({
+      downloadItem.setSaveDialogOptions({
         defaultPath: defaultFilename,
         filters: [
           {
@@ -440,14 +438,6 @@ function createMainWindow(): void {
           },
         ],
       });
-
-      if (saveDialogResult.canceled) {
-        downloadItem.cancel();
-
-        return;
-      }
-
-      downloadItem.setSavePath(saveDialogResult.filePath);
     });
   }
 }
