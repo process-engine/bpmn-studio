@@ -62,14 +62,7 @@ export function download(data, strFileName, strMimeType): XMLHttpRequest | boole
     }
   } else if (/([\x80-\xff])/.test(payload)) {
     // not data url, is it a string with special needs?
-    const tempUiArr: Uint8Array = new Uint8Array(payload.length);
-    const mx: number = tempUiArr.length;
-
-    for (let i = 0; i < mx; ++i) {
-      tempUiArr[i] = payload.charCodeAt(i);
-    }
-
-    payload = new Blob([tempUiArr], {type: mimeType});
+    payload = new Blob([payload], {type: mimeType});
   }
 
   const blob = payload instanceof Blob ? payload : new Blob([payload], {type: mimeType});
@@ -82,14 +75,7 @@ export function download(data, strFileName, strMimeType): XMLHttpRequest | boole
     const binData = decoder(parts.pop());
     const type = parts[1];
 
-    const mx = binData.length;
-    const uiArr = new Uint8Array(mx);
-
-    for (let i = 0; i < mx; ++i) {
-      uiArr[i] = binData.charCodeAt(i);
-    }
-
-    return new Blob([uiArr], {type: type});
+    return new Blob([binData], {type: type});
   }
 
   function saver(saveUrl, winMode): boolean {
