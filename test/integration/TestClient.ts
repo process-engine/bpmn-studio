@@ -72,7 +72,11 @@ export class TestClient {
   }
 
   public async removeUnneededVideos(filePath: string): Promise<void> {
-    await this.execCommand(`rm -rf ${filePath.replace('.webm', '')}*.webm`);
+    try {
+      await this.execCommand(`${REMOVE_COMMAND} ${filePath.replace('.webm', '')}*.webm`);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   public async clickOnBpmnElementWithName(name): Promise<void> {
