@@ -30,7 +30,8 @@ const TESTS_FOLDER_PATH = path.join(getUserConfigFolder(), 'bpmn-studio-tests');
 const DATABASE_PATH = path.join(TESTS_FOLDER_PATH, 'process_engine_databases');
 const SAVE_DIAGRAM_DIR = path.join(TESTS_FOLDER_PATH, 'saved_diagrams');
 const VISIBLE_TIMEOUT = 40000;
-const REMOVE_COMMAND = process.platform === 'win32' ? 'rmdir /s /q' : 'rm -rf';
+const REMOVE_COMMAND_DIR = process.platform === 'win32' ? 'rmdir /s /q' : 'rm -rf';
+const REMOVE_COMMAND_FILE = process.platform === 'win32' ? 'del' : 'rm -rf';
 
 export class TestClient {
   public solutionExplorer: SolutionExplorer = new SolutionExplorer(this);
@@ -73,7 +74,7 @@ export class TestClient {
 
   public async removeUnneededVideos(filePath: string): Promise<void> {
     try {
-      await this.execCommand(`${REMOVE_COMMAND} ${filePath.replace('.webm', '')}*.webm`);
+      await this.execCommand(`${REMOVE_COMMAND_FILE} ${filePath.replace('.webm', '')}*.webm`);
     } catch (error) {
       console.error(error);
     }
@@ -117,13 +118,13 @@ export class TestClient {
   }
 
   public async removeTestsFolder(): Promise<void> {
-    await this.execCommand(`${REMOVE_COMMAND} ${TESTS_FOLDER_PATH.replace(/\s/g, '\\ ')}`);
+    await this.execCommand(`${REMOVE_COMMAND_DIR} ${TESTS_FOLDER_PATH.replace(/\s/g, '\\ ')}`);
   }
 
   public async clearDatabase(): Promise<void> {
     if (fs.existsSync(DATABASE_PATH)) {
       try {
-        await this.execCommand(`${REMOVE_COMMAND} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
+        await this.execCommand(`${REMOVE_COMMAND_DIR} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
       } catch (error) {
         console.error(error);
       }
@@ -133,7 +134,7 @@ export class TestClient {
   public async clearSavedDiagrams(): Promise<void> {
     if (fs.existsSync(SAVE_DIAGRAM_DIR)) {
       try {
-        await this.execCommand(`${REMOVE_COMMAND} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
+        await this.execCommand(`${REMOVE_COMMAND_DIR} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
       } catch (error) {
         console.error(error);
       }
