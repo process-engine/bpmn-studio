@@ -71,6 +71,10 @@ export class TestClient {
     await this.ensureVisible('[data-test-start-page]', VISIBLE_TIMEOUT);
   }
 
+  public async removeUnneededVideos(filePath: string): Promise<void> {
+    await this.execCommand(`rm -rf ${filePath.replace('.webm', '')}*.webm`);
+  }
+
   public async clickOnBpmnElementWithName(name): Promise<void> {
     await this.ensureVisible(`.djs-label=${name}`, VISIBLE_TIMEOUT);
     await this.clickOn(`.djs-label=${name}`);

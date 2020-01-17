@@ -15,7 +15,8 @@ describe('SolutionExplorer', function foo() {
 
     const testName = this.ctx.currentTest.title.replace(/\s/g, '-');
     const suiteName = this.ctx.currentTest.parent.title.replace(/\s/g, '-');
-    await testClient.startRecording(`test-results/${testClient.startDate}_${suiteName}_${testName}.webm`);
+    (this as any).filePath = `test-results/${testClient.startDate}_${suiteName}_${testName}.webm`;
+    await testClient.startRecording((this as any).filePath);
   });
 
   afterEach(
@@ -25,6 +26,7 @@ describe('SolutionExplorer', function foo() {
           await testClient.stopRecordingAndSave();
         } else {
           await testClient.stopRecording();
+          await testClient.removeUnneededVideos((this as any).filePath);
         }
 
         await testClient.stopSpectronApp();
