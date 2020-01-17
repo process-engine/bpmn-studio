@@ -25,7 +25,7 @@ describe('SolutionExplorer', function foo() {
         if (this.ctx.currentTest.state === 'failed') {
           await testClient.stopRecordingAndSave();
         } else {
-          await testClient.stopRecording();
+          await testClient.cancelRecording();
           await testClient.removeUnneededVideos((this as any).filePath);
         }
 

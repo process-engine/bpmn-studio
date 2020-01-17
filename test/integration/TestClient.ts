@@ -59,8 +59,8 @@ export class TestClient {
     await callExposedFunction(this.webdriverClient, 'startRecording', filepath);
   }
 
-  public async stopRecording(): Promise<void> {
-    await callExposedFunction(this.webdriverClient, 'stopRecording');
+  public async cancelRecording(): Promise<void> {
+    await callExposedFunction(this.webdriverClient, 'cancelRecording');
   }
 
   public async stopRecordingAndSave(): Promise<void> {

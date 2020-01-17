@@ -31,8 +31,8 @@ export class ScreenRecorder {
       this.startRecording(filepath);
     });
 
-    exposeFunctionForTesting('stopRecording', () => {
-      this.stopRecording();
+    exposeFunctionForTesting('cancelRecording', () => {
+      this.cancelRecording();
     });
 
     exposeFunctionForTesting('stopRecordingAndSave', () => {
@@ -114,7 +114,7 @@ export class ScreenRecorder {
     window.localStorage.setItem(LOCALSTORAGE_FILEPATH, JSON.stringify(this.filepath));
   }
 
-  public stopRecording(): void {
+  public cancelRecording(): void {
     this.mediaRecorder.stop();
     if (this.isRecording) {
       window.localStorage.removeItem(LOCALSTORAGE_ISRECORDING);
