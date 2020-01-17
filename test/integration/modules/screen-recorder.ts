@@ -38,11 +38,8 @@ export class ScreenRecorder {
     exposeFunctionForTesting('stopRecordingAndSave', () => {
       this.stopRecordingAndSave();
     });
-    const item = JSON.parse(window.localStorage.getItem(LOCALSTORAGE_ISRECORDING));
 
-    if (item !== null) {
-      this.isRecording = item;
-    }
+    this.isRecording = JSON.parse(window.localStorage.getItem(LOCALSTORAGE_ISRECORDING)) === true;
 
     if (this.isRecording) {
       this.filepath = JSON.parse(window.localStorage.getItem(LOCALSTORAGE_FILEPATH));
