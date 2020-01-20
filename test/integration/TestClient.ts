@@ -75,7 +75,9 @@ export class TestClient {
   public async removeUnneededVideos(filePath: string): Promise<void> {
     try {
       const filePathToUse = process.platform === 'win32' ? filePath.replace(/\//g, '\\') : filePath;
-      fs.unlinkSync(filePathToUse);
+      if (fs.existsSync(filePathToUse)) {
+        fs.unlinkSync(filePathToUse);
+      }
       //await this.execCommand(`${REMOVE_COMMAND_FILE} ${filePathToUse.replace('.webm', '')}*.webm`);
     } catch (error) {
       console.error('remove unneeded videos', error);
