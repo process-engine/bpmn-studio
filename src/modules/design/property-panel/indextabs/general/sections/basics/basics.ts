@@ -264,6 +264,8 @@ export class BasicsSection implements ISection {
       .then()
       .satisfies((id: string) => this.formIdIsUnique(id) && this.isProcessIdUnique(id) && this.isDefinitionIdUnique(id))
       .withMessage('ID already exists.')
+      .satisfies((id: string) => !id.includes(' '))
+      .withMessage('ID must not contain spaces.')
       .on(this);
   }
 
