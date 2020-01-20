@@ -6,6 +6,7 @@ import {DataModels} from '@process-engine/management_api_contracts';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 import {ISolutionEntry} from '../../../contracts';
 import {IPayloadEntry, IPayloadEntryValue, IRawTokenEntry, ITokenEntry, ITokenViewerService} from './contracts/index';
+import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 
 // tslint:disable: no-magic-numbers
 
@@ -81,6 +82,12 @@ export class TokenViewer {
   private async updateFlowNode(): Promise<void> {
     this.firstElementSelected = true;
     this.tokenEntries = [];
+
+    if (!solutionIsRemoteSolution(this.activeSolutionEntry.uri)) {
+      this.clearTokenViewer();
+
+      return;
+    }
 
     if (this.processEngineSupportsFetchingTokensByProcessInstanceId()) {
       const noProcessInstanceId: boolean = this.processInstanceId === undefined;
