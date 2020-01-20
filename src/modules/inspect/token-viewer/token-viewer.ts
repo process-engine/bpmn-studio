@@ -48,10 +48,7 @@ export class TokenViewer {
 
     const flowNodeIsSequenceFlow: boolean = this.flowNode.type === 'bpmn:SequenceFlow';
     if (flowNodeIsSequenceFlow) {
-      this.shouldShowFlowNodeId = false;
-      this.showTokenEntries = false;
-      this.tokenEntries = [];
-      this.rawTokenEntries = [];
+      this.clearTokenViewer();
 
       return;
     }
@@ -68,10 +65,7 @@ export class TokenViewer {
       newFlowNode.type === 'bpmn:SequenceFlow';
 
     if (flowNodeCannotHaveTokenHistory) {
-      this.shouldShowFlowNodeId = false;
-      this.showTokenEntries = false;
-      this.tokenEntries = [];
-      this.rawTokenEntries = [];
+      this.clearTokenViewer();
 
       return;
     }
@@ -129,10 +123,10 @@ export class TokenViewer {
   }
 
   private clearTokenViewer(): void {
-    this.tokenEntries = undefined;
-    this.rawTokenEntries = undefined;
-    this.showTokenEntries = false;
     this.shouldShowFlowNodeId = false;
+    this.showTokenEntries = false;
+    this.tokenEntries = [];
+    this.rawTokenEntries = [];
   }
 
   private processEngineSupportsFetchingTokensByProcessInstanceId(): boolean {
