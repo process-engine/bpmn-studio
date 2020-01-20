@@ -50,7 +50,7 @@
   "dependencies": {
     "@essential-projects/errors_ts": "^1.6.1",
     "@fortawesome/fontawesome-free": "5.11.2",
-    "@process-engine/bpmn-js-custom-bundle": "~2.7.0",
+    "@process-engine/bpmn-js-custom-bundle": "2.9.0-alpha.2",
     "@process-engine/bpmn-lint_rules": "^1.6.2",
     "@process-engine/ci_tools": "2.5.0-beta.1",
     "@process-engine/dynamic_ui_core": "1.6.0",
