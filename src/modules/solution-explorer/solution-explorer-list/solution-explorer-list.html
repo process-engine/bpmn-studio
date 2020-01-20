@@ -100,7 +100,8 @@
           is-connected.two-way="solutionEntry.isConnected"
           tooltip-text.two-way="solutionEntry.tooltipText"
           pe-has-started.two-way="peHasStarted"
-          style.bind="solutionEntry.hidden ? 'display: none;' : 'display: inherit;'">
+          style.bind="solutionEntry.hidden ? 'display: none;' : 'display: inherit;'"
+          class.bind="solutionEntry.isOpenDiagram ? 'open-diagrams-entry' : ''">
         </solution-explorer-solution>
       </div>
     </div>
