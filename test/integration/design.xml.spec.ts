@@ -21,7 +21,7 @@ async function assertXmlViewContainsText(text: string): Promise<void> {
 
 let testClient: TestClient;
 
-describe.only('XML View', function foo() {
+describe('XML View', function foo() {
   this.slow(10000);
   this.timeout(40000);
 
