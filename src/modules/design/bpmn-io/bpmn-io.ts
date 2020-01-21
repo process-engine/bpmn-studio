@@ -274,7 +274,9 @@ export class BpmnIo {
             this.setDjsPaletteLeftStyle(showSolutionExplorer);
           }
 
-          this.hideOrShowPpForSpaceReasons();
+          setTimeout(() => {
+            this.hideOrShowPpForSpaceReasons();
+          }, 0);
         },
       ),
 
