@@ -261,6 +261,8 @@ export class BasicsSection implements ISection {
       .displayName('elementId')
       .required()
       .withMessage('ID cannot be blank.')
+      .satisfies((id: string) => !id.includes(' '))
+      .withMessage('ID must not contain spaces.')
       .then()
       .satisfies((id: string) => this.formIdIsUnique(id) && this.isProcessIdUnique(id) && this.isDefinitionIdUnique(id))
       .withMessage('ID already exists.')
