@@ -14,7 +14,6 @@ import {isRunningInElectron} from '../../services/is-running-in-electron-module/
 export class NavBar {
   public activeSolutionEntry: ISolutionEntry;
   public activeDiagram: IDiagram;
-  public navbarContainer: HTMLDivElement;
 
   public diagramInfo: HTMLElement;
   public dropdown: HTMLElement;
@@ -136,8 +135,6 @@ export class NavBar {
         this.disableInspectProcessInstanceButton = true;
       }),
     ];
-
-    this.navbarContainer.addEventListener('dblclick', this.maximizeWindow);
   }
 
   public maximizeWindow = (): void => {
