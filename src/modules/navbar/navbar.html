@@ -1,6 +1,6 @@
 <template>
   <require from="./navbar.css"></require>
-  <div class="bpmn-studio-navbar" class.bind="showLeftMarginInNavbar ? 'bpmn-studio-navbar--left-margin' : ''" ref="navbarContainer" dblclick.trigger="maximizeWindow($event)">
+  <div class="bpmn-studio-navbar" class.bind="showLeftMarginInNavbar ? 'bpmn-studio-navbar--left-margin' : ''" ref="navbarContainer" dblclick.trigger="maximizeWindow()">
     <div class="menu-bar__menu--left" id="navBarLeft">
       <div class="menu__menu-tabbed-link">
         <button class="button menu-tabbed-link action-button" class.bind="solutionExplorerIsActive ? 'button--active' : ''" click.delegate="toggleSolutionExplorer($event)" dblclick.trigger="$event.stopPropagation()" title="Toggle visibility of the Solution Explorer" data-test-toggle-solution-explorer>
