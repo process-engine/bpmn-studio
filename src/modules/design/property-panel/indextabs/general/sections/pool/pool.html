@@ -16,7 +16,7 @@
             <input class="process-id-checkbox" type="checkbox" checked.bind="processIdCheckboxChecked" disabled.bind="!isEditable" title="Allow editing process ID">
           </th>
           <td>
-            <input type="text" id="processId" class="props-input" value.bind="businessObjInPanel.processRef.id & validateOnChange" change.delegate="validate()" disabled.bind="!isEditable || !processIdCheckboxChecked">
+            <input type="text" id="processId" class="props-input" value.bind="processRefId & validateOnChange" change.delegate="updateId()"  disabled.bind="!isEditable || !processIdCheckboxChecked">
           </td>
           <td>
             <template if.bind="validationError">
