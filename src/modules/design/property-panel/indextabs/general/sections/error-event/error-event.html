@@ -35,12 +35,14 @@
           <th>Code</th>
           <td>
             <input type="text" class="props-input" value.bind="selectedError.errorCode" change.delegate="updateErrorCode()" disabled.bind="!isEditable">
+            <small>Expected error code. Leave empty for any.</small>
           </td>
         </tr>
         <tr>
           <th>Message</th>
           <td>
             <input type="text" class="props-input" value.bind="errorMessageVariable" change.delegate="updateErrorMessage()" disabled.bind="!isEditable">
+            <small>Expected error message. Leave empty for any.</small>
           </td>
         </tr>
       </table>
