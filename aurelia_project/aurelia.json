@@ -196,7 +196,6 @@
             "path": "../node_modules/proxy-polyfill"
           },
           "ms",
-          "downloadjs",
           "eventemitter2",
           "velocity-animate",
           "tether",

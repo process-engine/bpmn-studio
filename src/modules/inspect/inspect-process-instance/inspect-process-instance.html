@@ -1,15 +1,15 @@
 <template>
-  <require from="./inspect-correlation.css"></require>
+  <require from="./inspect-process-instance.css"></require>
   <require from="./components/inspect-panel/inspect-panel"></require>
   <require from="./components/diagram-viewer/diagram-viewer"></require>
   <require from="../token-viewer/token-viewer"></require>
-  <div class="inspect-correlation">
-    <div class="inspect-correlation__left-toolbar"></div>
-    <div class="inspect-correlation__panels">
-      <div class="inspect-correlation__upper-panel" show.bind="!inspectPanelFullscreen" >
-        <diagram-viewer class="inspect-correlation__diagram-viewer" view-model.ref="diagramViewer" active-solution-entry.bind="activeSolutionEntry" selected-flow-node.two-way="selectedFlowNode" active-diagram.bind="activeDiagram" process-instance.to-view="selectedProcessInstance"></diagram-viewer>
-        <div class="inspect-correlation__right-resize-div" ref="rightPanelResizeDiv" show.bind="showTokenViewer"></div>
-        <token-viewer class="inspect-correlation__token-viewer" css="width: ${tokenViewerWidth}px;"
+  <div class="inspect-process-instance">
+    <div class="inspect-process-instance__left-toolbar"></div>
+    <div class="inspect-process-instance__panels">
+      <div class="inspect-process-instance__upper-panel" show.bind="!inspectPanelFullscreen" >
+        <diagram-viewer class="inspect-process-instance__diagram-viewer" view-model.ref="diagramViewer" active-solution-entry.bind="activeSolutionEntry" selected-flow-node.two-way="selectedFlowNode" active-diagram.bind="activeDiagram" process-instance.to-view="selectedProcessInstance"></diagram-viewer>
+        <div class="inspect-process-instance__right-resize-div" ref="rightPanelResizeDiv" show.bind="showTokenViewer"></div>
+        <token-viewer class="inspect-process-instance__token-viewer" css="width: ${tokenViewerWidth}px;"
           active-diagram.bind="activeDiagram"
           flow-node.bind="selectedFlowNode"
           active-solution-entry.bind="activeSolutionEntry"
@@ -17,9 +17,9 @@
           correlation-id.bind="selectedProcessInstance.correlationId"
           show.bind="showTokenViewer"></token-viewer>
       </div>
-      <div class="inspect-correlation__bottom-resize-div" ref="bottomPanelResizeDiv" if.bind="!inspectPanelFullscreen"></div>
-      <div class="inspect-correlation__bottom-panel" css="height: ${bottomPanelHeight}px;"
-            class.bind="inspectPanelFullscreen ? 'inspect-correlation__bottom-panel--fullscreen' : ''"
+      <div class="inspect-process-instance__bottom-resize-div" ref="bottomPanelResizeDiv" if.bind="!inspectPanelFullscreen"></div>
+      <div class="inspect-process-instance__bottom-panel" css="height: ${bottomPanelHeight}px;"
+            class.bind="inspectPanelFullscreen ? 'inspect-process-instance__bottom-panel--fullscreen' : ''"
             show.bind="showInspectPanel">
         <inspect-panel view-model.ref="inspectPanel" active-solution-entry.bind="activeSolutionEntry" active-diagram.bind="activeDiagram" process-instances.bind="processInstances" correlations.bind="correlations" selected-process-instance.from-view="selectedProcessInstance" selected-correlation.from-view="selectedCorrelation" fullscreen.two-way="inspectPanelFullscreen" log.bind="log" process-instance-to-select.bind="processInstanceToSelect" correlation-to-select.to-view="correlationToSelect" total-process-instance-count.to-view="totalProcessInstanceCount"  total-correlation-count.bind="totalCorrelationCount"></inspect-panel>
       </div>

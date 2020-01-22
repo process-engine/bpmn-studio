@@ -12,13 +12,13 @@ import {
 } from '../../../../../../../contracts/index';
 import {getBeautifiedDate} from '../../../../../../../services/date-service/date.service';
 import {NotificationService} from '../../../../../../../services/notification-service/notification.service';
-import {IInspectCorrelationService} from '../../../../contracts';
+import {IInspectProcessInstanceService} from '../../../../contracts';
 
 interface IClipboard {
   writeText?(text: string): void;
 }
 
-@inject('NotificationService', 'InspectCorrelationService')
+@inject('NotificationService', 'InspectProcessInstanceService')
 export class LogViewer {
   @bindable public log: Array<DataModels.Logging.LogEntry>;
   @bindable public processInstance: DataModels.Correlations.ProcessInstance;
@@ -31,11 +31,11 @@ export class LogViewer {
   };
 
   private notificationService: NotificationService;
-  private inspectCorrelationService: IInspectCorrelationService;
+  private inspectProcessInstanceService: IInspectProcessInstanceService;
 
-  constructor(notificationService: NotificationService, inspectCorrelationService: IInspectCorrelationService) {
+  constructor(notificationService: NotificationService, inspectProcessInstanceService: IInspectProcessInstanceService) {
     this.notificationService = notificationService;
-    this.inspectCorrelationService = inspectCorrelationService;
+    this.inspectProcessInstanceService = inspectProcessInstanceService;
   }
 
   public async processInstanceChanged(): Promise<void> {
@@ -45,7 +45,7 @@ export class LogViewer {
     }
 
     setTimeout(async () => {
-      const logList = await this.inspectCorrelationService.getLogsForProcessInstance(
+      const logList = await this.inspectProcessInstanceService.getLogsForProcessInstance(
         this.processInstance.processModelId,
         this.processInstance.processInstanceId,
         this.activeSolutionEntry.identity,

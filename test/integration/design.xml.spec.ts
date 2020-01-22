@@ -38,12 +38,13 @@ describe('XML View', function foo() {
       if (await testClient.isSpectronAppRunning()) {
         await testClient.stopSpectronApp();
         await testClient.clearDatabase();
+        await testClient.clearSavedDiagrams();
       }
     },
   );
 
   this.afterAll(async () => {
-    await testClient.clearSavedDiagrams();
+    await testClient.removeTestsFolder();
   });
 
   it('should have content', async () => {

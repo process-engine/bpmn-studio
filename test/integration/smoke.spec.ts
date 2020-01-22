@@ -27,12 +27,13 @@ describe('Application launch', function foo() {
       if (await testClient.isSpectronAppRunning()) {
         await testClient.stopSpectronApp();
         await testClient.clearDatabase();
+        await testClient.clearSavedDiagrams();
       }
     },
   );
 
   this.afterAll(async () => {
-    await testClient.clearSavedDiagrams();
+    await testClient.removeTestsFolder();
   });
 
   it('should start the application', async () => {
@@ -101,7 +102,8 @@ describe('Application launch', function foo() {
   it('should open the Think view from navbar', async () => {
     await testClient.createAndOpenNewDiagram();
 
-    await testClient.openThinkView();
+    await testClient.openThinkViewFromNavbar();
+
     await testClient.assertWindowTitleIs('Think | BPMN Studio');
   });
 

@@ -46,7 +46,7 @@ export default {
       showDiagramViewButtons: 'statusbar:diagramviewbuttons:show',
       hideDiagramViewButtons: 'statusbar:diagramviewbuttons:hide',
       setXmlIdentifier: 'statusbar:xmlIdentifier',
-      showInspectCorrelationButtons: 'statusbar:inspectcorrelationbuttons',
+      showInspectProcessInstanceButtons: 'statusbar:InspectProcessInstancebuttons',
     },
     configPanel: {
       solutionEntryChanged: 'configpanel:solutionentry:changed',
@@ -61,7 +61,7 @@ export default {
       hideInspectButtons: 'navbar:tools:hideButtonsOnInspect',
       toggleDashboardView: 'navbar:tools:inspectButtons:toggleDashboardView',
       toggleHeatmapView: 'navbar:tools:inspectButtons:toggleHeatmapView',
-      toggleInspectCorrelationView: 'navbar:tools:inspectButtons:toggleInspectCorrelationView',
+      toggleInspectProcessInstanceView: 'navbar:tools:inspectButtons:toggleInspectProcessInstanceView',
       updateActiveSolutionAndDiagram: 'navbar:activeSolution:diagram:update',
     },
     diagramDetail: {
@@ -98,14 +98,14 @@ export default {
       shouldDisableTokenViewerButton: 'inspect:tokenViewerButton:disable',
       exportDiagramAs: 'inspect:diagram:exportas',
     },
-    inspectCorrelation: {
-      showInspectPanel: 'inspectCorrelation:inspectPanel:show',
-      showTokenViewer: 'inspectCorrelation:tokenViewer:show',
-      showLogViewer: 'inpsectCorrelation:logViewer:show',
-      showProcessInstanceList: 'inspectCorrelation:processInstanceList:show',
-      noCorrelationsFound: 'inspectCorrelation:diagramViewer:noCorrelationsFound',
-      updateProcessInstances: 'inspectCorrelation:updateProcessInstances',
-      updateCorrelations: 'inspectCorrelation:updateCorrelations',
+    inspectProcessInstance: {
+      showInspectPanel: 'inspectProcessInstance:inspectPanel:show',
+      showTokenViewer: 'inspectProcessInstance:tokenViewer:show',
+      showLogViewer: 'inspectProcessInstance:logViewer:show',
+      showProcessInstanceList: 'inspectProcessInstance:processInstanceList:show',
+      noCorrelationsFound: 'inspectProcessInstance:diagramViewer:noCorrelationsFound',
+      updateProcessInstances: 'inspectProcessInstance:updateProcessInstances',
+      updateCorrelations: 'inspectProcessInstance:updateCorrelations',
     },
     solutionExplorer: {
       closeAllOpenDiagrams: 'solutionExplorer:openDiagrams:closeAll',

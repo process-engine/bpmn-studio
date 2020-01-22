@@ -21,12 +21,13 @@ describe('Design View', function foo() {
       if (await testClient.isSpectronAppRunning()) {
         await testClient.stopSpectronApp();
         await testClient.clearDatabase();
+        await testClient.clearSavedDiagrams();
       }
     },
   );
 
   this.afterAll(async () => {
-    await testClient.clearSavedDiagrams();
+    await testClient.removeTestsFolder();
   });
 
   it('should save a diagram', async () => {
@@ -45,7 +46,6 @@ describe('Design View', function foo() {
     await testClient.startPageLoaded();
     await testClient.solutionExplorer.openDirectoryAsSolution('fixtures', diagramName);
     await testClient.assertDiagramIsOnFileSystem();
-
     // Act
     await testClient.designView.deployDiagram();
     // Assert
@@ -58,6 +58,7 @@ describe('Design View', function foo() {
     await testClient.startPageLoaded();
     await testClient.solutionExplorer.openDirectoryAsSolution('fixtures', diagramName);
     await testClient.assertDiagramIsOnFileSystem();
+
     await testClient.designView.deployDiagram();
     await testClient.assertNavbarTitleIs(diagramName);
     await testClient.assertDiagramIsOnProcessEngine();

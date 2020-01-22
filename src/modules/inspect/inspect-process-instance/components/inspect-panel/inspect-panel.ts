@@ -36,10 +36,10 @@ export class InspectPanel {
 
   public attached(): void {
     this.subscriptions = [
-      this.eventAggregator.subscribe(environment.events.inspectCorrelation.showLogViewer, () => {
+      this.eventAggregator.subscribe(environment.events.inspectProcessInstance.showLogViewer, () => {
         this.changeTab(InspectPanelTab.LogViewer);
       }),
-      this.eventAggregator.subscribe(environment.events.inspectCorrelation.showProcessInstanceList, () => {
+      this.eventAggregator.subscribe(environment.events.inspectProcessInstance.showProcessInstanceList, () => {
         this.changeTab(InspectPanelTab.ProcessInstanceList);
       }),
     ];

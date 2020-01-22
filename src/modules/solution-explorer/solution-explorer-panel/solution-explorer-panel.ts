@@ -652,13 +652,18 @@ export class SolutionExplorerPanel {
   };
 
   private electronOnCreateDiagram = async (_: Event): Promise<void> => {
-    this.openNewDiagram();
+    await this.openNewDiagram();
+
+    setTimeout(() => {
+      const openDiagramsEntry = document.getElementsByClassName('open-diagrams-entry')[0];
+      openDiagramsEntry.scrollTop = openDiagramsEntry.scrollHeight;
+    }, 0);
   };
 
-  private openNewDiagram(): void {
+  private openNewDiagram(): Promise<void> {
     const uri: string = 'about:open-diagrams';
 
-    this.solutionExplorerList.createDiagram(uri);
+    return this.solutionExplorerList.createDiagram(uri);
   }
 
   private createNewDiagram(): void {

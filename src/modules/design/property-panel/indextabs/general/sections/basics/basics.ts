@@ -231,7 +231,7 @@ export class BasicsSection implements ISection {
         return false;
       }
 
-      const elementHasSameId: boolean = element.businessObject.id === this.businessObjInPanelId;
+      const elementHasSameId: boolean = element.businessObject.id === id;
 
       return elementHasSameId;
     });
@@ -251,15 +251,22 @@ export class BasicsSection implements ISection {
     return !elementIds.includes(id);
   }
 
+  private isDefinitionIdUnique(id: string): boolean {
+    // eslint-disable-next-line no-underscore-dangle
+    return this.modeler._definitions.id !== id;
+  }
+
   private setValidationRules(): void {
-    ValidationRules.ensure((businessObject: IModdleElement) => businessObject.id)
+    ValidationRules.ensure((basicsSection: BasicsSection) => basicsSection.businessObjInPanelId)
       .displayName('elementId')
       .required()
       .withMessage('ID cannot be blank.')
+      .satisfies((id: string) => !id.includes(' '))
+      .withMessage('ID must not contain spaces.')
       .then()
-      .satisfies((id: string) => this.formIdIsUnique(id) && this.isProcessIdUnique(id))
+      .satisfies((id: string) => this.formIdIsUnique(id) && this.isProcessIdUnique(id) && this.isDefinitionIdUnique(id))
       .withMessage('ID already exists.')
-      .on(this.businessObjInPanel);
+      .on(this);
   }
 
   private saveInputHeightOnChange(): void {

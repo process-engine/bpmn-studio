@@ -132,7 +132,7 @@ export class DiagramViewer {
       }),
 
       this.eventAggregator.subscribe(
-        environment.events.inspectCorrelation.noCorrelationsFound,
+        environment.events.inspectProcessInstance.noCorrelationsFound,
         (noCorrelationsFound: boolean) => {
           this.noCorrelationsFound = noCorrelationsFound;
         },
@@ -267,7 +267,7 @@ export class DiagramViewer {
 
     if (xmlIsNotLoaded) {
       const notificationMessage: string =
-        'The xml could not be loaded. Please try to reopen the Inspect Correlation View.';
+        'The xml could not be loaded. Please try to reopen the Inspect Process Instance view.';
       this.notificationService.showNotification(NotificationType.ERROR, notificationMessage);
 
       return undefined;

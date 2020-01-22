@@ -1,6 +1,6 @@
 <template>
   <require from="./navbar.css"></require>
-  <div class="bpmn-studio-navbar" class.bind="showLeftMarginInNavbar ? 'bpmn-studio-navbar--left-margin' : ''" ref="navbarContainer">
+  <div class="bpmn-studio-navbar" class.bind="showLeftMarginInNavbar ? 'bpmn-studio-navbar--left-margin' : ''" ref="navbarContainer" dblclick.trigger="maximizeWindow()">
     <div class="menu-bar__menu--left" id="navBarLeft">
       <div class="menu__menu-tabbed-link">
         <button class="button menu-tabbed-link action-button" class.bind="solutionExplorerIsActive ? 'button--active' : ''" click.delegate="toggleSolutionExplorer($event)" dblclick.trigger="$event.stopPropagation()" title="Toggle visibility of the Solution Explorer" data-test-toggle-solution-explorer>
@@ -12,7 +12,7 @@
       </div>
     </div>
     <div class="menu-bar__menu--center">
-      <div class="menu__element menu__element--title btn-group" if.bind="showProcessName" ref="diagramInfo">
+      <div class="menu__element menu__element--title btn-group" if.bind="showProcessName" ref="diagramInfo" dblclick.trigger="$event.stopPropagation()">
         <span if.bind="savingTargetIsRemoteSolution" class="fas menu__origin-icon fa-database" data-test-navbar-icon-remote-solution></span>
         <span else class="fas menu__origin-icon fa-folder" data-test-navbar-icon-local-solution></span>
         <span class="process-details-title" title.bind="navbarTitle" data-test-navbar-title>${navbarTitle}</span>
@@ -21,18 +21,19 @@
     </div>
     <div class="menu-bar__menu--right">
       <template if.bind="showTools">
-        <button class="button menu-bar__menu-center--action-button menu-bar__menu-center--back-button back-button" click.delegate="navigateBack()" title="Navigate back">
+        <button class="button menu-bar__menu-center--action-button menu-bar__menu-center--back-button back-button" click.delegate="navigateBack()" dblclick.trigger="$event.stopPropagation()" title="Navigate back">
           <i class="fas fa-arrow-circle-left"></i>
         </button>
-        <button if.bind="!savingTargetIsRemoteSolution" class="button menu-bar__menu-center--action-button" class.bind="validationError ? 'button--disabled' : ''" click.delegate="saveDiagram()" disabled.bind="validationError" title="Save Diagram">
+        <button if.bind="!savingTargetIsRemoteSolution" class="button menu-bar__menu-center--action-button" class.bind="validationError ? 'button--disabled' : ''" dblclick.trigger="$event.stopPropagation()" click.delegate="saveDiagram()" disabled.bind="validationError" title="Save Diagram">
           <i class="fas fa-save"></i>
         </button>
       </template>
-      <template if.bind="showTools || showExportOnInspectCorrelation">
+      <template if.bind="showTools || showExportOnInspectProcessInstance">
         <div class="dropdown">
           <button class="button menu-bar__menu-center--action-button dropdown-toggle"
-                  class.bind="showExportOnInspectCorrelation ? 'export_button-inspect_correlation' : ''"
+                  class.bind="showExportOnInspectProcessInstance ? 'export_button-inspect_correlation' : ''"
                   title="Export Diagram"
+                  dblclick.trigger="$event.stopPropagation()"
                   data-toggle="dropdown"
                   aria-haspopup="true"
                   aria-expanded="false">
@@ -47,17 +48,17 @@
         </div>
       </template>
       <template if.bind="showTools">
-        <button class="button menu-bar__menu-center--action-button"  click.delegate="printDiagram()" title="Print Diagram">
+        <button class="button menu-bar__menu-center--action-button"  click.delegate="printDiagram()" dblclick.trigger="$event.stopPropagation()" title="Print Diagram">
           <i class="fas fa-print"></i>
         </button>
-        <button class="button menu-bar__menu-center--action-button" class.bind="validationError || disableDiagramUploadButton ? 'button--disabled' : ''" click.delegate="uploadProcess()" title.bind="diagramUploadButtonTitle" data-test-deploy-diagram-button>
+        <button class="button menu-bar__menu-center--action-button" class.bind="validationError || disableDiagramUploadButton ? 'button--disabled' : ''" click.delegate="uploadProcess()" dblclick.trigger="$event.stopPropagation()" title.bind="diagramUploadButtonTitle" data-test-deploy-diagram-button>
           <i class="fas fa-dolly-flatbed"></i>
         </button>
         <div class="btn-group">
-          <button class="button menu-bar__menu-center--action-button" class.bind="validationError || disableStartButton ? 'button--disabled' : ''" click.delegate="startProcess()" disabled.bind="validationError || disableStartButton" title.bind="startButtonTitle" data-test-start-diagram-button>
+          <button class="button menu-bar__menu-center--action-button" class.bind="validationError || disableStartButton ? 'button--disabled' : ''" click.delegate="startProcess()" dblclick.trigger="$event.stopPropagation()" disabled.bind="validationError || disableStartButton" title.bind="startButtonTitle" data-test-start-diagram-button>
             <i class="fas fa-play"></i>
           </button>
-          <button type="button" class="button menu-bar__menu-center--action-button dropdown-toggle dropdown-toggle-split dropdown__start-button" class.bind="validationError || disableStartButton ? 'button--disabled' : ''" disabled.bind="validationError || disableStartButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <button type="button" class="button menu-bar__menu-center--action-button dropdown-toggle dropdown-toggle-split dropdown__start-button" class.bind="validationError || disableStartButton ? 'button--disabled' : ''" dblclick.trigger="$event.stopPropagation()" disabled.bind="validationError || disableStartButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="fas fa-angle-down start-options__icon"></i>
           </button>
           <div class="dropdown-menu">
@@ -66,13 +67,13 @@
         </div>
       </template>
       <template if.bind="showInspectTools">
-        <button class="button menu-bar__menu-center--action-button" class.bind="disableInspectCorrelationButton ? 'button--active' : ''" click.delegate="showInspectCorrelation()" disabled.bind="disableInspectCorrelationButton" title.bind="disableInspectCorrelationButton ? 'You are on the inspect correlation view' : 'Show Inspect Correlation'">
+        <button class="button menu-bar__menu-center--action-button" class.bind="disableInspectProcessInstanceButton ? 'button--active' : ''" click.delegate="showInspectProcessInstance()" dblclick.trigger="$event.stopPropagation()" disabled.bind="disableInspectProcessInstanceButton" title.bind="disableInspectProcessInstanceButton ? 'You are on the inspect process instance view' : 'Show Inspect Process Instance'">
           <i class="fas fa-search"></i>
         </button>
-        <button class="button menu-bar__menu-center--action-button" class.bind="disableDashboardButton ? 'button--active' : ''" click.delegate="showDashboard()" disabled.bind="disableDashboardButton" title.bind="disableDashboardButton ? 'You are on the dashboard' : 'Show Dashboard'">
+        <button class="button menu-bar__menu-center--action-button" class.bind="disableDashboardButton ? 'button--active' : ''" click.delegate="showDashboard()" dblclick.trigger="$event.stopPropagation()" disabled.bind="disableDashboardButton" title.bind="disableDashboardButton ? 'You are on the dashboard' : 'Show Dashboard'">
           <i class="fas fa-chalkboard"></i>
         </button>
-        <button class="button menu-bar__menu-center--action-button" class.bind="disableHeatmapButton ? 'button--active' : ''" click.delegate="showHeatmap()" disabled.bind="disableHeatmapButton" title.bind="disableHeatmapButton ? 'You are on the heatmap view' : 'Show Heatmap'">
+        <button class="button menu-bar__menu-center--action-button" class.bind="disableHeatmapButton ? 'button--active' : ''" click.delegate="showHeatmap()" dblclick.trigger="$event.stopPropagation()" disabled.bind="disableHeatmapButton" title.bind="disableHeatmapButton ? 'You are on the heatmap view' : 'Show Heatmap'">
           <i class="fas fa-chart-line"></i>
         </button>
       </template>

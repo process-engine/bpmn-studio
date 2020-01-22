@@ -2,16 +2,16 @@
   <require from="./inspect.css"></require>
   <require from="./heatmap/heatmap"></require>
   <require from="./dashboard/dashboard"></require>
-  <require from="./inspect-correlation/inspect-correlation"></require>
+  <require from="./inspect-process-instance/inspect-process-instance"></require>
   <div class="inspect">
 
     <dashboard if.bind="showDashboard" view-model.ref="dashboard" active-solution-entry.bind="activeSolutionEntry"></dashboard>
     <heatmap if.bind="showHeatmap" active-diagram.bind="activeDiagram" active-solution-entry.bind="activeSolutionEntry"></heatmap>
-    <inspect-correlation if.bind="showInspectCorrelation" active-diagram.bind="activeDiagram" active-solution-entry.bind="activeSolutionEntry" process-instance-id-to-select.to-view="processInstanceToSelect" flow-node-to-select.to-view="flowNodeToSelect" inspect-panel-tab-to-show.to-view="inspectPanelTabToShow"></inspect-correlation>
+    <inspect-process-instance if.bind="showInspectProcessInstance" active-diagram.bind="activeDiagram" active-solution-entry.bind="activeSolutionEntry" process-instance-id-to-select.to-view="processInstanceToSelect" flow-node-to-select.to-view="flowNodeToSelect" inspect-panel-tab-to-show.to-view="inspectPanelTabToShow"></inspect-process-instance>
 
     <div class="inspect-layout__tools-right">
       <div class="tool-list tool-list--vertical">
-        <div if.bind="showInspectCorrelation"
+        <div if.bind="showInspectProcessInstance"
              class="inspect-layout__tool"
              class.bind="tokenViewerButtonDisabled ? 'inspect-layout__tool--disabled' : showTokenViewer ? 'inspect-layout__tool--active' : ''"
              disabled.bind="tokenViewerButtonDisabled"

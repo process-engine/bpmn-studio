@@ -53,7 +53,7 @@ export class CorrelationList {
   }
 
   public showProcessInstanceList(): void {
-    this.eventAggregator.publish(environment.events.inspectCorrelation.showProcessInstanceList);
+    this.eventAggregator.publish(environment.events.inspectProcessInstance.showProcessInstanceList);
   }
 
   public selectCorrelation(selectedTableEntry: ICorrelationTableEntry): void {
@@ -112,7 +112,7 @@ export class CorrelationList {
         offset: 0,
         limit: this.pageSize,
       };
-      this.eventAggregator.publish(environment.events.inspectCorrelation.updateCorrelations, payload);
+      this.eventAggregator.publish(environment.events.inspectProcessInstance.updateCorrelations, payload);
 
       return;
     }
@@ -133,7 +133,7 @@ export class CorrelationList {
       limit: this.pageSize,
     };
 
-    this.eventAggregator.publish(environment.events.inspectCorrelation.updateCorrelations, payload);
+    this.eventAggregator.publish(environment.events.inspectProcessInstance.updateCorrelations, payload);
   }
 
   private convertCorrelationsIntoTableData(

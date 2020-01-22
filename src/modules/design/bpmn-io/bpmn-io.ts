@@ -270,9 +270,13 @@ export class BpmnIo {
       this.eventAggregator.subscribe(
         environment.events.solutionExplorerPanel.toggleSolutionExplorer,
         (showSolutionExplorer: boolean) => {
-          this.setDjsPaletteLeftStyle(showSolutionExplorer);
+          if (!this.solutionIsRemote) {
+            this.setDjsPaletteLeftStyle(showSolutionExplorer);
+          }
 
-          this.hideOrShowPpForSpaceReasons();
+          setTimeout(() => {
+            this.hideOrShowPpForSpaceReasons();
+          }, 0);
         },
       ),
 
@@ -446,8 +450,10 @@ export class BpmnIo {
 
     bpmnIoPaletteContainer.className += ' djs-palette-override';
 
-    const showSolutionExplorer: boolean = localStorage.getItem('SolutionExplorerVisibility') !== 'false';
-    this.setDjsPaletteLeftStyle(showSolutionExplorer);
+    if (!this.solutionIsRemote) {
+      const showSolutionExplorer: boolean = localStorage.getItem('SolutionExplorerVisibility') !== 'false';
+      this.setDjsPaletteLeftStyle(showSolutionExplorer);
+    }
   }
 
   public async saveCurrentXML(): Promise<void> {

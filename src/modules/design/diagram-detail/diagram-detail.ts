@@ -476,6 +476,10 @@ export class DiagramDetail {
       xml,
     );
 
+    if (deployResult === undefined) {
+      return;
+    }
+
     this.router.navigateToRoute('design', {
       diagramName: deployResult.diagram.name,
       solutionUri: deployResult.solution.uri,

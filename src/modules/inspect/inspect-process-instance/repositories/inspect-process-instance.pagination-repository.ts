@@ -5,11 +5,11 @@ import {
   ProcessInstance,
   ProcessInstanceList,
 } from '@process-engine/management_api_contracts/dist/data_models/correlation';
-import {IInspectCorrelationRepository} from '../contracts';
-import {InspectCorrelationRepository} from './inspect-correlation.repository';
+import {IInspectProcessInstanceRepository} from '../contracts';
+import {InspectProcessInstanceRepository} from './inspect-process-instance.repository';
 
-export class InspectCorrelationPaginationRepository extends InspectCorrelationRepository
-  implements IInspectCorrelationRepository {
+export class InspectProcessInstancePaginationRepository extends InspectProcessInstanceRepository
+  implements IInspectProcessInstanceRepository {
   public async getAllCorrelationsForProcessModelId(
     identity: IIdentity,
     processModelId: string,
