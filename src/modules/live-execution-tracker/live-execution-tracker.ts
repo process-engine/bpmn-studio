@@ -2,6 +2,7 @@
 /* eslint-disable 6river/new-cap */
 import {computedFrom, inject, observable} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
+import {EventAggregator} from 'aurelia-event-aggregator';
 
 import * as bundle from '@process-engine/bpmn-js-custom-bundle';
 
@@ -45,7 +46,7 @@ const OVERLAY_HEIGHT: number = 30;
 const versionRegex: RegExp = /(\d+)\.(\d+).(\d+)/;
 
 // tslint:disable: no-magic-numbers
-@inject(Router, 'NotificationService', 'SolutionService', 'LiveExecutionTrackerService')
+@inject(Router, 'NotificationService', 'SolutionService', 'LiveExecutionTrackerService', EventAggregator)
 export class LiveExecutionTracker {
   public canvasModel: HTMLElement;
   public previewCanvasModel: HTMLElement;
@@ -96,17 +97,20 @@ export class LiveExecutionTracker {
   private overlaysWithEventListeners: Array<string> = [];
 
   private liveExecutionTrackerService: ILiveExecutionTrackerService;
+  private eventAggregator: EventAggregator;
 
   constructor(
     router: Router,
     notificationService: NotificationService,
     solutionService: ISolutionService,
     liveExecutionTrackerService: ILiveExecutionTrackerService,
+    eventAggregator: EventAggregator,
   ) {
     this.router = router;
     this.notificationService = notificationService;
     this.solutionService = solutionService;
     this.liveExecutionTrackerService = liveExecutionTrackerService;
+    this.eventAggregator = eventAggregator;
   }
 
   public async activate(routeParameters: RouteParameters): Promise<void> {
@@ -115,6 +119,7 @@ export class LiveExecutionTracker {
 
     this.activeSolutionEntry = await this.solutionService.getSolutionEntryForUri(routeParameters.solutionUri);
     this.activeSolutionEntry.service.openSolution(routeParameters.solutionUri, this.activeSolutionEntry.identity);
+    this.eventAggregator.publish(environment.events.configPanel.solutionEntryChanged, this.activeSolutionEntry);
 
     this.processInstanceId = routeParameters.processInstanceId;
 
