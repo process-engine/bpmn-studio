@@ -79,8 +79,9 @@ export class NavBar {
     this.updateNavbar();
 
     this.subscriptions = [
-      this.eventAggregator.subscribe('router:navigation:success', () => {
-        this.updateNavbar();
+      this.eventAggregator.subscribe('router:navigation:success', async () => {
+        await this.updateNavbar();
+        this.eventAggregator.publish(environment.events.updatingNavbarDone);
       }),
 
       this.eventAggregator.subscribe(environment.events.navBar.showTools, () => {
@@ -284,7 +285,9 @@ export class NavBar {
     this.eventAggregator.publish(environment.events.diagramDetail.startProcessWithOptions);
   }
 
-  public uploadProcess(): void {
+  public uploadProcess(event: Event): void {
+    event.stopPropagation();
+
     if (this.validationError || this.disableDiagramUploadButton) {
       return;
     }

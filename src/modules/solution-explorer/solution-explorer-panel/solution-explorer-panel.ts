@@ -245,6 +245,9 @@ export class SolutionExplorerPanel {
       this.eventAggregator.subscribe(AuthenticationStateEvent.LOGOUT, () => {
         this.solutionExplorerList.refreshSolutions();
       }),
+      this.eventAggregator.subscribe(environment.events.hideAllModals, () => {
+        this.showOpenRemoteSolutionModal = false;
+      }),
     ];
   }
 
@@ -373,6 +376,8 @@ export class SolutionExplorerPanel {
       const filePath: string = openedFile[0];
 
       await this.openDiagramOrDisplayError(filePath);
+
+      this.eventAggregator.publish(environment.events.tutorial.diagramOpened);
     });
   }
 

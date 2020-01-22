@@ -38,7 +38,7 @@
   </div>
 
   <modal if.bind="showDynamicUiModal"
-         modal-style.bind="modalStyleString"
+         modal-dialog-style.bind="modalStyleString"
          content-style.bind="contentStyleString"
          css="display: ${showDynamicUiModal ? 'block' : 'none'};"
          body-style="overflow: auto;"
@@ -60,7 +60,7 @@
   </modal>
 
   <modal show.bind="showDiagramPreviewViewer"
-         modal-style="top: 10%; bottom: 10%; left: 10%; right: 10%; margin: 0; position: absolute; max-width: 100%;"
+         modal-dialog-style="top: 10%; bottom: 10%; left: 10%; right: 10%; margin: 0; position: absolute; max-width: 100%;"
          css="display: ${showDiagramPreviewViewer ? 'block' : 'none'};"
          body-style="overflow: auto; width: 100%; height: 100%; padding: 0;"
          origin.bind="liveExecutionTracker">

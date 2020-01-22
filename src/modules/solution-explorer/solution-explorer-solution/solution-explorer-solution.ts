@@ -223,6 +223,9 @@ export class SolutionExplorerSolution {
         environment.events.solutionExplorer.closeAllOpenDiagrams,
         this.closeAllDiagramsEventFunction,
       ),
+      this.eventAggregator.subscribe(environment.events.hideAllModals, () => {
+        this.showCloseModal = false;
+      }),
     ];
 
     if (this.displayedSolutionEntry.isOpenDiagram) {

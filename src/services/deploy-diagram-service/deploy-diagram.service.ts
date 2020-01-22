@@ -103,6 +103,8 @@ export class DeployDiagramService {
 
       this.eventAggregator.publish(environment.events.diagramDetail.onDiagramDeployed, processModelId);
 
+      this.eventAggregator.publish(environment.events.tutorial.diagramDeployed);
+
       return {
         diagram: deployedDiagram,
         solution: solutionToDeployTo,

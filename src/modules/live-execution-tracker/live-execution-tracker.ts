@@ -2,13 +2,13 @@
 /* eslint-disable 6river/new-cap */
 import {computedFrom, inject, observable} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
-import {EventAggregator} from 'aurelia-event-aggregator';
+import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 
 import * as bundle from '@process-engine/bpmn-js-custom-bundle';
 
 import {DataModels} from '@process-engine/management_api_contracts';
 
-import {Subscription} from '@essential-projects/event_aggregator_contracts';
+import {Subscription as RuntimeSubscription} from '@essential-projects/event_aggregator_contracts';
 import {IShape} from '@process-engine/bpmn-elements_contracts';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 
@@ -93,11 +93,14 @@ export class LiveExecutionTracker {
   private isColorizing: boolean = false;
   private colorizeAgain: boolean = false;
 
-  private eventListenerSubscriptions: Array<Subscription> = [];
+  private eventListenerSubscriptions: Array<RuntimeSubscription> = [];
   private overlaysWithEventListeners: Array<string> = [];
 
   private liveExecutionTrackerService: ILiveExecutionTrackerService;
   private eventAggregator: EventAggregator;
+
+  private eventAggregator: EventAggregator;
+  private subscriptions: Array<Subscription>;
 
   constructor(
     router: Router,
@@ -257,6 +260,13 @@ export class LiveExecutionTracker {
     } catch (error) {
       this.processStopped = true;
     }
+
+    this.subscriptions = [
+      this.eventAggregator.subscribe(environment.events.hideAllModals, () => {
+        this.showDiagramPreviewViewer = false;
+        this.showDynamicUiModal = false;
+      }),
+    ];
   }
 
   public async detached(): Promise<void> {
@@ -271,7 +281,7 @@ export class LiveExecutionTracker {
     this.diagramPreviewViewer.destroy();
 
     const removeSubscriptionPromises: Array<Promise<void>> = [];
-    this.eventListenerSubscriptions.forEach((subscription: Subscription) => {
+    this.eventListenerSubscriptions.forEach((subscription: RuntimeSubscription) => {
       const removingPromise: Promise<void> = this.liveExecutionTrackerService.removeSubscription(
         this.activeSolutionEntry.identity,
         subscription,
@@ -282,6 +292,10 @@ export class LiveExecutionTracker {
 
     await Promise.all(removeSubscriptionPromises);
     this.eventListenerSubscriptions = [];
+
+    for (const subscription of this.subscriptions) {
+      subscription.dispose();
+    }
   }
 
   public determineActivationStrategy(): string {
@@ -988,7 +1002,7 @@ export class LiveExecutionTracker {
     return parentProcessInstanceId;
   }
 
-  private createBackendEventListeners(): Promise<Array<Subscription>> {
+  private createBackendEventListeners(): Promise<Array<RuntimeSubscription>> {
     const processEndedCallback: Function = (): void => {
       this.handleElementColorization();
 
@@ -1076,7 +1090,7 @@ export class LiveExecutionTracker {
       colorizationCallback,
     );
 
-    const subscriptionPromises: Array<Promise<Subscription>> = [
+    const subscriptionPromises: Array<Promise<RuntimeSubscription>> = [
       processEndedSubscriptionPromise,
       processErrorSubscriptionPromise,
       processTerminatedSubscriptionPromise,
