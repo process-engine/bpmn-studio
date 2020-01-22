@@ -35,14 +35,16 @@
           <th>Code</th>
           <td>
             <input type="text" class="props-input" value.bind="selectedError.errorCode" change.delegate="updateErrorCode()" disabled.bind="!isEditable">
-            <small>Expected error code. Leave empty for any.</small>
+            <small if.bind="isEndEvent">The Code the error should have.</small>
+            <small else>Optional. If set, only errors with a matching code are caught.</small>
           </td>
         </tr>
         <tr>
           <th>Message</th>
           <td>
             <input type="text" class="props-input" value.bind="errorMessageVariable" change.delegate="updateErrorMessage()" disabled.bind="!isEditable">
-            <small>Expected error message. Leave empty for any.</small>
+            <small if.bind="isEndEvent">Optional: The message the error should have.</small>
+            <small else>Optional. If set, only errors with a matching message are caught.</small>
           </td>
         </tr>
       </table>
