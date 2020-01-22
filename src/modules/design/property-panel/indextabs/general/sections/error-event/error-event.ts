@@ -51,6 +51,7 @@ export class ErrorEventSection implements ISection {
     this.modeler = model.modeler;
     this.linter = model.modeler.get('linting');
 
+    this.isEndEvent = this.elementIsEndEvent(model.elementInPanel);
     this.errors = await this.getErrors();
 
     this.init();
@@ -58,7 +59,6 @@ export class ErrorEventSection implements ISection {
 
   public isSuitableForElement(element: IShape): boolean {
     if (this.elementIsErrorEvent(element)) {
-      this.isEndEvent = this.elementIsEndEvent(element);
       return true;
     }
     return false;
