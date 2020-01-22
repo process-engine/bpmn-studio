@@ -1,5 +1,5 @@
 import {EventAggregator} from 'aurelia-event-aggregator';
-import {bindable, BindingEngine, Disposable inject} from 'aurelia-framework';
+import {BindingEngine, Disposable, bindable, inject} from 'aurelia-framework';
 import {ValidateEvent, ValidationController, ValidationRules} from 'aurelia-validation';
 
 import {IModdleElement, IPoolElement, IShape} from '@process-engine/bpmn-elements_contracts';
