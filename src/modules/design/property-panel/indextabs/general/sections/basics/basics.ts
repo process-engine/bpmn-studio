@@ -239,14 +239,16 @@ export class BasicsSection implements ISection {
     return elementsWithSameId.length === 0;
   }
 
-  private isProcessIdUnique(id: string): boolean {
+  private areRootElementIdsUnique(id: string): boolean {
     // eslint-disable-next-line no-underscore-dangle
     const elementIds: Array<string> = this.modeler._definitions.rootElements.map((rootElement: IModdleElement) => {
       return rootElement.id;
     });
 
-    const currentId: number = elementIds.indexOf(id);
-    elementIds.splice(currentId, 1);
+    const currentId: number = elementIds.indexOf(this.businessObjInPanel.id);
+    if (currentId >= 0) {
+      elementIds.splice(currentId, 1);
+    }
 
     return !elementIds.includes(id);
   }
@@ -264,7 +266,9 @@ export class BasicsSection implements ISection {
       .satisfies((id: string) => !id.includes(' '))
       .withMessage('ID must not contain spaces.')
       .then()
-      .satisfies((id: string) => this.formIdIsUnique(id) && this.isProcessIdUnique(id) && this.isDefinitionIdUnique(id))
+      .satisfies(
+        (id: string) => this.formIdIsUnique(id) && this.areRootElementIdsUnique(id) && this.isDefinitionIdUnique(id),
+      )
       .withMessage('ID already exists.')
       .on(this);
   }
