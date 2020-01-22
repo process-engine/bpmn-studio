@@ -61,6 +61,7 @@ export class ErrorEventSection implements ISection {
     if (this.elementIsErrorEvent(element)) {
       return true;
     }
+
     return false;
   }
 
