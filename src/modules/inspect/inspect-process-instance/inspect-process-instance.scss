@@ -33,6 +33,7 @@
 .inspect-process-instance__bottom-panel {
   width: 100%;
   max-height: calc(100% - 150px);
+  flex-shrink: 0;
 }
 
 .inspect-process-instance__bottom-panel--fullscreen {
@@ -59,7 +60,7 @@
 }
 
 .inspect-process-instance__upper-panel {
-  height: auto;
+  height: 100%;
   display: flex;
   flex-grow: 1;
 }
