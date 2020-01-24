@@ -183,6 +183,8 @@ export class ErrorEventSection implements ISection {
       this.selectedError = this.errors.find((error: IError) => {
         return error.id === this.selectedId;
       });
+
+      this.errorMessageVariable = errorElement.errorMessageVariable;
     } else {
       this.selectedError = null;
       this.selectedId = null;
