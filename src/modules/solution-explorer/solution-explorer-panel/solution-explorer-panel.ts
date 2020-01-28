@@ -637,10 +637,6 @@ export class SolutionExplorerPanel {
 
       const diagramWithURIIsAlreadyOpened: boolean = diagram !== null;
       if (diagramWithURIIsAlreadyOpened) {
-        if (diagramState.metadata.isChanged === true) {
-          diagram.xml = diagramState.data.xml;
-        }
-
         return this.navigateToDetailView(diagram, solution);
       }
 
@@ -653,7 +649,7 @@ export class SolutionExplorerPanel {
   private electronFileOpeningHook = async (_: Event, pathToFile: string): Promise<void> => {
     const uri: string = pathToFile;
 
-    this.openDiagramOrDisplayError(uri);
+    await this.openDiagramOrDisplayError(uri);
   };
 
   private electronOnMenuOpenDiagramHook = async (_: Event): Promise<void> => {
@@ -691,7 +687,7 @@ export class SolutionExplorerPanel {
     this.solutionExplorerList.createDiagram(uri);
   }
 
-  private registerElectronHooks(): void {
+  private async registerElectronHooks(): Promise<void> {
     // Register handler for double-click event fired from "electron.js".
     this.ipcRenderer.on('double-click-on-file', this.electronFileOpeningHook);
 
@@ -709,7 +705,7 @@ export class SolutionExplorerPanel {
     if (fileInfo.path) {
       // There was a file opened before BPMN Studio was loaded, open it.
       const uri: string = fileInfo.path;
-      this.openDiagramOrDisplayError(uri);
+      await this.openDiagramOrDisplayError(uri);
     }
   }
 

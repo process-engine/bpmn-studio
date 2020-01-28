@@ -207,6 +207,13 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
                   this.openDiagramStateService.updateDiagramState(diagram.uri, diagramState);
 
                   this.eventAggregator.publish(environment.events.diagramNeedsToBeUpdated);
+                  if (!diagramState.metadata.isChanged) {
+                    diagramState.data.xml = xml;
+
+                    this.openDiagramStateService.updateDiagramState(diagram.uri, diagramState);
+
+                    this.eventAggregator.publish(environment.events.diagramNeedsToBeUpdated);
+                  }
                 }
 
                 isSaving = false;
