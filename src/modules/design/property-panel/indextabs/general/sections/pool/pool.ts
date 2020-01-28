@@ -154,13 +154,20 @@ export class PoolSection implements ISection {
     return !elementIds.includes(id);
   }
 
+  private isDefinitionIdUnique(id: string): boolean {
+    // eslint-disable-next-line no-underscore-dangle
+    return this.modeler._definitions.id !== id;
+  }
+
   private setValidationRules(): void {
     ValidationRules.ensure((poolSection: PoolSection) => poolSection.processRefId)
       .displayName('processId')
       .required()
       .withMessage('Process-ID cannot be blank.')
       .then()
-      .satisfies((id: string) => this.formIdIsUnique(id) && this.areRootElementIdsUnique(id))
+      .satisfies(
+        (id: string) => this.formIdIsUnique(id) && this.areRootElementIdsUnique(id) && this.isDefinitionIdUnique(id),
+      )
       .withMessage('Process-ID already exists.')
       .on(this);
   }
