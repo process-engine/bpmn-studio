@@ -190,7 +190,7 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
               const xml: string = fs.readFileSync(diagram.uri, 'utf8');
 
               const diagramWasChangedByStudio: boolean =
-                (change !== undefined && (change.change === 'save' && change.xml === xml)) ||
+                (change !== undefined && change.change === 'save' && change.xml === xml) ||
                 (change !== undefined && change.change === 'create');
 
               const diagramWasNotChangedOutsideOfTheStudio: boolean = diagram.xml === xml;
