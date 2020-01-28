@@ -23,6 +23,7 @@ import {getPortListByVersion} from '../../../services/default-ports-module/defau
 import {HttpFetchClient} from '../../fetch-http-client/http-fetch-client';
 import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 import {isRunningInElectron} from '../../../services/is-running-in-electron-module/is-running-in-electron.module';
+import {OpenDiagramStateService} from '../../../services/solution-explorer-services/open-diagram-state.service';
 
 type RemoteSolutionListEntry = {
   uri: string;
@@ -44,7 +45,7 @@ enum SupportedProtocols {
  *  - Refreshing on login/logout
  *  - Updating the remote processengine uri if needed
  */
-@inject(EventAggregator, 'NotificationService', Router, 'SolutionService', 'HttpFetchClient')
+@inject(EventAggregator, 'NotificationService', Router, 'SolutionService', 'HttpFetchClient', 'OpenDiagramStateService')
 export class SolutionExplorerPanel {
   @observable public selectedProtocol: string = 'http://';
 
@@ -69,6 +70,7 @@ export class SolutionExplorerPanel {
   private ipcRenderer: any | null = null;
   private subscriptions: Array<Subscription> = [];
   private solutionService: ISolutionService;
+  private openDiagramStateService: OpenDiagramStateService;
   private remoteSolutionHistoryStatusPollingTimer: NodeJS.Timer;
   private remoteSolutionHistoryStatusIsPolling: boolean;
 
@@ -80,12 +82,14 @@ export class SolutionExplorerPanel {
     router: Router,
     solutionService: ISolutionService,
     httpFetchClient: HttpFetchClient,
+    openDiagramStateService: OpenDiagramStateService,
   ) {
     this.eventAggregator = eventAggregator;
     this.notificationService = notificationService;
     this.router = router;
     this.solutionService = solutionService;
     this.httpFetchClient = httpFetchClient;
+    this.openDiagramStateService = openDiagramStateService;
 
     if (isRunningInElectron()) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
@@ -626,9 +630,14 @@ export class SolutionExplorerPanel {
       // The diagram may already be opened.
       const diagram: IDiagram | null = await this.solutionExplorerList.getOpenedDiagramByURI(uri);
       const solution: ISolutionEntry = this.solutionExplorerList.getOpenDiagramSolutionEntry();
+      const diagramState = this.openDiagramStateService.loadDiagramState(uri);
 
       const diagramWithURIIsAlreadyOpened: boolean = diagram !== null;
       if (diagramWithURIIsAlreadyOpened) {
+        if (diagramState.metadata.isChanged === true) {
+          diagram.xml = diagramState.data.xml;
+        }
+
         return this.navigateToDetailView(diagram, solution);
       }
 
