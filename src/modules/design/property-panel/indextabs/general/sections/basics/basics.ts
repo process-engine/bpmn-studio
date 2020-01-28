@@ -245,9 +245,9 @@ export class BasicsSection implements ISection {
       return rootElement.id;
     });
 
-    const currentId: number = elementIds.indexOf(this.businessObjInPanel.id);
-    if (currentId >= 0) {
-      elementIds.splice(currentId, 1);
+    const currentElementIdIndex = elementIds.indexOf(this.businessObjInPanel.id);
+    if (currentElementIdIndex >= 0) {
+      elementIds.splice(currentElementIdIndex, 1);
     }
 
     return !elementIds.includes(id);
