@@ -218,18 +218,21 @@ export class SolutionExplorerPanel {
     });
 
     const persistedOpenDiagrams: Array<IDiagram> = this.solutionService.getOpenDiagrams();
-    persistedOpenDiagrams.forEach(async (diagram: IDiagram) => {
+    for (const persistedOpenDiagram of persistedOpenDiagrams) {
       try {
-        await this.solutionExplorerList.openDiagram(diagram.uri);
+        await this.solutionExplorerList.openDiagram(persistedOpenDiagram.uri);
       } catch {
         // Do nothing
       }
-    });
+    }
+
+    if (isRunningInElectron()) {
+      this.registerElectronHooks();
+    }
   }
 
   public async attached(): Promise<void> {
     if (isRunningInElectron()) {
-      this.registerElectronHooks();
       document.addEventListener('drop', this.openDiagramOnDropBehaviour);
     }
 
@@ -649,6 +652,7 @@ export class SolutionExplorerPanel {
 
   private electronFileOpeningHook = async (_: Event, pathToFile: string): Promise<void> => {
     const uri: string = pathToFile;
+
     this.openDiagramOrDisplayError(uri);
   };
 
