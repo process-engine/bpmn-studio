@@ -26,13 +26,13 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
     this.notificationService = notificationService;
   }
 
-  public async isLoggedIn(authority: string, identity: IIdentity): Promise<boolean> {
-    authority = this.formAuthority(authority);
+  public async isLoggedIn(authorityUrl: string, identity: IIdentity): Promise<boolean> {
+    authorityUrl = this.formAuthority(authorityUrl);
 
     let userIdentity: IUserIdentity;
 
     try {
-      userIdentity = await this.getUserIdentity(authority, identity);
+      userIdentity = await this.getUserIdentity(authorityUrl, identity);
     } catch (error) {
       return false;
     }
@@ -42,10 +42,10 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
     return userIdentityIsDefined;
   }
 
-  public async login(authority: string, refreshCallback: Function): Promise<ILoginResult> {
-    authority = this.formAuthority(authority);
+  public async login(authorityUrl: string, solutionUri: string, refreshCallback: Function): Promise<ILoginResult> {
+    authorityUrl = this.formAuthority(authorityUrl);
 
-    const identityServerIsNotReachable: boolean = !(await this.isAuthorityReachable(authority));
+    const identityServerIsNotReachable: boolean = !(await this.isAuthorityReachable(authorityUrl));
     if (identityServerIsNotReachable) {
       return undefined;
     }
@@ -54,12 +54,12 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
       async (resolve: Function): Promise<void> => {
         const ipcRenderer: any = (window as any).nodeRequire('electron').ipcRenderer;
 
-        ipcRenderer.on(`oidc-silent_refresh-${authority}`, async (event, tokenObject) => {
+        ipcRenderer.on(`oidc-silent_refresh-${solutionUri}`, async (event, tokenObject) => {
           const iamIdentity: IIdentity = {
             token: tokenObject.accessToken,
             userId: tokenObject.idToken,
           };
-          const identity: IUserIdentity = await this.getUserIdentity(authority, iamIdentity);
+          const identity: IUserIdentity = await this.getUserIdentity(authorityUrl, iamIdentity);
 
           const silentRefreshResult: ILoginResult = {
             identity: identity,
@@ -75,7 +75,7 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
             token: tokenObject.accessToken,
             userId: tokenObject.idToken,
           };
-          const identity: IUserIdentity = await this.getUserIdentity(authority, iamIdentity);
+          const identity: IUserIdentity = await this.getUserIdentity(authorityUrl, iamIdentity);
 
           const loginResult: ILoginResult = {
             identity: identity,
@@ -88,15 +88,15 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
           resolve(loginResult);
         });
 
-        ipcRenderer.send('oidc-login', authority);
+        ipcRenderer.send('oidc-login', {authorityUrl, solutionUri});
       },
     );
 
     return loginResultPromise;
   }
 
-  public async logout(authority: string, identity: IIdentity): Promise<void> {
-    authority = this.formAuthority(authority);
+  public async logout(authorityUrl: string, solutionUri: string, identity: IIdentity): Promise<void> {
+    authorityUrl = this.formAuthority(authorityUrl);
 
     const ipcRenderer: any = (window as any).nodeRequire('electron').ipcRenderer;
 
@@ -105,16 +105,16 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
         this.eventAggregator.publish(AuthenticationStateEvent.LOGOUT);
       }
 
-      ipcRenderer.removeAllListeners(`oidc-silent_refresh-${authority}`);
+      ipcRenderer.removeAllListeners(`oidc-silent_refresh-${solutionUri}`);
     });
 
-    ipcRenderer.send('oidc-logout', identity, authority);
+    ipcRenderer.send('oidc-logout', identity, {authorityUrl, solutionUri});
   }
 
-  public async getUserIdentity(authority: string, identity: IIdentity): Promise<IUserIdentity | null> {
-    authority = this.formAuthority(authority);
+  public async getUserIdentity(authorityUrl: string, identity: IIdentity): Promise<IUserIdentity | null> {
+    authorityUrl = this.formAuthority(authorityUrl);
 
-    const userInfoRequest: Request = new Request(`${authority}connect/userinfo`, {
+    const userInfoRequest: Request = new Request(`${authorityUrl}connect/userinfo`, {
       method: 'GET',
       mode: 'cors',
       referrer: 'no-referrer',
@@ -135,8 +135,8 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
     return userInfoResponse.json();
   }
 
-  private async isAuthorityReachable(authority: string): Promise<boolean> {
-    const configRequest: Request = new Request(`${authority}.well-known/openid-configuration`, {
+  private async isAuthorityReachable(authorityUrl: string): Promise<boolean> {
+    const configRequest: Request = new Request(`${authorityUrl}.well-known/openid-configuration`, {
       method: 'GET',
       mode: 'cors',
       referrer: 'no-referrer',
@@ -167,17 +167,17 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
     return false;
   }
 
-  private formAuthority(authority: string): string {
-    if (authority === undefined) {
+  private formAuthority(authorityUrl: string): string {
+    if (authorityUrl === undefined) {
       return undefined;
     }
 
-    const authorityDoesNotEndWithSlash: boolean = !authority.endsWith('/');
+    const authorityDoesNotEndWithSlash: boolean = !authorityUrl.endsWith('/');
 
     if (authorityDoesNotEndWithSlash) {
-      authority = `${authority}/`;
+      authorityUrl = `${authorityUrl}/`;
     }
 
-    return authority;
+    return authorityUrl;
   }
 }

@@ -1,7 +1,7 @@
 import queryString from 'querystring';
 import fetch from 'node-fetch';
 import nodeUrl from 'url';
-import {BrowserWindowConstructorOptions, Event as ElectronEvent} from 'electron';
+import {BrowserWindowConstructorOptions, Event as ElectronEvent, session} from 'electron';
 import crypto from 'crypto';
 import Bluebird from 'bluebird';
 
@@ -11,48 +11,66 @@ import {IOidcConfig, ITokenObject} from '../src/contracts/index';
 import electron = require('electron');
 
 const BrowserWindow = electron.BrowserWindow || electron.remote.BrowserWindow;
-const authoritiesToRefresh: Array<string> = [];
+const solutionsToRefresh: Array<string> = [];
 const refreshTimeouts: Map<string, any> = new Map();
+
+const identityServerCookieName = '.AspNetCore.Identity.Application';
+const cookieUrl = 'http://localhost';
 
 export default (
   config: IOidcConfig,
   windowParams: BrowserWindowConstructorOptions,
 ): {
-  getTokenObject: (authorityUrl: string) => Promise<ITokenObject>;
-  logout: (tokenObject: ITokenObject, authorityUrl: string) => Promise<boolean>;
-  startSilentRefreshing: (authorityUrl: string, tokenObject: ITokenObject, refreshCallback: Function) => void;
+  getTokenObject: (authorityUrl: string, solutionUri: string) => Promise<ITokenObject>;
+  logout: (authorityUrl: string, solutionUri: string, tokenObject: ITokenObject) => Promise<boolean>;
+  startSilentRefreshing: (
+    authorityUrl: string,
+    solutionUri: string,
+    tokenObject: ITokenObject,
+    refreshCallback: Function,
+  ) => void;
 } => {
-  function getTokenObjectForAuthorityUrl(authorityUrl): Promise<any> {
-    return getTokenObject(authorityUrl, config, windowParams);
+  function getTokenObjectForSolution(authorityUrl, solutionUri): Promise<any> {
+    return getTokenObject(authorityUrl, solutionUri, config, windowParams);
   }
 
-  function logoutViaTokenObjectAndAuthorityUrl(tokenObject: ITokenObject, authorityUrl: string): Promise<boolean> {
-    return logout(tokenObject, authorityUrl, config, windowParams);
+  function logoutForSolution(authorityUrl: string, solutionUri: string, tokenObject: ITokenObject): Promise<boolean> {
+    return logout(authorityUrl, solutionUri, tokenObject, config, windowParams);
   }
 
   function refreshTokenViaSilentRefresh(
     authorityUrl: string,
+    solutionUri: string,
     tokenObject: ITokenObject,
     refreshCallback: Function,
   ): void {
-    return startSilentRefreshing(authorityUrl, config, tokenObject, refreshCallback);
+    return startSilentRefreshing(authorityUrl, solutionUri, config, tokenObject, refreshCallback);
   }
 
   return {
-    getTokenObject: getTokenObjectForAuthorityUrl,
-    logout: logoutViaTokenObjectAndAuthorityUrl,
+    getTokenObject: getTokenObjectForSolution,
+    logout: logoutForSolution,
     startSilentRefreshing: refreshTokenViaSilentRefresh,
   };
 };
 
-function getTokenObject(
+async function getTokenObject(
   authorityUrl: string,
+  solutionUri: string,
   config: IOidcConfig,
   windowParams: BrowserWindowConstructorOptions,
 ): Promise<{
   idToken: string;
   accessToken: string;
 }> {
+  if (!(await identityServerCookieIsEmpty())) {
+    await waitUntillCookieIsEmpty();
+  }
+
+  if (await solutionHasIdentityServerCookie(solutionUri)) {
+    await setIdentityServerCookie(solutionUri);
+  }
+
   // Build the Url Params from the Config.
   const urlParams = {
     client_id: config.clientId,
@@ -93,7 +111,14 @@ function getTokenObject(
         event.preventDefault();
       }
 
-      redirectCallback(url, authWindow, config, resolve, reject);
+      const redirectCallbackResolved = async (tokenObject: ITokenObject): Promise<void> => {
+        await setCurrentIdentityServerCookieForSolution(solutionUri);
+        await removeCurrentIdentityServerCookie();
+
+        resolve(tokenObject);
+      };
+
+      redirectCallback(url, authWindow, config, redirectCallbackResolved, reject);
     });
   });
 }
@@ -164,9 +189,10 @@ function redirectCallback(
   }
 }
 
-function logout(
-  tokenObject: ITokenObject,
+async function logout(
   authorityUrl: string,
+  solutionUri: string,
+  tokenObject: ITokenObject,
   config: IOidcConfig,
   windowParams: BrowserWindowConstructorOptions,
 ): Promise<boolean> {
@@ -177,7 +203,9 @@ function logout(
 
   const endSessionUrl = `${authorityUrl}connect/endsession?${queryString.stringify(urlParams)}`;
 
-  stopSilentRefreshing(authorityUrl);
+  stopSilentRefreshing(solutionUri);
+
+  await removeIdentityServerCookieOfSolution(solutionUri);
 
   return new Promise(
     async (resolve: Function): Promise<void> => {
@@ -205,6 +233,7 @@ function logout(
 
 async function silentRefresh(
   authorityUrl: string,
+  solutionUri: string,
   config: IOidcConfig,
   tokenObject: ITokenObject,
   refreshCallback: Function,
@@ -215,11 +244,15 @@ async function silentRefresh(
   const tokenRefreshInterval = tokenObject.expiresIn * tokenRefreshFactor * secondsInMilisecondsFactor;
 
   const timeout = wait(tokenRefreshInterval);
-  refreshTimeouts.set(authorityUrl, timeout);
+  refreshTimeouts.set(solutionUri, timeout);
   await timeout;
 
-  if (!authoritiesToRefresh.includes(authorityUrl)) {
+  if (!solutionsToRefresh.includes(solutionUri)) {
     return;
+  }
+
+  if (await solutionHasIdentityServerCookie(solutionUri)) {
+    await setIdentityServerCookie(solutionUri);
   }
 
   // Build the Url Params from the Config.
@@ -261,10 +294,12 @@ async function silentRefresh(
       event.preventDefault();
     }
 
-    const redirectCallbackResolved = (token: ITokenObject): void => {
+    const redirectCallbackResolved = async (token: ITokenObject): Promise<void> => {
       refreshCallback(token);
+      await setCurrentIdentityServerCookieForSolution(solutionUri);
+      await removeCurrentIdentityServerCookie();
 
-      silentRefresh(authorityUrl, config, tokenObject, refreshCallback);
+      silentRefresh(authorityUrl, solutionUri, config, token, refreshCallback);
     };
 
     const redirectCallbackRejected = (error: Error): void => {
@@ -272,7 +307,7 @@ async function silentRefresh(
         throw error;
       }
 
-      stopSilentRefreshing(authorityUrl);
+      stopSilentRefreshing(solutionUri);
     };
 
     redirectCallback(url, authWindow, config, redirectCallbackResolved, redirectCallbackRejected);
@@ -281,23 +316,24 @@ async function silentRefresh(
 
 function startSilentRefreshing(
   authorityUrl: string,
+  solutionUri: string,
   config: IOidcConfig,
   tokenObject: ITokenObject,
   refreshCallback: Function,
 ): void {
-  authoritiesToRefresh.push(authorityUrl);
+  solutionsToRefresh.push(solutionUri);
 
-  silentRefresh(authorityUrl, config, tokenObject, refreshCallback);
+  silentRefresh(authorityUrl, solutionUri, config, tokenObject, refreshCallback);
 }
 
-function stopSilentRefreshing(authorityUrl: string): void {
-  if (refreshTimeouts.has(authorityUrl)) {
-    refreshTimeouts.get(authorityUrl).cancel();
-    refreshTimeouts.delete(authorityUrl);
+function stopSilentRefreshing(solutionUri: string): void {
+  if (refreshTimeouts.has(solutionUri)) {
+    refreshTimeouts.get(solutionUri).cancel();
+    refreshTimeouts.delete(solutionUri);
   }
-  if (authoritiesToRefresh.includes(authorityUrl)) {
-    const authorityToRemove = authoritiesToRefresh.findIndex((authority) => authority === authorityUrl);
-    authoritiesToRefresh.splice(authorityToRemove, 0);
+  if (solutionsToRefresh.includes(solutionUri)) {
+    const solutionToReemove = solutionsToRefresh.findIndex((solution) => solution === solutionUri);
+    solutionsToRefresh.splice(solutionToReemove, 1);
   }
 }
 
@@ -330,4 +366,66 @@ function getRandomString(length: number): string {
   }
 
   return result;
+}
+
+async function getIdentityServerCookie(): Promise<electron.Cookie> {
+  const cookies = await session.defaultSession.cookies.get({});
+
+  return cookies.find((cookie) => {
+    return cookie.name === identityServerCookieName;
+  });
+}
+
+async function getIdentityServerCookieForSolution(solutionUri: string): Promise<electron.Cookie> {
+  const cookies = await session.defaultSession.cookies.get({});
+
+  return cookies.find((cookie) => {
+    return cookie.name === getCookieNameForSolution(solutionUri);
+  });
+}
+
+async function setIdentityServerCookie(solutionUri: string): Promise<void> {
+  const cookieToSet = await getIdentityServerCookieForSolution(solutionUri);
+
+  const cookiesSetDetails: electron.CookiesSetDetails = Object.assign(cookieToSet, {url: cookieUrl});
+  cookiesSetDetails.name = identityServerCookieName;
+
+  session.defaultSession.cookies.set(cookiesSetDetails);
+}
+
+async function setCurrentIdentityServerCookieForSolution(solutionUri: string): Promise<void> {
+  const currentIdentityServerCookie = await getIdentityServerCookie();
+
+  const cookiesSetDetails: electron.CookiesSetDetails = Object.assign(currentIdentityServerCookie, {
+    url: cookieUrl,
+  });
+  cookiesSetDetails.name = getCookieNameForSolution(solutionUri);
+
+  session.defaultSession.cookies.set(cookiesSetDetails);
+}
+
+function removeCurrentIdentityServerCookie(): Promise<void> {
+  return session.defaultSession.cookies.remove(cookieUrl, identityServerCookieName);
+}
+
+function removeIdentityServerCookieOfSolution(solutionUri: string): Promise<void> {
+  return session.defaultSession.cookies.remove(cookieUrl, getCookieNameForSolution(solutionUri));
+}
+
+async function identityServerCookieIsEmpty(): Promise<boolean> {
+  return (await getIdentityServerCookie()) === undefined;
+}
+
+async function solutionHasIdentityServerCookie(solutionUri: string): Promise<boolean> {
+  return (await getIdentityServerCookieForSolution(solutionUri)) !== undefined;
+}
+
+async function waitUntillCookieIsEmpty(): Promise<void> {
+  while (!(await identityServerCookieIsEmpty())) {
+    await wait(100);
+  }
+}
+
+function getCookieNameForSolution(solutionUri: string): string {
+  return `identity-server-cookie__${solutionUri}`;
 }

@@ -248,14 +248,14 @@ function initializeOidc(): void {
 
   const electronOidcInstance = electronOidc(oidcConfig, windowParams);
 
-  ipcMain.on('oidc-login', (event, authorityUrl) => {
-    electronOidcInstance.getTokenObject(authorityUrl).then(
+  ipcMain.on('oidc-login', (event, {authorityUrl, solutionUri}) => {
+    electronOidcInstance.getTokenObject(authorityUrl, solutionUri).then(
       async (token) => {
         const refreshCallback: Function = (tokenObject: ITokenObject) => {
-          event.sender.send(`oidc-silent_refresh-${authorityUrl}`, tokenObject);
+          event.sender.send(`oidc-silent_refresh-${solutionUri}`, tokenObject);
         };
 
-        electronOidcInstance.startSilentRefreshing(authorityUrl, token, refreshCallback);
+        electronOidcInstance.startSilentRefreshing(authorityUrl, solutionUri, token, refreshCallback);
         event.sender.send('oidc-login-reply', token);
       },
       (err) => {
@@ -264,8 +264,8 @@ function initializeOidc(): void {
     );
   });
 
-  ipcMain.on('oidc-logout', (event, tokenObject, authorityUrl) => {
-    electronOidcInstance.logout(tokenObject, authorityUrl).then(
+  ipcMain.on('oidc-logout', (event, tokenObject, {authorityUrl, solutionUri}) => {
+    electronOidcInstance.logout(authorityUrl, solutionUri, tokenObject).then(
       (logoutWasSuccessful) => {
         event.sender.send('oidc-logout-reply', logoutWasSuccessful);
       },

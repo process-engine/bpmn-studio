@@ -398,7 +398,11 @@ export class SolutionExplorerList {
       this.eventAggregator.publish(AuthenticationStateEvent.LOGIN);
     };
 
-    const result: ILoginResult = await this.authenticationService.login(solutionEntry.authority, onTokenRefresh);
+    const result: ILoginResult = await this.authenticationService.login(
+      solutionEntry.authority,
+      solutionEntry.uri,
+      onTokenRefresh,
+    );
 
     const couldNotConnectToAuthority: boolean = result === undefined;
     if (couldNotConnectToAuthority) {
@@ -426,7 +430,7 @@ export class SolutionExplorerList {
   }
 
   public async logout(solutionEntry: ISolutionEntry): Promise<void> {
-    await this.authenticationService.logout(solutionEntry.authority, solutionEntry.identity);
+    await this.authenticationService.logout(solutionEntry.authority, solutionEntry.uri, solutionEntry.identity);
 
     solutionEntry.identity = this.createIdentityForSolutionExplorer();
     solutionEntry.isLoggedIn = false;
