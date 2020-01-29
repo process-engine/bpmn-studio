@@ -203,10 +203,6 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
               if (diagramWasNotChangedOutsideOfTheStudio) {
                 const diagramWasRecoveredToTheStateWhenItWasInitiallyOpened: boolean = diagramState.data.xml !== xml;
                 if (diagramWasRecoveredToTheStateWhenItWasInitiallyOpened) {
-                  diagramState.data.xml = xml;
-                  this.openDiagramStateService.updateDiagramState(diagram.uri, diagramState);
-
-                  this.eventAggregator.publish(environment.events.diagramNeedsToBeUpdated);
                   if (!diagramState.metadata.isChanged) {
                     diagramState.data.xml = xml;
 
