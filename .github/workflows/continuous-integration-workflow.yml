@@ -123,47 +123,47 @@ jobs:
         name: package_json
         path: "."
 
-    - name: Install npm Dependencies
-      run: |
-        npm ci
-        ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+    # - name: Install npm Dependencies
+    #   run: |
+    #     npm ci
+    #     ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
 
-    - name: Build the Electron App
-      run: npm run electron-build-macos
-      env:
-        CSC_LINK: ${{ secrets.CSC_LINK }}
+    # - name: Build the Electron App
+    #   run: npm run electron-build-macos
+    #   env:
+    #     CSC_LINK: ${{ secrets.CSC_LINK }}
 
-    - name: Run the Tests
-      run: npm test
+    # - name: Run the Tests
+    #   run: npm test
 
-    - name: Prepare macOS Bundle
-      run: |
-        mkdir dist_electron_macos
-        cp dist/electron/bpmn-studio-setup**.zip dist_electron_macos
-        cp dist/electron/bpmn-studio-setup**.dmg dist_electron_macos
+    # - name: Prepare macOS Bundle
+    #   run: |
+    #     mkdir dist_electron_macos
+    #     cp dist/electron/bpmn-studio-setup**.zip dist_electron_macos
+    #     cp dist/electron/bpmn-studio-setup**.dmg dist_electron_macos
 
-    - name: Prepare macOS Bundle for GitHub Release
-      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
-      run: |
-        cp dist/electron/bpmn-studio-setup**.dmg.blockmap dist_electron_macos
-        cp dist/electron/latest-mac.yml dist_electron_macos
+    # - name: Prepare macOS Bundle for GitHub Release
+    #   if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
+    #   run: |
+    #     cp dist/electron/bpmn-studio-setup**.dmg.blockmap dist_electron_macos
+    #     cp dist/electron/latest-mac.yml dist_electron_macos
 
-    - uses: actions/upload-artifact@master
-      name: Upload Electron macOS app
-      with:
-        name: dist_electron_macos
-        path: dist_electron_macos
+    # - uses: actions/upload-artifact@master
+    #   name: Upload Electron macOS app
+    #   with:
+    #     name: dist_electron_macos
+    #     path: dist_electron_macos
 
-    - name: Slack Notification
-      uses: homoluctus/slatify@master
-      if: always()
-      with:
-        type: ${{ job.status }}
-        job_name: 'macOS Tests'
-        mention_if: 'always'
-        url: ${{ secrets.SLACK_WEBHOOK }}
-        commit: true
-        token: ${{ secrets.GH_TOKEN }}
+    # - name: Slack Notification
+    #   uses: homoluctus/slatify@master
+    #   if: always()
+    #   with:
+    #     type: ${{ job.status }}
+    #     job_name: 'macOS Tests'
+    #     mention_if: 'always'
+    #     url: ${{ secrets.SLACK_WEBHOOK }}
+    #     commit: true
+    #     token: ${{ secrets.GH_TOKEN }}
 
   build_and_test_windows:
     name: "Build & Test (Windows)"
@@ -182,51 +182,51 @@ jobs:
         name: package_json
         path: "."
 
-    - name: Install npm Dependencies
-      run: |
-        npm ci
-        ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
-      shell: powershell
+    # - name: Install npm Dependencies
+    #   run: |
+    #     npm ci
+    #     ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+    #   shell: powershell
 
-    - name: Install Windows Build Tools
-      run: npm --vs2015 install --global windows-build-tools
-      shell: powershell
+    # - name: Install Windows Build Tools
+    #   run: npm --vs2015 install --global windows-build-tools
+    #   shell: powershell
 
-    - name: Build the Electron App
-      run: npm run electron-build-windows
+    # - name: Build the Electron App
+    #   run: npm run electron-build-windows
 
-    - name: Run the Tests
-      run: npm test
+    # - name: Run the Tests
+    #   run: npm test
 
-    - name: Prepare Windows Bundle
-      run: |
-        mkdir dist_electron_windows
-        copy-item .\dist\electron\bpmn-studio-setup-**.exe .\dist_electron_windows\
-      shell: powershell
+    # - name: Prepare Windows Bundle
+    #   run: |
+    #     mkdir dist_electron_windows
+    #     copy-item .\dist\electron\bpmn-studio-setup-**.exe .\dist_electron_windows\
+    #   shell: powershell
 
-    - name: Prepare Windows Bundle for GitHub Release
-      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
-      run: |
-        copy-item .\dist\electron\bpmn-studio-setup-**.exe.blockmap .\dist_electron_windows\
-        copy-item .\dist\electron\latest.yml .\dist_electron_windows\
-      shell: powershell
+    # - name: Prepare Windows Bundle for GitHub Release
+    #   if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
+    #   run: |
+    #     copy-item .\dist\electron\bpmn-studio-setup-**.exe.blockmap .\dist_electron_windows\
+    #     copy-item .\dist\electron\latest.yml .\dist_electron_windows\
+    #   shell: powershell
 
-    - uses: actions/upload-artifact@master
-      name: Upload Electron Windows App
-      with:
-        name: dist_electron_windows
-        path: dist_electron_windows
+    # - uses: actions/upload-artifact@master
+    #   name: Upload Electron Windows App
+    #   with:
+    #     name: dist_electron_windows
+    #     path: dist_electron_windows
 
-    - name: Slack Notification
-      uses: homoluctus/slatify@master
-      if: always()
-      with:
-        type: ${{ job.status }}
-        job_name: 'Windows Tests'
-        mention_if: 'always'
-        url: ${{ secrets.SLACK_WEBHOOK }}
-        commit: true
-        token: ${{ secrets.GH_TOKEN }}
+    # - name: Slack Notification
+    #   uses: homoluctus/slatify@master
+    #   if: always()
+    #   with:
+    #     type: ${{ job.status }}
+    #     job_name: 'Windows Tests'
+    #     mention_if: 'always'
+    #     url: ${{ secrets.SLACK_WEBHOOK }}
+    #     commit: true
+    #     token: ${{ secrets.GH_TOKEN }}
 
   prepare_and_tag_version:
     name: "Commit & Tag Version"
@@ -245,16 +245,16 @@ jobs:
         name: package_json
         path: "."
 
-    - name: Install CI Tools
-      run: npm ci
+    # - name: Install CI Tools
+    #   run: npm ci
 
-    - name: Commit and Tag
-      run: |
-        ./node_modules/.bin/ci_tools commit-and-tag-version --only-on-primary-branches
-        ./node_modules/.bin/ci_tools update-github-release --only-on-primary-branches --use-title-and-text-from-git-tag
-      env:
-        GH_USER: ${{ secrets.GH_USER }}
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    # - name: Commit and Tag
+    #   run: |
+    #     ./node_modules/.bin/ci_tools commit-and-tag-version --only-on-primary-branches
+    #     ./node_modules/.bin/ci_tools update-github-release --only-on-primary-branches --use-title-and-text-from-git-tag
+    #   env:
+    #     GH_USER: ${{ secrets.GH_USER }}
+    #     GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
   publish_npm:
     name: "Publish npm Package"
