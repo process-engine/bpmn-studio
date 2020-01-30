@@ -4,6 +4,7 @@ import nodeUrl from 'url';
 import {BrowserWindowConstructorOptions, Event as ElectronEvent, session} from 'electron';
 import crypto from 'crypto';
 import Bluebird from 'bluebird';
+import Store from 'electron-store';
 
 import {IOidcConfig, ITokenObject} from '../src/contracts/index';
 
@@ -16,6 +17,7 @@ const refreshTimeouts: Map<string, any> = new Map();
 
 const identityServerCookieName = '.AspNetCore.Identity.Application';
 const cookieUrl = 'http://localhost';
+const solutionCookieStore = new Store();
 
 export default (
   config: IOidcConfig,
@@ -189,7 +191,7 @@ function redirectCallback(
   }
 }
 
-async function logout(
+function logout(
   authorityUrl: string,
   solutionUri: string,
   tokenObject: ITokenObject,
@@ -205,7 +207,7 @@ async function logout(
 
   stopSilentRefreshing(solutionUri);
 
-  await removeIdentityServerCookieOfSolution(solutionUri);
+  removeIdentityServerCookieOfSolution(solutionUri);
 
   return new Promise(
     async (resolve: Function): Promise<void> => {
@@ -377,11 +379,9 @@ async function getIdentityServerCookie(): Promise<electron.Cookie> {
 }
 
 async function getIdentityServerCookieForSolution(solutionUri: string): Promise<electron.Cookie> {
-  const cookies = await session.defaultSession.cookies.get({});
+  const persistedCookie = solutionCookieStore.get(getCookieNameForSolution(solutionUri));
 
-  return cookies.find((cookie) => {
-    return cookie.name === getCookieNameForSolution(solutionUri);
-  });
+  return persistedCookie ? JSON.parse(persistedCookie) : undefined;
 }
 
 async function setIdentityServerCookie(solutionUri: string): Promise<void> {
@@ -396,20 +396,15 @@ async function setIdentityServerCookie(solutionUri: string): Promise<void> {
 async function setCurrentIdentityServerCookieForSolution(solutionUri: string): Promise<void> {
   const currentIdentityServerCookie = await getIdentityServerCookie();
 
-  const cookiesSetDetails: electron.CookiesSetDetails = Object.assign(currentIdentityServerCookie, {
-    url: cookieUrl,
-  });
-  cookiesSetDetails.name = getCookieNameForSolution(solutionUri);
-
-  session.defaultSession.cookies.set(cookiesSetDetails);
+  solutionCookieStore.set(getCookieNameForSolution(solutionUri), JSON.stringify(currentIdentityServerCookie));
 }
 
 function removeCurrentIdentityServerCookie(): Promise<void> {
   return session.defaultSession.cookies.remove(cookieUrl, identityServerCookieName);
 }
 
-function removeIdentityServerCookieOfSolution(solutionUri: string): Promise<void> {
-  return session.defaultSession.cookies.remove(cookieUrl, getCookieNameForSolution(solutionUri));
+function removeIdentityServerCookieOfSolution(solutionUri: string): void {
+  solutionCookieStore.delete(getCookieNameForSolution(solutionUri));
 }
 
 async function identityServerCookieIsEmpty(): Promise<boolean> {
@@ -417,7 +412,7 @@ async function identityServerCookieIsEmpty(): Promise<boolean> {
 }
 
 async function solutionHasIdentityServerCookie(solutionUri: string): Promise<boolean> {
-  return (await getIdentityServerCookieForSolution(solutionUri)) !== undefined;
+  return solutionCookieStore.has(getCookieNameForSolution(solutionUri));
 }
 
 async function waitUntillCookieIsEmpty(): Promise<void> {
