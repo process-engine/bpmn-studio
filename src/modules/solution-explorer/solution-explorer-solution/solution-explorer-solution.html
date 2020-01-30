@@ -17,7 +17,7 @@
       <div show.bind="canRenameDiagram" class="diagram-contextmenu__entry" click.delegate="duplicateDiagram()">
         Duplicate
       </div>
-      <div class="diagram-contextmenu__entry" click.delegate="deployDiagram()">
+      <div show.bind="!displayedSolutionEntry.uri.startsWith('http')" class="diagram-contextmenu__entry" click.delegate="deployDiagram()">
         Deploy
       </div>
     </div>
