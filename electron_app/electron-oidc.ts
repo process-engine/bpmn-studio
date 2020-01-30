@@ -66,7 +66,7 @@ async function getTokenObject(
   accessToken: string;
 }> {
   if (!(await identityServerCookieIsEmpty())) {
-    await waitUntillCookieIsEmpty();
+    await waitUntilCookieIsEmpty();
   }
 
   if (await solutionHasIdentityServerCookie(solutionUri)) {
@@ -415,7 +415,7 @@ async function solutionHasIdentityServerCookie(solutionUri: string): Promise<boo
   return solutionCookieStore.has(getCookieNameForSolution(solutionUri));
 }
 
-async function waitUntillCookieIsEmpty(): Promise<void> {
+async function waitUntilCookieIsEmpty(): Promise<void> {
   while (!(await identityServerCookieIsEmpty())) {
     await wait(100);
   }
