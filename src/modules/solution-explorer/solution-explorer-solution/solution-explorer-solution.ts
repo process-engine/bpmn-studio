@@ -538,6 +538,10 @@ export class SolutionExplorerSolution {
   }
 
   public activateContextMenu(event: MouseEvent, diagram: IDiagram): void {
+    if (solutionIsRemoteSolution(this.displayedSolutionEntry.uri)) {
+      return;
+    }
+
     this.diagramInContextMenu = diagram;
 
     this.diagramContextMenu.style.top = `${event.y}px`;
