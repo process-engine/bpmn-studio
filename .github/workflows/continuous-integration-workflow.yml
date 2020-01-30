@@ -360,7 +360,7 @@ jobs:
     name: "Build & Publish Docker Image"
     needs: prepare_and_tag_version
     runs-on: ubuntu-18.04
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
+    #if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
 
     steps:
     - uses: actions/checkout@v1
