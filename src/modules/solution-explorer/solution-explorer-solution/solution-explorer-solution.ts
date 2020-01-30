@@ -663,7 +663,7 @@ export class SolutionExplorerSolution {
     return (
       !this.displayedSolutionEntry.isOpenDiagram &&
       this.openedSolution &&
-      !this.isUriFromRemoteSolution(this.openedSolution.uri)
+      !solutionIsRemoteSolution(this.openedSolution.uri)
     );
   }
 
@@ -741,7 +741,7 @@ export class SolutionExplorerSolution {
   }
 
   public async openDiagram(diagram: IDiagram): Promise<void> {
-    const diagramIsFromLocalSolution: boolean = !this.isUriFromRemoteSolution(diagram.uri);
+    const diagramIsFromLocalSolution: boolean = !solutionIsRemoteSolution(diagram.uri);
 
     if (diagramIsFromLocalSolution) {
       const diagramIsNotYetOpened: boolean = !this.openDiagramService
@@ -1536,7 +1536,7 @@ export class SolutionExplorerSolution {
         // The solution may have changed on the file system.
         await this.updateSolution();
 
-        const isRemoteSolution: boolean = this.isUriFromRemoteSolution(this.openedSolution.uri);
+        const isRemoteSolution: boolean = solutionIsRemoteSolution(this.openedSolution.uri);
 
         let expectedDiagramUri: string;
         if (isRemoteSolution) {
@@ -1552,9 +1552,5 @@ export class SolutionExplorerSolution {
       .withMessage('A diagram with that name already exists.')
       .on(this.diagramRenamingState)
       .on(this.diagramCreationState);
-  }
-
-  private isUriFromRemoteSolution(uri: string): boolean {
-    return solutionIsRemoteSolution(uri);
   }
 }
