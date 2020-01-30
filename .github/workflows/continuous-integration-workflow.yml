@@ -81,11 +81,11 @@ jobs:
       run: npm test
 
     - name: Create Tarball
-      #if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
+      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
       run: npm run create-tarball
 
     - name: Stash Tarball
-      #if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
+      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
       uses: actions/upload-artifact@master
       with:
         name: bpmn-studio_tar
@@ -123,47 +123,47 @@ jobs:
         name: package_json
         path: "."
 
-    # - name: Install npm Dependencies
-    #   run: |
-    #     npm ci
-    #     ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+    - name: Install npm Dependencies
+      run: |
+        npm ci
+        ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
 
-    # - name: Build the Electron App
-    #   run: npm run electron-build-macos
-    #   env:
-    #     CSC_LINK: ${{ secrets.CSC_LINK }}
+    - name: Build the Electron App
+      run: npm run electron-build-macos
+      env:
+        CSC_LINK: ${{ secrets.CSC_LINK }}
 
-    # - name: Run the Tests
-    #   run: npm test
+    - name: Run the Tests
+      run: npm test
 
-    # - name: Prepare macOS Bundle
-    #   run: |
-    #     mkdir dist_electron_macos
-    #     cp dist/electron/bpmn-studio-setup**.zip dist_electron_macos
-    #     cp dist/electron/bpmn-studio-setup**.dmg dist_electron_macos
+    - name: Prepare macOS Bundle
+      run: |
+        mkdir dist_electron_macos
+        cp dist/electron/bpmn-studio-setup**.zip dist_electron_macos
+        cp dist/electron/bpmn-studio-setup**.dmg dist_electron_macos
 
-    # - name: Prepare macOS Bundle for GitHub Release
-    #   if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
-    #   run: |
-    #     cp dist/electron/bpmn-studio-setup**.dmg.blockmap dist_electron_macos
-    #     cp dist/electron/latest-mac.yml dist_electron_macos
+    - name: Prepare macOS Bundle for GitHub Release
+      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
+      run: |
+        cp dist/electron/bpmn-studio-setup**.dmg.blockmap dist_electron_macos
+        cp dist/electron/latest-mac.yml dist_electron_macos
 
-    # - uses: actions/upload-artifact@master
-    #   name: Upload Electron macOS app
-    #   with:
-    #     name: dist_electron_macos
-    #     path: dist_electron_macos
+    - uses: actions/upload-artifact@master
+      name: Upload Electron macOS app
+      with:
+        name: dist_electron_macos
+        path: dist_electron_macos
 
-    # - name: Slack Notification
-    #   uses: homoluctus/slatify@master
-    #   if: always()
-    #   with:
-    #     type: ${{ job.status }}
-    #     job_name: 'macOS Tests'
-    #     mention_if: 'always'
-    #     url: ${{ secrets.SLACK_WEBHOOK }}
-    #     commit: true
-    #     token: ${{ secrets.GH_TOKEN }}
+    - name: Slack Notification
+      uses: homoluctus/slatify@master
+      if: always()
+      with:
+        type: ${{ job.status }}
+        job_name: 'macOS Tests'
+        mention_if: 'always'
+        url: ${{ secrets.SLACK_WEBHOOK }}
+        commit: true
+        token: ${{ secrets.GH_TOKEN }}
 
   build_and_test_windows:
     name: "Build & Test (Windows)"
@@ -182,51 +182,51 @@ jobs:
         name: package_json
         path: "."
 
-    # - name: Install npm Dependencies
-    #   run: |
-    #     npm ci
-    #     ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
-    #   shell: powershell
+    - name: Install npm Dependencies
+      run: |
+        npm ci
+        ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+      shell: powershell
 
-    # - name: Install Windows Build Tools
-    #   run: npm --vs2015 install --global windows-build-tools
-    #   shell: powershell
+    - name: Install Windows Build Tools
+      run: npm --vs2015 install --global windows-build-tools
+      shell: powershell
 
-    # - name: Build the Electron App
-    #   run: npm run electron-build-windows
+    - name: Build the Electron App
+      run: npm run electron-build-windows
 
-    # - name: Run the Tests
-    #   run: npm test
+    - name: Run the Tests
+      run: npm test
 
-    # - name: Prepare Windows Bundle
-    #   run: |
-    #     mkdir dist_electron_windows
-    #     copy-item .\dist\electron\bpmn-studio-setup-**.exe .\dist_electron_windows\
-    #   shell: powershell
+    - name: Prepare Windows Bundle
+      run: |
+        mkdir dist_electron_windows
+        copy-item .\dist\electron\bpmn-studio-setup-**.exe .\dist_electron_windows\
+      shell: powershell
 
-    # - name: Prepare Windows Bundle for GitHub Release
-    #   if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
-    #   run: |
-    #     copy-item .\dist\electron\bpmn-studio-setup-**.exe.blockmap .\dist_electron_windows\
-    #     copy-item .\dist\electron\latest.yml .\dist_electron_windows\
-    #   shell: powershell
+    - name: Prepare Windows Bundle for GitHub Release
+      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
+      run: |
+        copy-item .\dist\electron\bpmn-studio-setup-**.exe.blockmap .\dist_electron_windows\
+        copy-item .\dist\electron\latest.yml .\dist_electron_windows\
+      shell: powershell
 
-    # - uses: actions/upload-artifact@master
-    #   name: Upload Electron Windows App
-    #   with:
-    #     name: dist_electron_windows
-    #     path: dist_electron_windows
+    - uses: actions/upload-artifact@master
+      name: Upload Electron Windows App
+      with:
+        name: dist_electron_windows
+        path: dist_electron_windows
 
-    # - name: Slack Notification
-    #   uses: homoluctus/slatify@master
-    #   if: always()
-    #   with:
-    #     type: ${{ job.status }}
-    #     job_name: 'Windows Tests'
-    #     mention_if: 'always'
-    #     url: ${{ secrets.SLACK_WEBHOOK }}
-    #     commit: true
-    #     token: ${{ secrets.GH_TOKEN }}
+    - name: Slack Notification
+      uses: homoluctus/slatify@master
+      if: always()
+      with:
+        type: ${{ job.status }}
+        job_name: 'Windows Tests'
+        mention_if: 'always'
+        url: ${{ secrets.SLACK_WEBHOOK }}
+        commit: true
+        token: ${{ secrets.GH_TOKEN }}
 
   prepare_and_tag_version:
     name: "Commit & Tag Version"
@@ -245,122 +245,122 @@ jobs:
         name: package_json
         path: "."
 
-    # - name: Install CI Tools
-    #   run: npm ci
+    - name: Install CI Tools
+      run: npm ci
 
-    # - name: Commit and Tag
-    #   run: |
-    #     ./node_modules/.bin/ci_tools commit-and-tag-version --only-on-primary-branches
-    #     ./node_modules/.bin/ci_tools update-github-release --only-on-primary-branches --use-title-and-text-from-git-tag
-    #   env:
-    #     GH_USER: ${{ secrets.GH_USER }}
-    #     GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    - name: Commit and Tag
+      run: |
+        ./node_modules/.bin/ci_tools commit-and-tag-version --only-on-primary-branches
+        ./node_modules/.bin/ci_tools update-github-release --only-on-primary-branches --use-title-and-text-from-git-tag
+      env:
+        GH_USER: ${{ secrets.GH_USER }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  # publish_npm:
-  #   name: "Publish npm Package"
-  #   needs: prepare_and_tag_version
-  #   runs-on: ubuntu-18.04
-  #   steps:
-  #   - uses: actions/checkout@v1
-  #   - name: Use Node.js 12.x
-  #     uses: actions/setup-node@v1
-  #     with:
-  #       node-version: 12.x
+  publish_npm:
+    name: "Publish npm Package"
+    needs: prepare_and_tag_version
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js 12.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
 
-  #   - name: Unstash package.json
-  #     uses: actions/download-artifact@master
-  #     with:
-  #       name: package_json
-  #       path: "."
+    - name: Unstash package.json
+      uses: actions/download-artifact@master
+      with:
+        name: package_json
+        path: "."
 
-  #   - name: Install CI Tools
-  #     run: npm ci
+    - name: Install CI Tools
+      run: npm ci
 
-  #   - name: Publish npm package
-  #     run: ./node_modules/.bin/ci_tools publish-npm-package --create-tag-from-branch-name
-  #     env:
-  #       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    - name: Publish npm package
+      run: ./node_modules/.bin/ci_tools publish-npm-package --create-tag-from-branch-name
+      env:
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-  # publish_github:
-  #   name: "Publish GitHub Release"
-  #   needs: prepare_and_tag_version
-  #   runs-on: ubuntu-18.04
-  #   if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
+  publish_github:
+    name: "Publish GitHub Release"
+    needs: prepare_and_tag_version
+    runs-on: ubuntu-18.04
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
 
-  #   steps:
-  #   - uses: actions/checkout@v1
+    steps:
+    - uses: actions/checkout@v1
 
-  #   - name: Use Node.js 12.x
-  #     uses: actions/setup-node@v1
-  #     with:
-  #       node-version: 12.x
+    - name: Use Node.js 12.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
 
-  #   - name: Unstash package.json
-  #     uses: actions/download-artifact@master
-  #     with:
-  #       name: package_json
-  #       path: "."
+    - name: Unstash package.json
+      uses: actions/download-artifact@master
+      with:
+        name: package_json
+        path: "."
 
-  #   - name: Unstash macOS Electron App
-  #     uses: actions/download-artifact@master
-  #     with:
-  #       name: dist_electron_macos
-  #       path: "dist/electron"
+    - name: Unstash macOS Electron App
+      uses: actions/download-artifact@master
+      with:
+        name: dist_electron_macos
+        path: "dist/electron"
 
-  #   - name: Unstash Windows Electron App
-  #     uses: actions/download-artifact@master
-  #     with:
-  #       name: dist_electron_windows
-  #       path: "dist/electron"
+    - name: Unstash Windows Electron App
+      uses: actions/download-artifact@master
+      with:
+        name: dist_electron_windows
+        path: "dist/electron"
 
-  #   - name: Install CI Tools
-  #     run: npm ci
+    - name: Install CI Tools
+      run: npm ci
 
-  #   - name: Upload to GitHub
-  #     run: |
-  #       ./node_modules/.bin/ci_tools update-github-release \
-  #                             --assets dist/electron/bpmn-studio-setup-*.exe \
-  #                             --assets dist/electron/bpmn-studio-setup-*.exe.blockmap \
-  #                             --assets dist/electron/bpmn-studio-setup-*.zip \
-  #                             --assets dist/electron/bpmn-studio-setup-*.dmg \
-  #                             --assets dist/electron/bpmn-studio-setup-*.dmg.blockmap \
-  #                             --assets dist/electron/latest-mac.yml \
-  #                             --assets dist/electron/latest.yml
-  #     env:
-  #       GH_USER: ${{ secrets.GH_USER }}
-  #       GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    - name: Upload to GitHub
+      run: |
+        ./node_modules/.bin/ci_tools update-github-release \
+                              --assets dist/electron/bpmn-studio-setup-*.exe \
+                              --assets dist/electron/bpmn-studio-setup-*.exe.blockmap \
+                              --assets dist/electron/bpmn-studio-setup-*.zip \
+                              --assets dist/electron/bpmn-studio-setup-*.dmg \
+                              --assets dist/electron/bpmn-studio-setup-*.dmg.blockmap \
+                              --assets dist/electron/latest-mac.yml \
+                              --assets dist/electron/latest.yml
+      env:
+        GH_USER: ${{ secrets.GH_USER }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  #   - name: Slack Notification
-  #     uses: homoluctus/slatify@master
-  #     if: always()
-  #     with:
-  #       type: ${{ job.status }}
-  #       job_name: 'GitHub Release'
-  #       mention_if: 'always'
-  #       url: ${{ secrets.SLACK_WEBHOOK }}
-  #       commit: true
-  #       token: ${{ secrets.GH_TOKEN }}
+    - name: Slack Notification
+      uses: homoluctus/slatify@master
+      if: always()
+      with:
+        type: ${{ job.status }}
+        job_name: 'GitHub Release'
+        mention_if: 'always'
+        url: ${{ secrets.SLACK_WEBHOOK }}
+        commit: true
+        token: ${{ secrets.GH_TOKEN }}
 
-  #   - name: Announce Releasenotes
-  #     if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta'
-  #     run: |
-  #       ./node_modules/.bin/ci_tools publish-releasenotes-on-slack
-  #     env:
-  #       SLACK_WEBHOOK: ${{ secrets.SLACK_ANNOUNCER_WEBHOOK }}
+    - name: Announce Releasenotes
+      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta'
+      run: |
+        ./node_modules/.bin/ci_tools publish-releasenotes-on-slack
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_ANNOUNCER_WEBHOOK }}
 
-  #   - name: Trigger Deployment of ProcessEngine.io
-  #     if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta'
-  #     uses: peter-evans/repository-dispatch@v1
-  #     with:
-  #       token: ${{ secrets.GH_TOKEN }}
-  #       repository: process-engine/process-engine.github.io
-  #       event-type: release_was_published
+    - name: Trigger Deployment of ProcessEngine.io
+      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta'
+      uses: peter-evans/repository-dispatch@v1
+      with:
+        token: ${{ secrets.GH_TOKEN }}
+        repository: process-engine/process-engine.github.io
+        event-type: release_was_published
 
   build_docker:
     name: "Build & Publish Docker Image"
     needs: prepare_and_tag_version
     runs-on: ubuntu-18.04
-    #if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
 
     steps:
     - uses: actions/checkout@v1
@@ -382,7 +382,7 @@ jobs:
       id: studio_version
 
     - name: Get BPMN Studio Major Version
-      # if: github.ref == 'refs/heads/master'
+      if: github.ref == 'refs/heads/master'
       run: echo "##[set-output name=major_version;]$(VERSION=$VERSION node --print --eval "const indexOfDot = process.env.VERSION.indexOf('.'); process.env.VERSION.substr(0, indexOfDot)")"
       id: major_studio_version
       env:
@@ -395,24 +395,24 @@ jobs:
         VERSION: ${{ steps.studio_version.outputs.version }}
 
     - name: Log Major Studio Version
-      # if: github.ref == 'refs/heads/master'
+      if: github.ref == 'refs/heads/master'
       run: |
         echo $VERSION
       env:
         VERSION: ${{ steps.major_studio_version.outputs.major_version }}
 
-    # - name: Build Docker Image
-    #   if: github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
-    #   run: |
-    #     docker build --build-arg NODE_IMAGE_VERSION=10-alpine \
-    #                 --build-arg BPMN_STUDIO_VERSION=$VERSION \
-    #                 --no-cache \
-    #                 --tag 5minds/bpmn-studio-bundle:$VERSION .
-    #   env:
-    #     VERSION: ${{ steps.studio_version.outputs.version }}
+    - name: Build Docker Image
+      if: github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
+      run: |
+        docker build --build-arg NODE_IMAGE_VERSION=10-alpine \
+                    --build-arg BPMN_STUDIO_VERSION=$VERSION \
+                    --no-cache \
+                    --tag 5minds/bpmn-studio-bundle:$VERSION .
+      env:
+        VERSION: ${{ steps.studio_version.outputs.version }}
 
     - name: Build Docker Image Master
-      # if: github.ref == 'refs/heads/master'
+      if: github.ref == 'refs/heads/master'
       run: |
         docker build --build-arg NODE_IMAGE_VERSION=10-alpine \
                     --build-arg BPMN_STUDIO_VERSION=$VERSION \
@@ -425,11 +425,11 @@ jobs:
     - name: Show Docker Images
       run: docker images
 
-    # - name: Login to Docker
-    #   run: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-    #   env:
-    #     DOCKER_USER: ${{ secrets.DOCKER_USER }}
-    #     DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+    - name: Login to Docker
+      run: echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+      env:
+        DOCKER_USER: ${{ secrets.DOCKER_USER }}
+        DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
 
-    # - name: Push Docker Image
-    #   run: docker push 5minds/bpmn-studio-bundle
+    - name: Push Docker Image
+      run: docker push 5minds/bpmn-studio-bundle
