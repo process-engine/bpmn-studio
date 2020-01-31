@@ -758,6 +758,10 @@ export class SolutionExplorerSolution {
     this.navigateToDetailView(diagram);
   }
 
+  public isUriFromRemoteSolution(uri: string): boolean {
+    return solutionIsRemoteSolution(uri);
+  }
+
   private updateDiagramStateList(): void {
     this.diagramStateList = this.openDiagramStateService.loadDiagramStateForAllDiagrams();
   }
@@ -1552,9 +1556,5 @@ export class SolutionExplorerSolution {
       .withMessage('A diagram with that name already exists.')
       .on(this.diagramRenamingState)
       .on(this.diagramCreationState);
-  }
-
-  public isUriFromRemoteSolution(uri: string): boolean {
-    return solutionIsRemoteSolution(uri);
   }
 }
