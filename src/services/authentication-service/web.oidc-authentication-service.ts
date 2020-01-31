@@ -7,7 +7,7 @@ import {User} from 'oidc-client';
 import {IIdentity} from '@essential-projects/iam_contracts';
 
 import {IAuthenticationService, ILoginResult, IUserIdentity, NotificationType} from '../../contracts/index';
-import {oidcConfig} from '../../open-id-connect-configuration';
+import {oidcConfig} from '../../open-id-connect-web-configuration';
 import {NotificationService} from '../notification-service/notification.service';
 
 const UNAUTHORIZED_STATUS_CODE: number = 401;
