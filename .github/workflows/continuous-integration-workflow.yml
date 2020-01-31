@@ -378,12 +378,12 @@ jobs:
         path: "."
 
     - name: Get BPMN Studio Version
-      run: echo "##[set-output name=version;]$(node --print --eval "require('./package.json').version")"
+      run: echo "##[set-output name=version;]$(./node_modules/.bin/ci_tools get-version)"
       id: studio_version
 
     - name: Get BPMN Studio Major Version
       if: github.ref == 'refs/heads/master'
-      run: echo "##[set-output name=major_version;]$(VERSION=$VERSION node --print --eval "const indexOfDot = process.env.VERSION.indexOf('.'); process.env.VERSION.substr(0, indexOfDot)")"
+      run: echo "##[set-output name=major_version;]$(./node_modules/.bin/ci_tools get-version --major)"
       id: major_studio_version
       env:
         VERSION: ${{ steps.studio_version.outputs.version }}
