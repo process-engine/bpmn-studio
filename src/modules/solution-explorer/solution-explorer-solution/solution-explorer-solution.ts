@@ -1554,7 +1554,7 @@ export class SolutionExplorerSolution {
       .on(this.diagramCreationState);
   }
 
-  private isUriFromRemoteSolution(uri: string): boolean {
+  public isUriFromRemoteSolution(uri: string): boolean {
     return solutionIsRemoteSolution(uri);
   }
 }
