@@ -3,7 +3,7 @@
 import path from 'path';
 import os from 'os';
 import {exec} from 'child_process';
-import fs from 'fs';
+import fs from 'fs-extra';
 
 import {AppConstructorOptions, Application} from 'spectron';
 import assert from 'assert';
@@ -74,13 +74,23 @@ export class TestClient {
 
   public async removeUnneededVideos(filePath: string): Promise<void> {
     try {
-      const filePathToUse = process.platform === 'win32' ? filePath.replace(/\//g, '\\') : filePath;
-      if (fs.existsSync(filePathToUse)) {
-        fs.unlinkSync(filePathToUse);
+      // const filePathToUse = process.platform === 'win32' ? filePath.replace(/\//g, '\\') : filePath;
+      // await this.execCommand(`${REMOVE_COMMAND_FILE} ${filePathToUse.replace('.webm', '')}*.webm`);
+
+      const filePathToUse = `${filePath.replace('.webm', '*.webm')}`;
+      console.log(filePathToUse);
+      const filesToDelete = fs.readdirSync(path.dirname(filePathToUse), {encoding: 'utf8'}).filter((file) => {
+        const lastIndexOfMinus = filePath.lastIndexOf('-');
+        return file.includes(path.basename(filePath.substr(0, lastIndexOfMinus)));
+      });
+      console.log(filesToDelete);
+
+      for (const fileToDelete of filesToDelete) {
+        await this.deleteFile(`test-results\\${fileToDelete}`);
       }
-      //await this.execCommand(`${REMOVE_COMMAND_FILE} ${filePathToUse.replace('.webm', '')}*.webm`);
+      // await this.deleteFile(filePath);
     } catch (error) {
-      console.error('remove unneeded videos', error);
+      console.error('Error: removeUnneededVideos', error);
     }
   }
 
@@ -126,13 +136,82 @@ export class TestClient {
   }
 
   public async clearDatabase(): Promise<void> {
-    if (fs.existsSync(DATABASE_PATH)) {
+    if (fs.existsSync(DATABASE_PATH.replace(/\s/g, '\\ '))) {
       try {
-        await this.execCommand(`${REMOVE_COMMAND_DIR} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
+        if (process.platform === 'win32') {
+          await this.removeWindowsDB(DATABASE_PATH);
+        }
+
+        // await this.execCommand(`${REMOVE_COMMAND_DIR} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
       } catch (error) {
-        console.error(error);
+        console.error('Error:clearDatabase ', error);
       }
     }
+  }
+
+  private async removeWindowsDB(dbPath): Promise<void> {
+    await new Promise((resolve: Function, reject: Function) => {
+      fs.readdirSync(dbPath).forEach((file, index, arr) => {
+        const fileToDelete = path.join(dbPath, file);
+
+        const deleteFile = (filepath) =>
+          fs.open(filepath, 'r+', async (err, fd) => {
+            if (err && err.code === 'EBUSY') {
+              await this.pause(300);
+              deleteFile(filepath);
+            } else if (err && err.code === 'ENOENT') {
+              if (index === arr.length - 1) {
+                fs.rmdirSync(dbPath);
+                resolve();
+              }
+            } else {
+              fs.close(fd, () => {
+                fs.unlink(filepath, async (err) => {
+                  if (err) {
+                    await this.pause(300);
+                    deleteFile(filepath);
+                  } else if (index === arr.length - 1) {
+                    fs.rmdirSync(dbPath);
+                    resolve();
+                  }
+                });
+              });
+            }
+          });
+
+        deleteFile(fileToDelete);
+      });
+    });
+  }
+
+  private async deleteFile(fileToDelete): Promise<void> {
+    return new Promise((resolve: Function, reject: Function) => {
+      const deleteIt = (filepath) => {
+        fs.open(filepath, 'r+', async (err, fd) => {
+          if (err && err.code === 'EBUSY') {
+            await this.pause(300);
+            deleteIt(filepath);
+          } else if (err && err.code === 'ENOENT') {
+            console.log('deleted enoent');
+            resolve();
+          } else {
+            fs.close(fd, () => {
+              fs.unlink(filepath, async (err) => {
+                if (err) {
+                  await this.pause(300);
+                  deleteIt(filepath);
+                } else {
+                  console.log('deleted');
+                  resolve();
+                }
+              });
+            });
+          }
+        });
+      };
+
+      deleteIt(fileToDelete);
+    });
   }
 
   public async clearSavedDiagrams(): Promise<void> {
@@ -140,7 +219,7 @@ export class TestClient {
       try {
         await this.execCommand(`${REMOVE_COMMAND_DIR} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
       } catch (error) {
-        console.error(error);
+        console.error('Error:clearSavedDiagrams ', error);
       }
     }
   }

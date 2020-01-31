@@ -10,7 +10,7 @@ async function stopProcess(): Promise<void> {
   await testClient.ensureNotVisible('[data-test-stop-process-button]');
 }
 
-describe('Application launch', function foo() {
+describe.only('Application launch', function foo() {
   this.slow(10000);
   this.timeout(15000);
 
@@ -32,12 +32,17 @@ describe('Application launch', function foo() {
       if (await testClient.isSpectronAppRunning()) {
         if (this.ctx.currentTest.state === 'failed') {
           await testClient.stopRecordingAndSave();
-        } else {
-          await testClient.cancelRecording();
-          await testClient.removeUnneededVideos((this as any).filePath);
         }
+        // else {
+        // await testClient.cancelRecording();
+        //  await testClient.removeUnneededVideos((this as any).filePath);
+        // }
 
         await testClient.stopSpectronApp();
+
+        if (this.ctx.currentTest.state !== 'failed') {
+          await testClient.removeUnneededVideos((this as any).filePath);
+        }
         await testClient.clearDatabase();
         await testClient.clearSavedDiagrams();
       }
@@ -61,7 +66,7 @@ describe('Application launch', function foo() {
     await testClient.assertWindowTitleIs('Design | BPMN Studio');
   });
 
-  it('should create and open a second diagram', async () => {
+  it.only('should create and open a second diagram', async () => {
     await testClient.createAndOpenNewDiagram();
 
     await testClient.assertNavbarTitleIs('Untitled-1');
@@ -118,7 +123,7 @@ describe('Application launch', function foo() {
     await testClient.assertWindowTitleIs('Think | BPMN Studio');
   });
 
-  it('should stop a process from the LiveExecutionTracker', async () => {
+  it.only('should stop a process from the LiveExecutionTracker', async () => {
     const diagramName = 'receive_task_wait_test';
     await testClient.startPageLoaded();
     await testClient.solutionExplorer.openDirectoryAsSolution('fixtures', diagramName);
