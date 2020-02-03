@@ -58,7 +58,7 @@
     "@process-engine/management_api_client": "6.2.0",
     "@process-engine/process_engine_runtime": "9.4.0-beta.4",
     "@process-engine/solutionexplorer.repository.filesystem": "4.5.0-beta.2",
-    "@process-engine/solutionexplorer.repository.management_api": "3.3.0",
+    "@process-engine/solutionexplorer.repository.management_api": "3.3.0-feature-cafe31-k66jdbet",
     "@process-engine/solutionexplorer.service": "4.4.0",
     "about-window": "1.13.2",
     "aurelia-open-id-connect": "2.0.4",
