@@ -77,7 +77,6 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
     if (identityServerIsNotReachable) {
       return undefined;
     }
-    console.log(1);
 
     const tokenObject: ITokenObject = await this.showLoginPopup(authorityUrl, solutionUri, silent);
 
@@ -197,17 +196,13 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
   }
 
   private async showLoginPopup(authorityUrl: string, solutionUri: string, silent?: boolean): Promise<ITokenObject> {
-    console.log(2);
     if (!(await this.identityServerCookieIsEmpty())) {
       await this.waitUntilCookieIsEmpty();
     }
 
-    console.log(3);
-
     if (await this.solutionHasIdentityServerCookie(solutionUri)) {
       await this.setIdentityServerCookie(solutionUri);
     }
-    console.log(4);
 
     // Build the Url Params from the Config.
     const urlParams = {
@@ -528,7 +523,6 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
   }
 
   private async identityServerCookieIsEmpty(): Promise<boolean> {
-    console.log(await this.getIdentityServerCookie());
     return (await this.getIdentityServerCookie()) === undefined;
   }
 
