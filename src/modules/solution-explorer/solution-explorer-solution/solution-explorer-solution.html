@@ -4,13 +4,23 @@
 
   <div class="solution-explorer-solution">
 
-    <div class="solution-loading" if.bind="solutionIsNotLoaded && !processEngineStartupError">
+    <div class="solution-loading" if.bind="solutionIsNotLoaded && !processEngineStartupError && !authorisationError && !authenticationError">
       <i class="fa fa-spinner fa-spin"></i>
     </div>
 
     <div class="solution-loading" if.bind="solutionIsNotLoaded && processEngineStartupError">
       <span>ProcessEngine Startup Error</span><br>
       <small class="startup-error" click.delegate="showErrorLogs = true">Click here for more information</small>
+    </div>
+
+    <div class="solution-loading" if.bind="solutionIsNotLoaded && authorisationError">
+      <span class="authorisation-error__headline">Authorisation failed</span><br>
+      <span class="authorisation-error">You don't have the required permissions. Please try to <span class="authorisation-error__login-link" click.delegate="login(displayedSolutionEntry)">login</span> as another user.</span>
+    </div>
+
+    <div class="solution-loading" if.bind="solutionIsNotLoaded && authenticationError">
+      <span class="authorisation-error__headline">Authentication failed</span><br>
+      <span class="authorisation-error">Please try to <span class="authorisation-error__login-link" click.delegate="login(displayedSolutionEntry)">login.</span></span>
     </div>
 
     <div class="diagram-contextmenu" ref="diagramContextMenu" show.bind="showContextMenu">

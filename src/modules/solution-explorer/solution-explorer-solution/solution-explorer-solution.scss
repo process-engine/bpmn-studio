@@ -183,3 +183,11 @@
   min-height: 440px;
   resize: none;
 }
+
+.authorisation-error__headline {
+  font-weight: bold;
+}
+
+.authorisation-error:hover > .authorisation-error__login-link {
+  text-decoration: underline;
+}
