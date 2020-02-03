@@ -215,9 +215,11 @@ export class SolutionExplorerSolution {
           this.displayedSolutionEntry.service.unwatchSolution(this.solutionEventListenerId);
         }
 
-        this.solutionEventListenerId = this.displayedSolutionEntry.service.watchSolution(() => {
-          this.updateSolution();
-        });
+        if (!this.displayedSolutionEntry.isOpenDiagram) {
+          this.solutionEventListenerId = this.displayedSolutionEntry.service.watchSolution(() => {
+            this.updateSolution();
+          });
+        }
       }),
       this.eventAggregator.subscribe(
         environment.events.solutionExplorer.closeAllOpenDiagrams,
