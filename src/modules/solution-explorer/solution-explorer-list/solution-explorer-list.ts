@@ -377,12 +377,12 @@ export class SolutionExplorerList {
     }
   }
 
-  public async login(solutionEntry: ISolutionEntry, silent?: boolean): Promise<void> {
-    const onTokenRefresh = async (refreshResult: ILoginResult): Promise<void> => {
+  public async login(solutionEntry: ISolutionEntry, silent?: boolean): Promise<boolean> {
+    const onTokenRefresh = async (refreshResult: ILoginResult): Promise<boolean> => {
       const couldNotConnectToAuthority: boolean = refreshResult === undefined;
       const userIsNotLoggedIn: boolean = refreshResult.idToken === 'access_denied';
       if (couldNotConnectToAuthority || userIsNotLoggedIn) {
-        return;
+        return false;
       }
 
       solutionEntry.identity = {
@@ -396,23 +396,33 @@ export class SolutionExplorerList {
       this.solutionService.persistSolutionsInLocalStorage();
 
       this.eventAggregator.publish(AuthenticationStateEvent.LOGIN);
+      return true;
     };
 
-    const result: ILoginResult = await this.authenticationService.login(
-      solutionEntry.authority,
-      solutionEntry.uri,
-      onTokenRefresh,
-      silent,
-    );
+    let result: ILoginResult;
+    try {
+      result = await this.authenticationService.login(
+        solutionEntry.authority,
+        solutionEntry.uri,
+        onTokenRefresh,
+        silent,
+      );
+    } catch (error) {
+      if (error === 'window was closed by user' || error === 'User could not get logged in.') {
+        return false;
+      }
+
+      throw error;
+    }
 
     const couldNotConnectToAuthority: boolean = result === undefined;
     if (couldNotConnectToAuthority) {
-      return;
+      return false;
     }
 
     const userIsNotLoggedIn: boolean = result.idToken === 'access_denied';
     if (userIsNotLoggedIn) {
-      return;
+      return false;
     }
 
     const identity: IIdentity = {
@@ -428,6 +438,8 @@ export class SolutionExplorerList {
     this.solutionService.persistSolutionsInLocalStorage();
 
     this.eventAggregator.publish(AuthenticationStateEvent.LOGIN);
+
+    return true;
   }
 
   public async logout(solutionEntry: ISolutionEntry, silent?: boolean): Promise<void> {
