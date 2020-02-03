@@ -236,9 +236,14 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
       }
 
       // Reject the Promise when the user closes the new window.
-      authWindow.on('closed', (): void => {
-        reject(new Error('window was closed by user'));
-      });
+      authWindow.on(
+        'closed',
+        async (): Promise<void> => {
+          await this.removeCurrentIdentityServerCookie();
+
+          reject(new Error('window was closed by user'));
+        },
+      );
 
       /**
        * This will trigger everytime the new window will redirect.
