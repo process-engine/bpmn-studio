@@ -703,6 +703,14 @@ export class SolutionExplorerList {
     } else {
       this.openedSolutions.push(entry);
     }
+
+    if (identity.userId !== '') {
+      const success = await this.login(entry, true);
+
+      if (!success) {
+        await this.logout(entry, true);
+      }
+    }
   }
 
   private getHiddenStateForSolutionUri(uri: string): boolean {
