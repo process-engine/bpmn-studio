@@ -377,7 +377,7 @@ export class SolutionExplorerList {
     }
   }
 
-  public async login(solutionEntry: ISolutionEntry): Promise<void> {
+  public async login(solutionEntry: ISolutionEntry, silent?: boolean): Promise<void> {
     const onTokenRefresh = async (refreshResult: ILoginResult): Promise<void> => {
       const couldNotConnectToAuthority: boolean = refreshResult === undefined;
       const userIsNotLoggedIn: boolean = refreshResult.idToken === 'access_denied';
@@ -402,6 +402,7 @@ export class SolutionExplorerList {
       solutionEntry.authority,
       solutionEntry.uri,
       onTokenRefresh,
+      silent,
     );
 
     const couldNotConnectToAuthority: boolean = result === undefined;
@@ -429,8 +430,8 @@ export class SolutionExplorerList {
     this.eventAggregator.publish(AuthenticationStateEvent.LOGIN);
   }
 
-  public async logout(solutionEntry: ISolutionEntry): Promise<void> {
-    await this.authenticationService.logout(solutionEntry.authority, solutionEntry.uri, solutionEntry.identity);
+  public async logout(solutionEntry: ISolutionEntry, silent?: boolean): Promise<void> {
+    await this.authenticationService.logout(solutionEntry.authority, solutionEntry.uri, solutionEntry.identity, silent);
 
     solutionEntry.identity = this.createIdentityForSolutionExplorer();
     solutionEntry.isLoggedIn = false;

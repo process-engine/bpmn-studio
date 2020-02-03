@@ -65,7 +65,12 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
     return userIdentityIsDefined;
   }
 
-  public async login(authorityUrl: string, solutionUri: string, refreshCallback: Function): Promise<ILoginResult> {
+  public async login(
+    authorityUrl: string,
+    solutionUri: string,
+    refreshCallback: Function,
+    silent?: boolean,
+  ): Promise<ILoginResult> {
     authorityUrl = this.formAuthority(authorityUrl);
 
     const identityServerIsNotReachable: boolean = !(await this.isAuthorityReachable(authorityUrl));
@@ -74,7 +79,7 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
     }
     console.log(1);
 
-    const tokenObject: ITokenObject = await this.showLoginPopup(authorityUrl, solutionUri);
+    const tokenObject: ITokenObject = await this.showLoginPopup(authorityUrl, solutionUri, silent);
 
     const silentRefreshHandler = async (silentRefreshTokenObject: ITokenObject): Promise<void> => {
       const loginResult = await this.convertTokenObjectToLoginResult(authorityUrl, silentRefreshTokenObject);
@@ -90,10 +95,10 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
     return loginResult;
   }
 
-  public async logout(authorityUrl: string, solutionUri: string, identity: IIdentity): Promise<void> {
+  public async logout(authorityUrl: string, solutionUri: string, identity: IIdentity, silent?: boolean): Promise<void> {
     authorityUrl = this.formAuthority(authorityUrl);
 
-    await this.showLogoutPopup(authorityUrl, solutionUri, identity);
+    await this.showLogoutPopup(authorityUrl, solutionUri, identity, silent);
     this.eventAggregator.publish(AuthenticationStateEvent.LOGOUT);
   }
 
@@ -116,7 +121,12 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
     return userInfoResponse.result;
   }
 
-  private async showLogoutPopup(authorityUrl: string, solutionUri: string, identity: IIdentity): Promise<boolean> {
+  private async showLogoutPopup(
+    authorityUrl: string,
+    solutionUri: string,
+    identity: IIdentity,
+    silent?: boolean,
+  ): Promise<boolean> {
     const urlParams = {
       id_token_hint: identity.userId,
       post_logout_redirect_uri: oidcConfig.logoutRedirectUri,
@@ -132,6 +142,7 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
         const response: fetch.Response = await fetch(endSessionUrl);
 
         const windowParams = {
+          show: silent !== true,
           alwaysOnTop: true,
           autoHideMenuBar: true,
           webPreferences: {
@@ -155,7 +166,14 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
         });
 
         logoutWindow.loadURL(response.url);
-        logoutWindow.show();
+        if (!silent) {
+          logoutWindow.show();
+        } else {
+          logoutWindow.webContents.on('did-finish-load', () => {
+            resolve(true);
+            logoutWindow.close();
+          });
+        }
       },
     );
   }
@@ -178,7 +196,7 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
     return loginResult;
   }
 
-  private async showLoginPopup(authorityUrl: string, solutionUri: string): Promise<ITokenObject> {
+  private async showLoginPopup(authorityUrl: string, solutionUri: string, silent?: boolean): Promise<ITokenObject> {
     console.log(2);
     if (!(await this.identityServerCookieIsEmpty())) {
       await this.waitUntilCookieIsEmpty();
@@ -204,6 +222,7 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
     const urlToLoad: string = `${authorityUrl}connect/authorize?${queryString.stringify(urlParams)}`;
 
     const windowParams = {
+      show: silent !== true,
       alwaysOnTop: true,
       autoHideMenuBar: true,
       webPreferences: {
@@ -214,10 +233,12 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
 
     return new Promise((resolve: Function, reject: Function): void => {
       // Open a new browser window and load the previously constructed url.
-      const authWindow = new this.electronRemote.BrowserWindow(windowParams || {useContentSize: true});
+      const authWindow = new this.electronRemote.BrowserWindow(windowParams);
 
       authWindow.loadURL(urlToLoad);
-      authWindow.show();
+      if (!silent) {
+        authWindow.show();
+      }
 
       // Reject the Promise when the user closes the new window.
       authWindow.on('closed', (): void => {
