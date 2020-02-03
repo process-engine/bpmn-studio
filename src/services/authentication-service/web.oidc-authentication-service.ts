@@ -165,7 +165,7 @@ export class WebOidcAuthenticationService implements IAuthenticationService {
     oidcConfig.userManagerSettings.authority = authorityUrl;
 
     // This dirty way to update the settings is the only way during runtime
-    (this.openIdConnect as any).configuration.userManagerSettings.authorityUrl = authorityUrl;
+    (this.openIdConnect as any).configuration.userManagerSettings.authority = authorityUrl;
     // eslint-disable-next-line no-underscore-dangle
     (this.openIdConnect.userManager as any)._settings._authority = authorityUrl;
   }
