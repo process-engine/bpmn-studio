@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<semantic:definitions xmlns:semantic="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:trisobpmn="http://www.trisotech.com/2014/triso/bpmn" xmlns:triso="http://www.trisotech.com/2015/triso/modeling" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:trisofeed="http://trisotech.com/feed" xmlns:bpsim="http://www.bpsim.org/schemas/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" xmlns:rss="http://purl.org/rss/2.0/" xmlns="http://www.trisotech.com/definitions/_1363713357019" id="_1363713357019"         exporter="BPMN Modeler" exporterVersion="5.0.22" trisobpmn:logoChoice="Default" name="Order Processing with Credit Card Authorization" targetNamespace="http://www.trisotech.com/definitions/_1363713357019" expressionLanguage="http://www.w3.org/1999/XPath" typeLanguage="http://www.w3.org/2001/XMLSchema">
+    <semantic:message id="Message_1401821400030"/>
+    <semantic:message id="Message_1401821400031"/>
+    <semantic:collaboration id="C1401821400029" name="Order Processing with Credit Card Authorization" triso:defaultName="true">
+        <semantic:participant id="_dc39015e-7acf-48eb-9549-0b3b37ddb555" name="Financial Institution" processRef="WFP-6-1"/>
+        <semantic:participant id="_2d20f679-fbf5-4bdb-a330-3cc548353b73" name="Supplier" processRef="WFP-6-2"/>
+        <semantic:messageFlow id="_773b256d-864a-4c52-86de-fa2f1667212a" messageRef="Message_1401821400030" sourceRef="_f1745123-4199-4208-8ed8-4d93a4e980ed" targetRef="_85caa3bc-601a-4a12-904b-3b4b51368677"/>
+        <semantic:messageFlow id="_a538d67d-d985-42a4-bb36-60e0e4da5666" messageRef="Message_1401821400031" sourceRef="_85caa3bc-601a-4a12-904b-3b4b51368677" targetRef="_f1745123-4199-4208-8ed8-4d93a4e980ed"/>
+    </semantic:collaboration>
+    <semantic:process isExecutable="false" id="WFP-6-1" name="Order Processing with Credit Card Authorization - Financial Institution - Process" triso:defaultName="true">
+        <semantic:subProcess id="_f1745123-4199-4208-8ed8-4d93a4e980ed" name="Credit Card Authorization" startQuantity="1" completionQuantity="1" isForCompensation="false" triggeredByEvent="false">
+            <semantic:incoming>_0090383e-64b4-4706-9270-36ac6c4287fa</semantic:incoming>
+            <semantic:outgoing>_2cca6a10-f57c-45cc-a4a8-a685eb7f73dc</semantic:outgoing>
+        </semantic:subProcess>
+        <semantic:sequenceFlow id="_2cca6a10-f57c-45cc-a4a8-a685eb7f73dc" sourceRef="_f1745123-4199-4208-8ed8-4d93a4e980ed" targetRef="_45b2661d-c1a5-4aff-9a9e-9df351eac2da"/>
+        <semantic:sequenceFlow id="_0090383e-64b4-4706-9270-36ac6c4287fa" sourceRef="_f5561a51-b33b-4c69-9d52-5dbd9976edae" targetRef="_f1745123-4199-4208-8ed8-4d93a4e980ed"/>
+        <semantic:startEvent id="_f5561a51-b33b-4c69-9d52-5dbd9976edae">
+            <semantic:outgoing>_0090383e-64b4-4706-9270-36ac6c4287fa</semantic:outgoing>
+        </semantic:startEvent>
+        <semantic:endEvent id="_45b2661d-c1a5-4aff-9a9e-9df351eac2da">
+            <semantic:incoming>_2cca6a10-f57c-45cc-a4a8-a685eb7f73dc</semantic:incoming>
+        </semantic:endEvent>
+    </semantic:process>
+    <semantic:process isExecutable="false" id="WFP-6-2" name="Order Processing with Credit Card Authorization - Supplier - Process" triso:defaultName="true">
+        <semantic:laneSet>
+            <semantic:lane id="_9d3655d4-a2d5-4002-9d1e-5819bf382fd2" name="Sales">
+                <semantic:flowNodeRef>_85caa3bc-601a-4a12-904b-3b4b51368677</semantic:flowNodeRef>
+                <semantic:flowNodeRef>_662bb8a1-0025-4ce0-96f7-1503f9e5aab1</semantic:flowNodeRef>
+                <semantic:flowNodeRef>_a7488e6b-65df-4f80-9867-752283a69ef6</semantic:flowNodeRef>
+            </semantic:lane>
+            <semantic:lane id="_aaa5a54b-f617-45cb-a335-b1ed98870b1e" name="Distribution">
+                <semantic:flowNodeRef>_29294e97-d321-436b-8b77-acfe198daaff</semantic:flowNodeRef>
+                <semantic:flowNodeRef>_c4a339c2-b203-43b2-8d70-8808496ff7f4</semantic:flowNodeRef>
+                <semantic:flowNodeRef>_b573ad46-d088-45e0-86ca-a1f2bdb00183</semantic:flowNodeRef>
+            </semantic:lane>
+        </semantic:laneSet>
+        <semantic:task id="_85caa3bc-601a-4a12-904b-3b4b51368677" name="Authorize Payment" startQuantity="1" completionQuantity="1" isForCompensation="false">
+            <semantic:incoming>_eeef534f-113a-4c57-9e15-f12033427ed1</semantic:incoming>
+            <semantic:outgoing>_947c150a-3f09-4697-b86f-4b596ce57f4e</semantic:outgoing>
+        </semantic:task>
+        <semantic:sequenceFlow id="_947c150a-3f09-4697-b86f-4b596ce57f4e" sourceRef="_85caa3bc-601a-4a12-904b-3b4b51368677" targetRef="_a7488e6b-65df-4f80-9867-752283a69ef6"/>
+        <semantic:sequenceFlow id="_eeef534f-113a-4c57-9e15-f12033427ed1" sourceRef="_662bb8a1-0025-4ce0-96f7-1503f9e5aab1" targetRef="_85caa3bc-601a-4a12-904b-3b4b51368677"/>
+        <semantic:startEvent id="_662bb8a1-0025-4ce0-96f7-1503f9e5aab1">
+            <semantic:outgoing>_eeef534f-113a-4c57-9e15-f12033427ed1</semantic:outgoing>
+        </semantic:startEvent>
+        <semantic:subProcess id="_a7488e6b-65df-4f80-9867-752283a69ef6" name="Process Order" startQuantity="1" completionQuantity="1" isForCompensation="false" triggeredByEvent="false">
+            <semantic:incoming>_947c150a-3f09-4697-b86f-4b596ce57f4e</semantic:incoming>
+            <semantic:outgoing>_01fb74db-2f20-4c4f-8b7c-1af4ad7a32a2</semantic:outgoing>
+        </semantic:subProcess>
+        <semantic:sequenceFlow id="_01fb74db-2f20-4c4f-8b7c-1af4ad7a32a2" sourceRef="_a7488e6b-65df-4f80-9867-752283a69ef6" targetRef="_b573ad46-d088-45e0-86ca-a1f2bdb00183"/>
+        <semantic:task id="_29294e97-d321-436b-8b77-acfe198daaff" name="Ship Goods" startQuantity="1" completionQuantity="1" isForCompensation="false">
+            <semantic:incoming>_17caa9cd-a1a9-47b6-b53e-4f2b53da02aa</semantic:incoming>
+            <semantic:outgoing>_d9dca87e-56de-48cd-8783-3c4b52a55762</semantic:outgoing>
+        </semantic:task>
+        <semantic:sequenceFlow id="_d9dca87e-56de-48cd-8783-3c4b52a55762" sourceRef="_29294e97-d321-436b-8b77-acfe198daaff" targetRef="_c4a339c2-b203-43b2-8d70-8808496ff7f4"/>
+        <semantic:sequenceFlow id="_17caa9cd-a1a9-47b6-b53e-4f2b53da02aa" sourceRef="_b573ad46-d088-45e0-86ca-a1f2bdb00183" targetRef="_29294e97-d321-436b-8b77-acfe198daaff"/>
+        <semantic:endEvent id="_c4a339c2-b203-43b2-8d70-8808496ff7f4">
+            <semantic:incoming>_d9dca87e-56de-48cd-8783-3c4b52a55762</semantic:incoming>
+        </semantic:endEvent>
+        <semantic:task id="_b573ad46-d088-45e0-86ca-a1f2bdb00183" name="Pack Goods" startQuantity="1" completionQuantity="1" isForCompensation="false">
+            <semantic:incoming>_01fb74db-2f20-4c4f-8b7c-1af4ad7a32a2</semantic:incoming>
+            <semantic:outgoing>_17caa9cd-a1a9-47b6-b53e-4f2b53da02aa</semantic:outgoing>
+        </semantic:task>
+    </semantic:process>
+    <bpmndi:BPMNDiagram id="_6" name="Order Processing with Credit Card Authorization" documentation="">
+        <bpmndi:BPMNPlane bpmnElement="C1401821400029" id="_6_plane" trisobpmn:diagramWidth="856" trisobpmn:diagramHeight="760">
+            <di:extension/>
+            <bpmndi:BPMNShape id="S1401821400016__dc39015e-7acf-48eb-9549-0b3b37ddb555" bpmnElement="_dc39015e-7acf-48eb-9549-0b3b37ddb555" isHorizontal="true" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="50" y="203" width="756" height="144"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="756" width="12" x="55" y="-103"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821400020__f1745123-4199-4208-8ed8-4d93a4e980ed" bpmnElement="_f1745123-4199-4208-8ed8-4d93a4e980ed" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="195" y="241" width="83" height="68"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="26" width="83" x="195" y="262"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="E1401821400035__2cca6a10-f57c-45cc-a4a8-a685eb7f73dc" bpmnElement="_2cca6a10-f57c-45cc-a4a8-a685eb7f73dc" color:border-color="#000000">
+                <di:waypoint x="279" y="276"/>
+                <di:waypoint x="332" y="275"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="E1401821400036__0090383e-64b4-4706-9270-36ac6c4287fa" bpmnElement="_0090383e-64b4-4706-9270-36ac6c4287fa" color:border-color="#000000">
+                <di:waypoint x="140" y="275"/>
+                <di:waypoint x="196" y="276"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="S1401821400021__f5561a51-b33b-4c69-9d52-5dbd9976edae" bpmnElement="_f5561a51-b33b-4c69-9d52-5dbd9976edae" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="110" y="260" width="30" height="30"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821400022__45b2661d-c1a5-4aff-9a9e-9df351eac2da" bpmnElement="_45b2661d-c1a5-4aff-9a9e-9df351eac2da" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="332" y="260" width="30" height="30"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821400017__2d20f679-fbf5-4bdb-a330-3cc548353b73" bpmnElement="_2d20f679-fbf5-4bdb-a330-3cc548353b73" isHorizontal="true" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="50" y="431" width="756" height="279"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="756" width="12" x="55" y="192.5"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821400018__9d3655d4-a2d5-4002-9d1e-5819bf382fd2" bpmnElement="_9d3655d4-a2d5-4002-9d1e-5819bf382fd2" isHorizontal="true" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="80" y="431" width="726" height="144"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="726" width="12" x="85" y="140"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821400023__85caa3bc-601a-4a12-904b-3b4b51368677" bpmnElement="_85caa3bc-601a-4a12-904b-3b4b51368677" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="195" y="469" width="83" height="68"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="26" width="83" x="195" y="490"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="E1401821400038__947c150a-3f09-4697-b86f-4b596ce57f4e" bpmnElement="_947c150a-3f09-4697-b86f-4b596ce57f4e" color:border-color="#000000">
+                <di:waypoint x="278.9375" y="503"/>
+                <di:waypoint x="308" y="503"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="E1401821400039__eeef534f-113a-4c57-9e15-f12033427ed1" bpmnElement="_eeef534f-113a-4c57-9e15-f12033427ed1" color:border-color="#000000">
+                <di:waypoint x="146" y="503"/>
+                <di:waypoint x="196" y="504"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="S1401821400024__662bb8a1-0025-4ce0-96f7-1503f9e5aab1" bpmnElement="_662bb8a1-0025-4ce0-96f7-1503f9e5aab1" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="116" y="488" width="30" height="30"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821400025__a7488e6b-65df-4f80-9867-752283a69ef6" bpmnElement="_a7488e6b-65df-4f80-9867-752283a69ef6" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="308" y="469" width="83" height="68"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="12" width="83" x="308" y="497"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="E1401821400034__01fb74db-2f20-4c4f-8b7c-1af4ad7a32a2" bpmnElement="_01fb74db-2f20-4c4f-8b7c-1af4ad7a32a2" color:border-color="#000000">
+                <di:waypoint x="337" y="538"/>
+                <di:waypoint x="336" y="638"/>
+                <di:waypoint x="369" y="639"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="S1401821400019__aaa5a54b-f617-45cb-a335-b1ed98870b1e" bpmnElement="_aaa5a54b-f617-45cb-a335-b1ed98870b1e" isHorizontal="true" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="80" y="575" width="726" height="135"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="726" width="12" x="85" y="279.5"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821400026__29294e97-d321-436b-8b77-acfe198daaff" bpmnElement="_29294e97-d321-436b-8b77-acfe198daaff" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="494" y="604" width="83" height="68"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="12" width="83" x="494" y="632"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="E1401821400033__d9dca87e-56de-48cd-8783-3c4b52a55762" bpmnElement="_d9dca87e-56de-48cd-8783-3c4b52a55762" color:border-color="#000000">
+                <di:waypoint x="578" y="639"/>
+                <di:waypoint x="623" y="638"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="E1401821400037__17caa9cd-a1a9-47b6-b53e-4f2b53da02aa" bpmnElement="_17caa9cd-a1a9-47b6-b53e-4f2b53da02aa" color:border-color="#000000">
+                <di:waypoint x="452" y="638"/>
+                <di:waypoint x="495" y="639"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNShape id="S1401821400027__c4a339c2-b203-43b2-8d70-8808496ff7f4" bpmnElement="_c4a339c2-b203-43b2-8d70-8808496ff7f4" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="623" y="623" width="30" height="30"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="S1401821400028__b573ad46-d088-45e0-86ca-a1f2bdb00183" bpmnElement="_b573ad46-d088-45e0-86ca-a1f2bdb00183" color:background-color="#ffffff" color:border-color="#000000">
+                <dc:Bounds x="368" y="604" width="83" height="68"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6" trisobpmn:defaultBounds="true">
+                    <dc:Bounds height="12" width="83" x="368" y="632"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="E1401821400032__773b256d-864a-4c52-86de-fa2f1667212a" bpmnElement="_773b256d-864a-4c52-86de-fa2f1667212a" color:border-color="#000000">
+                <di:waypoint x="213" y="310"/>
+                <di:waypoint x="213" y="470"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="E1401821400040__a538d67d-d985-42a4-bb36-60e0e4da5666" bpmnElement="_a538d67d-d985-42a4-bb36-60e0e4da5666" color:border-color="#000000">
+                <di:waypoint x="262" y="470"/>
+                <di:waypoint x="261" y="451"/>
+                <di:waypoint x="262" y="310"/>
+                <bpmndi:BPMNLabel color:color="#000000" labelStyle="LS_6"/>
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+        <bpmndi:BPMNLabelStyle id="LS_6">
+            <dc:Font isBold="false" isItalic="false" isStrikeThrough="false" isUnderline="false" name="Arial" size="8"/>
+        </bpmndi:BPMNLabelStyle>
+    </bpmndi:BPMNDiagram>
+    <semantic:relationship type="ActivityStream">
+        <semantic:extensionElements>
+            <rss xmlns="http://purl.org/rss/2.0/" xmlns:trisofeed="http://trisotech.com/feed" version="2.0">
+                <channel/>
+            </rss>
+        </semantic:extensionElements>
+        <semantic:source>_1363713357019</semantic:source>
+        <semantic:target>_1363713357019</semantic:target>
+    </semantic:relationship>
+    <semantic:relationship type="trisoExtension">
+        <semantic:extensionElements>
+            <ProjectCharter xmlns="http://www.trisotech.com/2015/triso/modeling">
+                <projectDescription>&lt;p&gt;Simple Collaboration process requiring Credit Card Authorization from a Financial Institution before a Supplier process an order and ship it. It is presented in the BPMN v1.2 Specifications (page 88).&lt;/p&gt;</projectDescription>
+                <projectGoals/>
+                <projectChallenges/>
+                <projectStakeholders/>
+            </ProjectCharter>
+        </semantic:extensionElements>
+        <semantic:source>_1363713357019</semantic:source>
+        <semantic:target>_1363713357019</semantic:target>
+    </semantic:relationship>
+</semantic:definitions>
