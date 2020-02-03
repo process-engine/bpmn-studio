@@ -138,7 +138,7 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
 
     return new Promise(
       async (resolve: Function): Promise<void> => {
-        const response: fetch.Response = await fetch(endSessionUrl);
+        const response = await fetch(endSessionUrl);
 
         const windowParams = {
           show: silent !== true,
