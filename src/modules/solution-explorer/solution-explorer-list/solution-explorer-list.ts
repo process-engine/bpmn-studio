@@ -577,6 +577,7 @@ export class SolutionExplorerList {
     this.openedSolutions.splice(indexOfSolutionToBeRemoved, 1);
 
     const entryToRemove: ISolutionEntry = this.solutionService.getSolutionEntryForUri(uri);
+    this.logout(entryToRemove, true);
     this.solutionService.removeSolutionEntryByUri(entryToRemove.uri);
   }
   /**
