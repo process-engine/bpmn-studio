@@ -95,6 +95,8 @@ export class SolutionExplorerSolution {
 
   public authorisationError: boolean;
   public authenticationError: boolean;
+  @bindable public login: Function;
+
   private router: Router;
   private eventAggregator: EventAggregator;
   private validationController: ValidationController;
