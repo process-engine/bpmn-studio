@@ -77,7 +77,7 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
     const tokenObject: ITokenObject = await this.showLoginPopup(authorityUrl, solutionUri);
 
     const silentRefreshHandler = async (silentRefreshTokenObject: ITokenObject): Promise<void> => {
-      const loginResult = this.convertTokenObjectToLoginResult(authorityUrl, silentRefreshTokenObject);
+      const loginResult = await this.convertTokenObjectToLoginResult(authorityUrl, silentRefreshTokenObject);
 
       refreshCallback(loginResult);
     };
