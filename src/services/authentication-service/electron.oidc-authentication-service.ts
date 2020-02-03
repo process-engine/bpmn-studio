@@ -419,6 +419,24 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
       if (parameterAsArray[0].includes('login_required')) {
         reject(new Error('User is no longer logged in.'));
 
+        authWindow.removeAllListeners('closed');
+
+        setImmediate(() => {
+          authWindow.close();
+        });
+
+        return;
+      }
+
+      if (parameterAsArray[0].includes('error')) {
+        reject(new Error('User could not get logged in.'));
+
+        authWindow.removeAllListeners('closed');
+
+        setImmediate(() => {
+          authWindow.close();
+        });
+
         return;
       }
 
@@ -426,7 +444,7 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
       const accessToken = parameterAsArray[1].split('=')[1];
 
       const expiresIn: number = parseInt(
-        parameterAsArray.find((parameter) => parameter.startsWith('expires_in=')).split('=')[1],
+        parameterAsArray.find((parameter) => parameter.startsWith('expires_in='))?.split('=')[1],
       );
 
       const tokenObject: ITokenObject = {
