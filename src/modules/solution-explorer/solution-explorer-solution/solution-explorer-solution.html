@@ -15,7 +15,7 @@
 
     <div class="solution-loading" if.bind="solutionIsNotLoaded && authorisationError">
       <span class="authorisation-error__headline">Authorisation failed</span><br>
-      <span class="authorisation-error">You don't have the required permissions. Please try to <span class="authorisation-error__login-link" click.delegate="login(displayedSolutionEntry)">login</span> as another user.</span>
+      <span class="authorisation-error">You don't have sufficient permissions for accessing this ProcessEngine. Please try to <span class="authorisation-error__login-link" click.delegate="login(displayedSolutionEntry)">login</span> as another user.</span>
     </div>
 
     <div class="solution-loading" if.bind="solutionIsNotLoaded && authenticationError">
