@@ -28,8 +28,9 @@
   background-color: #ff00005c !important;
 }
 
-.process-list-item-modelname:hover {
+.process-list-item-modelname {
   color: inherit;
+  cursor: default;
 }
 
 .process-list-header {

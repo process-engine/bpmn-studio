@@ -93,6 +93,10 @@ export class SolutionExplorerSolution {
   public processEngineErrorLog: string;
   public errorLogArea: HTMLTextAreaElement;
 
+  public authorisationError: boolean;
+  public authenticationError: boolean;
+  @bindable public login: Function;
+
   private router: Router;
   private eventAggregator: EventAggregator;
   private validationController: ValidationController;
@@ -215,9 +219,11 @@ export class SolutionExplorerSolution {
           this.displayedSolutionEntry.service.unwatchSolution(this.solutionEventListenerId);
         }
 
-        this.solutionEventListenerId = this.displayedSolutionEntry.service.watchSolution(() => {
-          this.updateSolution();
-        });
+        if (!this.displayedSolutionEntry.isOpenDiagram) {
+          this.solutionEventListenerId = this.displayedSolutionEntry.service.watchSolution(() => {
+            this.updateSolution();
+          });
+        }
       }),
       this.eventAggregator.subscribe(
         environment.events.solutionExplorer.closeAllOpenDiagrams,
@@ -383,19 +389,20 @@ export class SolutionExplorerSolution {
       this.cssIconClass = this.originalIconClass;
       this.tooltipText = '';
       this.processEngineRunning = true;
+      this.authorisationError = false;
+      this.authenticationError = false;
     } catch (error) {
       // In the future we can maybe display a small icon indicating the error.
       if (isError(error, UnauthorizedError)) {
-        this.notificationService.showNotification(NotificationType.ERROR, 'You need to login to list process models.');
-
+        this.authorisationError = true;
         this.sortedDiagramsOfSolutions = [];
         this.openedSolution = undefined;
       } else if (isError(error, ForbiddenError)) {
-        this.notificationService.showNotification(
-          NotificationType.ERROR,
-          "You don't have the required permissions to list process models.",
-        );
-
+        if (this.displayedSolutionEntry.isLoggedIn) {
+          this.authorisationError = true;
+        } else {
+          this.authenticationError = true;
+        }
         this.sortedDiagramsOfSolutions = [];
         this.openedSolution = undefined;
       } else {

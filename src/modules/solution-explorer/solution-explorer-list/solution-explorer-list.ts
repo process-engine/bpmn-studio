@@ -41,6 +41,7 @@ interface IUriToViewModelMap {
   'HttpFetchClient',
 )
 export class SolutionExplorerList {
+  public loginFunction: Function;
   public internalProcessEngineVersion: string;
   public internalSolutionUri: string;
   public processEngineIsNewerModal: boolean = false;
@@ -100,6 +101,10 @@ export class SolutionExplorerList {
     exposeFunctionForTesting('openSolution', (uri: string, insertAtBeginning?: boolean, identity?: IIdentity): void => {
       this.openSolution(uri, insertAtBeginning, identity);
     });
+
+    this.loginFunction = async (solutionEntry: ISolutionEntry): Promise<void> => {
+      await this.login(solutionEntry);
+    };
 
     this.internalSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
     this.internalProcessEngineVersion = window.localStorage.getItem('InternalProcessEngineVersion');

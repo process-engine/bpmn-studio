@@ -19,8 +19,9 @@
   flex: 1;
 }
 
-.cronjob-list-item-modelname:hover {
+.cronjob-list-item-modelname {
   color: inherit;
+  cursor: default;
 }
 
 .cronjob-list-header {
