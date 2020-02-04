@@ -1,6 +1,7 @@
 <template>
   <require from="./task-list.css"></require>
   <require from="../../pagination/pagination"></require>
+  <require from="../../task-dynamic-ui/task-dynamic-ui"></require>
 
   <div class="task-list-container" id="taskListContainer">
     <h4 class="task-list-header">Tasks</h4>
@@ -44,4 +45,24 @@
       <img src="src/resources/images/gears.svg" class="loading-spinner">
     </div>
   </div>
+
+  <modal if.bind="showDynamicUiModal"
+        css="display: ${showDynamicUiModal ? 'block' : 'none'};"
+        body-style="overflow: auto;"
+        origin.bind="taskList">
+    <template replace-part="modal-header">
+      <btn class="button task-list__close-modal-button task-list__close-dynamic-ui-modal-button"><i class="fas fa-times" click.delegate="closeDynamicUiModal()"></i></btn>
+    </template>
+    <template replace-part="modal-body">
+      <task-dynamic-ui view-model.ref="origin.dynamicUi"
+                      process-instance-id.bind="processInstanceId"
+                      process-model-id.bind="processModelId"
+                      task-id.bind="taskId"
+                      is-modal="true"
+                      close-modal.trigger="closeDynamicUiModal()"
+                      active-solution-entry.bind="activeSolutionEntry">
+      </task-dynamic-ui>
+    </template>
+  </modal>
+
 </template>
