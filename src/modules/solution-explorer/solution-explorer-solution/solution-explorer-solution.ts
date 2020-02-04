@@ -1455,7 +1455,6 @@ export class SolutionExplorerSolution {
     const diagramNameIsSpecified: boolean = diagramName !== undefined;
 
     const diagramUri: string = this.router.currentInstruction.queryParams.diagramUri;
-
     const routeName: string = this.router.currentInstruction.config.name;
     const routeNameNeedsUpdate: boolean = routeName === 'design' || routeName === 'inspect' || routeName === 'think';
     if (routeNameNeedsUpdate) {
@@ -1468,8 +1467,6 @@ export class SolutionExplorerSolution {
       return;
     }
 
-    this.activeDiagram = undefined;
-
     if (solutionUriSpecified && diagramNameIsSpecified) {
       try {
         const activeSolution: ISolution = await this.solutionService.loadSolution();
@@ -1478,13 +1475,16 @@ export class SolutionExplorerSolution {
 
           const diagramIsInGivenSolution: boolean = solutionIsRemoteSolution(solutionUri)
             ? diagram.uri.includes(solutionUri)
-            : diagram.uri.includes(`${solutionUri}/${diagram.name}.bpmn`);
+            : diagram.uri.includes(`${solutionUri}/${diagram.name}.bpmn`) ||
+              diagram.uri.endsWith(`${diagram.name}.bpmn`);
 
           return diagram.name === diagramName && (currentDiagramIsGivenDiagram || diagramIsInGivenSolution);
         });
       } catch {
         // Do nothing
       }
+    } else {
+      this.activeDiagram = undefined;
     }
   }
 
