@@ -116,7 +116,6 @@
           "aurelia-task-queue",
           "aurelia-templating",
           "aurelia-templating-binding",
-          "clipboard-polyfill",
           "text",
           {
             "name": "aurelia-open-id-connect",
