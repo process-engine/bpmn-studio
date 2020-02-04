@@ -6,6 +6,7 @@ import {DataModels} from '@process-engine/management_api_contracts';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 import {ISolutionEntry} from '../../../contracts';
 import {IPayloadEntry, IPayloadEntryValue, IRawTokenEntry, ITokenEntry, ITokenViewerService} from './contracts/index';
+import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 
 // tslint:disable: no-magic-numbers
 
@@ -47,10 +48,7 @@ export class TokenViewer {
 
     const flowNodeIsSequenceFlow: boolean = this.flowNode.type === 'bpmn:SequenceFlow';
     if (flowNodeIsSequenceFlow) {
-      this.shouldShowFlowNodeId = false;
-      this.showTokenEntries = false;
-      this.tokenEntries = [];
-      this.rawTokenEntries = [];
+      this.clearTokenViewer();
 
       return;
     }
@@ -67,10 +65,7 @@ export class TokenViewer {
       newFlowNode.type === 'bpmn:SequenceFlow';
 
     if (flowNodeCannotHaveTokenHistory) {
-      this.shouldShowFlowNodeId = false;
-      this.showTokenEntries = false;
-      this.tokenEntries = [];
-      this.rawTokenEntries = [];
+      this.clearTokenViewer();
 
       return;
     }
@@ -81,6 +76,12 @@ export class TokenViewer {
   private async updateFlowNode(): Promise<void> {
     this.firstElementSelected = true;
     this.tokenEntries = [];
+
+    if (!solutionIsRemoteSolution(this.activeSolutionEntry.uri)) {
+      this.clearTokenViewer();
+
+      return;
+    }
 
     if (this.processEngineSupportsFetchingTokensByProcessInstanceId()) {
       const noProcessInstanceId: boolean = this.processInstanceId === undefined;
@@ -122,10 +123,10 @@ export class TokenViewer {
   }
 
   private clearTokenViewer(): void {
-    this.tokenEntries = undefined;
-    this.rawTokenEntries = undefined;
-    this.showTokenEntries = false;
     this.shouldShowFlowNodeId = false;
+    this.showTokenEntries = false;
+    this.tokenEntries = [];
+    this.rawTokenEntries = [];
   }
 
   private processEngineSupportsFetchingTokensByProcessInstanceId(): boolean {
@@ -223,7 +224,7 @@ export class TokenViewer {
   private convertHistoryEntryPayloadToTokenEntryPayload(tokenEntryPayload: any): Array<IPayloadEntry> {
     const formattedTokenEntryPayload: Array<IPayloadEntry> = [];
 
-    const payloadIsNotAnObjectOrArray: boolean = typeof tokenEntryPayload !== 'object';
+    const payloadIsNotAnObjectOrArray: boolean = typeof tokenEntryPayload !== 'object' || tokenEntryPayload === null;
     if (payloadIsNotAnObjectOrArray) {
       const payloadEntry: IPayloadEntry = this.getPayloadEntryForNonObject(tokenEntryPayload);
 
@@ -302,9 +303,9 @@ export class TokenViewer {
   }
 
   private getPayloadEntryValuesForNonObject(payload: any): Array<IPayloadEntryValue> {
-    const payloadIsString: boolean = typeof payload === 'string';
+    const payloadIsStringOrNull: boolean = typeof payload === 'string' || payload === null;
 
-    const payloadEntryValue: string = payloadIsString ? `"${payload}"` : payload.toString();
+    const payloadEntryValue: string = payloadIsStringOrNull ? `"${payload}"` : payload.toString();
 
     const payloadEntryValues: Array<IPayloadEntryValue> = [{value: payloadEntryValue}];
 

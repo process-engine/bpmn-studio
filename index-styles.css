@@ -1,0 +1,17 @@
+.loading-spinner--index {
+  position: absolute;
+  display: inline-block;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.aurelia-app--body {
+  height: 100%;
+}
+
+.loading-spinner__div {
+  height: 100%;
+  width: 100%;
+  background-color: #f7f7f7;
+}

@@ -27,7 +27,7 @@ export class Inspect {
   @bindable() public activeSolutionEntry: ISolutionEntry;
 
   public showHeatmap: boolean = false;
-  public showInspectCorrelation: boolean = false;
+  public showInspectProcessInstance: boolean = false;
   public dashboard: Dashboard;
   public showTokenViewer: boolean = false;
   public tokenViewerButtonDisabled: boolean = false;
@@ -88,7 +88,7 @@ export class Inspect {
 
     const routeViewIsDashboard: boolean = routeParameters.view === 'dashboard';
     const routeViewIsHeatmap: boolean = routeParameters.view === 'heatmap';
-    const routeViewIsInspectCorrelation: boolean = routeParameters.view === 'inspect-correlation';
+    const routeViewIsInspectProcessInstance: boolean = routeParameters.view === 'inspect-process-instance';
 
     this.processInstanceToSelect = routeParameters.processInstanceToSelect;
     this.flowNodeToSelect = routeParameters.flowNodeToSelect;
@@ -97,7 +97,7 @@ export class Inspect {
     if (routeViewIsDashboard) {
       this.showHeatmap = false;
       this.showDashboard = true;
-      this.showInspectCorrelation = false;
+      this.showInspectProcessInstance = false;
 
       this.eventAggregator.publish(environment.events.navBar.toggleDashboardView);
     } else if (routeViewIsHeatmap) {
@@ -105,13 +105,13 @@ export class Inspect {
 
       this.showDashboard = false;
       this.showHeatmap = true;
-      this.showInspectCorrelation = false;
-    } else if (routeViewIsInspectCorrelation) {
-      this.eventAggregator.publish(environment.events.navBar.toggleInspectCorrelationView);
+      this.showInspectProcessInstance = false;
+    } else if (routeViewIsInspectProcessInstance) {
+      this.eventAggregator.publish(environment.events.navBar.toggleInspectProcessInstanceView);
 
       this.showDashboard = false;
       this.showHeatmap = false;
-      this.showInspectCorrelation = true;
+      this.showInspectProcessInstance = true;
     }
 
     if (isRunningInElectron()) {
@@ -157,7 +157,7 @@ export class Inspect {
 
     this.showTokenViewer = !this.showTokenViewer;
 
-    this.eventAggregator.publish(environment.events.inspectCorrelation.showTokenViewer, this.showTokenViewer);
+    this.eventAggregator.publish(environment.events.inspectProcessInstance.showTokenViewer, this.showTokenViewer);
     window.localStorage.setItem('tokenViewerInspectCollapseState', JSON.stringify(this.showTokenViewer));
   }
 
@@ -184,19 +184,26 @@ export class Inspect {
 
     const diagramIsSet: boolean = diagramName !== undefined;
     if (diagramIsSet) {
+      let newActiveDiagram: IDiagram;
+
       const activeSolutionIsOpenSolution: boolean = solutionUriToUse === 'about:open-diagrams';
       if (activeSolutionIsOpenSolution) {
         const persistedDiagrams: Array<IDiagram> = this.solutionService.getOpenDiagrams();
 
-        this.activeDiagram = persistedDiagrams.find((diagram: IDiagram) => {
+        newActiveDiagram = persistedDiagrams.find((diagram: IDiagram) => {
           return diagram.name === diagramName;
         });
       } else {
         try {
-          this.activeDiagram = await this.activeSolutionEntry.service.loadDiagram(diagramName);
+          newActiveDiagram = await this.activeSolutionEntry.service.loadDiagram(diagramName);
         } catch {
           // If loading the diagram failed, do nothing
         }
+      }
+
+      const activeDiagramChanged: boolean = this.activeDiagram?.uri !== newActiveDiagram.uri;
+      if (activeDiagramChanged) {
+        this.activeDiagram = newActiveDiagram;
       }
     }
   }

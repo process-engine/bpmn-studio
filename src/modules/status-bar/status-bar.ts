@@ -25,7 +25,7 @@ export class StatusBar {
   public diffIsShown: boolean = false;
   public currentDiffMode: DiffMode;
   public xmlIsShown: boolean = false;
-  public showInspectCorrelationButtons: boolean = false;
+  public showInspectProcessInstanceButtons: boolean = false;
   public showChangeList: boolean = false;
   public currentXmlIdentifier: string = 'New';
   public previousXmlIdentifier: string = 'Old';
@@ -37,6 +37,7 @@ export class StatusBar {
   public updateVersion: string;
   public updateAvailable: boolean = false;
   public updateDropdown: HTMLElement;
+  public updateDropdownToggle: HTMLElement;
   public updateDownloadFinished: boolean = false;
   public updateStarted: boolean = false;
 
@@ -64,8 +65,14 @@ export class StatusBar {
     if (isRunningInElectron()) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
 
-      this.ipcRenderer.on('update_error', () => {
-        notificationService.showNotification(NotificationType.INFO, 'Update Error!');
+      this.ipcRenderer.on('update_error', (event: Event, message: string) => {
+        console.error('Update Error:', message);
+
+        const targetHref: string = `<a href="javascript:nodeRequire('open')('https://github.com/process-engine/bpmn-studio/releases/tag/v${this.updateVersion}')" style="text-decoration: underline;">click here</a>`;
+        notificationService.showNonDisappearingNotification(
+          NotificationType.WARNING,
+          `<h4>Update Error!</h4>The automatic update has failed!<br>To update BPMN Studio manually, ${targetHref}.`,
+        );
       });
 
       this.ipcRenderer.on('update_available', (event: Event, version: string) => {
@@ -75,7 +82,18 @@ export class StatusBar {
         const message: string =
           'A new update is available.\nPlease click on the BPMN Studio icon in the statusbar to start the download.';
 
-        this.notificationService.showNonDisappearingNotification(NotificationType.INFO, message);
+        const toastrOptions: ToastrOptions = {
+          onclick: (notificationClickEvent: Event) => {
+            notificationClickEvent.stopPropagation();
+
+            const updateDropdownIsHidden: boolean = $(this.updateDropdown).is(':hidden');
+            if (updateDropdownIsHidden) {
+              this.updateDropdownToggle.click();
+            }
+          },
+        };
+
+        this.notificationService.showNonDisappearingNotification(NotificationType.INFO, message, toastrOptions);
       });
 
       this.ipcRenderer.on('update_download_progress', (event: Event, updateProgressData: UpdateProgressData) => {
@@ -107,9 +125,9 @@ export class StatusBar {
       }),
 
       this.eventAggregator.subscribe(
-        environment.events.statusBar.showInspectCorrelationButtons,
-        (showInspectCorrelation: boolean) => {
-          this.showInspectCorrelationButtons = showInspectCorrelation;
+        environment.events.statusBar.showInspectProcessInstanceButtons,
+        (showInspectProcessInstance: boolean) => {
+          this.showInspectProcessInstanceButtons = showInspectProcessInstance;
         },
       ),
 
@@ -186,7 +204,7 @@ export class StatusBar {
   public toggleInspectPanel(): void {
     this.showInspectPanel = !this.showInspectPanel;
 
-    this.eventAggregator.publish(environment.events.inspectCorrelation.showInspectPanel, this.showInspectPanel);
+    this.eventAggregator.publish(environment.events.inspectProcessInstance.showInspectPanel, this.showInspectPanel);
   }
 
   public showReleaseNotes(): void {

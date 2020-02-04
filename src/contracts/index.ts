@@ -1,4 +1,5 @@
 export * from './authentication/index';
+export * from './bpmn/index';
 export * from './bpmnmodeler/index';
 export * from './colorpicker/index';
 export * from './diagram-validation-service/index';
@@ -17,8 +18,8 @@ export * from './exportService/index';
 export * from './propertypanel/index';
 export * from './form-fields/index';
 export * from './user-input-validation/index';
-export * from './inspect-correlation/index';
+export * from './inspect-process-instance/index';
 export * from './solution-explorer';
-export * from './navigation';
+export * from './navigation/index';
 export * from './diagram/index';
 export * from './constants';

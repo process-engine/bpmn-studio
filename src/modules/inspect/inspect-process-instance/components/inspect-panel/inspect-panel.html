@@ -1,0 +1,39 @@
+<template>
+  <require from="./inspect-panel.css"></require>
+  <require from="./components/log-viewer/log-viewer"></require>
+  <require from="./components/correlation-list/correlation-list"></require>
+  <require from="./components/process-instance-list/process-instance-list"></require>
+  <div class="inspect-panel">
+    <div class="inspect-panel__control-bar">
+      <div class="inspect-panel__tabs">
+        <button class="inspect-panel__tab"
+                class.bind="showCorrelationList ? 'inspect-panel__active-tab' : ''"
+                title="Show a list of all Correlations for this process model"
+                click.delegate="changeTab(inspectPanelTab.CorrelationList)">
+          Correlation List (${totalCorrelationCount})
+        </button>
+        <button class="inspect-panel__tab ${selectedCorrelation === undefined ? 'inspect-panel__disabled-tab' : ''} ${showProcessInstanceList ? 'inspect-panel__active-tab' : ''}"
+                disabled.bind="selectedCorrelation === undefined"
+                title.bind="selectedCorrelation !== undefined ? 'Show a list of all Process Instances for the selected Correlation' : 'Select a correlation in order to toggle the Process Instance table'"
+                click.delegate="changeTab(inspectPanelTab.ProcessInstanceList)">
+          Process Instance List (${totalProcessInstanceCount})
+        </button>
+        <button class="inspect-panel__tab ${showLogViewer ? 'inspect-panel__active-tab' : ''}"
+                class.bind="selectedProcessInstance === undefined ? 'inspect-panel__disabled-tab' : ''"
+                disabled.bind="selectedProcessInstance === undefined"
+                title.bind="selectedProcessInstance !== undefined ? 'Show log of the selected Process Instaance' : 'Select a correlation in order to toggle the log viewer'"
+                click.delegate="changeTab(inspectPanelTab.LogViewer)">
+          Log Viewer
+        </button>
+      </div>
+      <div class="button inspect-panel__fullscreen-button" click.delegate="toggleFullscreen()" title.bind="fullscreen ? 'Close full screen' : 'Open full screen'">
+        <i class.bind="fullscreen ? 'fas fa-arrow-down' : 'fas fa-arrow-up'"></i>
+      </div>
+    </div>
+    <div class="inspect-panel__body">
+      <correlation-list show.bind="showCorrelationList" active-diagram.bind="activeDiagram" correlations.to-view="correlations"  selected-correlation.from-view="selectedCorrelation" correlation-to-select.to-view="correlationToSelect" total-count.bind="totalCorrelationCount"></correlation-list>
+      <process-instance-list show.bind="showProcessInstanceList" active-diagram.bind="activeDiagram" process-instances.to-view="processInstances" selected-correlation.to-view="selectedCorrelation" selected-process-instance.from-view="selectedProcessInstance" process-instance-to-select.to-view="processInstanceToSelect" total-count.bind="totalProcessInstanceCount"></process-instance-list>
+      <log-viewer if.bind="showLogViewer" active-solution-entry.bind="activeSolutionEntry" process-instance.to-view="selectedProcessInstance"></log-viewer>
+    </div>
+  </div>
+</template>

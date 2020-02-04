@@ -67,6 +67,7 @@ interface IDiagramCreationState extends IDiagramNameInputState {
   'HttpFetchClient',
 )
 export class SolutionExplorerSolution {
+  public solutionExplorerSolution = this;
   public activeDiagram: IDiagram;
   public showCloseModal: boolean = false;
   @bindable public renameDiagramInput: HTMLInputElement;
@@ -78,6 +79,7 @@ export class SolutionExplorerSolution {
   @bindable public cssIconClass: string;
   @bindable public isConnected: boolean;
   @bindable public tooltipText: string;
+  @bindable public peHasStarted: boolean = false;
   public createNewDiagramInput: HTMLInputElement;
   public diagramContextMenu: HTMLElement;
   public showContextMenu: boolean = false;
@@ -86,6 +88,10 @@ export class SolutionExplorerSolution {
 
   public isSavingDiagrams: boolean = false;
   public currentlySavingDiagramName: string = '';
+
+  public processEngineStartupError: boolean = false;
+  public processEngineErrorLog: string;
+  public errorLogArea: HTMLTextAreaElement;
 
   private router: Router;
   private eventAggregator: EventAggregator;
@@ -156,7 +162,6 @@ export class SolutionExplorerSolution {
     this.saveDiagramService = saveDiagramService;
     this.signaler = bindingSignaler;
     this.httpFetchClient = httpFetchClient;
-
     this.updateDiagramStateList();
     this.diagramStatesChangedCallbackId = this.openDiagramStateService.onDiagramStatesChanged(() => {
       this.updateDiagramStateList();
@@ -164,9 +169,36 @@ export class SolutionExplorerSolution {
   }
 
   public async attached(): Promise<void> {
+    const solutionIsInternalProcessEngine: boolean =
+      this.displayedSolutionEntry.uri === window.localStorage.getItem('InternalProcessEngineRoute');
+
     this.isAttached = true;
     if (isRunningInElectron()) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
+
+      if (solutionIsInternalProcessEngine) {
+        this.ipcRenderer.send('add_internal_processengine_status_listener');
+
+        // wait for status to be reported
+        this.ipcRenderer.on('internal_processengine_status', async (event: any, status: string, errorLog: string) => {
+          if (status === 'success') {
+            this.processEngineRunning = true;
+            this.peHasStarted = true;
+            await this.updateSolution();
+
+            this.solutionEventListenerId = this.displayedSolutionEntry.service.watchSolution(() => {
+              this.updateSolution();
+            });
+          } else {
+            this.processEngineErrorLog = errorLog;
+            this.processEngineStartupError = true;
+            this.processEngineRunning = false;
+            this.isConnected = false;
+            this.cssIconClass = 'fa fa-bolt';
+            console.error(errorLog);
+          }
+        });
+      }
     }
 
     this.originalIconClass = this.cssIconClass;
@@ -215,9 +247,12 @@ export class SolutionExplorerSolution {
     }
 
     if (solutionIsRemoteSolution(this.displayedSolutionEntry.uri)) {
+      if (solutionIsInternalProcessEngine) {
+        return;
+      }
+
       await this.waitForProcessEngine();
     } else {
-      this.processEngineRunning = true;
       this.setValidationRules();
 
       setTimeout(async () => {
@@ -247,8 +282,6 @@ export class SolutionExplorerSolution {
                 throw error;
               }
             }
-
-            this.processEngineRunning = true;
 
             await this.updateSolution();
 
@@ -310,6 +343,11 @@ export class SolutionExplorerSolution {
       await this.updateSolution();
       this.refreshDisplayedDiagrams();
     }
+  }
+
+  public copyToClipboard(): void {
+    this.errorLogArea.select();
+    document.execCommand('copy');
   }
 
   /**
@@ -625,7 +663,7 @@ export class SolutionExplorerSolution {
     return (
       !this.displayedSolutionEntry.isOpenDiagram &&
       this.openedSolution &&
-      !this.isUriFromRemoteSolution(this.openedSolution.uri)
+      !solutionIsRemoteSolution(this.openedSolution.uri)
     );
   }
 
@@ -703,7 +741,7 @@ export class SolutionExplorerSolution {
   }
 
   public async openDiagram(diagram: IDiagram): Promise<void> {
-    const diagramIsFromLocalSolution: boolean = !this.isUriFromRemoteSolution(diagram.uri);
+    const diagramIsFromLocalSolution: boolean = !solutionIsRemoteSolution(diagram.uri);
 
     if (diagramIsFromLocalSolution) {
       const diagramIsNotYetOpened: boolean = !this.openDiagramService
@@ -1417,7 +1455,6 @@ export class SolutionExplorerSolution {
     const diagramNameIsSpecified: boolean = diagramName !== undefined;
 
     const diagramUri: string = this.router.currentInstruction.queryParams.diagramUri;
-
     const routeName: string = this.router.currentInstruction.config.name;
     const routeNameNeedsUpdate: boolean = routeName === 'design' || routeName === 'inspect' || routeName === 'think';
     if (routeNameNeedsUpdate) {
@@ -1430,8 +1467,6 @@ export class SolutionExplorerSolution {
       return;
     }
 
-    this.activeDiagram = undefined;
-
     if (solutionUriSpecified && diagramNameIsSpecified) {
       try {
         const activeSolution: ISolution = await this.solutionService.loadSolution();
@@ -1440,13 +1475,16 @@ export class SolutionExplorerSolution {
 
           const diagramIsInGivenSolution: boolean = solutionIsRemoteSolution(solutionUri)
             ? diagram.uri.includes(solutionUri)
-            : diagram.uri.includes(`${solutionUri}/${diagram.name}.bpmn`);
+            : diagram.uri.includes(`${solutionUri}/${diagram.name}.bpmn`) ||
+              diagram.uri.endsWith(`${diagram.name}.bpmn`);
 
           return diagram.name === diagramName && (currentDiagramIsGivenDiagram || diagramIsInGivenSolution);
         });
       } catch {
         // Do nothing
       }
+    } else {
+      this.activeDiagram = undefined;
     }
   }
 
@@ -1498,7 +1536,7 @@ export class SolutionExplorerSolution {
         // The solution may have changed on the file system.
         await this.updateSolution();
 
-        const isRemoteSolution: boolean = this.isUriFromRemoteSolution(this.openedSolution.uri);
+        const isRemoteSolution: boolean = solutionIsRemoteSolution(this.openedSolution.uri);
 
         let expectedDiagramUri: string;
         if (isRemoteSolution) {
@@ -1514,9 +1552,5 @@ export class SolutionExplorerSolution {
       .withMessage('A diagram with that name already exists.')
       .on(this.diagramRenamingState)
       .on(this.diagramCreationState);
-  }
-
-  private isUriFromRemoteSolution(uri: string): boolean {
-    return solutionIsRemoteSolution(uri);
   }
 }

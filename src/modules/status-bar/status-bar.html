@@ -5,7 +5,7 @@
   -->
   <div class="status-bar status-bar--system-macos" id="statusBarContainer">
     <div class="status-bar__left-bar" id="statusBarLeft">
-      <a if.bind="updateAvailable" class="status-bar__button update-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <a if.bind="updateAvailable" ref="updateDropdownToggle" class="update-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <img class="update-button-icon" src="src/resources/images/icon.png" title.bind="isDownloading ? updateProgressData.percent.toString() + '%' : 'Update available.'">
       </a>
       <div class="dropdown-menu update-dropdown" ref="updateDropdown">
@@ -43,18 +43,18 @@
       </div>
     </div>
     <div class="status-bar__center-bar" id="statusBarCenter">
-      <div if.bind="showInspectCorrelationButtons">
-        <a class="status-bar__element status-bar__button" class.bind="showInspectPanel ? 'status-bar__element--active' : ''" click.delegate="toggleInspectPanel()">Inspect Panel</a>
+      <div if.bind="showInspectProcessInstanceButtons">
+        <a class="status-bar__element" class.bind="showInspectPanel ? 'status-bar__element--active' : ''" click.delegate="toggleInspectPanel()">Inspect Panel</a>
       </div>
       <div class="center-bar__diff-view-buttons" if.bind="diffIsShown">
-        <a class="status-bar__element status-bar__button status-bar__diff-view" class.bind="currentDiffMode === diffMode.OldVsNew ? 'status-bar__element--active' : ''" click.delegate="changeDiffMode(diffMode.OldVsNew)" title="Compare the ${previousXmlIdentifier === 'Old' ? previousXmlIdentifier.toLowerCase() : previousXmlIdentifier} diagram with the ${currentXmlIdentifier === 'New' ? currentXmlIdentifier.toLowerCase() : currentXmlIdentifier} diagram" id="statusBarOldVsNew">
+        <a class="status-bar__element status-bar__diff-view" class.bind="currentDiffMode === diffMode.OldVsNew ? 'status-bar__element--active' : ''" click.delegate="changeDiffMode(diffMode.OldVsNew)" title="Compare the ${previousXmlIdentifier === 'Old' ? previousXmlIdentifier.toLowerCase() : previousXmlIdentifier} diagram with the ${currentXmlIdentifier === 'New' ? currentXmlIdentifier.toLowerCase() : currentXmlIdentifier} diagram" id="statusBarOldVsNew">
           <div class="identifier">${previousXmlIdentifier}</div> vs. <div class="identifier">${currentXmlIdentifier}</div>
           <i class="fa fa-arrow-right arrow-icon"></i>
         </a>
-        <a class="status-bar__element status-bar__button" class.bind="showChangeList ? 'status-bar__element--active' : ''" click.delegate="toggleChangeList()" title="Toggle visibility of the Change List" id="statusBarChangesLog">
+        <a class="status-bar__element" class.bind="showChangeList ? 'status-bar__element--active' : ''" click.delegate="toggleChangeList()" title="Toggle visibility of the Change List" id="statusBarChangesLog">
           <i class="fas fa-bars"></i>
         </a>
-        <a class="status-bar__element status-bar__button status-bar__diff-view" class.bind="currentDiffMode === diffMode.NewVsOld ? 'status-bar__element--active' : ''" click.delegate="changeDiffMode(diffMode.NewVsOld)" title="Compare the ${currentXmlIdentifier === 'New' ? currentXmlIdentifier.toLowerCase() : currentXmlIdentifier} diagram with the ${previousXmlIdentifier === 'Old' ? previousXmlIdentifier.toLowerCase() : previousXmlIdentifier} diagram" id="statusBarNewVsOld">
+        <a class="status-bar__element status-bar__diff-view" class.bind="currentDiffMode === diffMode.NewVsOld ? 'status-bar__element--active' : ''" click.delegate="changeDiffMode(diffMode.NewVsOld)" title="Compare the ${currentXmlIdentifier === 'New' ? currentXmlIdentifier.toLowerCase() : currentXmlIdentifier} diagram with the ${previousXmlIdentifier === 'Old' ? previousXmlIdentifier.toLowerCase() : previousXmlIdentifier} diagram" id="statusBarNewVsOld">
           <i class="fa fa-arrow-left arrow-icon"></i>
           <div class="identifier">${currentXmlIdentifier}</div> vs. <div class="identifier">${previousXmlIdentifier}</div>
         </a>
@@ -62,16 +62,16 @@
     </div>
     <div class="status-bar__right-bar" id="statusBarRight">
       <template if.bind="showDiagramViewButtons">
-        <a class="status-bar__element status-bar__button" click.delegate="toggleXMLView()" if.bind="!xmlIsShown" data-test-status-bar-xml-view-button>
+        <a class="status-bar__element" click.delegate="toggleXMLView()" if.bind="!xmlIsShown" data-test-status-bar-xml-view-button>
           <i class="fas fa-file-code"></i> Show XML
         </a>
-        <a class="status-bar__element status-bar__button" click.delegate="toggleXMLView()" if.bind="xmlIsShown" data-test-status-bar-disable-xml-view-button>
+        <a class="status-bar__element" click.delegate="toggleXMLView()" if.bind="xmlIsShown" data-test-status-bar-disable-xml-view-button>
           <i class="fas fa-file-code"></i> Show Diagram
         </a>
-        <a class="status-bar__element status-bar__button" click.delegate="toggleDiffView()" if.bind="!diffIsShown" data-test-status-bar-diff-view-button>
+        <a class="status-bar__element" click.delegate="toggleDiffView()" if.bind="!diffIsShown" data-test-status-bar-diff-view-button>
           <i class="fa fa-object-group"></i> Show Diff
         </a>
-        <a class="status-bar__element status-bar__button" click.delegate="toggleDiffView()" if.bind="diffIsShown" data-test-status-bar-disable-diff-view-button>
+        <a class="status-bar__element" click.delegate="toggleDiffView()" if.bind="diffIsShown" data-test-status-bar-disable-diff-view-button>
           <i class="fa fa-object-group"></i> Show Diagram
         </a>
       </template>

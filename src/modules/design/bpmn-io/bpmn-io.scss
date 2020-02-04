@@ -135,7 +135,6 @@
     width: 32px;
     height: 32px;
     margin-left: 1px;
-    cursor: pointer;
     font-size: 20px;
     line-height: 24px;
   }
@@ -206,11 +205,9 @@
 .bpmn-js-bpmnlint-button {
   // Overwriting existing style of the plugin
   top: unset;
-
   bottom: 20px;
   left: 55px;
   height: 30px;
-  cursor: default;
   pointer-events: none;
 }
 

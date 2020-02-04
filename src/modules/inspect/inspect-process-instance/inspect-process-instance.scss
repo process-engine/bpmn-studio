@@ -1,0 +1,97 @@
+.inspect-process-instance {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.inspect-process-instance__panels {
+  display: flex;
+  width: calc(100% - 72px);
+  height: 100%;
+  margin-right: 36px;
+  margin-left: 36px;
+  flex-direction: column;
+}
+
+.inspect-process-instance__correlation-selection {
+  position: relative;
+  height: 175px;
+  margin-top: 20px;
+  margin-right: 20px;
+  margin-left: 20px;
+  overflow: hidden;
+  background-color: #f7f7f7;
+  border: 1px solid #ccc;
+  user-select: none;
+}
+
+.inspect-process-instance__correlation-data {
+  height: calc(100% - 175px - 20px);
+  padding: 20px;
+}
+
+.inspect-process-instance__bottom-panel {
+  width: 100%;
+  max-height: calc(100% - 150px);
+  flex-shrink: 0;
+}
+
+.inspect-process-instance__bottom-panel--fullscreen {
+  height: 100% !important;
+  max-height: 100%;
+}
+
+.inspect-process-instance__bottom-resize-div {
+  z-index: 1;
+  height: 9px;
+  width: 100%;
+  margin-top: -4px;
+  margin-bottom: -4px;
+  cursor: row-resize;
+  flex-shrink: 0;
+}
+
+.inspect-process-instance__right-resize-div {
+  z-index: 1;
+  width: 6px;
+  margin-right: -4px;
+  cursor: col-resize;
+  flex-shrink: 0;
+}
+
+.inspect-process-instance__upper-panel {
+  height: 100%;
+  display: flex;
+  flex-grow: 1;
+}
+
+.inspect-process-instance__diagram-viewer {
+  flex-basis: 100%;
+}
+
+.inspect-process-instance__token-viewer {
+  height: 100%;
+  max-width: calc(100% - 300px);
+  flex-shrink: 0;
+}
+
+.inspect-process-instance__right-toolbar {
+  position: absolute;
+  z-index: 1;
+  top: 0px;
+  right: 0px;
+  width: 36px;
+  height: 100%;
+  padding-bottom: 22px;
+}
+
+.inspect-process-instance__left-toolbar {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 36px;
+  height: 100%;
+  background-color: #f7f7f7;
+  border-right: 2px solid #ccc;
+  padding-bottom: 22px;
+}

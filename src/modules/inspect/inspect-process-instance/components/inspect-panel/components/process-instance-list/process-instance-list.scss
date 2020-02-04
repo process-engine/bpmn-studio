@@ -1,0 +1,94 @@
+.process-instance-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.process-instance-table{
+  width: 100%;
+  height: 100%;
+  background: #f0f0f0;
+  user-select: none;
+}
+
+.process-instance-table__headlines {
+  display: flex;
+  width: 100%;
+}
+
+.process-instance-table__headline {
+  width: 34%;
+  padding: 8px;
+  overflow: hidden;
+  border-bottom: 2px solid #ccc !important;
+  font-size: 14px;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.process-instance-table__headline--number {
+  width: 10%;
+  padding: 8px;
+  overflow: hidden;
+  border-bottom: 2px solid #ccc !important;
+  font-size: 14px;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.process-instance-table__body {
+  display: block;
+  height: 100%;
+  overflow: auto;
+}
+
+.process-instance-table__table-row {
+  display: flex;
+  width: 100%;
+}
+
+.process-instance-table__table-row--instance-to-select {
+  border: 4px double;
+}
+
+.process-instance-table__table-entry {
+  width: 34%;
+  padding: 8px;
+  overflow: hidden;
+  border-top: none !important;
+  border-bottom: 1px solid #ccc;
+  text-overflow: ellipsis;
+}
+
+.process-instance-table__table-entry--state {
+  text-transform: uppercase;
+}
+
+.process-instance-table__pagesize-entry {
+  float: left;
+  margin-top: 5px;
+  margin-right: 5px;
+}
+
+.process-instance-table__pagesize-entry--select {
+  width: 70px;
+  margin: unset;
+}
+
+.process-instance-table__pagination-entry {
+  width: 70%;
+}
+
+.process-instance-table__selected-entry {
+  background-color: #d3d3d3 !important;
+}
+
+.process-instance-table__empty-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  user-select: none;
+}

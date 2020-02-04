@@ -41,6 +41,10 @@ export class SolutionExplorer {
     await this.testClient.ensureVisible('[data-test-solution-is-internal=true]', VISIBLE_TIMEOUT);
   }
 
+  public async assertInternalProcessEngineIsConnected(): Promise<void> {
+    await this.testClient.ensureVisible('[data-test-solution-is-connected="true"]', VISIBLE_TIMEOUT);
+  }
+
   public async openDirectoryAsSolution(dir: string, diagramName?: string): Promise<void> {
     const pathToSolution: string = path.join(__dirname, '..', '..', '..', '..', '..', dir);
 

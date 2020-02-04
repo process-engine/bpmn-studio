@@ -12,14 +12,6 @@ input:focus {
   outline: none !important;
 }
 
-.button:not(:disabled) {
-  cursor: pointer;
-}
-
-.btn:disabled {
-  cursor: default;
-}
-
 .form-control:focus {
   border-color: #ced4da;
   box-shadow: none;
@@ -59,7 +51,6 @@ router-view {
 .button {
   color: #333;
   opacity: 0.5;
-  cursor: default;
 }
 
 .button:hover {
@@ -108,7 +99,6 @@ router-view {
 }
 
 .dropdown-item {
-   cursor: pointer !important;
    background-color: transparent !important;
    color: black !important;
    user-select: none;

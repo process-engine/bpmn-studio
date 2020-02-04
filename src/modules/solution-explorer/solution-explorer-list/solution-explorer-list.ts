@@ -373,7 +373,27 @@ export class SolutionExplorerList {
   }
 
   public async login(solutionEntry: ISolutionEntry): Promise<void> {
-    const result: ILoginResult = await this.authenticationService.login(solutionEntry.authority);
+    const onTokenRefresh = async (refreshResult: ILoginResult): Promise<void> => {
+      const couldNotConnectToAuthority: boolean = refreshResult === undefined;
+      const userIsNotLoggedIn: boolean = refreshResult.idToken === 'access_denied';
+      if (couldNotConnectToAuthority || userIsNotLoggedIn) {
+        return;
+      }
+
+      solutionEntry.identity = {
+        token: refreshResult.accessToken,
+        userId: refreshResult.idToken,
+      };
+      solutionEntry.isLoggedIn = true;
+      solutionEntry.userName = refreshResult.identity.name;
+
+      await solutionEntry.service.openSolution(solutionEntry.uri, solutionEntry.identity);
+      this.solutionService.persistSolutionsInLocalStorage();
+
+      this.eventAggregator.publish(AuthenticationStateEvent.LOGIN);
+    };
+
+    const result: ILoginResult = await this.authenticationService.login(solutionEntry.authority, onTokenRefresh);
 
     const couldNotConnectToAuthority: boolean = result === undefined;
     if (couldNotConnectToAuthority) {

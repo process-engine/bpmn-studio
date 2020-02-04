@@ -22,6 +22,7 @@ Bluebird.Promise.config({cancellation: true});
 @inject(OpenIdConnect, 'NotificationService', EventAggregator)
 export class App {
   public showSolutionExplorer: boolean = false;
+  public isRunningInElectron: boolean = isRunningInElectron();
 
   private openIdConnect: OpenIdConnect | any;
   private notificationService: NotificationService;
@@ -239,6 +240,18 @@ export class App {
         title: 'Preferences',
         name: 'preferences',
         moduleId: 'modules/user-preferences/user-preferences',
+      },
+      {
+        route: 'signin-popup-redirect',
+        title: 'Signin Popup Redirect',
+        name: 'signin-popup-redirect',
+        moduleId: 'modules/signin-popup-redirect/signin-popup-redirect',
+      },
+      {
+        route: 'signout-popup-redirect',
+        title: 'Signout Popup Redirect',
+        name: 'signout-popup-redirect',
+        moduleId: 'modules/signout-popup-redirect/signout-popup-redirect',
       },
     ]);
 

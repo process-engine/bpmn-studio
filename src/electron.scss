@@ -1,0 +1,9 @@
+.electron {
+  button,
+  button:not(:disabled),
+  a.tool,
+  .dropdown,
+  .dropdown-item {
+    cursor: default;
+  }
+}

@@ -214,18 +214,21 @@ export class SolutionExplorerPanel {
     });
 
     const persistedOpenDiagrams: Array<IDiagram> = this.solutionService.getOpenDiagrams();
-    persistedOpenDiagrams.forEach(async (diagram: IDiagram) => {
+    for (const persistedOpenDiagram of persistedOpenDiagrams) {
       try {
-        await this.solutionExplorerList.openDiagram(diagram.uri);
+        await this.solutionExplorerList.openDiagram(persistedOpenDiagram.uri);
       } catch {
         // Do nothing
       }
-    });
+    }
+
+    if (isRunningInElectron()) {
+      this.registerElectronHooks();
+    }
   }
 
   public async attached(): Promise<void> {
     if (isRunningInElectron()) {
-      this.registerElectronHooks();
       document.addEventListener('drop', this.openDiagramOnDropBehaviour);
     }
 
@@ -640,7 +643,8 @@ export class SolutionExplorerPanel {
 
   private electronFileOpeningHook = async (_: Event, pathToFile: string): Promise<void> => {
     const uri: string = pathToFile;
-    this.openDiagramOrDisplayError(uri);
+
+    await this.openDiagramOrDisplayError(uri);
   };
 
   private electronOnMenuOpenDiagramHook = async (_: Event): Promise<void> => {
@@ -652,13 +656,18 @@ export class SolutionExplorerPanel {
   };
 
   private electronOnCreateDiagram = async (_: Event): Promise<void> => {
-    this.openNewDiagram();
+    await this.openNewDiagram();
+
+    setTimeout(() => {
+      const openDiagramsEntry = document.getElementsByClassName('open-diagrams-entry')[0];
+      openDiagramsEntry.scrollTop = openDiagramsEntry.scrollHeight;
+    }, 0);
   };
 
-  private openNewDiagram(): void {
+  private openNewDiagram(): Promise<void> {
     const uri: string = 'about:open-diagrams';
 
-    this.solutionExplorerList.createDiagram(uri);
+    return this.solutionExplorerList.createDiagram(uri);
   }
 
   private createNewDiagram(): void {
@@ -673,7 +682,7 @@ export class SolutionExplorerPanel {
     this.solutionExplorerList.createDiagram(uri);
   }
 
-  private registerElectronHooks(): void {
+  private async registerElectronHooks(): Promise<void> {
     // Register handler for double-click event fired from "electron.js".
     this.ipcRenderer.on('double-click-on-file', this.electronFileOpeningHook);
 
@@ -691,7 +700,7 @@ export class SolutionExplorerPanel {
     if (fileInfo.path) {
       // There was a file opened before BPMN Studio was loaded, open it.
       const uri: string = fileInfo.path;
-      this.openDiagramOrDisplayError(uri);
+      await this.openDiagramOrDisplayError(uri);
     }
   }
 

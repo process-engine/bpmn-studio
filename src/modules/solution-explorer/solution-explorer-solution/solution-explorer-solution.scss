@@ -67,7 +67,6 @@
 .diagram-entry {
   display: flex;
   padding: 2.5px 5px 2.5px 22px;
-  cursor: pointer;
 }
 
 .diagram-entry--highlight {
@@ -174,4 +173,13 @@
   transform: translateX(-50%);
   margin-top: 5px;
   bottom: 10px;
+}
+
+.startup-error:hover {
+  text-decoration: underline;
+}
+
+.error-log {
+  min-height: 440px;
+  resize: none;
 }
