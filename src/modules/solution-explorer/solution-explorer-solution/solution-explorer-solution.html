@@ -14,13 +14,11 @@
     </div>
 
     <div class="authority-issue" if.bind="solutionIsNotLoaded && authorisationError">
-      <span class="authorisation-error__headline">Authorisation failed</span><br>
-      <span class="authorisation-error">You don't have sufficient permissions for accessing this ProcessEngine. Please try to <a href="#" class="authorisation-error__login-link" click.delegate="login(displayedSolutionEntry)">login</a> as another user.</span>
+      <span class="authorisation-error">You don't have sufficient permissions for accessing this ProcessEngine. Please <a href="#" class="authorisation-error__login-link" click.delegate="login(displayedSolutionEntry)">try to login</a> as another user.</span>
     </div>
 
     <div class="authority-issue" if.bind="solutionIsNotLoaded && authenticationError">
-      <span class="authorisation-error__headline">Authentication failed</span><br>
-      <span class="authorisation-error">Please try to <a href="#" class="authorisation-error__login-link" click.delegate="login(displayedSolutionEntry)">login.</a></span>
+      <span class="authorisation-error">Please <a href="#" class="authorisation-error__login-link" click.delegate="login(displayedSolutionEntry)">try to login.</a></span>
     </div>
 
     <div class="diagram-contextmenu" ref="diagramContextMenu" show.bind="showContextMenu">
