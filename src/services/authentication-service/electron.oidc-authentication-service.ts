@@ -104,7 +104,7 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
   public async getUserIdentity(authorityUrl: string, identity: IIdentity): Promise<IUserIdentity | null> {
     authorityUrl = this.formAuthority(authorityUrl);
 
-    const userInfoResponse = await this.httpFetchClient.get(`${authorityUrl}connect/userinfo`, {
+    const userInfoResponse: IResponse<any> = await this.httpFetchClient.get(`${authorityUrl}connect/userinfo`, {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json',
