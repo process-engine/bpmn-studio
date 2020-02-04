@@ -41,6 +41,7 @@ export class TaskList {
   @bindable public processModelId: string;
   @bindable public taskId: string;
   @bindable public processInstanceId: string;
+  @bindable public correlationId: string;
 
   private activeSolutionUri: string;
   private dashboardService: IDashboardService;
@@ -143,6 +144,8 @@ export class TaskList {
         this.processModelId = processModelId;
         this.processInstanceId = processInstanceId;
         this.taskId = id;
+        this.correlationId = correlationId;
+
         this.showDynamicUiModal = true;
         return;
       }

@@ -55,6 +55,7 @@
     </template>
     <template replace-part="modal-body">
       <task-dynamic-ui view-model.ref="origin.dynamicUi"
+                      correlation-id.bind="correlationId"
                       process-instance-id.bind="processInstanceId"
                       process-model-id.bind="processModelId"
                       task-id.bind="taskId"
