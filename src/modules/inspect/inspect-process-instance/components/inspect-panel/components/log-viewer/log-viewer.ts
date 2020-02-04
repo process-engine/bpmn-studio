@@ -1,22 +1,11 @@
 import {bindable, inject} from 'aurelia-framework';
 
-import * as clipboard from 'clipboard-polyfill';
-
 import {DataModels} from '@process-engine/management_api_contracts';
 
-import {
-  ILogSortSettings,
-  ISolutionEntry,
-  LogSortProperty,
-  NotificationType,
-} from '../../../../../../../contracts/index';
+import {ILogSortSettings, ISolutionEntry, LogSortProperty} from '../../../../../../../contracts/index';
 import {getBeautifiedDate} from '../../../../../../../services/date-service/date.service';
 import {NotificationService} from '../../../../../../../services/notification-service/notification.service';
 import {IInspectProcessInstanceService} from '../../../../contracts';
-
-interface IClipboard {
-  writeText?(text: string): void;
-}
 
 @inject('NotificationService', 'InspectProcessInstanceService')
 export class LogViewer {
@@ -55,12 +44,6 @@ export class LogViewer {
 
       this.sortLogs();
     }, 0);
-  }
-
-  public copyToClipboard(textToCopy: string): void {
-    (clipboard as IClipboard).writeText(textToCopy);
-
-    this.notificationService.showNotification(NotificationType.SUCCESS, 'Successfully copied to clipboard.');
   }
 
   public getDateStringFromTimestamp(timestamp: string): string {
