@@ -705,12 +705,36 @@ export class SolutionExplorerList {
     }
 
     if (identity.userId !== '') {
+      if (entry.authority === undefined) {
+        entry.authority = await this.getAuthorityWhenAvailable(entry.uri);
+      }
+
       const success = await this.login(entry, true);
 
       if (!success) {
         await this.logout(entry, true);
       }
     }
+  }
+
+  private getAuthorityWhenAvailable(solutionUri: string): Promise<string> {
+    return new Promise((resolve) => {
+      const authorityCheckInterval = setInterval(async () => {
+        let authority;
+        try {
+          authority = await this.getAuthorityForSolution(solutionUri);
+        } catch (error) {
+          if (error.message !== 'Failed to fetch') {
+            throw error;
+          }
+        }
+
+        if (authority !== undefined) {
+          clearInterval(authorityCheckInterval);
+          resolve(authority);
+        }
+      }, 100);
+    });
   }
 
   private getHiddenStateForSolutionUri(uri: string): boolean {
