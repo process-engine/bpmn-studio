@@ -110,7 +110,7 @@ export class TaskList {
 
     this.isAttached = false;
 
-    if (this.solutionEventListenerId !== undefined) {
+    if (this.solutionEventListenerId !== undefined && !this.activeSolutionEntry.isOpenDiagram) {
       this.activeSolutionEntry.service.unwatchSolution(this.solutionEventListenerId);
     }
 
