@@ -277,8 +277,8 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
       this.refreshTimeouts.delete(solutionUri);
     }
     if (this.solutionsToRefresh.includes(solutionUri)) {
-      const solutionToReemove = this.solutionsToRefresh.findIndex((solution) => solution === solutionUri);
-      this.solutionsToRefresh.splice(solutionToReemove, 1);
+      const solutionToRemove = this.solutionsToRefresh.findIndex((solution) => solution === solutionUri);
+      this.solutionsToRefresh.splice(solutionToRemove, 1);
     }
   }
 
