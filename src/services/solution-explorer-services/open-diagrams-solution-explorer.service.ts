@@ -190,7 +190,7 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
               const xml: string = fs.readFileSync(diagram.uri, 'utf8');
 
               const diagramWasChangedByStudio: boolean =
-                (change !== undefined && (change.change === 'save' && change.xml === xml)) ||
+                (change !== undefined && change.change === 'save' && change.xml === xml) ||
                 (change !== undefined && change.change === 'create');
 
               const diagramWasNotChangedOutsideOfTheStudio: boolean = diagram.xml === xml;
@@ -203,10 +203,13 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
               if (diagramWasNotChangedOutsideOfTheStudio) {
                 const diagramWasRecoveredToTheStateWhenItWasInitiallyOpened: boolean = diagramState.data.xml !== xml;
                 if (diagramWasRecoveredToTheStateWhenItWasInitiallyOpened) {
-                  diagramState.data.xml = xml;
-                  this.openDiagramStateService.updateDiagramState(diagram.uri, diagramState);
+                  if (!diagramState.metadata.isChanged) {
+                    diagramState.data.xml = xml;
 
-                  this.eventAggregator.publish(environment.events.diagramNeedsToBeUpdated);
+                    this.openDiagramStateService.updateDiagramState(diagram.uri, diagramState);
+
+                    this.eventAggregator.publish(environment.events.diagramNeedsToBeUpdated);
+                  }
                 }
 
                 isSaving = false;

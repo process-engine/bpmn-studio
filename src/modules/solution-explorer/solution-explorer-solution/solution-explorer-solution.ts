@@ -670,7 +670,7 @@ export class SolutionExplorerSolution {
     return (
       !this.displayedSolutionEntry.isOpenDiagram &&
       this.openedSolution &&
-      !this.isUriFromRemoteSolution(this.openedSolution.uri)
+      !solutionIsRemoteSolution(this.openedSolution.uri)
     );
   }
 
@@ -748,7 +748,7 @@ export class SolutionExplorerSolution {
   }
 
   public async openDiagram(diagram: IDiagram): Promise<void> {
-    const diagramIsFromLocalSolution: boolean = !this.isUriFromRemoteSolution(diagram.uri);
+    const diagramIsFromLocalSolution: boolean = !solutionIsRemoteSolution(diagram.uri);
 
     if (diagramIsFromLocalSolution) {
       const diagramIsNotYetOpened: boolean = !this.openDiagramService
@@ -1466,7 +1466,6 @@ export class SolutionExplorerSolution {
     const diagramNameIsSpecified: boolean = diagramName !== undefined;
 
     const diagramUri: string = this.router.currentInstruction.queryParams.diagramUri;
-
     const routeName: string = this.router.currentInstruction.config.name;
     const routeNameNeedsUpdate: boolean = routeName === 'design' || routeName === 'inspect' || routeName === 'think';
     if (routeNameNeedsUpdate) {
@@ -1479,8 +1478,6 @@ export class SolutionExplorerSolution {
       return;
     }
 
-    this.activeDiagram = undefined;
-
     if (solutionUriSpecified && diagramNameIsSpecified) {
       try {
         const activeSolution: ISolution = await this.solutionService.loadSolution();
@@ -1489,13 +1486,16 @@ export class SolutionExplorerSolution {
 
           const diagramIsInGivenSolution: boolean = solutionIsRemoteSolution(solutionUri)
             ? diagram.uri.includes(solutionUri)
-            : diagram.uri.includes(`${solutionUri}/${diagram.name}.bpmn`);
+            : diagram.uri.includes(`${solutionUri}/${diagram.name}.bpmn`) ||
+              diagram.uri.endsWith(`${diagram.name}.bpmn`);
 
           return diagram.name === diagramName && (currentDiagramIsGivenDiagram || diagramIsInGivenSolution);
         });
       } catch {
         // Do nothing
       }
+    } else {
+      this.activeDiagram = undefined;
     }
   }
 
@@ -1547,7 +1547,7 @@ export class SolutionExplorerSolution {
         // The solution may have changed on the file system.
         await this.updateSolution();
 
-        const isRemoteSolution: boolean = this.isUriFromRemoteSolution(this.openedSolution.uri);
+        const isRemoteSolution: boolean = solutionIsRemoteSolution(this.openedSolution.uri);
 
         let expectedDiagramUri: string;
         if (isRemoteSolution) {

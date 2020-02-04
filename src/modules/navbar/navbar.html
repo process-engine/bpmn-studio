@@ -12,7 +12,7 @@
       </div>
     </div>
     <div class="menu-bar__menu--center">
-      <div class="menu__element menu__element--title btn-group" if.bind="showProcessName" ref="diagramInfo" dblclick.trigger="$event.stopPropagation()">
+      <div class="menu__element menu__element--title btn-group" if.bind="showProcessName" ref="diagramInfo">
         <span if.bind="savingTargetIsRemoteSolution" class="fas menu__origin-icon fa-database" data-test-navbar-icon-remote-solution></span>
         <span else class="fas menu__origin-icon fa-folder" data-test-navbar-icon-local-solution></span>
         <span class="process-details-title" title.bind="navbarTitle" data-test-navbar-title>${navbarTitle}</span>
