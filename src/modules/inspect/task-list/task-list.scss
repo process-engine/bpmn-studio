@@ -19,8 +19,9 @@
   flex: 1;
 }
 
-.task-list-item-modelname:hover {
+.task-list-item-modelname {
   color: inherit;
+  cursor: default;
 }
 
 .task-list-header {

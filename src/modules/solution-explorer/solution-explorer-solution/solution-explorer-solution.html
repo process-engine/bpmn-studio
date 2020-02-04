@@ -13,14 +13,14 @@
       <small class="startup-error" click.delegate="showErrorLogs = true">Click here for more information</small>
     </div>
 
-    <div class="solution-loading" if.bind="solutionIsNotLoaded && authorisationError">
+    <div class="authority-issue" if.bind="solutionIsNotLoaded && authorisationError">
       <span class="authorisation-error__headline">Authorisation failed</span><br>
-      <span class="authorisation-error">You don't have sufficient permissions for accessing this ProcessEngine. Please try to <span class="authorisation-error__login-link" click.delegate="login(displayedSolutionEntry)">login</span> as another user.</span>
+      <span class="authorisation-error">You don't have sufficient permissions for accessing this ProcessEngine. Please try to <a href="#" class="authorisation-error__login-link" click.delegate="login(displayedSolutionEntry)">login</a> as another user.</span>
     </div>
 
-    <div class="solution-loading" if.bind="solutionIsNotLoaded && authenticationError">
+    <div class="authority-issue" if.bind="solutionIsNotLoaded && authenticationError">
       <span class="authorisation-error__headline">Authentication failed</span><br>
-      <span class="authorisation-error">Please try to <span class="authorisation-error__login-link" click.delegate="login(displayedSolutionEntry)">login.</span></span>
+      <span class="authorisation-error">Please try to <a href="#" class="authorisation-error__login-link" click.delegate="login(displayedSolutionEntry)">login.</a></span>
     </div>
 
     <div class="diagram-contextmenu" ref="diagramContextMenu" show.bind="showContextMenu">

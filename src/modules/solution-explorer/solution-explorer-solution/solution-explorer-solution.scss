@@ -184,10 +184,14 @@
   resize: none;
 }
 
+.authority-issue {
+  margin-left: 20px;
+}
+
 .authorisation-error__headline {
   font-weight: bold;
 }
 
 .authorisation-error:hover > .authorisation-error__login-link {
-  text-decoration: underline;
+  cursor: default;
 }
