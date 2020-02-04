@@ -78,7 +78,7 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
       return undefined;
     }
 
-    const tokenObject: ITokenObject = await this.showLoginPopup(authorityUrl, solutionUri, silent);
+    const tokenObject = await this.showLoginPopup(authorityUrl, solutionUri, silent);
 
     const silentRefreshHandler = async (silentRefreshTokenObject: ITokenObject): Promise<void> => {
       const loginResult = await this.convertTokenObjectToLoginResult(authorityUrl, silentRefreshTokenObject);
@@ -104,7 +104,7 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
   public async getUserIdentity(authorityUrl: string, identity: IIdentity): Promise<IUserIdentity | null> {
     authorityUrl = this.formAuthority(authorityUrl);
 
-    const userInfoResponse: IResponse<any> = await this.httpFetchClient.get(`${authorityUrl}connect/userinfo`, {
+    const userInfoResponse = await this.httpFetchClient.get(`${authorityUrl}connect/userinfo`, {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json',
