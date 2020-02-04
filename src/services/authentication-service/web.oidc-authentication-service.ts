@@ -50,7 +50,7 @@ export class WebOidcAuthenticationService implements IAuthenticationService {
     const isAuthorityUnReachable: boolean = !(await this.isAuthorityReachable(authorityUrl));
 
     if (isAuthorityUnReachable) {
-      this.notificationService.showNotification(NotificationType.ERROR, 'AuthorityUrl seems to be offline');
+      this.notificationService.showNotification(NotificationType.ERROR, 'Authority seems to be offline');
 
       return undefined;
     }
