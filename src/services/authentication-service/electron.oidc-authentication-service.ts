@@ -168,6 +168,10 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
   }
 
   private formAuthority(authority: string): string {
+    if (authority === undefined) {
+      return undefined;
+    }
+
     const authorityDoesNotEndWithSlash: boolean = !authority.endsWith('/');
 
     if (authorityDoesNotEndWithSlash) {
