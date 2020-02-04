@@ -205,7 +205,6 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
       await this.setIdentityServerCookie(solutionUri);
     }
 
-    // Build the Url Params from the Config.
     const urlParams = {
       client_id: oidcConfig.clientId,
       redirect_uri: oidcConfig.redirectUri,
@@ -228,7 +227,6 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
     };
 
     return new Promise((resolve: Function, reject: Function): void => {
-      // Open a new browser window and load the previously constructed url.
       const authWindow = new this.electronRemote.BrowserWindow(windowParams);
 
       authWindow.loadURL(urlToLoad);
@@ -236,7 +234,6 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
         authWindow.show();
       }
 
-      // Reject the Promise when the user closes the new window.
       authWindow.on(
         'closed',
         async (): Promise<void> => {
@@ -246,17 +243,6 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
         },
       );
 
-      /**
-       * This will trigger everytime the new window will redirect.
-       * Important: Not AFTER it redirects but BEFORE.
-       * This gives us the possibility to intercept the redirect to
-       * the specified redirect uri, which would lead to faulty behaviour
-       * due to security aspects in chromium.
-       *
-       * If that redirect would start we stop it by preventing the default
-       * behaviour and instead parse its parameters in the
-       * "onCallback"-function.
-       */
       authWindow.webContents.on('will-redirect', (event: Electron.Event, url: string): void => {
         if (url.includes(oidcConfig.redirectUri)) {
           event.preventDefault();
@@ -302,7 +288,6 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
     tokenObject: ITokenObject,
     refreshCallback: Function,
   ): Promise<void> {
-    // Token refresh factor is set as described at https://github.com/manfredsteyer/angular-oauth2-oidc/blob/master/docs-src/silent-refresh.md#automatically-refreshing-a-token-when-before-it-expires-code-flow-and-implicit-flow
     const tokenRefreshFactor = 0.75;
     const secondsInMilisecondsFactor = 1000;
     const tokenRefreshInterval = tokenObject.expiresIn * tokenRefreshFactor * secondsInMilisecondsFactor;
@@ -319,7 +304,6 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
       await this.setIdentityServerCookie(solutionUri);
     }
 
-    // Build the Url Params from the Config.
     const urlParams = {
       client_id: oidcConfig.clientId,
       redirect_uri: oidcConfig.redirectUri,
@@ -332,27 +316,14 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
 
     const urlToLoad: string = `${authorityUrl}connect/authorize?${queryString.stringify(urlParams)}`;
 
-    // Open a new browser window and load the previously constructed url.
     const authWindow = new this.electronRemote.BrowserWindow({show: false});
 
     authWindow.loadURL(urlToLoad);
 
-    // Throw an error, if the user closes the new window.
     authWindow.on('closed', (): void => {
       throw new Error('window was closed by user');
     });
 
-    /**
-     * This will trigger everytime the new window will redirect.
-     * Important: Not AFTER it redirects but BEFORE.
-     * This gives us the possibility to intercept the redirect to
-     * the specified redirect uri, which would lead to faulty behaviour
-     * due to security aspects in chromium.
-     *
-     * If that redirect would start we stop it by preventing the default
-     * behaviour and instead parse its parameters in the
-     * "onCallback"-function.
-     */
     authWindow.webContents.on('will-redirect', (event: Electron.Event, url: string): void => {
       if (url.includes(oidcConfig.redirectUri)) {
         event.preventDefault();
@@ -378,31 +349,15 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
     });
   }
 
-  // Handle the different callbacks.
   private handleRedirectCallback(
     url: string,
     authWindow: Electron.BrowserWindow,
     resolve: Function,
     reject: Function,
   ): void {
-    // Parse callback url into its parts.
     const urlParts = nodeUrl.parse(url, true);
     const href = urlParts.href;
 
-    /**
-     * If there was an error:
-     * - Reject the promise with the error.
-     * - Close the window.
-     *
-     * If the href includes the callback uri:
-     * - Load that href in the window.
-     *
-     * If the href includes the specified redirect uri:
-     * - Parse the hash into its parts.
-     * - Add those parts to new object.
-     * - Resolve the promise with this object.
-     * - Close the window.
-     */
     if (href === null) {
       reject(new Error(`Could not parse url: ${url}`));
 
