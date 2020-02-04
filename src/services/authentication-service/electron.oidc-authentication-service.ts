@@ -192,6 +192,7 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
       accessToken: tokenObject.accessToken,
       idToken: tokenObject.idToken,
     };
+
     return loginResult;
   }
 
