@@ -154,79 +154,6 @@ export class TestClient {
     }
   }
 
-  private async removeWindowsDB(dbPath): Promise<void> {
-    await new Promise((resolve: Function, reject: Function) => {
-      fs.readdirSync(dbPath).forEach((file, index, arr) => {
-        const fileToDelete = path.join(dbPath, file);
-
-        const deleteFile = (filepath): void =>
-          fs.open(filepath, 'r+', async (err, fd) => {
-            if (err && err.code === 'EBUSY') {
-              // await this.pause(300);
-              deleteFile(filepath);
-            } else if (err && err.code === 'ENOENT') {
-              if (index === arr.length - 1) {
-                fs.rmdirSync(dbPath);
-                resolve();
-              }
-            } else {
-              fs.close(fd, () => {
-                fs.unlink(filepath, async (unlinkErr) => {
-                  if (unlinkErr) {
-                    // await this.pause(300);
-                    deleteFile(filepath);
-                  } else if (index === arr.length - 1) {
-                    console.log(index, arr.length, arr.length - 1);
-                    try {
-                      fs.rmdirSync(dbPath);
-                      resolve();
-                    } catch (error) {
-                      if (error.code === 'ENOTEMPTY') {
-                        await this.removeWindowsDB(dbPath);
-                        resolve();
-                      }
-                    }
-                  }
-                });
-              });
-            }
-          });
-
-        deleteFile(fileToDelete);
-      });
-    });
-  }
-
-  private async deleteFile(fileToDelete): Promise<void> {
-    return new Promise((resolve: Function, reject: Function) => {
-      const deleteIt = (filepath): void => {
-        fs.open(filepath, 'r+', async (err, fd) => {
-          if (err && err.code === 'EBUSY') {
-            // await this.pause(300);
-            deleteIt(filepath);
-          } else if (err && err.code === 'ENOENT') {
-            console.log('deleted enoent');
-            resolve();
-          } else {
-            fs.close(fd, () => {
-              fs.unlink(filepath, async (unlinkErr) => {
-                if (unlinkErr) {
-                  // await this.pause(300);
-                  deleteIt(filepath);
-                } else {
-                  console.log('deleted');
-                  resolve();
-                }
-              });
-            });
-          }
-        });
-      };
-
-      deleteIt(fileToDelete);
-    });
-  }
-
   public async clearSavedDiagrams(): Promise<void> {
     if (fs.existsSync(SAVE_DIAGRAM_DIR)) {
       try {
@@ -395,6 +322,72 @@ export class TestClient {
         }
         return resolve(stdin);
       });
+    });
+  }
+
+  private async removeWindowsDB(dbPath): Promise<void> {
+    await new Promise((resolve: Function, reject: Function) => {
+      fs.readdirSync(dbPath).forEach((file, index, arr) => {
+        const fileToDelete = path.join(dbPath, file);
+
+        const deleteFile = (filepath): void =>
+          fs.open(filepath, 'r+', async (err, fd) => {
+            if (err && err.code === 'EBUSY') {
+              deleteFile(filepath);
+            } else if (err && err.code === 'ENOENT') {
+              if (index === arr.length - 1) {
+                fs.rmdirSync(dbPath);
+                resolve();
+              }
+            } else {
+              fs.close(fd, () => {
+                fs.unlink(filepath, async (unlinkErr) => {
+                  if (unlinkErr) {
+                    deleteFile(filepath);
+                  } else if (index === arr.length - 1) {
+                    try {
+                      fs.rmdirSync(dbPath);
+                      resolve();
+                    } catch (error) {
+                      if (error.code === 'ENOTEMPTY') {
+                        await this.removeWindowsDB(dbPath);
+                        resolve();
+                      }
+                    }
+                  }
+                });
+              });
+            }
+          });
+
+        deleteFile(fileToDelete);
+      });
+    });
+  }
+
+  private async deleteFile(fileToDelete): Promise<void> {
+    return new Promise((resolve: Function, reject: Function) => {
+      const deleteIt = (filepath): void => {
+        fs.open(filepath, 'r+', async (err, fd) => {
+          if (err && err.code === 'EBUSY') {
+            deleteIt(filepath);
+          } else if (err && err.code === 'ENOENT') {
+            resolve();
+          } else {
+            fs.close(fd, () => {
+              fs.unlink(filepath, async (unlinkErr) => {
+                if (unlinkErr) {
+                  deleteIt(filepath);
+                } else {
+                  resolve();
+                }
+              });
+            });
+          }
+        });
+      };
+
+      deleteIt(fileToDelete);
     });
   }
 }
