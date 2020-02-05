@@ -37,7 +37,7 @@ jobs:
         name: package_json
         path: package.json
 
-  lint_linux:
+  #lint_linux:
     # name: "Lint Sources"
     # needs: prepare_version
     # runs-on: ubuntu-18.04
