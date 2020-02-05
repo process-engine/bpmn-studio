@@ -125,4 +125,10 @@ export interface IDashboardRepository {
   onCronjobRemoved(identity: IIdentity, callback: Function): Promise<Subscription>;
   removeSubscription(identity: IIdentity, subscription: Subscription): Promise<void>;
   getCorrelationById(identity: IIdentity, correlationId: string): Promise<Correlation>;
+  finishEmptyActivity(
+    identity: IIdentity,
+    processInstanceId: string,
+    correlationId: string,
+    emptyActivityInstanceId: string,
+  ): Promise<void>;
 }
