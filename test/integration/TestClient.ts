@@ -75,20 +75,19 @@ export class TestClient {
   public async removeUnneededVideos(filePath: string): Promise<void> {
     try {
       const filePathToUse = `${filePath.replace('.webm', '*.webm')}`;
-      
+
       if (process.platform === 'win32') {
         const filesToDelete = fs.readdirSync(path.dirname(filePathToUse), {encoding: 'utf8'}).filter((file) => {
           const lastIndexOfMinus = filePath.lastIndexOf('-');
           return file.includes(path.basename(filePath.substr(0, lastIndexOfMinus)));
         });
-  
+
         for (const fileToDelete of filesToDelete) {
           await this.deleteFile(`test-results\\${fileToDelete}`);
         }
       } else {
         await this.execCommand(`${REMOVE_COMMAND_FILE} ${filePathToUse}`);
       }
-
     } catch (error) {
       console.error('Error: removeUnneededVideos', error);
     }
@@ -142,9 +141,7 @@ export class TestClient {
           await this.removeWindowsDB(DATABASE_PATH);
         } else {
           await this.execCommand(`${REMOVE_COMMAND_DIR} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
-
         }
-
       } catch (error) {
         console.error('Error:clearDatabase ', error);
       }
@@ -156,7 +153,7 @@ export class TestClient {
       fs.readdirSync(dbPath).forEach((file, index, arr) => {
         const fileToDelete = path.join(dbPath, file);
 
-        const deleteFile = (filepath) =>
+        const deleteFile = (filepath): void =>
           fs.open(filepath, 'r+', async (err, fd) => {
             if (err && err.code === 'EBUSY') {
               // await this.pause(300);
@@ -168,17 +165,15 @@ export class TestClient {
               }
             } else {
               fs.close(fd, () => {
-                fs.unlink(filepath, async (err) => {
-                  if (err) {
+                fs.unlink(filepath, async (unlinkErr) => {
+                  if (unlinkErr) {
                     // await this.pause(300);
                     deleteFile(filepath);
                   } else if (index === arr.length - 1) {
-                    console.log(index, arr.length, arr.length -1)
+                    console.log(index, arr.length, arr.length - 1);
                     try {
-                      
                       fs.rmdirSync(dbPath);
                       resolve();
-
                     } catch (error) {
                       if (error.code === 'ENOTEMPTY') {
                         await this.removeWindowsDB(dbPath);
@@ -198,7 +193,7 @@ export class TestClient {
 
   private async deleteFile(fileToDelete): Promise<void> {
     return new Promise((resolve: Function, reject: Function) => {
-      const deleteIt = (filepath) => {
+      const deleteIt = (filepath): void => {
         fs.open(filepath, 'r+', async (err, fd) => {
           if (err && err.code === 'EBUSY') {
             // await this.pause(300);
@@ -208,8 +203,8 @@ export class TestClient {
             resolve();
           } else {
             fs.close(fd, () => {
-              fs.unlink(filepath, async (err) => {
-                if (err) {
+              fs.unlink(filepath, async (unlinkErr) => {
+                if (unlinkErr) {
                   // await this.pause(300);
                   deleteIt(filepath);
                 } else {

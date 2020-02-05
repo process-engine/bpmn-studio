@@ -46,16 +46,14 @@ describe('XML View', function foo() {
         } else {
           // await testClient.cancelRecording();
         }
-        
+
         await testClient.stopSpectronApp();
         await testClient.clearDatabase();
-        //await testClient.clearSavedDiagrams();
-        
+        // await testClient.clearSavedDiagrams();
+
         if (this.ctx.currentTest.state === 'failed') {
           await testClient.removeUnneededVideos((this as any).filePath);
-
         }
-
       }
     },
   );
