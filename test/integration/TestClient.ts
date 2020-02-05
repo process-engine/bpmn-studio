@@ -74,21 +74,21 @@ export class TestClient {
 
   public async removeUnneededVideos(filePath: string): Promise<void> {
     try {
-      // const filePathToUse = process.platform === 'win32' ? filePath.replace(/\//g, '\\') : filePath;
-      // await this.execCommand(`${REMOVE_COMMAND_FILE} ${filePathToUse.replace('.webm', '')}*.webm`);
-
       const filePathToUse = `${filePath.replace('.webm', '*.webm')}`;
-      console.log(filePathToUse);
-      const filesToDelete = fs.readdirSync(path.dirname(filePathToUse), {encoding: 'utf8'}).filter((file) => {
-        const lastIndexOfMinus = filePath.lastIndexOf('-');
-        return file.includes(path.basename(filePath.substr(0, lastIndexOfMinus)));
-      });
-      console.log(filesToDelete);
-
-      for (const fileToDelete of filesToDelete) {
-        await this.deleteFile(`test-results\\${fileToDelete}`);
+      
+      if (process.platform === 'win32') {
+        const filesToDelete = fs.readdirSync(path.dirname(filePathToUse), {encoding: 'utf8'}).filter((file) => {
+          const lastIndexOfMinus = filePath.lastIndexOf('-');
+          return file.includes(path.basename(filePath.substr(0, lastIndexOfMinus)));
+        });
+  
+        for (const fileToDelete of filesToDelete) {
+          await this.deleteFile(`test-results\\${fileToDelete}`);
+        }
+      } else {
+        await this.execCommand(`${REMOVE_COMMAND_FILE} ${filePathToUse}`);
       }
-      // await this.deleteFile(filePath);
+
     } catch (error) {
       console.error('Error: removeUnneededVideos', error);
     }
@@ -140,9 +140,11 @@ export class TestClient {
       try {
         if (process.platform === 'win32') {
           await this.removeWindowsDB(DATABASE_PATH);
+        } else {
+          await this.execCommand(`${REMOVE_COMMAND_DIR} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
+
         }
 
-        // await this.execCommand(`${REMOVE_COMMAND_DIR} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
       } catch (error) {
         console.error('Error:clearDatabase ', error);
       }
@@ -157,7 +159,7 @@ export class TestClient {
         const deleteFile = (filepath) =>
           fs.open(filepath, 'r+', async (err, fd) => {
             if (err && err.code === 'EBUSY') {
-              await this.pause(300);
+              // await this.pause(300);
               deleteFile(filepath);
             } else if (err && err.code === 'ENOENT') {
               if (index === arr.length - 1) {
@@ -168,11 +170,21 @@ export class TestClient {
               fs.close(fd, () => {
                 fs.unlink(filepath, async (err) => {
                   if (err) {
-                    await this.pause(300);
+                    // await this.pause(300);
                     deleteFile(filepath);
                   } else if (index === arr.length - 1) {
-                    fs.rmdirSync(dbPath);
-                    resolve();
+                    console.log(index, arr.length, arr.length -1)
+                    try {
+                      
+                      fs.rmdirSync(dbPath);
+                      resolve();
+
+                    } catch (error) {
+                      if (error.code === 'ENOTEMPTY') {
+                        await this.removeWindowsDB(dbPath);
+                        resolve();
+                      }
+                    }
                   }
                 });
               });
@@ -189,7 +201,7 @@ export class TestClient {
       const deleteIt = (filepath) => {
         fs.open(filepath, 'r+', async (err, fd) => {
           if (err && err.code === 'EBUSY') {
-            await this.pause(300);
+            // await this.pause(300);
             deleteIt(filepath);
           } else if (err && err.code === 'ENOENT') {
             console.log('deleted enoent');
@@ -198,7 +210,7 @@ export class TestClient {
             fs.close(fd, () => {
               fs.unlink(filepath, async (err) => {
                 if (err) {
-                  await this.pause(300);
+                  // await this.pause(300);
                   deleteIt(filepath);
                 } else {
                   console.log('deleted');
