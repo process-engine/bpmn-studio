@@ -214,12 +214,26 @@ export class DashboardService implements IDashboardService {
     userTaskInstanceId: string,
     userTaskResult: DataModels.UserTasks.UserTaskResult,
   ): Promise<void> {
-    return this.managementApiClient.finishUserTask(
+    return this.dashboardRepository.finishUserTask(
       identity,
       processInstanceId,
       correlationId,
       userTaskInstanceId,
       userTaskResult,
+    );
+  }
+
+  public finishEmptyActivity(
+    identity: IIdentity,
+    processInstanceId: string,
+    correlationId: string,
+    emptyActivityInstanceId: string,
+  ): Promise<void> {
+    return this.dashboardRepository.finishEmptyActivity(
+      identity,
+      processInstanceId,
+      correlationId,
+      emptyActivityInstanceId,
     );
   }
 

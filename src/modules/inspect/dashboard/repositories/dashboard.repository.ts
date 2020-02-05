@@ -320,6 +320,20 @@ export class DashboardRepository implements IDashboardRepository {
     );
   }
 
+  public finishEmptyActivity(
+    identity: IIdentity,
+    processInstanceId: string,
+    correlationId: string,
+    emptyActivityInstanceId: string,
+  ): Promise<void> {
+    return this.managementApiClient.finishEmptyActivity(
+      identity,
+      processInstanceId,
+      correlationId,
+      emptyActivityInstanceId,
+    );
+  }
+
   public removeSubscription(identity: IIdentity, subscription: Subscription): Promise<void> {
     return this.managementApiClient.removeSubscription(identity, subscription);
   }
