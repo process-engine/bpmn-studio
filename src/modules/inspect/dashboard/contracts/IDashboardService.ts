@@ -4,6 +4,7 @@ import {IIdentity} from '@essential-projects/iam_contracts';
 import {Subscription} from '@essential-projects/event_aggregator_contracts';
 import {DataModels} from '@process-engine/management_api_contracts';
 
+import {Correlation} from '@process-engine/management_api_contracts/dist/data_models/correlation';
 import {TaskList} from './index';
 
 export interface IDashboardService {
@@ -100,4 +101,11 @@ export interface IDashboardService {
   onCronjobStopped(identity: IIdentity, callback: Function): Promise<Subscription>;
   onCronjobUpdated(identity: IIdentity, callback: Function): Promise<Subscription>;
   onCronjobRemoved(identity: IIdentity, callback: Function): Promise<Subscription>;
+  getCorrelationById(identity: IIdentity, correlationId: string): Promise<Correlation>;
+  finishEmptyActivity(
+    identity: IIdentity,
+    processInstanceId: string,
+    correlationId: string,
+    emptyActivityInstanceId: string,
+  ): Promise<void>;
 }
