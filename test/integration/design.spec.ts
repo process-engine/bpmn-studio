@@ -15,9 +15,7 @@ describe('Design View', function foo() {
     await testClient.startSpectronApp();
     await testClient.awaitReadiness();
 
-    const testName = this.ctx.currentTest.title.replace(/\s/g, '-');
-    const suiteName = this.ctx.currentTest.parent.title.replace(/\s/g, '-');
-    (this as any).filePath = `test-results/${testClient.startDate}_${suiteName}_${testName}.webm`;
+    (this as any).filePath = testClient.getVideoFilePathForTest(this.ctx.currentTest);
     await testClient.startRecording((this as any).filePath);
   });
 
