@@ -10,7 +10,7 @@ async function stopProcess(): Promise<void> {
   await testClient.ensureNotVisible('[data-test-stop-process-button]');
 }
 
-describe.only('Application launch', function foo() {
+describe('Application launch', function foo() {
   this.slow(10000);
   this.timeout(15000);
 
@@ -66,7 +66,7 @@ describe.only('Application launch', function foo() {
     await testClient.assertWindowTitleIs('Design | BPMN Studio');
   });
 
-  it.only('should create and open a second diagram', async () => {
+  it('should create and open a second diagram', async () => {
     await testClient.createAndOpenNewDiagram();
 
     await testClient.assertNavbarTitleIs('Untitled-1');
@@ -123,7 +123,7 @@ describe.only('Application launch', function foo() {
     await testClient.assertWindowTitleIs('Think | BPMN Studio');
   });
 
-  it.only('should stop a process from the LiveExecutionTracker', async () => {
+  it('should stop a process from the LiveExecutionTracker', async () => {
     const diagramName = 'receive_task_wait_test';
     await testClient.startPageLoaded();
     await testClient.solutionExplorer.openDirectoryAsSolution('fixtures', diagramName);
