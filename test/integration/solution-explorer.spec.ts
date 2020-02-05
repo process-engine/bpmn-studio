@@ -24,12 +24,13 @@ describe('SolutionExplorer', function foo() {
       if (await testClient.isSpectronAppRunning()) {
         if (this.ctx.currentTest.state === 'failed') {
           await testClient.stopRecordingAndSave();
-        } else {
-          await testClient.cancelRecording();
-          await testClient.removeUnneededVideos((this as any).filePath);
         }
 
         await testClient.stopSpectronApp();
+
+        if (this.ctx.currentTest.state !== 'failed') {
+          await testClient.removeUnneededVideos((this as any).filePath);
+        }
         await testClient.clearDatabase();
         await testClient.clearSavedDiagrams();
       }

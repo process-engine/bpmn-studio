@@ -86,7 +86,7 @@ export class TestClient {
           await this.deleteFile(`test-results\\${fileToDelete}`);
         }
       } else {
-        await this.execCommand(`${REMOVE_COMMAND_FILE} ${filePathToUse}`);
+        await this.execCommand(`${REMOVE_COMMAND_FILE} ${filePathToUse.replace(/"/g, '\\"')}`);
       }
     } catch (error) {
       console.error('Error: removeUnneededVideos', error);
