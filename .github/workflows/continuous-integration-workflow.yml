@@ -377,6 +377,8 @@ jobs:
         name: bpmn-studio_tar
         path: "."
 
+    - name: Install Dependencies
+      run: npm ci
     # - name: Get BPMN Studio Version
     #   run: echo "##[set-output name=version;]$(./node_modules/.bin/ci_tools get-version)"
     #   id: studio_version
