@@ -135,7 +135,7 @@ export class TestClient {
   }
 
   public async clearDatabase(): Promise<void> {
-    if (fs.existsSync(DATABASE_PATH.replace(/\s/g, '\\ '))) {
+    if (fs.existsSync(DATABASE_PATH)) {
       try {
         if (process.platform === 'win32') {
           await this.removeWindowsDB(DATABASE_PATH);
