@@ -14,7 +14,7 @@ import {NotificationType} from './contracts/index';
 import environment from './environment';
 import {NotificationService} from './services/notification-service/notification.service';
 
-import {oidcConfig} from './open-id-connect-configuration';
+import {oidcConfig} from './open-id-connect-web-configuration';
 import {isRunningInElectron} from './services/is-running-in-electron-module/is-running-in-electron.module';
 
 Bluebird.Promise.config({cancellation: true});

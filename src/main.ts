@@ -3,7 +3,7 @@ import {Aurelia} from 'aurelia-framework';
 import process from 'process';
 import environment from './environment';
 
-import {oidcConfig} from './open-id-connect-configuration';
+import {oidcConfig} from './open-id-connect-web-configuration';
 import {isRunningInElectron} from './services/is-running-in-electron-module/is-running-in-electron.module';
 
 export function configure(aurelia: Aurelia): void {

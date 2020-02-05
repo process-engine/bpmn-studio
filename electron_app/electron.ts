@@ -24,13 +24,11 @@ import open from 'open';
 import {CancellationToken, autoUpdater} from '@process-engine/electron-updater';
 import {version as ProcessEngineVersion} from '@process-engine/process_engine_runtime/package.json';
 
-import electronOidc from './electron-oidc';
-import oidcConfig from './oidc-config';
 import ReleaseChannel from '../src/services/release-channel-service/release-channel.service';
 import {solutionIsRemoteSolution} from '../src/services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 import {version as CurrentStudioVersion} from '../package.json';
 import {getPortListByVersion} from '../src/services/default-ports-module/default-ports.module';
-import {FeedbackData, ITokenObject} from '../src/contracts';
+import {FeedbackData} from '../src/contracts';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import electron = require('electron');
@@ -145,7 +143,6 @@ function initializeApplication(): void {
   }
 
   initializeFileOpenFeature();
-  initializeOidc();
 }
 
 function initializeAutoUpdater(): void {
@@ -228,51 +225,6 @@ function initializeAutoUpdater(): void {
     });
 
     autoUpdater.checkForUpdates();
-  });
-}
-
-/**
- * This initializes the oidc flow for electron.
- * It mainly registers on the "oidc-login" event called by the authentication
- * service and calls the "getTokenObject"-function on the service.
- */
-function initializeOidc(): void {
-  const windowParams = {
-    alwaysOnTop: true,
-    autoHideMenuBar: true,
-    webPreferences: {
-      nodeIntegration: true,
-      nodeIntegrationInWorker: true,
-    },
-  };
-
-  const electronOidcInstance = electronOidc(oidcConfig, windowParams);
-
-  ipcMain.on('oidc-login', (event, authorityUrl) => {
-    electronOidcInstance.getTokenObject(authorityUrl).then(
-      async (token) => {
-        const refreshCallback: Function = (tokenObject: ITokenObject) => {
-          event.sender.send(`oidc-silent_refresh-${authorityUrl}`, tokenObject);
-        };
-
-        electronOidcInstance.startSilentRefreshing(authorityUrl, token, refreshCallback);
-        event.sender.send('oidc-login-reply', token);
-      },
-      (err) => {
-        console.log('Error while getting token', err);
-      },
-    );
-  });
-
-  ipcMain.on('oidc-logout', (event, tokenObject, authorityUrl) => {
-    electronOidcInstance.logout(tokenObject, authorityUrl).then(
-      (logoutWasSuccessful) => {
-        event.sender.send('oidc-logout-reply', logoutWasSuccessful);
-      },
-      (err) => {
-        console.log('Error while logging out', err);
-      },
-    );
   });
 }
 

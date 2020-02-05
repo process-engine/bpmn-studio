@@ -65,7 +65,11 @@ export class ConfigPanel {
     );
 
     if (userIsLoggedIn) {
-      await this.authenticationService.logout(this.internalSolution.authority, this.internalSolution.identity);
+      await this.authenticationService.logout(
+        this.internalSolution.authority,
+        this.internalSolution.uri,
+        this.internalSolution.identity,
+      );
 
       this.internalSolution.identity = this.createDummyIdentity();
       this.internalSolution.isLoggedIn = false;
