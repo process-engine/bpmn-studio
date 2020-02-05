@@ -140,7 +140,7 @@ jobs:
       name: Upload Test Videos
       if: always()
       with:
-        name: test_results
+        name: test_results_macos
         path: test-results
 
     - name: Prepare macOS Bundle
@@ -204,6 +204,13 @@ jobs:
 
     - name: Run the Tests
       run: npm test
+
+    - uses: actions/upload-artifact@master
+      name: Upload Test Videos
+      if: always()
+      with:
+        name: test_results_windows
+        path: test-results
 
     - name: Prepare Windows Bundle
       run: |
