@@ -10,7 +10,7 @@ import {Subscription as RuntimeSubscription} from '@essential-projects/event_agg
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {AuthenticationStateEvent, ISolutionEntry, ISolutionService} from '../../../contracts/index';
 import environment from '../../../environment';
-import {IDashboardService, TaskList as SuspendedTaskList, TaskListEntry} from '../dashboard/contracts/index';
+import {IDashboardService, TaskList as SuspendedTaskList, TaskListEntry, TaskType} from '../dashboard/contracts/index';
 import {Pagination} from '../../pagination/pagination';
 import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 
@@ -134,19 +134,29 @@ export class TaskList {
   }
 
   public async continueTask(task: TaskListEntry): Promise<void> {
-    const {correlationId, id, processInstanceId, processModelId} = task;
+    const {correlationId, id, processInstanceId, processModelId, taskType, flowNodeInstanceId} = task;
 
     try {
-      const result = await this.dashboardService.getCorrelationById(this.activeSolutionEntry.identity, correlationId);
-      console.log(result);
+      await this.dashboardService.getCorrelationById(this.activeSolutionEntry.identity, correlationId);
     } catch (error) {
       if (isError(error, NotFoundError)) {
+        if (taskType === TaskType.EmptyActivity) {
+          await this.dashboardService.finishEmptyActivity(
+            this.activeSolutionEntry.identity,
+            processInstanceId,
+            correlationId,
+            flowNodeInstanceId,
+          );
+
+          return;
+        }
+
         this.processModelId = processModelId;
         this.processInstanceId = processInstanceId;
         this.taskId = id;
         this.correlationId = correlationId;
-
         this.showDynamicUiModal = true;
+
         return;
       }
 
