@@ -377,24 +377,27 @@ jobs:
         name: bpmn-studio_tar
         path: "."
 
-    - name: Get BPMN Studio Version
-      run: echo "##[set-output name=version;]$(node --print --eval "require('./package.json').version")"
-      id: studio_version
-
-    - name: Log Studio Version
-      run: |
-        echo $VERSION
-      env:
-        VERSION: ${{ steps.studio_version.outputs.version }}
+    - name: Install Dependencies
+      run: npm ci
 
     - name: Build Docker Image
+      if: github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
       run: |
+        VERSION="$(./node_modules/.bin/ci_tools get-version)"
         docker build --build-arg NODE_IMAGE_VERSION=10-alpine \
                     --build-arg BPMN_STUDIO_VERSION=$VERSION \
                     --no-cache \
                     --tag 5minds/bpmn-studio-bundle:$VERSION .
-      env:
-        VERSION: ${{ steps.studio_version.outputs.version }}
+
+    - name: Build Docker Image Master
+      if: github.ref == 'refs/heads/master'
+      run: |
+        VERSION="$(./node_modules/.bin/ci_tools get-version)"
+        MAJOR_VERSION="$(./node_modules/.bin/ci_tools get-version --major)"
+        docker build --build-arg NODE_IMAGE_VERSION=10-alpine \
+                    --build-arg BPMN_STUDIO_VERSION=$VERSION \
+                    --no-cache \
+                    --tag 5minds/bpmn-studio-bundle:latest --tag 5minds/bpmn-studio-bundle:$MAJOR_VERSION --tag 5minds/bpmn-studio-bundle:$VERSION .
 
     - name: Show Docker Images
       run: docker images

@@ -7,7 +7,7 @@ import {User} from 'oidc-client';
 import {IIdentity} from '@essential-projects/iam_contracts';
 
 import {IAuthenticationService, ILoginResult, IUserIdentity, NotificationType} from '../../contracts/index';
-import {oidcConfig} from '../../open-id-connect-configuration';
+import {oidcConfig} from '../../open-id-connect-web-configuration';
 import {NotificationService} from '../notification-service/notification.service';
 
 const UNAUTHORIZED_STATUS_CODE: number = 401;
@@ -34,20 +34,20 @@ export class WebOidcAuthenticationService implements IAuthenticationService {
     this.openIdConnect = openIdConnect;
   }
 
-  public async isLoggedIn(authority: string, identity: IIdentity): Promise<boolean> {
-    authority = this.formAuthority(authority);
+  public async isLoggedIn(authorityUrl: string, identity: IIdentity): Promise<boolean> {
+    authorityUrl = this.formAuthority(authorityUrl);
 
-    const userIdentity: IUserIdentity = await this.getUserIdentity(authority);
+    const userIdentity: IUserIdentity = await this.getUserIdentity(authorityUrl);
 
     const userIsAuthorized: boolean = userIdentity !== null && userIdentity !== undefined;
 
     return userIsAuthorized;
   }
 
-  public async login(authority: string, refreshCallback: Function): Promise<ILoginResult> {
-    authority = this.formAuthority(authority);
+  public async login(authorityUrl: string, solutionUri: string, refreshCallback: Function): Promise<ILoginResult> {
+    authorityUrl = this.formAuthority(authorityUrl);
 
-    const isAuthorityUnReachable: boolean = !(await this.isAuthorityReachable(authority));
+    const isAuthorityUnReachable: boolean = !(await this.isAuthorityReachable(authorityUrl));
 
     if (isAuthorityUnReachable) {
       this.notificationService.showNotification(NotificationType.ERROR, 'Authority seems to be offline');
@@ -55,17 +55,17 @@ export class WebOidcAuthenticationService implements IAuthenticationService {
       return undefined;
     }
 
-    await this.setAuthority(authority);
+    await this.setAuthority(authorityUrl);
 
     const signinResult: User = await this.openIdConnect.userManager.signinPopup();
 
-    window.localStorage.setItem('openIdRoute', authority);
+    window.localStorage.setItem('openIdRoute', authorityUrl);
 
     const iamIdentity: IIdentity = {
       token: signinResult.access_token,
       userId: signinResult.id_token,
     };
-    const identity: IUserIdentity = await this.getUserIdentity(authority, iamIdentity);
+    const identity: IUserIdentity = await this.getUserIdentity(authorityUrl, iamIdentity);
 
     const loginResult: ILoginResult = {
       identity: identity,
@@ -78,7 +78,7 @@ export class WebOidcAuthenticationService implements IAuthenticationService {
         token: user.access_token,
         userId: signinResult.id_token,
       };
-      const refreshedIdentity: IUserIdentity = await this.getUserIdentity(authority, refreshedIamIdentity);
+      const refreshedIdentity: IUserIdentity = await this.getUserIdentity(authorityUrl, refreshedIamIdentity);
 
       const refreshResult: ILoginResult = {
         identity: refreshedIdentity,
@@ -92,28 +92,28 @@ export class WebOidcAuthenticationService implements IAuthenticationService {
     return loginResult;
   }
 
-  public async logout(authority: string, identity: IIdentity): Promise<void> {
-    authority = this.formAuthority(authority);
+  public async logout(authorityUrl: string, solutionUri: string, identity: IIdentity): Promise<void> {
+    authorityUrl = this.formAuthority(authorityUrl);
 
     if (!this.isLoggedIn) {
       return;
     }
 
-    await this.setAuthority(authority);
+    await this.setAuthority(authorityUrl);
     await this.openIdConnect.userManager.signoutPopup();
   }
 
-  public async getUserIdentity(authority: string, identity?: IIdentity): Promise<IUserIdentity | null> {
-    authority = this.formAuthority(authority);
+  public async getUserIdentity(authorityUrl: string, identity?: IIdentity): Promise<IUserIdentity | null> {
+    authorityUrl = this.formAuthority(authorityUrl);
 
-    const accessToken: string = identity === undefined ? await this.getAccessToken(authority) : identity.token;
+    const accessToken: string = identity === undefined ? await this.getAccessToken(authorityUrl) : identity.token;
     const accessTokenIsDummyToken: boolean = accessToken === this.getDummyAccessToken();
 
     if (accessTokenIsDummyToken) {
       return null;
     }
 
-    const request: Request = new Request(`${authority}connect/userinfo`, {
+    const request: Request = new Request(`${authorityUrl}connect/userinfo`, {
       method: 'GET',
       mode: 'cors',
       referrer: 'no-referrer',
@@ -133,8 +133,8 @@ export class WebOidcAuthenticationService implements IAuthenticationService {
     return response.json();
   }
 
-  private async isAuthorityReachable(authority: string): Promise<boolean> {
-    const request: Request = new Request(`${authority}.well-known/openid-configuration`, {
+  private async isAuthorityReachable(authorityUrl: string): Promise<boolean> {
+    const request: Request = new Request(`${authorityUrl}.well-known/openid-configuration`, {
       method: 'GET',
       mode: 'cors',
       referrer: 'no-referrer',
@@ -161,13 +161,13 @@ export class WebOidcAuthenticationService implements IAuthenticationService {
     return false;
   }
 
-  private setAuthority(authority: string): void {
-    oidcConfig.userManagerSettings.authority = authority;
+  private setAuthority(authorityUrl: string): void {
+    oidcConfig.userManagerSettings.authority = authorityUrl;
 
     // This dirty way to update the settings is the only way during runtime
-    (this.openIdConnect as any).configuration.userManagerSettings.authority = authority;
+    (this.openIdConnect as any).configuration.userManagerSettings.authority = authorityUrl;
     // eslint-disable-next-line no-underscore-dangle
-    (this.openIdConnect.userManager as any)._settings._authority = authority;
+    (this.openIdConnect.userManager as any)._settings._authority = authorityUrl;
   }
 
   // TODO: The dummy token needs to be removed in the future!!
@@ -181,8 +181,8 @@ export class WebOidcAuthenticationService implements IAuthenticationService {
     return base64EncodedString;
   }
 
-  private async getAccessToken(authority: string): Promise<string | null> {
-    this.setAuthority(authority);
+  private async getAccessToken(authorityUrl: string): Promise<string | null> {
+    this.setAuthority(authorityUrl);
     const user: User = await this.openIdConnect.getUser();
 
     const userIsNotLoggedIn: boolean = user === undefined || user === null;
@@ -190,13 +190,13 @@ export class WebOidcAuthenticationService implements IAuthenticationService {
     return userIsNotLoggedIn ? this.getDummyAccessToken() : user.access_token;
   }
 
-  private formAuthority(authority: string): string {
-    const authorityDoesNotEndWithSlash: boolean = !authority.endsWith('/');
+  private formAuthority(authorityUrl: string): string {
+    const authorityDoesNotEndWithSlash: boolean = !authorityUrl.endsWith('/');
 
     if (authorityDoesNotEndWithSlash) {
-      authority = `${authority}/`;
+      authorityUrl = `${authorityUrl}/`;
     }
 
-    return authority;
+    return authorityUrl;
   }
 }

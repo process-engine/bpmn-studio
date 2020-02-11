@@ -19,8 +19,9 @@
   flex: 1;
 }
 
-.task-list-item-modelname:hover {
+.task-list-item-modelname {
   color: inherit;
+  cursor: default;
 }
 
 .task-list-header {
@@ -34,4 +35,13 @@
 
 .task-list__no-tasks-text--error {
   color: darkred;
+}
+
+.task-list__close-modal-button {
+  position: absolute;
+  right: 20px;
+}
+
+.task-list__close-dynamic-ui-modal-button {
+  top: 5px;
 }

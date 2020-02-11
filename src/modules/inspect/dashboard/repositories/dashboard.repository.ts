@@ -3,6 +3,7 @@ import {IIdentity} from '@essential-projects/iam_contracts';
 import {Subscription} from '@essential-projects/event_aggregator_contracts';
 import {NotFoundError} from '@essential-projects/errors_ts';
 
+import {Correlation} from '@process-engine/management_api_contracts/dist/data_models/correlation';
 import {IDashboardRepository} from '../contracts/IDashboardRepository';
 import {TaskList, TaskListEntry, TaskSource, TaskType} from '../contracts/index';
 import {applyPagination} from '../../../../services/pagination-module/pagination.module';
@@ -19,9 +20,9 @@ export class DashboardRepository implements IDashboardRepository {
     offset: number = 0,
     limit: number = 0,
   ): Promise<DataModels.Cronjobs.CronjobList> {
-    const cronjobs: Array<
-      DataModels.Cronjobs.CronjobConfiguration
-    > = (await this.managementApiClient.getAllActiveCronjobs(identity)) as any;
+    const cronjobs: Array<DataModels.Cronjobs.CronjobConfiguration> = (await this.managementApiClient.getAllActiveCronjobs(
+      identity,
+    )) as any;
 
     return {
       cronjobs: applyPagination(cronjobs, offset, limit),
@@ -37,9 +38,9 @@ export class DashboardRepository implements IDashboardRepository {
     const activeCorrelations: Array<DataModels.Correlations.Correlation> = (await this.getActiveCorrelations(identity))
       .correlations;
 
-    const processInstancesForCorrelations: Array<
-      Array<DataModels.Correlations.ProcessInstance>
-    > = activeCorrelations.map((correlation) => {
+    const processInstancesForCorrelations: Array<Array<
+      DataModels.Correlations.ProcessInstance
+    >> = activeCorrelations.map((correlation) => {
       const processInstances: Array<DataModels.Correlations.ProcessInstance> = correlation.processInstances.map(
         (processInstance) => {
           processInstance.correlationId = correlation.id;
@@ -319,6 +320,20 @@ export class DashboardRepository implements IDashboardRepository {
     );
   }
 
+  public finishEmptyActivity(
+    identity: IIdentity,
+    processInstanceId: string,
+    correlationId: string,
+    emptyActivityInstanceId: string,
+  ): Promise<void> {
+    return this.managementApiClient.finishEmptyActivity(
+      identity,
+      processInstanceId,
+      correlationId,
+      emptyActivityInstanceId,
+    );
+  }
+
   public removeSubscription(identity: IIdentity, subscription: Subscription): Promise<void> {
     return this.managementApiClient.removeSubscription(identity, subscription);
   }
@@ -516,6 +531,10 @@ export class DashboardRepository implements IDashboardRepository {
     };
 
     return taskList;
+  }
+
+  public getCorrelationById(identity: IIdentity, correlationId: string): Promise<Correlation> {
+    return this.managementApiClient.getCorrelationById(identity, correlationId);
   }
 
   private mapTasksToTaskListEntry(tasks: Array<TaskSource>, targetType: TaskType): Array<TaskListEntry> {

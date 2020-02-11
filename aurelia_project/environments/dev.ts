@@ -109,6 +109,7 @@ export default {
     },
     solutionExplorer: {
       closeAllOpenDiagrams: 'solutionExplorer:openDiagrams:closeAll',
+      closeDiagram: 'solutionExplorer:openDiagrams:closeDiagram',
       updateOpenDiagrams: 'solutioneExplorer:openDiagrams:update',
     },
   },

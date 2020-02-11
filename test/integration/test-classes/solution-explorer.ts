@@ -61,6 +61,13 @@ export class SolutionExplorer {
     if (diagramName) {
       const diagramUri = this.getUriForSelector(pathToSolution, diagramName);
       await this.testClient.ensureVisible(`[data-test-open-diagram-with-uri*="${diagramUri}"]`, VISIBLE_TIMEOUT);
+
+      await this.testClient.webdriverClient.executeAsync(async (uri, done) => {
+        const domElement = document.querySelector(`[data-test-open-diagram-with-uri*="${uri}"]`);
+        domElement.scrollIntoView();
+        done();
+      }, diagramUri);
+
       await this.testClient.clickOn(`[data-test-open-diagram-with-uri*="${diagramUri}"]`);
     }
   }
