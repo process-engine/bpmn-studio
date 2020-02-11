@@ -343,7 +343,8 @@ function createMainWindow(): void {
   browserWindow.loadURL('/');
 
   ipcMain.on('close_bpmn-studio', (event) => {
-    browserWindow.close();
+    const focusedWindow = BrowserWindow.getFocusedWindow();
+    focusedWindow.close();
   });
 
   browserWindow.on('closed', (event) => {
