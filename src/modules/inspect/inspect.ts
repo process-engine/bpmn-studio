@@ -39,7 +39,6 @@ export class Inspect {
   private subscriptions: Array<Subscription>;
   private solutionService: ISolutionService;
   private notificationService: NotificationService;
-  private ipcRenderer: any;
 
   constructor(
     eventAggregator: EventAggregator,
@@ -112,17 +111,6 @@ export class Inspect {
       this.showDashboard = false;
       this.showHeatmap = false;
       this.showInspectProcessInstance = true;
-    }
-
-    if (isRunningInElectron()) {
-      this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
-      this.ipcRenderer.on('menubar__start_close_diagram', this.closeBpmnStudio);
-    }
-  }
-
-  public deactivate(): void {
-    if (isRunningInElectron()) {
-      this.ipcRenderer.removeListener('menubar__start_close_diagram', this.closeBpmnStudio);
     }
   }
 
@@ -207,11 +195,4 @@ export class Inspect {
       }
     }
   }
-
-  private closeBpmnStudio: Function = (): void => {
-    const activeDiagramNotSet: boolean = this.activeDiagram === undefined;
-    if (activeDiagramNotSet) {
-      this.ipcRenderer.send('close_bpmn-studio');
-    }
-  };
 }
