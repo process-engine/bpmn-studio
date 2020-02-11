@@ -330,6 +330,7 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
 
       const redirectCallbackResolved = async (token: ITokenObject): Promise<void> => {
         refreshCallback(token);
+        await this.setCurrentIdentityServerCookieForSolution(solutionUri, authorityUrl);
         await this.removeCurrentIdentityServerCookie(authorityUrl);
 
         this.silentRefresh(authorityUrl, solutionUri, token, refreshCallback);
