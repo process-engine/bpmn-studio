@@ -229,6 +229,9 @@ export class SolutionExplorerSolution {
         environment.events.solutionExplorer.closeAllOpenDiagrams,
         this.closeAllDiagramsEventFunction,
       ),
+      this.eventAggregator.subscribe(environment.events.solutionExplorer.closeDiagram, () => {
+        this.closeDiagram(this.activeDiagram);
+      }),
     ];
 
     if (this.displayedSolutionEntry.isOpenDiagram) {
@@ -242,14 +245,9 @@ export class SolutionExplorerSolution {
       this.subscriptions.push(updateSubscription);
 
       if (isRunningInElectron()) {
-        this.ipcRenderer.on('menubar__start_close_diagram', this.closeDiagramEventFunction);
         this.ipcRenderer.on('menubar__start_close_all_diagrams', this.closeAllDiagramsEventFunction);
         this.ipcRenderer.on('menubar__start_save_all_diagrams', this.saveAllDiagramsEventFunction);
       }
-    }
-
-    if (solutionIsRemoteSolution(this.displayedSolutionEntry.uri) && isRunningInElectron()) {
-      this.ipcRenderer.on('menubar__start_close_diagram', this.closeDiagramEventFunction);
     }
 
     if (solutionIsRemoteSolution(this.displayedSolutionEntry.uri)) {
@@ -323,7 +321,6 @@ export class SolutionExplorerSolution {
     }
 
     if (this.displayedSolutionEntry.isOpenDiagram) {
-      this.ipcRenderer.removeListener('menubar__start_close_diagram', this.closeDiagramEventFunction);
       this.ipcRenderer.removeListener('menubar__start_close_all_diagrams', this.closeAllDiagramsEventFunction);
       this.ipcRenderer.removeListener('menubar__start_save_all_diagrams', this.saveAllDiagramsEventFunction);
     }
@@ -772,19 +769,6 @@ export class SolutionExplorerSolution {
   private updateDiagramStateList(): void {
     this.diagramStateList = this.openDiagramStateService.loadDiagramStateForAllDiagrams();
   }
-
-  private closeDiagramEventFunction: Function = (): void => {
-    const noDiagramIsActive: boolean = this.activeDiagram === undefined;
-    if (noDiagramIsActive) {
-      return;
-    }
-
-    if (solutionIsRemoteSolution(this.displayedSolutionEntry.uri)) {
-      this.router.navigateToRoute('start-page');
-    } else {
-      this.closeDiagram(this.activeDiagram);
-    }
-  };
 
   private closeAllDiagramsEventFunction: Function = async (): Promise<void> => {
     const currentlyOpenDiagrams: Array<IDiagram> = [...this.openedDiagrams];
