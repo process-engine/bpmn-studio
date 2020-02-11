@@ -25,7 +25,6 @@ const UNAUTHORIZED_STATUS_CODE: number = 401;
 const IDENTITY_SERVER_AVAILABLE_SUCCESS_STATUS_CODE: number = 200;
 
 const identityServerCookieName = '.AspNetCore.Identity.Application';
-const cookieUrl = 'http://localhost';
 
 @inject(EventAggregator, 'NotificationService', 'HttpFetchClient')
 export class ElectronOidcAuthenticationService implements IAuthenticationService {
@@ -197,12 +196,12 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
   }
 
   private async showLoginPopup(authorityUrl: string, solutionUri: string, silent?: boolean): Promise<ITokenObject> {
-    if (!(await this.identityServerCookieIsEmpty())) {
-      await this.waitUntilCookieIsEmpty();
+    if (!(await this.identityServerCookieIsEmpty(authorityUrl))) {
+      await this.waitUntilCookieIsEmpty(authorityUrl);
     }
 
     if (await this.solutionHasIdentityServerCookie(solutionUri)) {
-      await this.setIdentityServerCookie(solutionUri);
+      await this.setIdentityServerCookie(solutionUri, authorityUrl);
     }
 
     const urlParams = {
@@ -237,7 +236,7 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
       authWindow.on(
         'closed',
         async (): Promise<void> => {
-          await this.removeCurrentIdentityServerCookie();
+          await this.removeCurrentIdentityServerCookie(authorityUrl);
 
           reject(new Error('window was closed by user'));
         },
@@ -249,8 +248,8 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
         }
 
         const redirectCallbackResolved = async (tokenObject: ITokenObject): Promise<void> => {
-          await this.setCurrentIdentityServerCookieForSolution(solutionUri);
-          await this.removeCurrentIdentityServerCookie();
+          await this.setCurrentIdentityServerCookieForSolution(solutionUri, authorityUrl);
+          await this.removeCurrentIdentityServerCookie(authorityUrl);
 
           resolve(tokenObject);
         };
@@ -301,7 +300,7 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
     }
 
     if (await this.solutionHasIdentityServerCookie(solutionUri)) {
-      await this.setIdentityServerCookie(solutionUri);
+      await this.setIdentityServerCookie(solutionUri, authorityUrl);
     }
 
     const urlParams = {
@@ -331,8 +330,7 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
 
       const redirectCallbackResolved = async (token: ITokenObject): Promise<void> => {
         refreshCallback(token);
-        await this.setCurrentIdentityServerCookieForSolution(solutionUri);
-        await this.removeCurrentIdentityServerCookie();
+        await this.removeCurrentIdentityServerCookie(authorityUrl);
 
         this.silentRefresh(authorityUrl, solutionUri, token, refreshCallback);
       };
@@ -464,12 +462,14 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
     return authorityUrl;
   }
 
-  private async getIdentityServerCookie(): Promise<Electron.Cookie> {
-    const cookies = await this.electronRemote.session.defaultSession.cookies.get({});
-
-    return cookies.find((cookie) => {
-      return cookie.name === identityServerCookieName;
+  private async getIdentityServerCookie(authorityUrl): Promise<Electron.Cookie> {
+    const domain = this.convertUrltoDomain(authorityUrl);
+    const identityServerCookies = await this.electronRemote.session.defaultSession.cookies.get({
+      name: identityServerCookieName,
+      domain: domain,
     });
+
+    return identityServerCookies[0];
   }
 
   private async getIdentityServerCookieForSolution(solutionUri: string): Promise<Electron.Cookie> {
@@ -478,39 +478,51 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
     return persistedCookie ? JSON.parse(persistedCookie) : undefined;
   }
 
-  private async setIdentityServerCookie(solutionUri: string): Promise<void> {
+  private async setIdentityServerCookie(solutionUri: string, authorityUrl: string): Promise<void> {
     const cookieToSet = await this.getIdentityServerCookieForSolution(solutionUri);
 
-    const cookiesSetDetails: Electron.CookiesSetDetails = Object.assign(cookieToSet, {url: cookieUrl});
+    const cookiesSetDetails: Electron.CookiesSetDetails = Object.assign(cookieToSet, {
+      url: authorityUrl,
+      domain: this.convertUrltoDomain(authorityUrl),
+    });
     cookiesSetDetails.name = identityServerCookieName;
 
     this.electronRemote.session.defaultSession.cookies.set(cookiesSetDetails);
   }
 
-  private async setCurrentIdentityServerCookieForSolution(solutionUri: string): Promise<void> {
-    const currentIdentityServerCookie = await this.getIdentityServerCookie();
+  private async setCurrentIdentityServerCookieForSolution(solutionUri: string, authorityUrl: string): Promise<void> {
+    const currentIdentityServerCookie = await this.getIdentityServerCookie(authorityUrl);
 
     localStorage.setItem(this.getCookieNameForSolution(solutionUri), JSON.stringify(currentIdentityServerCookie));
   }
 
-  private removeCurrentIdentityServerCookie(): Promise<void> {
-    return this.electronRemote.session.defaultSession.cookies.remove(cookieUrl, identityServerCookieName);
+  private async removeCurrentIdentityServerCookie(authorityUrl: string): Promise<void> {
+    const identityServerCookie = await this.electronRemote.session.defaultSession.cookies.get({
+      name: identityServerCookieName,
+      domain: this.convertUrltoDomain(authorityUrl),
+    });
+
+    if (!identityServerCookie) {
+      return undefined;
+    }
+
+    return this.electronRemote.session.defaultSession.cookies.remove(authorityUrl, identityServerCookie[0].name);
   }
 
   private removeIdentityServerCookieOfSolution(solutionUri: string): void {
     localStorage.removeItem(this.getCookieNameForSolution(solutionUri));
   }
 
-  private async identityServerCookieIsEmpty(): Promise<boolean> {
-    return (await this.getIdentityServerCookie()) === undefined;
+  private async identityServerCookieIsEmpty(authorityUrl: string): Promise<boolean> {
+    return (await this.getIdentityServerCookie(authorityUrl)) === undefined;
   }
 
   private async solutionHasIdentityServerCookie(solutionUri: string): Promise<boolean> {
     return localStorage.getItem(this.getCookieNameForSolution(solutionUri)) !== null;
   }
 
-  private async waitUntilCookieIsEmpty(): Promise<void> {
-    while (!(await this.identityServerCookieIsEmpty())) {
+  private async waitUntilCookieIsEmpty(authorityUrl): Promise<void> {
+    while (!(await this.identityServerCookieIsEmpty(authorityUrl))) {
       await this.wait(100);
     }
   }
@@ -525,6 +537,12 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
         resolve();
       }, ms);
     });
+  }
+
+  private convertUrltoDomain(url: string): string {
+    const domainRegex = /^(?:.*:\/\/)?([^:/]*)/;
+
+    return url.match(domainRegex)[1];
   }
 
   private getRandomString(length: number): string {
