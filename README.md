@@ -1,8 +1,10 @@
+![Node CI](https://github.com/process-engine/bpmn-studio/workflows/Node%20CI/badge.svg?branch=master)
+
 # BPMN Studio
 
 BPMN Studio ist eine Web- und Desktop-Applikation zur Erstellung, Verwaltung,
 Ausführung und Auswertung von BPMN-Prozessen.  Es setzt auf dem BPMN.io auf und
-den BPMN-Standard 2.x um.
+den BPMN-Standard 2.x um. (Node, Electron, Aurelia, TypeScript)
 
 ## Was sind die Ziele dieses Projekts?
 
