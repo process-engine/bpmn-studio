@@ -9,8 +9,8 @@ den BPMN-Standard 2.x um. (Node, Electron, Aurelia, TypeScript)
 ## Was sind die Ziele dieses Projekts?
 
 BPMN Studio soll es dem Anwender so leicht wie möglich machen BPMN-Diagramme zu
-erstellen und zu pflegen.  Des Weiteren kann BPMN Studio mit einer Workflow
-Engine verbunden werden, um diese Diagramme auszuführen.
+erstellen und zu pflegen. Des Weiteren bringt BPMN Studio einee Workflow
+Engine mit, um diese Diagramme auszuführen.
 
 ## Relevante URLs
 
@@ -31,7 +31,7 @@ Ein [Docker-Image des kompletten Bundles](https://hub.docker.com/r/5minds/bpmn-s
 ### Voraussetzungen
 
 * Node [active LTS](https://github.com/nodejs/Release#release-schedule)
-* Laufende ProcessEngine
+* Python 
 
 ### Setup/Installation
 
@@ -131,15 +131,14 @@ automatisch neu geladen.
 npm run electron-build-macos
 ```
 
-Nach dem Bauen kann man in dem `dist/electron/mac` Ordner die fertige Applikation finden
-und ausführen.
+Nach dem Bauen befindet sich die fertige Applikation im `dist/electron/mac` Ordner.
 
 **Windows:**
 
 Vor dem erstmaligen Builden müssen  die windows-build-tools installiert werden:
 
 ```shell
-npm install --global --production windows-build-tools
+npm --vs2015 install --global windows-build-tools
 ```
 
 Danach kann gebuildet werden:
@@ -148,8 +147,8 @@ Danach kann gebuildet werden:
 npm run electron-build-windows
 ```
 
-Nach dem Bauen, kann man in dem `dist/electron/` Ordner die Datei `bpmn-studio-setup-
-<VERSION>.exe` ausführen, um die Applikation zu installieren; `<VERSION>` wird
+Nach dem Bauen befindet sich die Datei im `dist/electron/` Ordner. Die Datei `bpmn-studio-setup-
+<VERSION>.exe` muss ausgeführt werden, um die Applikation zu installieren; `<VERSION>` wird
 durch die entsprechende Version ersetzt.
 
 Beispiel:
