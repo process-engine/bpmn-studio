@@ -9,7 +9,7 @@ den BPMN-Standard 2.x um. (Node, Electron, Aurelia, TypeScript)
 ## Was sind die Ziele dieses Projekts?
 
 BPMN Studio soll es dem Anwender so leicht wie möglich machen BPMN-Diagramme zu
-erstellen und zu pflegen. Des Weiteren bringt BPMN Studio einee Workflow
+erstellen und zu pflegen. Des Weiteren bringt BPMN Studio eine Workflow
 Engine mit, um diese Diagramme auszuführen.
 
 ## Relevante URLs
