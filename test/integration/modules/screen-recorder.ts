@@ -92,12 +92,16 @@ export class ScreenRecorder {
       const baseName = path.basename(this.filepath, '.webm');
 
       const lastIndexOfMinus = baseName.lastIndexOf('-');
-      let number = JSON.parse(baseName.substr(lastIndexOfMinus + 1));
-      number++;
+      const currentVideoIndex = parseInt(baseName.substr(lastIndexOfMinus + 1));
+      const nextVideoIndex = currentVideoIndex + 1;
 
-      this.filepath = `${`${path.dirname(this.filepath)}/${baseName.substr(0, lastIndexOfMinus)}-${number}`}.webm`;
+      const baseNameWithoutIndex = baseName.substr(0, lastIndexOfMinus);
+      const newFilename = `${baseNameWithoutIndex}-${nextVideoIndex}.webm`;
+      this.filepath = path.join(path.dirname(this.filepath), newFilename);
     } else {
-      this.filepath = `${`${path.dirname(this.filepath)}/${path.basename(this.filepath, '.webm')}-1`}.webm`;
+      const baseName = path.basename(this.filepath, '.webm');
+      const newFilename = `${baseName}-1.webm`;
+      this.filepath = path.join(path.dirname(this.filepath), newFilename);
     }
 
     fs.writeFile(this.filepath, buffer, (error) => {

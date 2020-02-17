@@ -325,8 +325,8 @@ export class TestClient {
     });
   }
 
-  private async removeWindowsDB(dbPath): Promise<void> {
-    await new Promise((resolve: Function, reject: Function) => {
+  private removeWindowsDB(dbPath): Promise<void> {
+    return new Promise((resolve: Function, reject: Function) => {
       fs.readdirSync(dbPath).forEach((file, index, arr) => {
         const fileToDelete = path.join(dbPath, file);
 
