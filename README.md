@@ -147,8 +147,8 @@ Danach kann gebuildet werden:
 npm run electron-build-windows
 ```
 
-Nach dem Bauen befindet sich die Datei im `dist/electron/` Ordner. Die Datei `bpmn-studio-setup-
-<VERSION>.exe` muss ausgeführt werden, um die Applikation zu installieren; `<VERSION>` wird
+Nach dem Bauen befindet sich im `dist/electron/` Ordner die Datei `bpmn-studio-setup-<VERSION>.exe`.
+Um die Applikation zu installieren muss diese ausgeführt werden; `<VERSION>` wird
 durch die entsprechende Version ersetzt.
 
 Beispiel:
