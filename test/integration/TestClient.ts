@@ -31,7 +31,7 @@ const DATABASE_PATH = path.join(TESTS_FOLDER_PATH, 'process_engine_databases');
 const SAVE_DIAGRAM_DIR = path.join(TESTS_FOLDER_PATH, 'saved_diagrams');
 const VISIBLE_TIMEOUT = 40000;
 const REMOVE_COMMAND_DIR = process.platform === 'win32' ? 'rmdir /s /q' : 'rm -rf';
-const REMOVE_COMMAND_FILE = process.platform === 'win32' ? 'del /f' : 'rm -rf';
+const REMOVE_COMMAND_FILE = process.platform === 'win32' ? 'del /f' : 'rm -f';
 
 export class TestClient {
   public solutionExplorer: SolutionExplorer = new SolutionExplorer(this);
