@@ -2,9 +2,7 @@
 
 # BPMN Studio
 
-BPMN Studio ist eine Web- und Desktop-Applikation zur Erstellung, Verwaltung,
-Ausführung und Auswertung von BPMN-Prozessen.  Es setzt auf dem BPMN.io auf und
-den BPMN-Standard 2.x um. (Node, Electron, Aurelia, TypeScript)
+BPMN Studio ist eine Desktop- und Web-Applikation zum Erstellen, Verwalten, Ausführen und Auswerten von BPMN-Prozessen, implementiert in Electron, Aurelia & TypeScript.
 
 ## Was sind die Ziele dieses Projekts?
 
