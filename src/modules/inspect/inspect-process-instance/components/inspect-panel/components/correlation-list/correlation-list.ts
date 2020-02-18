@@ -41,7 +41,7 @@ export class CorrelationList {
 
   public correlationListSortProperty: typeof CorrelationListSortProperty = CorrelationListSortProperty;
   public sortSettings: ICorrelationSortSettings = {
-    ascending: true,
+    ascending: false,
     sortProperty: CorrelationListSortProperty.StartedAt,
   };
 
