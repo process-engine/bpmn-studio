@@ -162,7 +162,7 @@ export class ProcessInstanceList {
   }
 
   public changeSortProperty(property: ProcessInstanceListSortProperty): void {
-    if (this.pageSize !== 0) {
+    if (!this.showSortOption) {
       return;
     }
 

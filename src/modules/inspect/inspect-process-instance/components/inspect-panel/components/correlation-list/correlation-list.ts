@@ -158,7 +158,7 @@ export class CorrelationList {
   }
 
   public changeSortSettings(property: CorrelationListSortProperty): void {
-    if (this.pageSize !== 0) {
+    if (!this.showSortOption) {
       return;
     }
 
