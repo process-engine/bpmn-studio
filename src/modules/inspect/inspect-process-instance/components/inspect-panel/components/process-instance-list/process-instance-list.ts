@@ -41,7 +41,7 @@ export class ProcessInstanceList {
 
   public processInstanceListSortProperty: typeof ProcessInstanceListSortProperty = ProcessInstanceListSortProperty;
   public sortSettings: ProcessInstanceListSortSettings = {
-    ascending: true,
+    ascending: false,
     sortProperty: ProcessInstanceListSortProperty.StartedAt,
   };
 
