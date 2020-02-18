@@ -129,6 +129,10 @@ export class ProcessInstanceList {
     const showAllProcessInstances: boolean = this.pageSize === 0;
     if (showAllProcessInstances) {
       this.currentPage = 1;
+    } else {
+      this.sortSettings.ascending = false;
+      this.sortSettings.sortProperty = ProcessInstanceListSortProperty.StartedAt;
+      this.sortTableData();
     }
 
     const isFirstPage: boolean = this.currentPage === 1;
