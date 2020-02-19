@@ -1,5 +1,5 @@
 import {EventAggregator} from 'aurelia-event-aggregator';
-import {bindable, inject, observable} from 'aurelia-framework';
+import {bindable, computedFrom, inject, observable} from 'aurelia-framework';
 
 import {DataModels} from '@process-engine/management_api_contracts';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
@@ -41,7 +41,7 @@ export class CorrelationList {
 
   public correlationListSortProperty: typeof CorrelationListSortProperty = CorrelationListSortProperty;
   public sortSettings: ICorrelationSortSettings = {
-    ascending: true,
+    ascending: false,
     sortProperty: CorrelationListSortProperty.StartedAt,
   };
 
@@ -104,6 +104,10 @@ export class CorrelationList {
     const showAllProcessInstances: boolean = this.pageSize === 0;
     if (showAllProcessInstances) {
       this.currentPage = 1;
+    } else {
+      this.sortSettings.ascending = false;
+      this.sortSettings.sortProperty = CorrelationListSortProperty.StartedAt;
+      this.sortTableData();
     }
 
     const isFirstPage: boolean = this.currentPage === 1;
@@ -136,6 +140,11 @@ export class CorrelationList {
     this.eventAggregator.publish(environment.events.inspectProcessInstance.updateCorrelations, payload);
   }
 
+  @computedFrom('pageSize', 'totalCount')
+  public get showSortOption(): boolean {
+    return this.pageSize == 0 || this.totalCount < this.minPageSize;
+  }
+
   private convertCorrelationsIntoTableData(
     correlations: Array<DataModels.Correlations.Correlation>,
   ): Array<ICorrelationTableEntry> {
@@ -153,6 +162,10 @@ export class CorrelationList {
   }
 
   public changeSortSettings(property: CorrelationListSortProperty): void {
+    if (!this.showSortOption) {
+      return;
+    }
+
     const isSameSortPropertyAsBefore: boolean = this.sortSettings.sortProperty === property;
     const ascending: boolean = isSameSortPropertyAsBefore ? !this.sortSettings.ascending : true;
 

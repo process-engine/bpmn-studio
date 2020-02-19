@@ -7,13 +7,13 @@
       <thead>
         <tr class="correlation-table__headlines">
           <th class="correlation-table__headline" click.delegate="changeSortSettings(correlationListSortProperty.StartedAt)">
-            Started at <i if.bind="sortSettings.sortProperty === correlationListSortProperty.StartedAt" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
+            Started at <i if.bind="sortSettings.sortProperty === correlationListSortProperty.StartedAt && showSortOption" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
           <th class="correlation-table__headline" click.delegate="changeSortSettings(correlationListSortProperty.State)">
-            State <i if.bind="sortSettings.sortProperty == correlationListSortProperty.State" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
+            State <i if.bind="sortSettings.sortProperty == correlationListSortProperty.State && showSortOption" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
           <th class="correlation-table__headline" click.delegate="changeSortSettings(correlationListSortProperty.CorrelationId)">
-            Correlation ID <i if.bind="sortSettings.sortProperty === correlationListSortProperty.CorrelationId" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
+            Correlation ID <i if.bind="sortSettings.sortProperty === correlationListSortProperty.CorrelationId && showSortOption" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
         </tr>
       </thead>
@@ -31,7 +31,7 @@
         <tr if.bind="totalCount > minPageSize" class="correlation-table__table-row">
           <td>
             <div class="correlation-table__pagesize-entry">
-              Page size: 
+              Page size:
             </div>
             <select class="form-control correlation-table__pagesize-entry--select" value.bind="pageSize">
               <option model.bind="size" repeat.for="size of pageSizes">${size}</option>
