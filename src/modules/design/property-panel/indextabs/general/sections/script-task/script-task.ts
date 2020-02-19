@@ -5,8 +5,9 @@ import {IScriptTaskElement, IShape} from '@process-engine/bpmn-elements_contract
 
 import {IPageModel, ISection} from '../../../../../../../contracts';
 import environment from '../../../../../../../environment';
+import {HelpModalService} from '../../../../../../../services/help-modal-service/help-modal-service';
 
-@inject(EventAggregator)
+@inject(EventAggregator, HelpModalService)
 export class ScriptTaskSection implements ISection {
   public path: string = '/sections/script-task/script-task';
   public canHandleElement: boolean = false;
@@ -17,9 +18,11 @@ export class ScriptTaskSection implements ISection {
   public scriptInput: HTMLElement;
 
   private eventAggregator: EventAggregator;
+  private helpModalService: HelpModalService;
 
-  constructor(eventAggregator?: EventAggregator) {
+  constructor(eventAggregator?: EventAggregator, helpModalService?: HelpModalService) {
     this.eventAggregator = eventAggregator;
+    this.helpModalService = helpModalService;
   }
 
   public activate(model: IPageModel): void {
@@ -42,6 +45,14 @@ export class ScriptTaskSection implements ISection {
 
   public updateScript(): void {
     this.publishDiagramChange();
+  }
+
+  public showTokenHelpModal(): void {
+    const title = 'How to use the token';
+    const message =
+      'The data of previous tasks can be accessed via the token.\nIn order to do so make use of:\n"token.current" - In order to use the data of the previous tasks\n"token.history.<id-of-previous-task>" - In order to use the data of a specific tasks.';
+
+    this.helpModalService.showHelpModal(title, message);
   }
 
   private elementIsScriptTask(element: IShape): boolean {
