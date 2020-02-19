@@ -1,13 +1,14 @@
 import {ScriptTaskTokenUsageHelpMessage} from './help-texts/script-task-token-usage';
 
-import {HelpMessage} from '../../contracts/index';
-
-const messageMap = {
-  'script-task-token-usage': ScriptTaskTokenUsageHelpMessage,
-};
+import {HelpMessage, HelpMessageId} from '../../contracts/index';
 
 export class HelpTextService {
-  public getHelpMessageById(helpMessageId: string): HelpMessage {
-    return messageMap[helpMessageId];
+  public getHelpMessageById(helpMessageId: HelpMessageId): HelpMessage {
+    switch (helpMessageId) {
+      case HelpMessageId.ScriptTaskTokenUsageHelpMessage:
+        return ScriptTaskTokenUsageHelpMessage;
+      default:
+        throw new Error(`Help message with id "${helpMessageId}" is unknown.`);
+    }
   }
 }
