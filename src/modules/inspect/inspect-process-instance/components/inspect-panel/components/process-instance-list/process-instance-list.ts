@@ -64,14 +64,6 @@ export class ProcessInstanceList {
     this.selectedTableEntry = selectedTableEntry;
   }
 
-  public get showProcessInstanceToSelect(): boolean {
-    return (
-      this.processInstanceToSelect !== undefined &&
-      this.processInstanceToSelectTableEntry !== undefined &&
-      this.selectedCorrelation.id === this.processInstanceToSelect.correlationId
-    );
-  }
-
   public activeDiagramChanged(): void {
     this.currentPage = 1;
     this.processInstanceToSelect = undefined;
