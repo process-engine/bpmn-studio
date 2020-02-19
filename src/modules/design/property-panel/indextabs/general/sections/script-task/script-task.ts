@@ -3,7 +3,7 @@ import {inject} from 'aurelia-framework';
 
 import {IScriptTaskElement, IShape} from '@process-engine/bpmn-elements_contracts';
 
-import {IPageModel, ISection} from '../../../../../../../contracts';
+import {HelpMessageId, IPageModel, ISection} from '../../../../../../../contracts/index';
 import environment from '../../../../../../../environment';
 import {HelpModalService} from '../../../../../../../services/help-modal-service/help-modal-service';
 
@@ -48,7 +48,7 @@ export class ScriptTaskSection implements ISection {
   }
 
   public showTokenHelpModal(): void {
-    this.helpModalService.showHelpModal('script-task-token-usage');
+    this.helpModalService.showHelpModal(HelpMessageId.ScriptTaskTokenUsageHelpMessage);
   }
 
   private elementIsScriptTask(element: IShape): boolean {

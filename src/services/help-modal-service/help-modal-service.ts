@@ -1,3 +1,5 @@
+import {HelpMessageId} from '../../contracts/index';
+
 import {HelpTextService} from './help-text-service';
 
 export class HelpModalService {
@@ -9,7 +11,7 @@ export class HelpModalService {
     this.helpTextService = new HelpTextService();
   }
 
-  public showHelpModal(helpMessageId: string): void {
+  public showHelpModal(helpMessageId: HelpMessageId): void {
     this.showModal = !this.showModal;
     const node = document.createElement('div');
 
