@@ -15,9 +15,13 @@ nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
   runAfterFinish: false
-win:
-  target: nsis
   artifactName: 'bpmn-studio-setup-${version}.${ext}'
+portable:
+  artifactName: 'bpmn-studio-portable-${version}.${ext}'
+win:
+  target:
+    - nsis
+    - portable
 mac:
   target:
     - dmg
