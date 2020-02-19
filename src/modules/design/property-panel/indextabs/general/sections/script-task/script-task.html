@@ -8,7 +8,7 @@
         <tr>
           <th>Script
             <a class="script-task-enlarge-link" click.delegate="showModal = true"><small class="script-task-enlarge-text">Enlarge</small></a>
-            <i class="fas fa-info-circle feedback-modal__help-icon" title="How to use the token." click.delegate="showTokenHelpModal()"></i>
+            <i class="fas fa-info-circle feedback-modal__help-icon" title="Help: How to use the token" click.delegate="showTokenHelpModal()"></i>
           </th>
           <td>
             <textarea class="props-input-textarea name-input" ref="scriptInput" value.bind="businessObjInPanel.script" change.delegate="updateScript()" disabled.bind="!isEditable"></textarea>
