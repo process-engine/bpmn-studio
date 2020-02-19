@@ -118,8 +118,6 @@ export class DiagramDetail {
       this.ipcRenderer.on('menubar__start_save_diagram', this.electronOnSaveDiagram);
     }
 
-    this.eventAggregator.publish(environment.events.navBar.showTools);
-
     this.subscriptions = [
       this.validationController.subscribe((event: ValidateEvent) => {
         this.handleFormValidateEvents(event);
@@ -202,10 +200,6 @@ export class DiagramDetail {
     } else {
       this.hasValidationError = true;
     }
-  }
-
-  public deactivate(): void {
-    this.eventAggregator.publish(environment.events.navBar.hideTools);
   }
 
   public detached(): void {
