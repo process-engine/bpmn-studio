@@ -138,7 +138,7 @@ function initializeApplication(): void {
     createFeedbackZip(feedbackData);
   });
 
-  if (!releaseChannel.isDev() && !process.env.SPECTRON_TESTS) {
+  if (!releaseChannel.isDev() && !process.env.SPECTRON_TESTS && !electron.app.getName().includes('portable')) {
     initializeAutoUpdater();
   }
 
