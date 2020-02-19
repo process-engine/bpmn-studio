@@ -15,7 +15,7 @@ export class LogViewer {
   public logSortProperty: typeof LogSortProperty = LogSortProperty;
   public sortedLog: Array<DataModels.Logging.LogEntry>;
   public sortSettings: ILogSortSettings = {
-    ascending: true,
+    ascending: false,
     sortProperty: LogSortProperty.Time,
   };
 
