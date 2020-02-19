@@ -1,4 +1,4 @@
-import {HelpMessageId} from '../../contracts/index';
+import {HelpTextId} from '../../contracts/index';
 
 import {HelpTextService} from './help-text-service';
 
@@ -11,7 +11,7 @@ export class HelpModalService {
     this.helpTextService = new HelpTextService();
   }
 
-  public showHelpModal(helpMessageId: HelpMessageId): void {
+  public showHelpModal(helpTextId: HelpTextId): void {
     this.showModal = !this.showModal;
     const node = document.createElement('div');
 
@@ -19,18 +19,18 @@ export class HelpModalService {
       document.body.removeChild(node);
     };
 
-    const helpMessage = this.helpTextService.getHelpMessageById(helpMessageId);
+    const helpText = this.helpTextService.getHelpTextById(helpTextId);
 
     node.innerHTML = `
 <div class="modal show show-modal" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-style" style="display: flex; top: 10%; max-height: 80%;" role="document">
     <div class="modal-content" style="height: unset;">
       <div class="modal-header">
-        <h3>${helpMessage.title}</h3>
+        <h3>${helpText.title}</h3>
         <button id="help-modal-close-button" type="button" class="close">&times;</button>
       </div>
       <div class="modal-body" style="overflow-y: scroll;"><span style="white-space: pre-line;">${this.escapeMessage(
-        helpMessage.message,
+        helpText.message,
       )}<span></div>
     </div>
   </div>
