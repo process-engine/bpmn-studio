@@ -1,25 +1,34 @@
+import {HelpTextService} from './help-text-service';
+
 export class HelpModalService {
   public showModal = false;
 
-  public showHelpModal(headline: string, message: string): void {
+  private helpTextService: HelpTextService;
+
+  constructor() {
+    this.helpTextService = new HelpTextService();
+  }
+
+  public showHelpModal(helpMessageId: string): void {
     this.showModal = !this.showModal;
     const node = document.createElement('div');
 
     const removeModalFn = (): void => {
-      console.log('remove');
       document.body.removeChild(node);
     };
+
+    const helpMessage = this.helpTextService.getHelpMessageById(helpMessageId);
 
     node.innerHTML = `
 <div class="modal show show-modal" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-style" style="display: flex; top: 10%; max-height: 80%;" role="document">
     <div class="modal-content" style="height: unset;">
       <div class="modal-header">
-        <h3>${headline}</h3>
+        <h3>${helpMessage.title}</h3>
         <button id="help-modal-close-button" type="button" class="close">&times;</button>
       </div>
       <div class="modal-body" style="overflow-y: scroll;"><span style="white-space: pre-line;">${this.escapeMessage(
-        message,
+        helpMessage.message,
       )}<span></div>
     </div>
   </div>
@@ -30,7 +39,7 @@ export class HelpModalService {
     document.getElementById('help-modal-close-button').onclick = removeModalFn;
   }
 
-  private escapeMessage(message): string {
+  private escapeMessage(message: string): string {
     return message
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')

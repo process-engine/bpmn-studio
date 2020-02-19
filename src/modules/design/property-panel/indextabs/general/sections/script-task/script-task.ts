@@ -48,11 +48,7 @@ export class ScriptTaskSection implements ISection {
   }
 
   public showTokenHelpModal(): void {
-    const title = 'How to use the token';
-    const message =
-      'The data of previous tasks can be accessed via the token.\nIn order to do so make use of:\n"token.current" - In order to use the data of the previous tasks\n"token.history.<id-of-previous-task>" - In order to use the data of a specific tasks.';
-
-    this.helpModalService.showHelpModal(title, message);
+    this.helpModalService.showHelpModal('script-task-token-usage');
   }
 
   private elementIsScriptTask(element: IShape): boolean {
