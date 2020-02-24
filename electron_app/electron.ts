@@ -138,7 +138,7 @@ function initializeApplication(): void {
     createFeedbackZip(feedbackData);
   });
 
-  const portableIdentifier = electron.app.getName().includes('portable');
+  const portableIdentifier = electron.app.getName().includes('-portable');
   if (!releaseChannel.isDev() && !process.env.SPECTRON_TESTS && !portableIdentifier) {
     initializeAutoUpdater();
   }
