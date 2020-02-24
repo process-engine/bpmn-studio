@@ -3,7 +3,7 @@ const fs = require('fs');
 const {getReleaseChannelSuffix} = require('./release');
 
 const releaseChannelSuffix = getReleaseChannelSuffix();
-const isPortableBuild = process.env.isPortableBuild;
+const isPortableBuild = process.env.IS_PORTABLE_BUILD;
 
 const portableIdentifier = isPortableBuild ? '-portable' : '';
 

@@ -4,7 +4,7 @@ const {getReleaseChannelSuffix} = require('./release');
 
 const releaseChannelSuffix = getReleaseChannelSuffix();
 
-const isPortableBuild = process.env.isPortableBuild;
+const isPortableBuild = process.env.IS_PORTABLE_BUILD;
 const portableIdentifier = isPortableBuild ? '-portable' : '';
 
 fs.readFile('package.json', 'utf8', (err, data) => {
