@@ -70,13 +70,13 @@ npm install
 
 ### Benutzung
 
-**Zum bauen:**
+**Zum builden:**
 
 ```shell
 npm run build
 ```
 
-Dieses Skript baut die Anwendung, das Ergebnis ist produktionsreif.
+Dieses Skript buildet die Anwendung, das Ergebnis ist produktionsreif.
 
 **Zum starten:**
 
@@ -121,7 +121,7 @@ automatisch neu geladen.
 
 ### Electron Applikation
 
-**Zum bauen:**
+**Zum builden:**
 
 **Mac:**
 
@@ -129,7 +129,7 @@ automatisch neu geladen.
 npm run electron-build-macos
 ```
 
-Nach dem Bauen befindet sich die fertige Applikation im `dist/electron/mac` Ordner.
+Nach dem Builden befindet sich die fertige Applikation im `dist/electron/mac` Ordner.
 
 **Windows:**
 
@@ -146,7 +146,7 @@ npm run electron-build-windows
 ```
 
 Der Buildvorgang generiert im `dist/electron/` Ordner die Datei `bpmn-studio-setup-<VERSION>.exe`.
-Diese kann zur Installation der Applikation genutzt werden; 
+Diese kann zur Installation der Applikation genutzt werden;
 `<VERSION>` entspricht dabei der Version, in welcher die Applikation installiert wird.
 
 Beispiel:
@@ -155,15 +155,15 @@ Beispiel:
 
 ### Docker Image
 
-#### Container bauen
+#### Container builden
 
-Das Image lässt sich wie folgt bauen:
+Das Image lässt sich wie folgt builden:
 
 ```shell
 docker build --tag bpmn-studio:latest .
 ```
 
-#### Container bauen mit optionalen Parametern
+#### Container builden mit optionalen Parametern
 
 Es ist möglich, das base image, sowie die Paketversionen anzupassen:
 
