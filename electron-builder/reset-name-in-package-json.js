@@ -4,8 +4,8 @@ const {getReleaseChannelSuffix} = require('./release');
 
 const releaseChannelSuffix = getReleaseChannelSuffix();
 
-const MODE = process.env.MODE;
-const portableName = MODE ? `-${MODE}` : '';
+const isPortableBuild = process.env.isPortableBuild;
+const portableIdentifier = isPortableBuild ? '-portable' : '';
 
 fs.readFile('package.json', 'utf8', (err, data) => {
   if (err) {
@@ -13,7 +13,7 @@ fs.readFile('package.json', 'utf8', (err, data) => {
   }
 
   const dataWithNewName = data.replace(
-    `  "name": "bpmn-studio${releaseChannelSuffix}${portableName}",`,
+    `  "name": "bpmn-studio${releaseChannelSuffix}${portableIdentifier}",`,
     '  "name": "bpmn-studio",',
   );
 

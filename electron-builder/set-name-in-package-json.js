@@ -3,9 +3,9 @@ const fs = require('fs');
 const {getReleaseChannelSuffix} = require('./release');
 
 const releaseChannelSuffix = getReleaseChannelSuffix();
-const MODE = process.env.MODE;
+const isPortableBuild = process.env.isPortableBuild;
 
-const portableName = MODE ? `-${MODE}` : '';
+const portableIdentifier = isPortableBuild ? '-portable' : '';
 
 fs.readFile('package.json', 'utf8', (err, data) => {
   if (err) {
@@ -14,7 +14,7 @@ fs.readFile('package.json', 'utf8', (err, data) => {
 
   const dataWithNewName = data.replace(
     '  "name": "bpmn-studio",',
-    `  "name": "bpmn-studio${releaseChannelSuffix}${portableName}",`,
+    `  "name": "bpmn-studio${releaseChannelSuffix}${portableIdentifier}",`,
   );
 
   fs.writeFile('package.json', dataWithNewName, (errWrite) => {
@@ -22,6 +22,6 @@ fs.readFile('package.json', 'utf8', (err, data) => {
       throw errWrite;
     }
 
-    console.log(`[set-name-in-package-json]\tSet name to bpmn-studio${releaseChannelSuffix}`);
+    console.log(`[set-name-in-package-json]\tSet name to bpmn-studio${releaseChannelSuffix}${portableIdentifier}`);
   });
 });
