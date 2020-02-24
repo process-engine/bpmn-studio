@@ -4,7 +4,11 @@ const {getReleaseChannel} = require('./release');
 
 function copyFile(fromFile, toFile) {
   console.log(`Copying ${fromFile} to ${toFile}`);
-  const errorCallback = (err) => console.error(err);
+  const errorCallback = (err) => {
+    if (err) {
+      console.error(err);
+    }
+  };
   fs.copyFile(fromFile, toFile, errorCallback);
 }
 

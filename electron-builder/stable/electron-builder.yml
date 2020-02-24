@@ -15,14 +15,18 @@ nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
   runAfterFinish: false
+  artifactName: 'bpmn-studio-setup-${version}.${ext}'
+portable:
+  artifactName: 'bpmn-studio-portable-${version}.${ext}'
 win:
-  target: nsis
+  target:
+    - nsis
+    - portable
   fileAssociations:
     - ext:
         - bpmn
       name: BPMN
       description: BPMN diagram extension
-  artifactName: 'bpmn-studio-setup-${version}.${ext}'
 mac:
   target:
     - dmg
