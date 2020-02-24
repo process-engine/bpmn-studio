@@ -133,7 +133,7 @@ Nach dem Bauen befindet sich die fertige Applikation im `dist/electron/mac` Ordn
 
 **Windows:**
 
-Vor dem erstmaligen Builden müssen  die windows-build-tools installiert werden:
+Vor dem ersten Build müssen die windows-build-tools installiert werden:
 
 ```shell
 npm --vs2015 install --global windows-build-tools
@@ -145,9 +145,9 @@ Danach kann gebuildet werden:
 npm run electron-build-windows
 ```
 
-Nach dem Bauen befindet sich im `dist/electron/` Ordner die Datei `bpmn-studio-setup-<VERSION>.exe`.
-Um die Applikation zu installieren muss diese ausgeführt werden; `<VERSION>` wird
-durch die entsprechende Version ersetzt.
+Der Buildvorgang generiert im `dist/electron/` Ordner die Datei `bpmn-studio-setup-<VERSION>.exe`.
+Diese kann zur Installation der Applikation genutzt werden; 
+`<VERSION>` entspricht dabei der Version, in welcher die Applikation installiert wird.
 
 Beispiel:
 
