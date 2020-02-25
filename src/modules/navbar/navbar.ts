@@ -85,14 +85,6 @@ export class NavBar {
         this.updateNavbar();
       }),
 
-      this.eventAggregator.subscribe(environment.events.navBar.showTools, () => {
-        this.showTools = true;
-      }),
-
-      this.eventAggregator.subscribe(environment.events.navBar.hideTools, () => {
-        this.showTools = false;
-      }),
-
       this.eventAggregator.subscribe(environment.events.navBar.validationError, () => {
         this.validationError = true;
       }),
@@ -347,9 +339,9 @@ export class NavBar {
     this.disableDiagramUploadButton = activeSolutionIsRemoteSolution;
 
     if (activeRouteIsDiagramDetail) {
-      this.showTools = true;
       this.showInspectTools = false;
       this.showExportOnInspectProcessInstance = false;
+      this.showTools = true;
     } else if (activeRouteIsInspect) {
       const inspectView: string = this.router.currentInstruction.params.view;
       const inspectViewIsDashboard: boolean = inspectView === 'dashboard';
@@ -371,6 +363,7 @@ export class NavBar {
       this.showExportOnInspectProcessInstance = false;
     } else {
       this.showInspectTools = false;
+      this.showTools = false;
       this.showExportOnInspectProcessInstance = false;
     }
   }

@@ -64,11 +64,31 @@ export class ProcessInstanceList {
     this.selectedTableEntry = selectedTableEntry;
   }
 
+  @computedFrom('sortedTableData.length', 'pageSize')
   public get showProcessInstanceToSelect(): boolean {
+    const processInstanceToSelectExist = this.processInstanceToSelect != null;
+    const processInstanceToSelectTableEntryExist = this.processInstanceToSelectTableEntry != null;
+    const correlationIdIsSelectedCorrelationId =
+      this.selectedCorrelation &&
+      processInstanceToSelectExist &&
+      this.selectedCorrelation.id === this.processInstanceToSelect.correlationId;
+
+    if (this.sortedTableData == null || !processInstanceToSelectExist) {
+      return (
+        processInstanceToSelectExist && processInstanceToSelectTableEntryExist && correlationIdIsSelectedCorrelationId
+      );
+    }
+
+    const processInstanceToSelectIsNotInTable =
+      this.sortedTableData.find(
+        (entry) => entry.processInstanceId === this.processInstanceToSelect.processInstanceId,
+      ) == null;
+
     return (
-      this.processInstanceToSelect !== undefined &&
-      this.processInstanceToSelectTableEntry !== undefined &&
-      this.selectedCorrelation.id === this.processInstanceToSelect.correlationId
+      processInstanceToSelectExist &&
+      processInstanceToSelectTableEntryExist &&
+      processInstanceToSelectIsNotInTable &&
+      correlationIdIsSelectedCorrelationId
     );
   }
 

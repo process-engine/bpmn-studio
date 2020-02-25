@@ -18,7 +18,7 @@
         </tr>
       </thead>
       <tbody class="correlation-table__body">
-        <tr if.bind="correlationToSelectTableEntry" dblclick.delegate="showProcessInstanceList()" class="correlation-table__table-row correlation-table__table-row--instance-to-select" class.bind="correlationToSelectTableEntry.correlationId === selectedTableEntry.correlationId ? 'correlation-table__selected-entry': ''" click.delegate="selectCorrelation(correlationToSelectTableEntry)">
+        <tr if.bind="showCorrelationToSelect" dblclick.delegate="showProcessInstanceList()" class="correlation-table__table-row correlation-table__table-row--instance-to-select" class.bind="correlationToSelectTableEntry.correlationId === selectedTableEntry.correlationId ? 'correlation-table__selected-entry': ''" click.delegate="selectCorrelation(correlationToSelectTableEntry)">
           <td class="correlation-table__table-entry">${correlationToSelectTableEntry.startedAt}</td>
           <td class="correlation-table__table-entry correlation-table__table-entry--state">${correlationToSelectTableEntry.state}</td>
           <td class="correlation-table__table-entry">${correlationToSelectTableEntry.correlationId}</td>

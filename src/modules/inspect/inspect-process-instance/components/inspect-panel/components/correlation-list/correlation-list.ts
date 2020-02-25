@@ -145,6 +145,21 @@ export class CorrelationList {
     return this.pageSize == 0 || this.totalCount < this.minPageSize;
   }
 
+  @computedFrom('sortedTableData.length', 'pageSize')
+  public get showCorrelationToSelect(): boolean {
+    const correlationToSelectExist = this.correlationToSelect != null;
+    const correlationToSelectTableEntryExist = this.correlationToSelectTableEntry != null;
+
+    if (this.sortedTableData == null || !correlationToSelectExist) {
+      return correlationToSelectExist && correlationToSelectTableEntryExist;
+    }
+
+    const correlationToSelectIsNotInTable =
+      this.sortedTableData.find((entry) => entry.correlationId === this.correlationToSelect.id) == null;
+
+    return correlationToSelectExist && correlationToSelectTableEntryExist && correlationToSelectIsNotInTable;
+  }
+
   private convertCorrelationsIntoTableData(
     correlations: Array<DataModels.Correlations.Correlation>,
   ): Array<ICorrelationTableEntry> {
