@@ -150,7 +150,7 @@ export class CorrelationList {
     const correlationToSelectExist = this.correlationToSelect != null;
     const correlationToSelectTableEntryExist = this.correlationToSelectTableEntry != null;
 
-    if (this.sortedTableData == null) {
+    if (this.sortedTableData == null || !correlationToSelectExist) {
       return correlationToSelectExist && correlationToSelectTableEntryExist;
     }
 

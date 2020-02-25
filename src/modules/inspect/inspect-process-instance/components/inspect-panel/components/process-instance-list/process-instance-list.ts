@@ -69,9 +69,11 @@ export class ProcessInstanceList {
     const processInstanceToSelectExist = this.processInstanceToSelect != null;
     const processInstanceToSelectTableEntryExist = this.processInstanceToSelectTableEntry != null;
     const correlationIdIsSelectedCorrelationId =
+      this.selectedCorrelation &&
+      processInstanceToSelectExist &&
       this.selectedCorrelation.id === this.processInstanceToSelect.correlationId;
 
-    if (this.sortedTableData == null) {
+    if (this.sortedTableData == null || !processInstanceToSelectExist) {
       return (
         processInstanceToSelectExist && processInstanceToSelectTableEntryExist && correlationIdIsSelectedCorrelationId
       );
@@ -85,8 +87,8 @@ export class ProcessInstanceList {
     return (
       processInstanceToSelectExist &&
       processInstanceToSelectTableEntryExist &&
-      correlationIdIsSelectedCorrelationId &&
-      processInstanceToSelectIsNotInTable
+      processInstanceToSelectIsNotInTable &&
+      correlationIdIsSelectedCorrelationId
     );
   }
 
