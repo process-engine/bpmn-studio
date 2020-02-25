@@ -24,6 +24,13 @@
         </tr>
       </thead>
       <tbody class="process-instance-table__body">
+        <tr if.bind="showProcessInstanceToSelect" dblclick.delegate="showLogViewer()" class="process-instance-table__table-row process-instance-table__table-row--instance-to-select" class.bind="processInstanceToSelectTableEntry.processInstanceId === selectedTableEntry.processInstanceId ? 'process-instance-table__selected-entry': ''" click.delegate="selectProcessInstance(processInstanceToSelectTableEntry)">
+          <td class="process-instance-table__table-entry">${processInstanceToSelectTableEntry.startedAt}</td>
+          <td class="process-instance-table__table-entry process-instance-table__table-entry--state">${processInstanceToSelectTableEntry.state}</td>
+          <td class="process-instance-table__table-entry">${processInstanceToSelectTableEntry.user}</td>
+          <td class="process-instance-table__table-entry">${processInstanceToSelectTableEntry.processModelId}</td>
+          <td class="process-instance-table__table-entry">${processInstanceToSelectTableEntry.processInstanceId}</td>
+        </tr>
         <tr dblclick.delegate="showLogViewer()" class="process-instance-table__table-row" repeat.for="tableEntry of sortedTableData" class.bind="tableEntry.processInstanceId === selectedTableEntry.processInstanceId ? 'process-instance-table__selected-entry': ''" click.delegate="selectProcessInstance(tableEntry)">
           <td class="process-instance-table__table-entry">${tableEntry.startedAt}</td>
           <td class="process-instance-table__table-entry process-instance-table__table-entry--state">${tableEntry.state}</td>

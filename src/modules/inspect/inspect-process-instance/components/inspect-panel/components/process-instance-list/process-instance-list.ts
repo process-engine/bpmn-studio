@@ -64,6 +64,34 @@ export class ProcessInstanceList {
     this.selectedTableEntry = selectedTableEntry;
   }
 
+  @computedFrom('sortedTableData.length', 'pageSize')
+  public get showProcessInstanceToSelect(): boolean {
+    const processInstanceToSelectExist = this.processInstanceToSelect != null;
+    const processInstanceToSelectTableEntryExist = this.processInstanceToSelectTableEntry != null;
+    const correlationIdIsSelectedCorrelationId =
+      this.selectedCorrelation &&
+      processInstanceToSelectExist &&
+      this.selectedCorrelation.id === this.processInstanceToSelect.correlationId;
+
+    if (this.sortedTableData == null || !processInstanceToSelectExist) {
+      return (
+        processInstanceToSelectExist && processInstanceToSelectTableEntryExist && correlationIdIsSelectedCorrelationId
+      );
+    }
+
+    const processInstanceToSelectIsNotInTable =
+      this.sortedTableData.find(
+        (entry) => entry.processInstanceId === this.processInstanceToSelect.processInstanceId,
+      ) == null;
+
+    return (
+      processInstanceToSelectExist &&
+      processInstanceToSelectTableEntryExist &&
+      processInstanceToSelectIsNotInTable &&
+      correlationIdIsSelectedCorrelationId
+    );
+  }
+
   public activeDiagramChanged(): void {
     this.currentPage = 1;
     this.processInstanceToSelect = undefined;
