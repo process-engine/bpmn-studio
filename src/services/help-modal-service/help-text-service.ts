@@ -1,3 +1,4 @@
+import {UserTaskUsage} from './help-texts/usertask-usage';
 import {ExternalTaskTokenUsage} from './help-texts/external-task-token-usage';
 import {ScriptTaskTokenUsageHelpText} from './help-texts/script-task-token-usage';
 
@@ -10,6 +11,8 @@ export class HelpTextService {
         return ScriptTaskTokenUsageHelpText;
       case HelpTextId.ExternalTaskTokenUsage:
         return ExternalTaskTokenUsage;
+      case HelpTextId.UserTaskUsage:
+        return UserTaskUsage;
       default:
         throw new Error(`Help message with id "${helpTextId}" is unknown.`);
     }
