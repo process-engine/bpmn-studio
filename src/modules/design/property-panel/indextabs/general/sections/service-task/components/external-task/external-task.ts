@@ -3,11 +3,12 @@ import {bindable, inject} from 'aurelia-framework';
 
 import {IProperty, IServiceTaskElement} from '@process-engine/bpmn-elements_contracts';
 
-import {IPageModel} from '../../../../../../../../../contracts';
+import {HelpTextId, IPageModel} from '../../../../../../../../../contracts/index';
 import environment from '../../../../../../../../../environment';
 import {ServiceTaskService} from '../service-task-service/service-task.service';
+import {HelpModalService} from '../../../../../../../../../services/help-modal-service/help-modal-service';
 
-@inject(EventAggregator)
+@inject(EventAggregator, HelpModalService)
 export class ExternalTask {
   @bindable() public model: IPageModel;
   public businessObjInPanel: IServiceTaskElement;
@@ -19,9 +20,11 @@ export class ExternalTask {
 
   private eventAggregator: EventAggregator;
   private serviceTaskService: ServiceTaskService;
+  private helpModalService: HelpModalService;
 
-  constructor(eventAggregator?: EventAggregator) {
+  constructor(eventAggregator?: EventAggregator, helpModalService?: HelpModalService) {
     this.eventAggregator = eventAggregator;
+    this.helpModalService = helpModalService;
   }
 
   public attached(): void {
@@ -52,6 +55,10 @@ export class ExternalTask {
     this.setPayloadToModel(this.selectedPayload);
 
     this.publishDiagramChange();
+  }
+
+  public showTokenHelpModal(): void {
+    this.helpModalService.showHelpModal(HelpTextId.ExternalTaskTokenUsage);
   }
 
   private getPayloadFromModel(): string | undefined {
