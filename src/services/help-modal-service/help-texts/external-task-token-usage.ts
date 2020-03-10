@@ -1,7 +1,7 @@
 import {HelpText} from '../../../contracts/index';
 
 export const ExternalTaskTokenUsage: HelpText = {
-  title: 'How to use the token result from previous tasks',
+  title: 'How to use the results from previous tasks?',
   message: `The data of previous tasks can be accessed via the token.
     Examples of using the token as a payload or topic for ExternalTasks:
 
