@@ -20,13 +20,12 @@ export const ExternalTaskTokenUsage: HelpText = {
         sendMeLotsOfEmails: token.history.AskForConsent.sendMeLotsOfEmails
        }
 
-    2. To split the token into an object, the configuration could look like this:
+    2. To use the current token, the configuration could look like this:
 
        Topic: EXAMPLE_TOPIC
        Payload:
         {
-          currentToken: token.current,
-          tokenHistory: token.history
+          currentToken: token.current
         }
 
     3. Custom Topics:
