@@ -16,7 +16,7 @@ export const UserTaskUsage: HelpText = {
 
     Each form field also has the following properties:
 
-    - ID: the ID of the form field
+      - ID: the form field's ID. Can be used to access the form field through the token
     - Label: the displayed name of the form field
     - Default Value: the default value of the form field
 
@@ -33,7 +33,7 @@ export const UserTaskUsage: HelpText = {
 
     Attaching a confirmation dialog:
 
-    A confirm control / user task can ask the user something or simply display a text and offers the possibility that the user can reject or continue the task.
+    A confirmation dialog can be used to ask the user a question. These dialogues come with a "decline" and "proceed" option, by which the user can either proceed or decline the task.
     A simple example is a UserTask for displaying some terms of usage, where the user is asked "Do you accept our terms and condition?"
 
     To add a confirmation dialog, add a property named "preferredControl" to the UserTask and assign the value "confirm".
