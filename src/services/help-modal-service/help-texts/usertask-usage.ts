@@ -1,15 +1,15 @@
 import {HelpText} from '../../../contracts/index';
 
 export const UserTaskUsage: HelpText = {
-  title: 'How to use UserTasks',
-  message: `To use UserTasks you must add one or more form fields to the task.
+  title: 'How to use user tasks',
+  message: `To use user tasks you must add one or more form fields to the task.
 
     The form fields have different types such as:
 
     - Text: Shows an input field for texts
     - Integer: Shows an input field for numbers
     - Decimal: Shows an input field for decimal number
-    - Truth value: Shows a checkbox, especially if the UserTask is a "confirm" control
+    - Truth value: Shows a checkbox, especially if the user task is a "confirm" control
     - Date: Shows an input field for dates
     - Enumeration: Shows a dropdown list
     - Custom
@@ -34,11 +34,11 @@ export const UserTaskUsage: HelpText = {
     Attaching a confirmation dialog:
 
     A confirmation dialog can be used to ask the user a question. These dialogues come with a "decline" and "proceed" option, by which the user can either proceed or decline the task.
-    A simple example is a UserTask for displaying some terms of usage, where the user is asked "Do you accept our terms and condition?"
+    A simple example is a user task for displaying some terms of usage, where the user is asked "Do you accept our terms and condition?"
 
-    To add a confirmation dialog, add a property named "preferredControl" to the UserTask and assign the value "confirm".
+    To add a confirmation dialog, add a property named "preferredControl" to the user task and assign the value "confirm".
 
-    If the UserTask is a confirmation dialog, you can use the first "Truth Value" form field to configure your text and question.
+    If the user task is a confirmation dialog, you can use the first "Truth Value" form field to configure your text and question.
     It must be set as the "Default Value" property.
     `,
 };

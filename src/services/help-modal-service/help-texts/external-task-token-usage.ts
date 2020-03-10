@@ -6,10 +6,10 @@ export const ExternalTaskTokenUsage: HelpText = {
   This progression and state accumulation can be visualized as a token moving along the execution's path in the diagram.
 
   The data of previous tasks can be accessed through the token.
-    Examples of using the token as a payload or topic for ExternalTasks:
+    Examples of using the token as a payload or topic for external tasks:
 
     1. To use the given user data from previous tasks, e.g. an account registration worker.
-       The full ExternalTask configuration could look like this:
+       The full external task configuration could look like this:
 
        Topic: EXAMPLE_TOPIC
        Payload:
