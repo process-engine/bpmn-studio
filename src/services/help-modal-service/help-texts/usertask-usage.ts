@@ -2,7 +2,13 @@ import {HelpText} from '../../../contracts/index';
 
 export const UserTaskUsage: HelpText = {
   title: 'How to use user tasks',
-  message: `To use user tasks you must add one or more form fields to the task.
+  message: `The data of previous tasks can be accessed through the token.
+  In order to do so make use of:
+
+  "token.current" - In order to use the data of the previous tasks.
+  "token.history.<id-of-previous-task>" - In order to use the data of a specific tasks.
+
+  To use user tasks you must add one or more form fields to the task.
 
     The form fields have different types, such as:
 
