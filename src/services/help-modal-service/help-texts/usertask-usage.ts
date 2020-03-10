@@ -6,19 +6,19 @@ export const UserTaskUsage: HelpText = {
 
     The form fields have different types such as:
 
-    - Text: shows an input field for texts
-    - Integer: shows an input field for numbers
-    - Decimal: shows an input field for decimal number
-    - Truth value: shows a checkbox, especially if the UserTask is a "confirm" control
-    - Date: shows an input field for dates
-    - Enumeration: shows a dropdown list
+    - Text: Shows an input field for texts
+    - Integer: Shows an input field for numbers
+    - Decimal: Shows an input field for decimal number
+    - Truth value: Shows a checkbox, especially if the UserTask is a "confirm" control
+    - Date: Shows an input field for dates
+    - Enumeration: Shows a dropdown list
     - Custom
 
     Each form field also has the following properties:
 
-      - ID: the form field's ID. Can be used to access the form field through the token
-    - Label: the displayed name of the form field
-    - Default Value: the default value of the form field
+    - ID: The form field's ID. Can be used to access the form field through the token
+    - Label: The displayed name of the form field
+    - Default Value: The default value of the form field
 
     The values for "label" and "default value" can be any thing.
     However, you can also use token expressions.
