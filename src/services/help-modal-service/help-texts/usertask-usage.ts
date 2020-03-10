@@ -6,21 +6,21 @@ export const UserTaskUsage: HelpText = {
 
     The form fields have different types such as:
 
-    - Text (shows an input field for texts)
-    - Integer (shows an input field for numbers)
-    - Decimal (shows an input field for decimal number)
-    - Truth value (shows a checkbox, especially if the UserTask is a "confirm" control)
-    - Date (shows an input field for dates)
-    - Enumeration (shows a dropdown list)
+    - Text: shows an input field for texts
+    - Integer: shows an input field for numbers
+    - Decimal: shows an input field for decimal number
+    - Truth value: shows a checkbox, especially if the UserTask is a "confirm" control
+    - Date: shows an input field for dates
+    - Enumeration: shows a dropdown list
     - Custom
 
     Each form field also has the following properties:
 
-    - ID (the ID of the form field used for the token)
-    - Label
-    - Default Value
+    - ID: the ID of the form field
+    - Label: the displayed name of the form field
+    - Default Value: the default value of the form field
 
-    The values for "label" and "default value" can be anything. 
+    The values for "label" and "default value" can be any thing.
     However, you can also use token expressions.
 
     Example:
@@ -38,7 +38,7 @@ export const UserTaskUsage: HelpText = {
 
     To add a confirmation dialog, add a property named "preferredControl" to the UserTask and assign the value "confirm".
 
-    If the UserTask is a confirmation dialog, you can use the first "Truth Value" form field to configure your text and question. 
+    If the UserTask is a confirmation dialog, you can use the first "Truth Value" form field to configure your text and question.
     It must be set as the "Default Value" property.
     `,
 };
