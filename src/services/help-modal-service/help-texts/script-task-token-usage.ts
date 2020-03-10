@@ -2,7 +2,10 @@ import {HelpText} from '../../../contracts/index';
 
 export const ScriptTaskTokenUsageHelpText: HelpText = {
   title: 'How to use the token',
-  message: `The data of previous tasks can be accessed via the token.
+  message: `When a process is executed, it progresses through the different elements of the diagram and captures state along the way.
+  This progression and state accumulation can be visualized as a token moving along the execution's path in the diagram.
+
+  The data of previous tasks can be accessed through the token.
 
     In order to do so make use of:
 
