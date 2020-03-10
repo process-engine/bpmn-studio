@@ -20,24 +20,25 @@ export const UserTaskUsage: HelpText = {
     - Label
     - Default Value
 
-    The "label" and the "default value" can be set via the process token.
+    The values for "label" and "default value" can be anything. 
+    However, you can also use token expressions.
 
     Example:
 
     We have a task with the ID "Default_Checked_Task" that returns an object with a property called "checked" that is true or false.
 
     A form field of type "Truth Value" gets the default value property "\${token.history.Default_Checked_Task.checked}".
-    The check box is now selected when "Default_Checked_Task" returns true and not selected when false is returned.
+    The check box is now be checked, when "Default_Checked_Task.checked" equals "true" . Otherwise, it will not be checked.
 
 
-    Confirm Control/UserTask:
+    Attaching a confirmation dialog:
 
     A confirm control / user task can ask the user something or simply display a text and offers the possibility that the user can reject or continue the task.
-    A simple example is a UserTask, in which the user makes some entries and ends up with a question such as "Do you accept our terms and conditions?"
+    A simple example is a UserTask for displaying some terms of usage, where the user is asked "Do you accept our terms and condition?"
 
-    To use the confirm control simply add a property named "preferredControl" with the value "confirm" to the UserTask.
+    To add a confirmation dialog, add a property named "preferredControl" to the UserTask and assign the value "confirm".
 
-    If the UserTask is a confirm, the first "Truth Value" form field of the UerTask is the place where you can define your question/text.
+    If the UserTask is a confirmation dialog, you can use the first "Truth Value" form field to configure your text and question. 
     It must be set as the "Default Value" property.
     `,
 };
