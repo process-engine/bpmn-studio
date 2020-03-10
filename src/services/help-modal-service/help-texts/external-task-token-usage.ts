@@ -2,14 +2,14 @@ import {HelpText} from '../../../contracts/index';
 
 export const ExternalTaskTokenUsage: HelpText = {
   title: 'How to use the results from previous tasks?',
-  message: `When a process is executed, it progresses through the different elements of the diagram and captures state along the way.
+  message: `When a process is executed, it progresses through the different elements of the diagram and captures states along the way.
   This progression and state accumulation can be visualized as a token moving along the execution's path in the diagram.
 
   The data of previous tasks can be accessed through the token.
-    Examples of using the token as a payload or topic for external tasks:
+  
+  Examples of using the token as a payload or topic for external tasks:
 
-    1. To use the given user data from previous tasks, e.g. an account registration worker.
-       The full external task configuration could look like this:
+    1. To use the given user data from previous tasks, e.g. an account registration worker:
 
        Topic: EXAMPLE_TOPIC
        Payload:

@@ -4,7 +4,7 @@ export const UserTaskUsage: HelpText = {
   title: 'How to use user tasks',
   message: `To use user tasks you must add one or more form fields to the task.
 
-    The form fields have different types such as:
+    The form fields have different types, such as:
 
     - Text: Shows an input field for texts
     - Integer: Shows an input field for numbers
@@ -20,7 +20,7 @@ export const UserTaskUsage: HelpText = {
     - Label: The displayed name of the form field
     - Default Value: The default value of the form field
 
-    The values for "label" and "default value" can be any thing.
+    The values for "label" and "default value" can be anything.
     However, you can also use token expressions.
 
     Example:
@@ -28,7 +28,7 @@ export const UserTaskUsage: HelpText = {
     We have a task with the ID "Default_Checked_Task" that returns an object with a property called "checked" that is true or false.
 
     A form field of type "Truth Value" gets the default value property "\${token.history.Default_Checked_Task.checked}".
-    The check box is now be checked, when "Default_Checked_Task.checked" equals "true" . Otherwise, it will not be checked.
+    The check box will now be checked, when "Default_Checked_Task.checked" equals "true" . Otherwise, it will not be checked.
 
 
     Attaching a confirmation dialog:
