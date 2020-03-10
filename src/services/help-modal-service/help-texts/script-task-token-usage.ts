@@ -9,6 +9,6 @@ export const ScriptTaskTokenUsage: HelpText = {
 
     In order to do so make use of:
 
-    "token.current" - In order to use the data of the previous tasks.
-    "token.history.<id-of-previous-task>" - In order to use the data of a specific tasks.`,
+    "token.current" - To access the task that immediately preceded the user task.
+    "token.history.<id-of-previous-task>" - To access a specific preceding task.`,
 };
