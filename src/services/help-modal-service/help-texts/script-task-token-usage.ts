@@ -1,6 +1,6 @@
 import {HelpText} from '../../../contracts/index';
 
-export const ScriptTaskTokenUsageHelpText: HelpText = {
+export const ScriptTaskTokenUsage: HelpText = {
   title: 'How to use the token',
   message: `When a process is executed, it progresses through the different elements of the diagram and captures state along the way.
   This progression and state accumulation can be visualized as a token moving along the execution's path in the diagram.

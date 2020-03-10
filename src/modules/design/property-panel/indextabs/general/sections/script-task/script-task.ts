@@ -48,7 +48,7 @@ export class ScriptTaskSection implements ISection {
   }
 
   public showTokenHelpModal(): void {
-    this.helpModalService.showHelpModal(HelpTextId.ScriptTaskTokenUsageHelpText);
+    this.helpModalService.showHelpModal(HelpTextId.ScriptTaskTokenUsage);
   }
 
   private elementIsScriptTask(element: IShape): boolean {
