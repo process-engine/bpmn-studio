@@ -39,9 +39,7 @@ export class HelpModalService {
         <h3>${helpText.title}</h3>
         <button id="help-modal-close-button" type="button" class="close">&times;</button>
       </div>
-      <div class="modal-body" style="overflow-y: scroll;"><span style="white-space: pre-line;">${marked(
-        helpText.message,
-      )}<span></div>
+      <div class="modal-body" style="overflow-y: scroll;">${marked(helpText.message)}</div>
     </div>
   </div>
 </div>
