@@ -10,8 +10,16 @@ import {
   IModdleElement,
   IShape,
 } from '@process-engine/bpmn-elements_contracts';
+import {HelpModalService} from '../../../../../../../services/help-modal-service/help-modal-service';
 
-import {IBpmnModdle, IBpmnModeler, IElementRegistry, IPageModel, ISection} from '../../../../../../../contracts';
+import {
+  HelpTextId,
+  IBpmnModdle,
+  IBpmnModeler,
+  IElementRegistry,
+  IPageModel,
+  ISection,
+} from '../../../../../../../contracts/index';
 import environment from '../../../../../../../environment';
 
 enum FormfieldTypes {
@@ -24,7 +32,7 @@ enum FormfieldTypes {
   customType = 'custom type',
 }
 
-@inject(ValidationController, EventAggregator)
+@inject(ValidationController, EventAggregator, HelpModalService)
 export class BasicsSection implements ISection {
   public path: string = '/sections/basics/basics';
   public canHandleElement: boolean = true;
@@ -51,10 +59,16 @@ export class BasicsSection implements ISection {
   private previousFormId: string;
   private previousForm: IForm;
   private eventAggregator: EventAggregator;
+  private helpModalService: HelpModalService;
 
-  constructor(controller?: ValidationController, eventAggregator?: EventAggregator) {
+  constructor(
+    controller?: ValidationController,
+    eventAggregator?: EventAggregator,
+    helpModalService?: HelpModalService,
+  ) {
     this.validationController = controller;
     this.eventAggregator = eventAggregator;
+    this.helpModalService = helpModalService;
   }
 
   public activate(model: IPageModel): void {
@@ -242,6 +256,10 @@ export class BasicsSection implements ISection {
     }
 
     this.publishDiagramChange();
+  }
+
+  public showUserTaskHelpModal(): void {
+    this.helpModalService.showHelpModal(HelpTextId.UserTaskUsage);
   }
 
   private validateOnDetach(): void {

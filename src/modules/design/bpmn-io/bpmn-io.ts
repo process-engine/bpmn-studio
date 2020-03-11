@@ -53,7 +53,6 @@ export class BpmnIo {
   @bindable({changeHandler: 'diagramChanged'}) public diagramUri: string;
   @bindable({defaultBindingMode: bindingMode.twoWay}) public xml: string;
   @bindable({changeHandler: 'nameChanged'}) public name: string;
-  @bindable public isDisplayed: boolean;
   @observable public propertyPanelWidth: number;
   public showLinter: boolean;
   public solutionIsRemote: boolean = false;
@@ -488,12 +487,6 @@ export class BpmnIo {
     }
 
     this.diagramHasChanged = false;
-  }
-
-  public isDisplayedChanged(): void {
-    if (this.isDisplayed && this.diagramHasState(this.diagramUri)) {
-      this.recoverDiagramState();
-    }
   }
 
   public async diagramChanged(newUri: string, previousUri: string): Promise<void> {

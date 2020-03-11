@@ -183,3 +183,11 @@
   min-height: 440px;
   resize: none;
 }
+
+.authority-issue {
+  margin-left: 20px;
+}
+
+.authorisation-error:hover > .authorisation-error__login-link {
+  cursor: default;
+}

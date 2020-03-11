@@ -260,8 +260,8 @@ export class TokenViewer {
       values: [],
     };
 
-    const entryIsNotAnObject: boolean = typeof load !== 'object';
-    if (entryIsNotAnObject) {
+    const entryIsNotAnObjectOrNull: boolean = typeof load !== 'object' || load == null;
+    if (entryIsNotAnObjectOrNull) {
       const payloadEntryValues: Array<IPayloadEntryValue> = this.getPayloadEntryValuesForNonObject(load);
 
       payloadEntry.values = payloadEntryValues;

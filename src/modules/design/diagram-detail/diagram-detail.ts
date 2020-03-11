@@ -47,7 +47,6 @@ export class DiagramDetail {
   @observable({changeHandler: 'diagramHasChangedChanged'}) public diagramHasChanged: boolean;
   @bindable({defaultBindingMode: bindingMode.oneWay}) public xml: string;
   @bindable() public initialToken: string;
-  @bindable public isDisplayed: boolean;
   public bpmnio: BpmnIo;
   public showSaveForStartModal: boolean = false;
   public showStartEventModal: boolean = false;
@@ -118,8 +117,6 @@ export class DiagramDetail {
       this.ipcRenderer.on('menubar__start_save_diagram_as', this.electronOnSaveDiagramAs);
       this.ipcRenderer.on('menubar__start_save_diagram', this.electronOnSaveDiagram);
     }
-
-    this.eventAggregator.publish(environment.events.navBar.showTools);
 
     this.subscriptions = [
       this.validationController.subscribe((event: ValidateEvent) => {
@@ -203,10 +200,6 @@ export class DiagramDetail {
     } else {
       this.hasValidationError = true;
     }
-  }
-
-  public deactivate(): void {
-    this.eventAggregator.publish(environment.events.navBar.hideTools);
   }
 
   public detached(): void {

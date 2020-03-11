@@ -1,5 +1,5 @@
 import {EventAggregator} from 'aurelia-event-aggregator';
-import {bindable, inject, observable} from 'aurelia-framework';
+import {bindable, computedFrom, inject, observable} from 'aurelia-framework';
 
 import {DataModels} from '@process-engine/management_api_contracts';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
@@ -41,7 +41,7 @@ export class ProcessInstanceList {
 
   public processInstanceListSortProperty: typeof ProcessInstanceListSortProperty = ProcessInstanceListSortProperty;
   public sortSettings: ProcessInstanceListSortSettings = {
-    ascending: true,
+    ascending: false,
     sortProperty: ProcessInstanceListSortProperty.StartedAt,
   };
 
@@ -64,11 +64,31 @@ export class ProcessInstanceList {
     this.selectedTableEntry = selectedTableEntry;
   }
 
+  @computedFrom('sortedTableData.length', 'pageSize')
   public get showProcessInstanceToSelect(): boolean {
+    const processInstanceToSelectExist = this.processInstanceToSelect != null;
+    const processInstanceToSelectTableEntryExist = this.processInstanceToSelectTableEntry != null;
+    const correlationIdIsSelectedCorrelationId =
+      this.selectedCorrelation &&
+      processInstanceToSelectExist &&
+      this.selectedCorrelation.id === this.processInstanceToSelect.correlationId;
+
+    if (this.sortedTableData == null || !processInstanceToSelectExist) {
+      return (
+        processInstanceToSelectExist && processInstanceToSelectTableEntryExist && correlationIdIsSelectedCorrelationId
+      );
+    }
+
+    const processInstanceToSelectIsNotInTable =
+      this.sortedTableData.find(
+        (entry) => entry.processInstanceId === this.processInstanceToSelect.processInstanceId,
+      ) == null;
+
     return (
-      this.processInstanceToSelect !== undefined &&
-      this.processInstanceToSelectTableEntry !== undefined &&
-      this.selectedCorrelation.id === this.processInstanceToSelect.correlationId
+      processInstanceToSelectExist &&
+      processInstanceToSelectTableEntryExist &&
+      processInstanceToSelectIsNotInTable &&
+      correlationIdIsSelectedCorrelationId
     );
   }
 
@@ -129,6 +149,10 @@ export class ProcessInstanceList {
     const showAllProcessInstances: boolean = this.pageSize === 0;
     if (showAllProcessInstances) {
       this.currentPage = 1;
+    } else {
+      this.sortSettings.ascending = false;
+      this.sortSettings.sortProperty = ProcessInstanceListSortProperty.StartedAt;
+      this.sortTableData();
     }
 
     const isFirstPage: boolean = this.currentPage === 1;
@@ -162,6 +186,10 @@ export class ProcessInstanceList {
   }
 
   public changeSortProperty(property: ProcessInstanceListSortProperty): void {
+    if (!this.showSortOption) {
+      return;
+    }
+
     const isSameSortPropertyAsBefore: boolean = this.sortSettings.sortProperty === property;
     const ascending: boolean = isSameSortPropertyAsBefore ? !this.sortSettings.ascending : true;
 
@@ -169,6 +197,11 @@ export class ProcessInstanceList {
     this.sortSettings.sortProperty = property;
 
     this.sortTableData();
+  }
+
+  @computedFrom('pageSize', 'totalCount')
+  public get showSortOption(): boolean {
+    return this.pageSize == 0 || this.totalCount < this.minPageSize;
   }
 
   private convertProcessInstancesIntoTableData(

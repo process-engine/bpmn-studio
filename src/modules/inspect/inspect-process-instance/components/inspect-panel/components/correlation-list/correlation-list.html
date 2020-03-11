@@ -7,18 +7,18 @@
       <thead>
         <tr class="correlation-table__headlines">
           <th class="correlation-table__headline" click.delegate="changeSortSettings(correlationListSortProperty.StartedAt)">
-            Started at <i if.bind="sortSettings.sortProperty === correlationListSortProperty.StartedAt" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
+            Started at <i if.bind="sortSettings.sortProperty === correlationListSortProperty.StartedAt && showSortOption" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
           <th class="correlation-table__headline" click.delegate="changeSortSettings(correlationListSortProperty.State)">
-            State <i if.bind="sortSettings.sortProperty == correlationListSortProperty.State" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
+            State <i if.bind="sortSettings.sortProperty == correlationListSortProperty.State && showSortOption" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
           <th class="correlation-table__headline" click.delegate="changeSortSettings(correlationListSortProperty.CorrelationId)">
-            Correlation ID <i if.bind="sortSettings.sortProperty === correlationListSortProperty.CorrelationId" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
+            Correlation ID <i if.bind="sortSettings.sortProperty === correlationListSortProperty.CorrelationId && showSortOption" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
         </tr>
       </thead>
       <tbody class="correlation-table__body">
-        <tr if.bind="correlationToSelectTableEntry" dblclick.delegate="showProcessInstanceList()" class="correlation-table__table-row correlation-table__table-row--instance-to-select" class.bind="correlationToSelectTableEntry.correlationId === selectedTableEntry.correlationId ? 'correlation-table__selected-entry': ''" click.delegate="selectCorrelation(correlationToSelectTableEntry)">
+        <tr if.bind="showCorrelationToSelect" dblclick.delegate="showProcessInstanceList()" class="correlation-table__table-row correlation-table__table-row--instance-to-select" class.bind="correlationToSelectTableEntry.correlationId === selectedTableEntry.correlationId ? 'correlation-table__selected-entry': ''" click.delegate="selectCorrelation(correlationToSelectTableEntry)">
           <td class="correlation-table__table-entry">${correlationToSelectTableEntry.startedAt}</td>
           <td class="correlation-table__table-entry correlation-table__table-entry--state">${correlationToSelectTableEntry.state}</td>
           <td class="correlation-table__table-entry">${correlationToSelectTableEntry.correlationId}</td>
@@ -31,7 +31,7 @@
         <tr if.bind="totalCount > minPageSize" class="correlation-table__table-row">
           <td>
             <div class="correlation-table__pagesize-entry">
-              Page size: 
+              Page size:
             </div>
             <select class="form-control correlation-table__pagesize-entry--select" value.bind="pageSize">
               <option model.bind="size" repeat.for="size of pageSizes">${size}</option>

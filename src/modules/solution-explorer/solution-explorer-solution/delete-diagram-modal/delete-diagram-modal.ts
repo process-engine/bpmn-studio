@@ -128,7 +128,7 @@ export class DeleteDiagramModal {
       }
     }
 
-    if (openDiagramServiceIsAvailable) {
+    if (openDiagramServiceIsAvailable && !this.diagram.uri.startsWith('http')) {
       this.openDiagramService.closeDiagram(this.diagram);
       this.solutionService.removeOpenDiagramByUri(this.diagram.uri);
       this.openDiagramStateService.deleteDiagramState(this.diagram.uri);

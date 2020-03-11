@@ -116,7 +116,6 @@
           "aurelia-task-queue",
           "aurelia-templating",
           "aurelia-templating-binding",
-          "clipboard-polyfill",
           "text",
           {
             "name": "aurelia-open-id-connect",
@@ -320,6 +319,11 @@
             "name": "bpmn-js-differ",
             "main": "dist/index.cjs.js",
             "path": "../node_modules/bpmn-js-differ"
+          },
+          {
+            "name": "marked",
+            "main": "marked.min.js",
+            "path": "../node_modules/marked"
           },
           {
             "name": "socket.io-client",

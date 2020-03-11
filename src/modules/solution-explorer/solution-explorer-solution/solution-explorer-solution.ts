@@ -93,6 +93,10 @@ export class SolutionExplorerSolution {
   public processEngineErrorLog: string;
   public errorLogArea: HTMLTextAreaElement;
 
+  public authorisationError: boolean;
+  public authenticationError: boolean;
+  @bindable public login: Function;
+
   private router: Router;
   private eventAggregator: EventAggregator;
   private validationController: ValidationController;
@@ -215,14 +219,19 @@ export class SolutionExplorerSolution {
           this.displayedSolutionEntry.service.unwatchSolution(this.solutionEventListenerId);
         }
 
-        this.solutionEventListenerId = this.displayedSolutionEntry.service.watchSolution(() => {
-          this.updateSolution();
-        });
+        if (!this.displayedSolutionEntry.isOpenDiagram) {
+          this.solutionEventListenerId = this.displayedSolutionEntry.service.watchSolution(() => {
+            this.updateSolution();
+          });
+        }
       }),
       this.eventAggregator.subscribe(
         environment.events.solutionExplorer.closeAllOpenDiagrams,
         this.closeAllDiagramsEventFunction,
       ),
+      this.eventAggregator.subscribe(environment.events.solutionExplorer.closeDiagram, () => {
+        this.closeDiagram(this.activeDiagram);
+      }),
     ];
 
     if (this.displayedSolutionEntry.isOpenDiagram) {
@@ -236,14 +245,9 @@ export class SolutionExplorerSolution {
       this.subscriptions.push(updateSubscription);
 
       if (isRunningInElectron()) {
-        this.ipcRenderer.on('menubar__start_close_diagram', this.closeDiagramEventFunction);
         this.ipcRenderer.on('menubar__start_close_all_diagrams', this.closeAllDiagramsEventFunction);
         this.ipcRenderer.on('menubar__start_save_all_diagrams', this.saveAllDiagramsEventFunction);
       }
-    }
-
-    if (solutionIsRemoteSolution(this.displayedSolutionEntry.uri) && isRunningInElectron()) {
-      this.ipcRenderer.on('menubar__start_close_diagram', this.closeDiagramEventFunction);
     }
 
     if (solutionIsRemoteSolution(this.displayedSolutionEntry.uri)) {
@@ -317,7 +321,6 @@ export class SolutionExplorerSolution {
     }
 
     if (this.displayedSolutionEntry.isOpenDiagram) {
-      this.ipcRenderer.removeListener('menubar__start_close_diagram', this.closeDiagramEventFunction);
       this.ipcRenderer.removeListener('menubar__start_close_all_diagrams', this.closeAllDiagramsEventFunction);
       this.ipcRenderer.removeListener('menubar__start_save_all_diagrams', this.saveAllDiagramsEventFunction);
     }
@@ -383,19 +386,20 @@ export class SolutionExplorerSolution {
       this.cssIconClass = this.originalIconClass;
       this.tooltipText = '';
       this.processEngineRunning = true;
+      this.authorisationError = false;
+      this.authenticationError = false;
     } catch (error) {
       // In the future we can maybe display a small icon indicating the error.
       if (isError(error, UnauthorizedError)) {
-        this.notificationService.showNotification(NotificationType.ERROR, 'You need to login to list process models.');
-
+        this.authorisationError = true;
         this.sortedDiagramsOfSolutions = [];
         this.openedSolution = undefined;
       } else if (isError(error, ForbiddenError)) {
-        this.notificationService.showNotification(
-          NotificationType.ERROR,
-          "You don't have the required permissions to list process models.",
-        );
-
+        if (this.displayedSolutionEntry.isLoggedIn) {
+          this.authorisationError = true;
+        } else {
+          this.authenticationError = true;
+        }
         this.sortedDiagramsOfSolutions = [];
         this.openedSolution = undefined;
       } else {
@@ -758,22 +762,13 @@ export class SolutionExplorerSolution {
     this.navigateToDetailView(diagram);
   }
 
+  public isUriFromRemoteSolution(uri: string): boolean {
+    return solutionIsRemoteSolution(uri);
+  }
+
   private updateDiagramStateList(): void {
     this.diagramStateList = this.openDiagramStateService.loadDiagramStateForAllDiagrams();
   }
-
-  private closeDiagramEventFunction: Function = (): void => {
-    const noDiagramIsActive: boolean = this.activeDiagram === undefined;
-    if (noDiagramIsActive) {
-      return;
-    }
-
-    if (solutionIsRemoteSolution(this.displayedSolutionEntry.uri)) {
-      this.router.navigateToRoute('start-page');
-    } else {
-      this.closeDiagram(this.activeDiagram);
-    }
-  };
 
   private closeAllDiagramsEventFunction: Function = async (): Promise<void> => {
     const currentlyOpenDiagrams: Array<IDiagram> = [...this.openedDiagrams];

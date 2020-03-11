@@ -2,7 +2,9 @@
   <require from="./basics.css"></require>
   <require from="../../../../styles/sections.css"></require>
   <div class="section-panel" id="js-forms-basics-section">
-    <div class="panel__heading">User Task</div>
+    <div class="panel__heading">User Task
+      <i class="fas fa-info-circle feedback-modal__help-icon" title="Help: How to use a UserTask" click.delegate="showUserTaskHelpModal()"></i>
+    </div>
     <div class="panel__content">
       <table class="props-table">
         <tr>

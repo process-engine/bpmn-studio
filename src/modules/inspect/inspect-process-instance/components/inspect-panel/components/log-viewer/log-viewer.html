@@ -23,7 +23,7 @@
         </tr>
       </thead class="log-table__header">
       <tbody class="log-table__body">
-        <tr class="log-table__table-row" repeat.for="logEntry of sortedLog" click.delegate="copyToClipboard(logEntry.message)">
+        <tr class="log-table__table-row" repeat.for="logEntry of sortedLog">
           <td class="log-table__table-entry log-table__time-column">${getDateStringFromTimestamp(logEntry.timeStamp)}</td>
           <td class="log-table__table-entry log-table__flow-node-id-column">${logEntry.flowNodeId || '-'}</td>
           <td class="log-table__table-entry log-table__flow-node-instance-id-column">${logEntry.flowNodeInstanceId || '-'}</td>

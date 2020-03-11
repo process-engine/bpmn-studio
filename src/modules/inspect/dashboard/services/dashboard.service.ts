@@ -5,6 +5,7 @@ import {DataModels, IManagementApiClient} from '@process-engine/management_api_c
 import {EventAggregator} from 'aurelia-event-aggregator';
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {Subscription} from '@essential-projects/event_aggregator_contracts';
+import {Correlation} from '@process-engine/management_api_contracts/dist/data_models/correlation';
 import environment from '../../../../environment';
 import {ISolutionEntry} from '../../../../contracts';
 import {IDashboardRepository} from '../contracts/IDashboardRepository';
@@ -213,12 +214,26 @@ export class DashboardService implements IDashboardService {
     userTaskInstanceId: string,
     userTaskResult: DataModels.UserTasks.UserTaskResult,
   ): Promise<void> {
-    return this.managementApiClient.finishUserTask(
+    return this.dashboardRepository.finishUserTask(
       identity,
       processInstanceId,
       correlationId,
       userTaskInstanceId,
       userTaskResult,
+    );
+  }
+
+  public finishEmptyActivity(
+    identity: IIdentity,
+    processInstanceId: string,
+    correlationId: string,
+    emptyActivityInstanceId: string,
+  ): Promise<void> {
+    return this.dashboardRepository.finishEmptyActivity(
+      identity,
+      processInstanceId,
+      correlationId,
+      emptyActivityInstanceId,
     );
   }
 
@@ -244,5 +259,9 @@ export class DashboardService implements IDashboardService {
 
   public onCronjobExecuted(identity: IIdentity, callback: Function): Promise<Subscription> {
     return this.dashboardRepository.onCronjobExecuted(identity, callback);
+  }
+
+  public getCorrelationById(identity: IIdentity, correlationId: string): Promise<Correlation> {
+    return this.dashboardRepository.getCorrelationById(identity, correlationId);
   }
 }

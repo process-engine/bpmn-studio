@@ -4,13 +4,13 @@ import {Router} from 'aurelia-router';
 
 import * as Bluebird from 'bluebird';
 
-import {ForbiddenError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
+import {ForbiddenError, NotFoundError, UnauthorizedError, isError} from '@essential-projects/errors_ts';
 import {Subscription as RuntimeSubscription} from '@essential-projects/event_aggregator_contracts';
 
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {AuthenticationStateEvent, ISolutionEntry, ISolutionService} from '../../../contracts/index';
 import environment from '../../../environment';
-import {IDashboardService, TaskList as SuspendedTaskList, TaskListEntry} from '../dashboard/contracts/index';
+import {IDashboardService, TaskList as SuspendedTaskList, TaskListEntry, TaskType} from '../dashboard/contracts/index';
 import {Pagination} from '../../pagination/pagination';
 import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 
@@ -22,6 +22,8 @@ interface ITaskListRouteParameters {
 
 @inject('DashboardService', Router, 'SolutionService')
 export class TaskList {
+  public taskList = this;
+
   @bindable() public activeSolutionEntry: ISolutionEntry;
 
   @observable public currentPage: number = 1;
@@ -34,6 +36,12 @@ export class TaskList {
 
   public pagination: Pagination;
   public paginationShowsLoading: boolean;
+
+  public showDynamicUiModal: boolean = false;
+  @bindable public processModelId: string;
+  @bindable public taskId: string;
+  @bindable public processInstanceId: string;
+  @bindable public correlationId: string;
 
   private activeSolutionUri: string;
   private dashboardService: IDashboardService;
@@ -117,12 +125,43 @@ export class TaskList {
     this.removeRuntimeSubscriptions();
   }
 
+  public closeDynamicUiModal(): void {
+    this.showDynamicUiModal = false;
+  }
+
   public goBack(): void {
     this.router.navigateBack();
   }
 
-  public continueTask(task: TaskListEntry): void {
-    const {correlationId, id, processInstanceId} = task;
+  public async continueTask(task: TaskListEntry): Promise<void> {
+    const {correlationId, id, processInstanceId, processModelId, taskType, flowNodeInstanceId} = task;
+
+    try {
+      await this.dashboardService.getCorrelationById(this.activeSolutionEntry.identity, correlationId);
+    } catch (error) {
+      if (isError(error, NotFoundError)) {
+        if (taskType === TaskType.EmptyActivity) {
+          await this.dashboardService.finishEmptyActivity(
+            this.activeSolutionEntry.identity,
+            processInstanceId,
+            correlationId,
+            flowNodeInstanceId,
+          );
+
+          return;
+        }
+
+        this.processModelId = processModelId;
+        this.processInstanceId = processInstanceId;
+        this.taskId = id;
+        this.correlationId = correlationId;
+        this.showDynamicUiModal = true;
+
+        return;
+      }
+
+      throw error;
+    }
 
     this.router.navigateToRoute('live-execution-tracker', {
       diagramName: task.processModelId,

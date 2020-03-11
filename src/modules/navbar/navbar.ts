@@ -70,6 +70,8 @@ export class NavBar {
       this.ipcRenderer.on('toggle-fullscreen', (uselessEvent, showFullscreen) => {
         this.showLeftMarginInNavbar = !showFullscreen;
       });
+
+      this.ipcRenderer.on('menubar__start_close_diagram', this.closeDiagramOrStudioEventFunction);
     }
 
     const isFullscreen: boolean = !window.screenTop && !window.screenY;
@@ -81,14 +83,6 @@ export class NavBar {
     this.subscriptions = [
       this.eventAggregator.subscribe('router:navigation:success', () => {
         this.updateNavbar();
-      }),
-
-      this.eventAggregator.subscribe(environment.events.navBar.showTools, () => {
-        this.showTools = true;
-      }),
-
-      this.eventAggregator.subscribe(environment.events.navBar.hideTools, () => {
-        this.showTools = false;
       }),
 
       this.eventAggregator.subscribe(environment.events.navBar.validationError, () => {
@@ -154,6 +148,7 @@ export class NavBar {
 
   public detached(): void {
     this.disposeAllSubscriptions();
+    this.ipcRenderer.removeListener('menubar__start_close_diagram', this.closeDiagramOrStudioEventFunction);
   }
 
   private disposeAllSubscriptions(): void {
@@ -344,9 +339,9 @@ export class NavBar {
     this.disableDiagramUploadButton = activeSolutionIsRemoteSolution;
 
     if (activeRouteIsDiagramDetail) {
-      this.showTools = true;
       this.showInspectTools = false;
       this.showExportOnInspectProcessInstance = false;
+      this.showTools = true;
     } else if (activeRouteIsInspect) {
       const inspectView: string = this.router.currentInstruction.params.view;
       const inspectViewIsDashboard: boolean = inspectView === 'dashboard';
@@ -368,6 +363,7 @@ export class NavBar {
       this.showExportOnInspectProcessInstance = false;
     } else {
       this.showInspectTools = false;
+      this.showTools = false;
       this.showExportOnInspectProcessInstance = false;
     }
   }
@@ -432,6 +428,19 @@ export class NavBar {
     this.navbarTitle = '';
     this.showProcessName = false;
   }
+
+  private closeDiagramOrStudioEventFunction: Function = (): void => {
+    const noDiagramIsActive: boolean = this.activeDiagram === undefined;
+    if (noDiagramIsActive) {
+      this.ipcRenderer.send('close_bpmn-studio');
+    }
+
+    if (solutionIsRemoteSolution(this.activeSolutionEntry.uri)) {
+      this.router.navigateToRoute('start-page');
+    } else {
+      this.eventAggregator.publish(environment.events.solutionExplorer.closeDiagram);
+    }
+  };
 
   private checkIfCurrentPlatformIsMac(): boolean {
     const macRegex: RegExp = /.*mac*./i;

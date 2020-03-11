@@ -41,6 +41,7 @@ interface IUriToViewModelMap {
   'HttpFetchClient',
 )
 export class SolutionExplorerList {
+  public loginFunction: Function;
   public internalProcessEngineVersion: string;
   public internalSolutionUri: string;
   public processEngineIsNewerModal: boolean = false;
@@ -100,6 +101,10 @@ export class SolutionExplorerList {
     exposeFunctionForTesting('openSolution', (uri: string, insertAtBeginning?: boolean, identity?: IIdentity): void => {
       this.openSolution(uri, insertAtBeginning, identity);
     });
+
+    this.loginFunction = async (solutionEntry: ISolutionEntry): Promise<void> => {
+      await this.login(solutionEntry);
+    };
 
     this.internalSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
     this.internalProcessEngineVersion = window.localStorage.getItem('InternalProcessEngineVersion');
@@ -372,12 +377,12 @@ export class SolutionExplorerList {
     }
   }
 
-  public async login(solutionEntry: ISolutionEntry): Promise<void> {
-    const onTokenRefresh = async (refreshResult: ILoginResult): Promise<void> => {
+  public async login(solutionEntry: ISolutionEntry, silent?: boolean): Promise<boolean> {
+    const onTokenRefresh = async (refreshResult: ILoginResult): Promise<boolean> => {
       const couldNotConnectToAuthority: boolean = refreshResult === undefined;
       const userIsNotLoggedIn: boolean = refreshResult.idToken === 'access_denied';
       if (couldNotConnectToAuthority || userIsNotLoggedIn) {
-        return;
+        return false;
       }
 
       solutionEntry.identity = {
@@ -391,18 +396,33 @@ export class SolutionExplorerList {
       this.solutionService.persistSolutionsInLocalStorage();
 
       this.eventAggregator.publish(AuthenticationStateEvent.LOGIN);
+      return true;
     };
 
-    const result: ILoginResult = await this.authenticationService.login(solutionEntry.authority, onTokenRefresh);
+    let result: ILoginResult;
+    try {
+      result = await this.authenticationService.login(
+        solutionEntry.authority,
+        solutionEntry.uri,
+        onTokenRefresh,
+        silent,
+      );
+    } catch (error) {
+      if (error === 'window was closed by user' || error === 'User could not get logged in.') {
+        return false;
+      }
+
+      throw error;
+    }
 
     const couldNotConnectToAuthority: boolean = result === undefined;
     if (couldNotConnectToAuthority) {
-      return;
+      return false;
     }
 
     const userIsNotLoggedIn: boolean = result.idToken === 'access_denied';
     if (userIsNotLoggedIn) {
-      return;
+      return false;
     }
 
     const identity: IIdentity = {
@@ -418,10 +438,12 @@ export class SolutionExplorerList {
     this.solutionService.persistSolutionsInLocalStorage();
 
     this.eventAggregator.publish(AuthenticationStateEvent.LOGIN);
+
+    return true;
   }
 
-  public async logout(solutionEntry: ISolutionEntry): Promise<void> {
-    await this.authenticationService.logout(solutionEntry.authority, solutionEntry.identity);
+  public async logout(solutionEntry: ISolutionEntry, silent?: boolean): Promise<void> {
+    await this.authenticationService.logout(solutionEntry.authority, solutionEntry.uri, solutionEntry.identity, silent);
 
     solutionEntry.identity = this.createIdentityForSolutionExplorer();
     solutionEntry.isLoggedIn = false;
@@ -555,6 +577,7 @@ export class SolutionExplorerList {
     this.openedSolutions.splice(indexOfSolutionToBeRemoved, 1);
 
     const entryToRemove: ISolutionEntry = this.solutionService.getSolutionEntryForUri(uri);
+    this.logout(entryToRemove, true);
     this.solutionService.removeSolutionEntryByUri(entryToRemove.uri);
   }
   /**
@@ -680,6 +703,38 @@ export class SolutionExplorerList {
     } else {
       this.openedSolutions.push(entry);
     }
+
+    if (identity.userId !== '') {
+      if (entry.authority === undefined) {
+        entry.authority = await this.getAuthorityWhenAvailable(entry.uri);
+      }
+
+      const success = await this.login(entry, true);
+
+      if (!success) {
+        await this.logout(entry, true);
+      }
+    }
+  }
+
+  private getAuthorityWhenAvailable(solutionUri: string): Promise<string> {
+    return new Promise((resolve) => {
+      const authorityCheckInterval = setInterval(async () => {
+        let authority;
+        try {
+          authority = await this.getAuthorityForSolution(solutionUri);
+        } catch (error) {
+          if (error.message !== 'Failed to fetch') {
+            throw error;
+          }
+        }
+
+        if (authority !== undefined) {
+          clearInterval(authorityCheckInterval);
+          resolve(authority);
+        }
+      }, 100);
+    });
   }
 
   private getHiddenStateForSolutionUri(uri: string): boolean {

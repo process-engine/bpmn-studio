@@ -296,10 +296,6 @@ export class Design {
     this.eventAggregator.publish(environment.events.bpmnio.togglePropertyPanel);
   }
 
-  public deactivate(): void {
-    this.diagramDetail.deactivate();
-  }
-
   public activeDiagramChanged(newValue: IDiagram, oldValue: IDiagram): void {
     const noOldValue: boolean = oldValue === undefined;
     if (noOldValue) {

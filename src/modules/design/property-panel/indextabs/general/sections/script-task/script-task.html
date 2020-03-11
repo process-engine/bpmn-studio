@@ -2,12 +2,14 @@
   <require from="./script-task.css"></require>
   <require from="../../../../styles/sections.css"></require>
   <div class="section-panel" id="js-general-scriptTask-section">
-    <div class="panel__heading">Script Task</div>
+    <div class="panel__heading">Script Task
+      <i class="fas fa-info-circle feedback-modal__help-icon" title="Help: How to use the token" click.delegate="showTokenHelpModal()"></i>
+    </div>
     <div class="panel__content">
       <table class="props-table">
         <tr>
           <th>Script
-            <a class="script-task-enlarge-link" click.delegate="showModal = true"><small class="script-task-enlarge-text">Enlarge</small>
+            <a class="script-task-enlarge-link" click.delegate="showModal = true"><small class="script-task-enlarge-text">Enlarge</small></a>
           </th>
           <td>
             <textarea class="props-input-textarea name-input" ref="scriptInput" value.bind="businessObjInPanel.script" change.delegate="updateScript()" disabled.bind="!isEditable"></textarea>

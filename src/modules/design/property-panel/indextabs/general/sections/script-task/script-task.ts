@@ -3,10 +3,11 @@ import {inject} from 'aurelia-framework';
 
 import {IScriptTaskElement, IShape} from '@process-engine/bpmn-elements_contracts';
 
-import {IPageModel, ISection} from '../../../../../../../contracts';
+import {HelpTextId, IPageModel, ISection} from '../../../../../../../contracts/index';
 import environment from '../../../../../../../environment';
+import {HelpModalService} from '../../../../../../../services/help-modal-service/help-modal-service';
 
-@inject(EventAggregator)
+@inject(EventAggregator, HelpModalService)
 export class ScriptTaskSection implements ISection {
   public path: string = '/sections/script-task/script-task';
   public canHandleElement: boolean = false;
@@ -17,9 +18,11 @@ export class ScriptTaskSection implements ISection {
   public scriptInput: HTMLElement;
 
   private eventAggregator: EventAggregator;
+  private helpModalService: HelpModalService;
 
-  constructor(eventAggregator?: EventAggregator) {
+  constructor(eventAggregator?: EventAggregator, helpModalService?: HelpModalService) {
     this.eventAggregator = eventAggregator;
+    this.helpModalService = helpModalService;
   }
 
   public activate(model: IPageModel): void {
@@ -42,6 +45,10 @@ export class ScriptTaskSection implements ISection {
 
   public updateScript(): void {
     this.publishDiagramChange();
+  }
+
+  public showTokenHelpModal(): void {
+    this.helpModalService.showHelpModal(HelpTextId.ScriptTaskTokenUsage);
   }
 
   private elementIsScriptTask(element: IShape): boolean {
