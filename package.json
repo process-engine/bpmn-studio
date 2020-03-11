@@ -53,7 +53,7 @@
     "@process-engine/bpmn-js-custom-bundle": "2.9.0",
     "@process-engine/bpmn-lint_rules": "^1.6.2",
     "@process-engine/ci_tools": "2.5.1",
-    "@process-engine/dynamic_ui_core": "1.6.0-alpha.2",
+    "@process-engine/dynamic_ui_core": "1.7.0",
     "@process-engine/electron-updater": "1.1.0",
     "@process-engine/management_api_client": "6.2.0",
     "@process-engine/process_engine_runtime": "9.5.0",
