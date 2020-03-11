@@ -1,5 +1,7 @@
-import {HelpTextId} from '../../contracts/index';
+import marked from 'marked';
+import * as hljs from 'highlight.js';
 
+import {HelpTextId} from '../../contracts/index';
 import {HelpTextService} from './help-text-service';
 
 export class HelpModalService {
@@ -9,6 +11,14 @@ export class HelpModalService {
 
   constructor() {
     this.helpTextService = new HelpTextService();
+
+    marked.setOptions({
+      renderer: new marked.Renderer(),
+      highlight: (code, language) => {
+        const validLanguage = hljs.getLanguage(language) ? language : 'plaintext';
+        return hljs.highlight(validLanguage, code).value;
+      },
+    });
   }
 
   public showHelpModal(helpTextId: HelpTextId): void {
@@ -29,9 +39,7 @@ export class HelpModalService {
         <h3>${helpText.title}</h3>
         <button id="help-modal-close-button" type="button" class="close">&times;</button>
       </div>
-      <div class="modal-body" style="overflow-y: scroll;"><span style="white-space: pre-line;">${this.escapeMessage(
-        helpText.message,
-      )}<span></div>
+      <div class="modal-body" style="overflow-y: scroll;">${marked(helpText.message)}</div>
     </div>
   </div>
 </div>
@@ -39,14 +47,5 @@ export class HelpModalService {
 
     document.body.appendChild(node);
     document.getElementById('help-modal-close-button').onclick = removeModalFn;
-  }
-
-  private escapeMessage(message: string): string {
-    return message
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
   }
 }
