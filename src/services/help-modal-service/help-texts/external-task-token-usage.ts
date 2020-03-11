@@ -2,7 +2,7 @@ import {HelpText} from '../../../contracts/index';
 import {removeMultilineIndent} from '../remove-multiline-indent';
 
 export const ExternalTaskTokenUsage: HelpText = {
-  title: 'How to use the results from previous tasks?',
+  title: 'How to use the results from previous tasks',
   message: removeMultilineIndent(`
   When a process is executed, it progresses through the different elements of the diagram and captures states along the way.
   This progression and state accumulation can be visualized as a token moving along the execution's path in the diagram.
