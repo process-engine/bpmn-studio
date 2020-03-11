@@ -75,6 +75,7 @@
     "highlight.js": "9.16.2",
     "highlightjs-line-numbers.js": "^2.7.0",
     "jszip": "3.2.2",
+    "marked": "^0.8.0",
     "minimist": "^1.2.0",
     "moment": "2.24.0",
     "node-abi": "2.13.0",
