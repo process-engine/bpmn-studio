@@ -321,6 +321,11 @@
             "path": "../node_modules/bpmn-js-differ"
           },
           {
+            "name": "marked",
+            "main": "marked.min.js",
+            "path": "../node_modules/marked"
+          },
+          {
             "name": "socket.io-client",
             "path": "../node_modules/socket.io-client/dist",
             "main": "socket.io"
