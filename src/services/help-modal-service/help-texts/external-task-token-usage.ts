@@ -19,6 +19,7 @@ export const ExternalTaskTokenUsage: HelpText = {
   1. To use the given user data from previous tasks, e.g. an account registration worker:
 
       Topic: \`EXAMPLE_TOPIC\`
+
       Payload:
       \`\`\`javascript
       {
@@ -32,6 +33,7 @@ export const ExternalTaskTokenUsage: HelpText = {
   2. To use the current token, the configuration could look like this:
 
       Topic: \`EXAMPLE_TOPIC\`
+
       Payload:
       \`\`\`javascript
       {
@@ -42,6 +44,7 @@ export const ExternalTaskTokenUsage: HelpText = {
   3. Custom Topics:
 
       Topic: \`token.current + 'my string'\`
+
       Payload: \`EXAMPLE_PAYLOAD\`
 
     Note: String operations also work for payloads.
