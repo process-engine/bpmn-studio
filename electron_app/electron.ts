@@ -22,7 +22,6 @@ import getPort from 'get-port';
 import open from 'open';
 
 import {CancellationToken, autoUpdater} from '@process-engine/electron-updater';
-import {version as atlasEngineVersion} from '@atlas-engine/fullstack_server/package.json';
 
 import ReleaseChannel from '../src/services/release-channel-service/release-channel.service';
 import {solutionIsRemoteSolution} from '../src/services/solution-is-remote-solution-module/solution-is-remote-solution.module';
@@ -923,10 +922,6 @@ async function startInternalProcessEngine(): Promise<any> {
   // will be running; this 'get_host' request ist emitted in src/main.ts.
   ipcMain.on('get_host', (event: IpcMainEvent) => {
     event.returnValue = `localhost:${port}`;
-  });
-
-  ipcMain.on('get_version', (event: IpcMainEvent) => {
-    event.returnValue = atlasEngineVersion;
   });
 
   try {

@@ -107,7 +107,6 @@ export class SolutionExplorerList {
     };
 
     this.internalSolutionUri = window.localStorage.getItem('InternalProcessEngineRoute');
-    this.internalProcessEngineVersion = window.localStorage.getItem('InternalProcessEngineVersion');
   }
 
   /**
@@ -166,7 +165,7 @@ export class SolutionExplorerList {
   }
 
   public isProcessEngineNewerThanInternal(solutionEntry: ISolutionEntry): boolean {
-    if (this.internalProcessEngineVersion === 'null') {
+    if (this.internalProcessEngineVersion == null) {
       return false;
     }
 
@@ -177,7 +176,7 @@ export class SolutionExplorerList {
   }
 
   public isProcessEngineOlderThanInternal(solutionEntry: ISolutionEntry): boolean {
-    if (this.internalProcessEngineVersion === 'null') {
+    if (this.internalProcessEngineVersion == null) {
       return false;
     }
 
@@ -283,6 +282,7 @@ export class SolutionExplorerList {
 
       const uriIsInternalProcessEngine = !uriIsNotInternalProcessEngine;
       if (uriIsInternalProcessEngine) {
+        this.getInternalProcessEngineVersion();
         processEngineVersion = this.internalProcessEngineVersion;
       }
 
@@ -557,6 +557,26 @@ export class SolutionExplorerList {
 
   public closeAllOpenDiagrams(): void {
     this.eventAggregator.publish(environment.events.solutionExplorer.closeAllOpenDiagrams);
+  }
+
+  private async getInternalProcessEngineVersion(): Promise<string> {
+    return new Promise((resolve: Function): void => {
+      const internalProcessEngineRoute = window.localStorage.getItem('InternalProcessEngineRoute');
+      const makeRequest: Function = (): void => {
+        setTimeout(async () => {
+          try {
+            const response: any = await this.httpFetchClient.get(`${internalProcessEngineRoute}/process_engine`);
+            this.internalProcessEngineVersion = response.result.version;
+            window.localStorage.setItem('InternalProcessEngineVersion', this.internalProcessEngineVersion);
+            resolve(response.result.version);
+          } catch (error) {
+            makeRequest();
+          }
+        }, 100);
+      };
+
+      makeRequest();
+    });
   }
 
   private openingSolutionWasCanceled(solutionUri: string): void {
