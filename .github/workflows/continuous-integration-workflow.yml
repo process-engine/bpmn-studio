@@ -184,7 +184,7 @@ jobs:
 
     - name: Install npm Dependencies
       run: |
-        npm ci
+        npm ci --no-optional
         ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
       shell: powershell
 
