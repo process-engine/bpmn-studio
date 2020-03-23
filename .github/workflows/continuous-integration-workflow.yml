@@ -189,7 +189,7 @@ jobs:
       shell: powershell
 
     - name: Install Windows Build Tools
-      run: npm install --global --production windows-build-tools
+      run: npm --vs2015 install --global windows-build-tools
       shell: powershell
 
     - name: Build the Electron App
