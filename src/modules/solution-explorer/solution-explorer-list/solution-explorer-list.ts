@@ -165,7 +165,7 @@ export class SolutionExplorerList {
   }
 
   public isProcessEngineNewerThanInternal(solutionEntry: ISolutionEntry): boolean {
-    if (this.internalProcessEngineVersion == null) {
+    if (this.internalProcessEngineVersion == null || this.solutionIsInternalSolution(solutionEntry)) {
       return false;
     }
 
@@ -176,7 +176,7 @@ export class SolutionExplorerList {
   }
 
   public isProcessEngineOlderThanInternal(solutionEntry: ISolutionEntry): boolean {
-    if (this.internalProcessEngineVersion == null) {
+    if (this.internalProcessEngineVersion == null || this.solutionIsInternalSolution(solutionEntry)) {
       return false;
     }
 
