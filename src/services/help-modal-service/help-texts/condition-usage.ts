@@ -22,13 +22,13 @@ export const ConditionUsage: HelpText = {
   Otherwise, the path following through the second sequence flow should be taken.
 
   To accomplish this, we can add a condition to each of the sequence flow.
-  
+
   The first sequence flow gets the following condition:
 
   \`token.history.User_Age.age >= 18\`
 
-  For the second sequence flow, we have two options. 
-  
+  For the second sequence flow, we have two options.
+
   We could add the following condition:
 
   \`token.history.User_Age.age < 18\`
@@ -36,7 +36,7 @@ export const ConditionUsage: HelpText = {
   Or we could set the second sequence flow as **default flow**.
 
   A default flow will always be executed, when no other sequence flow's condition was fulfilled.
-  
+
   In our example, this would be the case, if the user is **not** 18 or above.
 
   To mark a sequence flow as 'default', select it, then click on the wrench and choose 'default flow'.
