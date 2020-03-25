@@ -27,7 +27,7 @@ export const ConditionUsage: HelpText = {
 
   \`token.history.User_Age.age >= 18\`
 
-  For the second sequnce flow, we have two options. 
+  For the second sequence flow, we have two options. 
   
   We could add the following condition:
 
@@ -39,7 +39,7 @@ export const ConditionUsage: HelpText = {
   
   In our example, this would be the case, if the user is **not** 18 or above.
 
-  To mark a sequnce flow as 'default', select it, then click on the wrench and choose 'default flow'.
+  To mark a sequence flow as 'default', select it, then click on the wrench and choose 'default flow'.
   <div style="text-align: center;">
     <img src="src/resources/images/default_flow.png" width="200px">
   </div>
