@@ -17,22 +17,29 @@ export const ConditionUsage: HelpText = {
 
   We have a task with the ID \`User_Age\` that returns an object with a property called \`age\` that is a number.
 
-  We want to check whether the user is 18 or older to determine which sequence flow should be executed.
-  If the user is 18 or over the first sequence flow should be used for the process execution.
+  We want to check if the user is aged 18 or above. The result of this check will determine through which path our process will continue.
+  If the user *is* 18 or above, the process should continue through the first sequence flow.
+  Otherwise, the path following through the second sequence flow should be taken.
 
-  The condition of the first sequence flow must look like:
+  To accomplish this, we can add a condition to each of the sequence flow.
+  
+  The first sequence flow gets the following condition:
 
   \`token.history.User_Age.age >= 18\`
 
-  The condition of the second sequence flow now could be:
+  For the second sequnce flow, we have two options. 
+  
+  We could add the following condition:
 
   \`token.history.User_Age.age < 18\`
 
-  The second condition is not necessary if you set the second sequence flow as **default flow**.
+  Or we could set the second sequence flow as **default flow**.
 
-  A default flow means it is choosed for execution if no other sequence flows condition has matched.
+  A default flow will always be executed, when no other sequence flow's condition was fulfilled.
+  
+  In our example, this would be the case, if the user is **not** 18 or above.
 
-  You can set it by selecting the sequence flow, then click on the wrench and default flow.
+  To mark a sequnce flow as 'default', select it, then click on the wrench and choose 'default flow'.
   <div style="text-align: center;">
     <img src="src/resources/images/default_flow.png" width="200px">
   </div>
