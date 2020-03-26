@@ -21,7 +21,7 @@ export const ConditionUsage: HelpText = {
   If the user *is* 18 or above, the process should continue through the first sequence flow.
   Otherwise, the path following through the second sequence flow should be taken.
 
-  To accomplish this, we can add a condition to each of the sequence flow.
+  To accomplish this, we can add a condition to each of the sequence flows.
 
   The first sequence flow gets the following condition:
 
