@@ -8,8 +8,8 @@ extraFiles:
       - config/**
 extraResources:
   - filter:
-      - node_modules/@process-engine/process_engine_runtime/config/**/*
-      - node_modules/@process-engine/process_engine_runtime/sequelize/migrations/**/*
+      - node_modules/@atlas-engine/fullstack_server/config/**/*
+      - node_modules/@atlas-engine/fullstack_server/migrations/**/*
 nsis:
   perMachine: false
   oneClick: false

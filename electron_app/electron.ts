@@ -22,11 +22,10 @@ import getPort from 'get-port';
 import open from 'open';
 
 import {CancellationToken, autoUpdater} from '@process-engine/electron-updater';
-import {version as ProcessEngineVersion} from '@process-engine/process_engine_runtime/package.json';
 
 import ReleaseChannel from '../src/services/release-channel-service/release-channel.service';
 import {solutionIsRemoteSolution} from '../src/services/solution-is-remote-solution-module/solution-is-remote-solution.module';
-import {version as CurrentStudioVersion} from '../package.json';
+import {version as currentStudioVersion} from '../package.json';
 import {getPortListByVersion} from '../src/services/default-ports-module/default-ports.module';
 import {FeedbackData} from '../src/contracts';
 
@@ -38,7 +37,7 @@ const dialog: Dialog = electron.dialog;
 const app: App = electron.app;
 
 let browserWindow: BrowserWindow;
-const releaseChannel: ReleaseChannel = new ReleaseChannel(CurrentStudioVersion);
+const releaseChannel: ReleaseChannel = new ReleaseChannel(currentStudioVersion);
 // If BPMN Studio was opened by double-clicking a .bpmn file, then the
 // following code tells the frontend the name and content of that file;
 // this 'get_opened_file' request is emmitted in src/main.ts.
@@ -925,10 +924,6 @@ async function startInternalProcessEngine(): Promise<any> {
     event.returnValue = `localhost:${port}`;
   });
 
-  ipcMain.on('get_version', (event: IpcMainEvent) => {
-    event.returnValue = ProcessEngineVersion;
-  });
-
   try {
     await startRuntime();
 
@@ -975,8 +970,8 @@ async function startRuntime(): Promise<void> {
       '..',
       '..',
       'node_modules',
-      '@process-engine',
-      'process_engine_runtime',
+      '@atlas-engine',
+      'fullstack_server',
       'bin',
       'index.js',
     );

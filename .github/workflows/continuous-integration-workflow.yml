@@ -184,12 +184,8 @@ jobs:
 
     - name: Install npm Dependencies
       run: |
-        npm ci
+        npm ci --no-optional
         ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
-      shell: powershell
-
-    - name: Install Windows Build Tools
-      run: npm --vs2015 install --global windows-build-tools
       shell: powershell
 
     - name: Build the Electron App
