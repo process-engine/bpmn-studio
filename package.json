@@ -50,7 +50,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@atlas-engine/fullstack_server": "10.0.0-alpha.8",
+    "@atlas-engine/fullstack_server": "feature~add_migrations_for_pe_databases",
     "@essential-projects/errors_ts": "^1.6.1",
     "@fortawesome/fontawesome-free": "5.11.2",
     "@process-engine/bpmn-js-custom-bundle": "2.9.0",
