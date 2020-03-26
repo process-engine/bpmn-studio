@@ -3,10 +3,11 @@ import {inject} from 'aurelia-framework';
 
 import {IConditionExpression, IFlowElement, IShape} from '@process-engine/bpmn-elements_contracts';
 
-import {IBpmnModdle, IPageModel, ISection} from '../../../../../../../contracts';
+import {HelpTextId, IBpmnModdle, IPageModel, ISection} from '../../../../../../../contracts/index';
 import environment from '../../../../../../../environment';
+import {HelpModalService} from '../../../../../../../services/help-modal-service/help-modal-service';
 
-@inject(EventAggregator)
+@inject(EventAggregator, HelpModalService)
 export class FlowSection implements ISection {
   public path: string = '/sections/flow/flow';
   public canHandleElement: boolean = false;
@@ -15,9 +16,11 @@ export class FlowSection implements ISection {
   private businessObjInPanel: IFlowElement;
   private moddle: IBpmnModdle;
   private eventAggregator: EventAggregator;
+  private helpModalService: HelpModalService;
 
-  constructor(eventAggregator?: EventAggregator) {
+  constructor(eventAggregator?: EventAggregator, helpModalService?: HelpModalService) {
     this.eventAggregator = eventAggregator;
+    this.helpModalService = helpModalService;
   }
 
   public activate(model: IPageModel): void {
@@ -62,6 +65,10 @@ export class FlowSection implements ISection {
 
     this.businessObjInPanel.conditionExpression.body = this.condition;
     this.publishDiagramChange();
+  }
+
+  public showConditionHelpModal(): void {
+    this.helpModalService.showHelpModal(HelpTextId.ConditionUsage);
   }
 
   private createConditionExpression(): void {
