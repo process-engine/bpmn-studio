@@ -977,10 +977,6 @@ async function startRuntime(): Promise<void> {
     );
     runtimeProcess = fork(pathToRuntime, [`--sqlitePath=${sqlitePath}`, `--logFilePath=${logFilepath}`], {
       stdio: 'pipe',
-      env: {
-        NODE_OPTIONS: '--max-old-space-size=50000',
-        ...process.env,
-      },
     });
 
     runtimeProcess.stdout.on('data', (data) => process.stdout.write(data));
