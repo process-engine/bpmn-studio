@@ -2,14 +2,11 @@ productName: "BPMN Studio"
 directories:
   output: dist/electron
   buildResources: build
+asar: false
 extraFiles:
   - filter:
       - build/**
       - config/**
-extraResources:
-  - filter:
-      - node_modules/@atlas-engine/fullstack_server/config/**/*
-      - node_modules/@atlas-engine/fullstack_server/migrations/**/*
 nsis:
   perMachine: false
   oneClick: false

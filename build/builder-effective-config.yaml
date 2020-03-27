@@ -5,9 +5,6 @@ extraFiles:
   - filter:
       - build/**
       - config/**
-extraResources:
-  - filter:
-      - node_modules/@atlas-engine/fullstack_server/migrations/**/*
 nsis:
   perMachine: false
   oneClick: false
