@@ -7,7 +7,9 @@ extraFiles:
       - config/**
 extraResources:
   - filter:
+      - node_modules/@atlas-engine/fullstack_server/config/**/*
       - node_modules/@atlas-engine/fullstack_server/migrations/**/*
+      - node_modules/@atlas-engine/sequelize_connection_manager/**/*
 nsis:
   perMachine: false
   oneClick: false
