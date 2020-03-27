@@ -133,8 +133,8 @@ jobs:
       env:
         CSC_LINK: ${{ secrets.CSC_LINK }}
 
-    - name: Run the Tests
-      run: npm test
+    # - name: Run the Tests
+    #   run: npm test
 
     - name: Prepare macOS Bundle
       run: |
