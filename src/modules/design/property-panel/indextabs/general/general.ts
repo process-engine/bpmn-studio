@@ -16,6 +16,7 @@ import {ServiceTaskSection} from './sections/service-task/service-task';
 import {SignalEventSection} from './sections/signal-event/signal-event';
 import {TimerEventSection} from './sections/timer-event/timer-event';
 import {LinkEventSection} from './sections/link-event/link-event';
+import {ExclusiveGatewaySection} from './sections/exclusive-gateway/exclusive-gateway';
 
 export class General implements IIndextab {
   public title: string = 'General';
@@ -36,6 +37,7 @@ export class General implements IIndextab {
   public processSection: ISection = new ProcessSection();
   public serviceTaskSection: ISection = new ServiceTaskSection();
   public linkEventSection: ISection = new LinkEventSection();
+  public exclusiveGatewaySection: ISection = new ExclusiveGatewaySection();
 
   public sections: Array<ISection> = [
     this.basicsSection,
@@ -53,6 +55,7 @@ export class General implements IIndextab {
     this.processSection,
     this.serviceTaskSection,
     this.linkEventSection,
+    this.exclusiveGatewaySection,
   ];
 
   public canHandleElement: boolean = true;

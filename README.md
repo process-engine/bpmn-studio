@@ -1,14 +1,14 @@
+![Node CI](https://github.com/process-engine/bpmn-studio/workflows/Node%20CI/badge.svg?branch=master)
+
 # BPMN Studio
 
-BPMN Studio ist eine Web- und Desktop-Applikation zur Erstellung, Verwaltung,
-Ausführung und Auswertung von BPMN-Prozessen.  Es setzt auf dem BPMN.io auf und
-den BPMN-Standard 2.x um.
+BPMN Studio ist eine Desktop- und Web-Applikation zum Erstellen, Verwalten, Ausführen und Auswerten von BPMN-Prozessen, implementiert in Electron, Aurelia & TypeScript.
 
 ## Was sind die Ziele dieses Projekts?
 
 BPMN Studio soll es dem Anwender so leicht wie möglich machen BPMN-Diagramme zu
-erstellen und zu pflegen.  Des Weiteren kann BPMN Studio mit einer Workflow
-Engine verbunden werden, um diese Diagramme auszuführen.
+erstellen und zu pflegen. Des Weiteren bringt BPMN Studio eine Workflow
+Engine mit, um diese Diagramme auszuführen.
 
 ## Relevante URLs
 
@@ -29,7 +29,7 @@ Ein [Docker-Image des kompletten Bundles](https://hub.docker.com/r/5minds/bpmn-s
 ### Voraussetzungen
 
 * Node [active LTS](https://github.com/nodejs/Release#release-schedule)
-* Laufende ProcessEngine
+* Python 
 
 ### Setup/Installation
 
@@ -70,13 +70,13 @@ npm install
 
 ### Benutzung
 
-**Zum bauen:**
+**Zum builden:**
 
 ```shell
 npm run build
 ```
 
-Dieses Skript baut die Anwendung, das Ergebnis ist produktionsreif.
+Dieses Skript buildet die Anwendung, das Ergebnis ist produktionsreif.
 
 **Zum starten:**
 
@@ -121,7 +121,7 @@ automatisch neu geladen.
 
 ### Electron Applikation
 
-**Zum bauen:**
+**Zum builden:**
 
 **Mac:**
 
@@ -129,15 +129,14 @@ automatisch neu geladen.
 npm run electron-build-macos
 ```
 
-Nach dem Bauen kann man in dem `dist/electron/mac` Ordner die fertige Applikation finden
-und ausführen.
+Nach dem Builden befindet sich die fertige Applikation im `dist/electron/mac` Ordner.
 
 **Windows:**
 
-Vor dem erstmaligen Builden müssen  die windows-build-tools installiert werden:
+Vor dem ersten Build müssen die windows-build-tools installiert werden:
 
 ```shell
-npm install --global --production windows-build-tools
+npm --vs2015 install --global windows-build-tools
 ```
 
 Danach kann gebuildet werden:
@@ -146,9 +145,9 @@ Danach kann gebuildet werden:
 npm run electron-build-windows
 ```
 
-Nach dem Bauen, kann man in dem `dist/electron/` Ordner die Datei `bpmn-studio-setup-
-<VERSION>.exe` ausführen, um die Applikation zu installieren; `<VERSION>` wird
-durch die entsprechende Version ersetzt.
+Der Buildvorgang generiert im `dist/electron/` Ordner die Datei `bpmn-studio-setup-<VERSION>.exe`.
+Diese kann zur Installation der Applikation genutzt werden;
+`<VERSION>` entspricht dabei der Version, in welcher die Applikation installiert wird.
 
 Beispiel:
 
@@ -156,15 +155,15 @@ Beispiel:
 
 ### Docker Image
 
-#### Container bauen
+#### Container builden
 
-Das Image lässt sich wie folgt bauen:
+Das Image lässt sich wie folgt builden:
 
 ```shell
 docker build --tag bpmn-studio:latest .
 ```
 
-#### Container bauen mit optionalen Parametern
+#### Container builden mit optionalen Parametern
 
 Es ist möglich, das base image, sowie die Paketversionen anzupassen:
 

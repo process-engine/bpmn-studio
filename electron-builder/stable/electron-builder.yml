@@ -2,27 +2,28 @@ productName: "BPMN Studio"
 directories:
   output: dist/electron
   buildResources: build
+asar: false
 extraFiles:
   - filter:
       - build/**
       - config/**
-extraResources:
-  - filter:
-      - node_modules/@process-engine/process_engine_runtime/config/**/*
-      - node_modules/@process-engine/process_engine_runtime/sequelize/migrations/**/*
 nsis:
   perMachine: false
   oneClick: false
   allowToChangeInstallationDirectory: true
   runAfterFinish: false
+  artifactName: 'bpmn-studio-setup-${version}.${ext}'
+portable:
+  artifactName: 'bpmn-studio-portable-${version}.${ext}'
 win:
-  target: nsis
+  target:
+    - nsis
+    - portable
   fileAssociations:
     - ext:
         - bpmn
       name: BPMN
       description: BPMN diagram extension
-  artifactName: 'bpmn-studio-setup-${version}.${ext}'
 mac:
   target:
     - dmg

@@ -5,9 +5,6 @@ extraFiles:
   - filter:
       - build/**
       - config/**
-extraResources:
-  - filter:
-      - node_modules/@process-engine/process_engine_runtime/sequelize/migrations/**/*
 nsis:
   perMachine: false
   oneClick: false

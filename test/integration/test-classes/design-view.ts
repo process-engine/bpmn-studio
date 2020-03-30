@@ -33,7 +33,7 @@ export class DesignViewClient {
     const directoryExists: boolean = await fs.existsSync(this.saveDiagramDir);
 
     if (!directoryExists) {
-      fs.mkdirSync(this.saveDiagramDir);
+      fs.mkdirSync(this.saveDiagramDir, {recursive: true});
     }
 
     await callExposedFunction(this.testClient.webdriverClient, 'saveDiagramAs', fileUri);

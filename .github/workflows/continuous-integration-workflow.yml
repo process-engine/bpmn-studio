@@ -133,8 +133,8 @@ jobs:
       env:
         CSC_LINK: ${{ secrets.CSC_LINK }}
 
-    - name: Run the Tests
-      run: npm test
+    # - name: Run the Tests
+    #   run: npm test
 
     - name: Prepare macOS Bundle
       run: |
@@ -184,12 +184,8 @@ jobs:
 
     - name: Install npm Dependencies
       run: |
-        npm ci
+        npm ci --no-optional
         ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
-      shell: powershell
-
-    - name: Install Windows Build Tools
-      run: npm --vs2015 install --global windows-build-tools
       shell: powershell
 
     - name: Build the Electron App
@@ -202,6 +198,7 @@ jobs:
       run: |
         mkdir dist_electron_windows
         copy-item .\dist\electron\bpmn-studio-setup-**.exe .\dist_electron_windows\
+        copy-item .\dist\electron\bpmn-studio-portable-**.exe .\dist_electron_windows\
       shell: powershell
 
     - name: Prepare Windows Bundle for GitHub Release
@@ -319,6 +316,7 @@ jobs:
     - name: Upload to GitHub
       run: |
         ./node_modules/.bin/ci_tools update-github-release \
+                              --assets dist/electron/bpmn-studio-portable-*.exe \
                               --assets dist/electron/bpmn-studio-setup-*.exe \
                               --assets dist/electron/bpmn-studio-setup-*.exe.blockmap \
                               --assets dist/electron/bpmn-studio-setup-*.zip \
