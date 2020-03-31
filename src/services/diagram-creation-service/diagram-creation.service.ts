@@ -101,7 +101,7 @@ export class DiagramCreationService implements IDiagramCreationService {
       xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-      id="${definitionId}"
+      id="Definition_${definitionId}"
       targetNamespace="http://bpmn.io/schema/bpmn"
       exporter="BPMN Studio"
       exporterVersion="1">
