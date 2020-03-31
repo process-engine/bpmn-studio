@@ -1,5 +1,7 @@
 import {inject} from 'aurelia-framework';
 
+import uuid from 'node-uuid';
+
 import {IModdleElement, IProcessRef} from '@process-engine/bpmn-elements_contracts';
 import * as bundle from '@process-engine/bpmn-js-custom-bundle';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
@@ -90,6 +92,8 @@ export class DiagramCreationService implements IDiagramCreationService {
   }
 
   private getInitialProcessXML(processModelId: string): string {
+    const definitionId = uuid.v4();
+
     return `<?xml version="1.0" encoding="UTF-8"?>
     <bpmn:definitions
       xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
@@ -97,7 +101,7 @@ export class DiagramCreationService implements IDiagramCreationService {
       xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-      id="Definition_1"
+      id="${definitionId}"
       targetNamespace="http://bpmn.io/schema/bpmn"
       exporter="BPMN Studio"
       exporterVersion="1">
