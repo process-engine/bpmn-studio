@@ -295,7 +295,9 @@ export class SolutionExplorerSolution {
 
             resolve(true);
           } catch (error) {
-            makeRequest();
+            setTimeout(() => {
+              makeRequest();
+            }, 1000);
           }
           // tslint:disable-next-line: no-magic-numbers
         }, 10);
