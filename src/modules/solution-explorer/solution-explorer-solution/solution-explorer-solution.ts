@@ -271,7 +271,7 @@ export class SolutionExplorerSolution {
     }
   }
 
-  public waitForProcessEngine(): Promise<boolean> {
+  public waitForProcessEngine(): Promise<void> {
     return new Promise((resolve: Function, reject: Function): void => {
       const makeRequest: Function = (): void => {
         setTimeout(async () => {
@@ -293,7 +293,7 @@ export class SolutionExplorerSolution {
               this.updateSolution();
             });
 
-            resolve(true);
+            resolve();
           } catch (error) {
             setTimeout(() => {
               makeRequest();
