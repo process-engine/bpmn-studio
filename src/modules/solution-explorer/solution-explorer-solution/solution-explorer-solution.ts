@@ -399,9 +399,12 @@ export class SolutionExplorerSolution {
       } else if (isError(error, ForbiddenError)) {
         if (this.displayedSolutionEntry.isLoggedIn) {
           this.authorisationError = true;
+          this.authenticationError = false;
         } else {
           this.authenticationError = true;
+          this.authorisationError = false;
         }
+
         this.sortedDiagramsOfSolutions = [];
         this.openedSolution = undefined;
       } else {
