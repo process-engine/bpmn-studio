@@ -97,7 +97,10 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
     authorityUrl = this.formAuthority(authorityUrl);
 
     await this.showLogoutPopup(authorityUrl, solutionUri, identity, silent);
-    this.eventAggregator.publish(AuthenticationStateEvent.LOGOUT);
+
+    setTimeout(() => {
+      this.eventAggregator.publish(AuthenticationStateEvent.LOGOUT);
+    }, 0);
   }
 
   public async getUserIdentity(authorityUrl: string, identity: IIdentity): Promise<IUserIdentity | null> {
