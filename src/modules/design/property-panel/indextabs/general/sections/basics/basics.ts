@@ -192,7 +192,7 @@ export class BasicsSection implements ISection {
 
   private humanizeElementType(type: string): string {
     const rawType: string = type.replace(/^bpmn:/, '');
-    const humanizedType: string = rawType.replace(/([a-z])([A-Z])/, '$1 $2');
+    const humanizedType: string = rawType.replace(/([a-z])([A-Z])/g, '$1 $2');
 
     return humanizedType;
   }
