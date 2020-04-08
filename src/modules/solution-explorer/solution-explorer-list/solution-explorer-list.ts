@@ -570,7 +570,9 @@ export class SolutionExplorerList {
             window.localStorage.setItem('InternalProcessEngineVersion', this.internalProcessEngineVersion);
             resolve(response.result.version);
           } catch (error) {
-            makeRequest();
+            setTimeout(() => {
+              makeRequest();
+            }, 1000);
           }
         }, 100);
       };
