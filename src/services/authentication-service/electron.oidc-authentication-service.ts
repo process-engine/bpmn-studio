@@ -1,6 +1,7 @@
 import {EventAggregator} from 'aurelia-event-aggregator';
 import {inject} from 'aurelia-framework';
 
+import AsyncLock from 'async-lock';
 import Bluebird from 'bluebird';
 import queryString from 'querystring';
 import nodeUrl from 'url';
@@ -36,6 +37,8 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
   private solutionsToRefresh: Array<string> = [];
   private refreshTimeouts: Map<string, any> = new Map();
 
+  private lock: AsyncLock;
+
   constructor(
     eventAggregator: EventAggregator,
     notificationService: NotificationService,
@@ -44,6 +47,8 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
     this.eventAggregator = eventAggregator;
     this.notificationService = notificationService;
     this.httpFetchClient = httpFetchClient;
+
+    this.lock = new AsyncLock();
 
     this.electronRemote = (window as any).nodeRequire('electron').remote;
   }
@@ -302,52 +307,61 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
       return;
     }
 
-    if (await this.solutionHasIdentityServerCookie(solutionUri)) {
-      await this.setIdentityServerCookie(solutionUri, authorityUrl);
-    }
+    await this.refreshToken(authorityUrl, solutionUri, refreshCallback);
+  }
 
-    const urlParams = {
-      client_id: oidcConfig.clientId,
-      redirect_uri: oidcConfig.redirectUri,
-      response_type: oidcConfig.responseType,
-      scope: oidcConfig.scope,
-      state: this.getRandomString(16),
-      nonce: this.getRandomString(16),
-      prompt: 'none',
-    };
-
-    const urlToLoad: string = `${authorityUrl}connect/authorize?${queryString.stringify(urlParams)}`;
-
-    const authWindow = new this.electronRemote.BrowserWindow({show: false});
-
-    authWindow.loadURL(urlToLoad);
-
-    authWindow.on('closed', (): void => {
-      throw new Error('window was closed by user');
-    });
-
-    authWindow.webContents.on('will-redirect', (event: Electron.Event, url: string): void => {
-      if (url.includes(oidcConfig.redirectUri)) {
-        event.preventDefault();
+  private async refreshToken(authorityUrl: string, solutionUri: string, refreshCallback: Function): Promise<void> {
+    return this.lock.acquire('refreshToken', async (done: Function) => {
+      if (await this.solutionHasIdentityServerCookie(solutionUri)) {
+        await this.setIdentityServerCookie(solutionUri, authorityUrl);
       }
 
-      const redirectCallbackResolved = async (token: ITokenObject): Promise<void> => {
-        refreshCallback(token);
-        await this.setCurrentIdentityServerCookieForSolution(solutionUri, authorityUrl);
-        await this.removeCurrentIdentityServerCookie(authorityUrl);
-
-        this.silentRefresh(authorityUrl, solutionUri, token, refreshCallback);
+      const urlParams = {
+        client_id: oidcConfig.clientId,
+        redirect_uri: oidcConfig.redirectUri,
+        response_type: oidcConfig.responseType,
+        scope: oidcConfig.scope,
+        state: this.getRandomString(16),
+        nonce: this.getRandomString(16),
+        prompt: 'none',
       };
 
-      const redirectCallbackRejected = (error: Error): void => {
-        if (error.message !== 'User is no longer logged in.') {
-          throw error;
+      const urlToLoad: string = `${authorityUrl}connect/authorize?${queryString.stringify(urlParams)}`;
+
+      const authWindow = new this.electronRemote.BrowserWindow({show: false});
+
+      authWindow.loadURL(urlToLoad);
+
+      authWindow.on('closed', (): void => {
+        throw new Error('window was closed by user');
+      });
+
+      authWindow.webContents.on('will-redirect', (event: Electron.Event, url: string): void => {
+        if (url.includes(oidcConfig.redirectUri)) {
+          event.preventDefault();
         }
 
-        this.stopSilentRefreshing(solutionUri);
-      };
+        const redirectCallbackResolved = async (token: ITokenObject): Promise<void> => {
+          await this.setCurrentIdentityServerCookieForSolution(solutionUri, authorityUrl);
+          await this.removeCurrentIdentityServerCookie(authorityUrl);
 
-      this.handleRedirectCallback(url, authWindow, redirectCallbackResolved, redirectCallbackRejected);
+          done();
+
+          this.silentRefresh(authorityUrl, solutionUri, token, refreshCallback);
+        };
+
+        const redirectCallbackRejected = async (error: Error): Promise<void> => {
+          if (error.message !== 'User is no longer logged in.') {
+            throw error;
+          }
+
+          done();
+
+          this.stopSilentRefreshing(solutionUri);
+        };
+
+        this.handleRedirectCallback(url, authWindow, redirectCallbackResolved, redirectCallbackRejected);
+      });
     });
   }
 
