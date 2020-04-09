@@ -355,6 +355,8 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
             throw error;
           }
 
+          await this.removeCurrentIdentityServerCookie(authorityUrl);
+
           done();
 
           this.stopSilentRefreshing(solutionUri);
