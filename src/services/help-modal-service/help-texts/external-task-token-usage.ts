@@ -43,9 +43,20 @@ export const ExternalTaskTokenUsage: HelpText = {
 
   3. Custom Topics:
 
-      Topic: \`token.current + 'my string'\`
+      To use dynamic topics for external task workers, you can customize the topic using the token.
+      For example, we have a task that returns an access token.
 
-      Payload: \`EXAMPLE_PAYLOAD\`
+      If we adjust the topic with the access token, only an external task worker who knows the access token can process the task.
+      To use the access token, your topic might look like this:
+
+      Topic: \`'MY_TOPIC_' + token.current.accessToken\`
+
+      Payload:
+      \`\`\`javascript
+      {
+        currentToken: token.current
+      }
+      \`\`\`
 
     Note: String operations also work for payloads.
    `),
