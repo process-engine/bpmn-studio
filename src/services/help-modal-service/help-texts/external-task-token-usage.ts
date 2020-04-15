@@ -43,10 +43,20 @@ export const ExternalTaskTokenUsage: HelpText = {
 
   3. Custom Topics:
 
-      Topic: \`token.current + 'my string'\`
+    Sometimes it is useful to control which workers are able to execute certain tasks, e.g. dealing with sensitive information.
 
-      Payload: \`EXAMPLE_PAYLOAD\`
+    We can implement this use case by assigning a secret to our token und using a "dynamic topic" for the external task.
 
-    Note: String operations also work for payloads.
+    To use the secret, your topic might look like this:
+
+    Topic: \`'handle-sensitive-data.' + token.current.mySecret\`
+
+    If we add the secret to the topic, then only those external task workers which know the secret can subscribe and process the task.
+
+    Please also that you can name these things differently: both the term "secret" as well as the field name \`mySecret\` are arbitrary choices.
+
+    Payload: \`YOUR_PAYLOAD\`
+
+    Please also note: String operations also work for payloads.
    `),
 };
