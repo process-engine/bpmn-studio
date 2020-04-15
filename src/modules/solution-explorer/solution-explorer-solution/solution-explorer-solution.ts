@@ -227,12 +227,15 @@ export class SolutionExplorerSolution {
           });
         }
       }),
-      this.eventAggregator.subscribe(`${AuthenticationStateEvent.REFRESH}-${this.openedSolution.uri}`, async () => {
-        if (this.shouldRefreshOnTokenRefresh) {
-          await this.updateSolution();
-          this.shouldRefreshOnTokenRefresh = false;
-        }
-      }),
+      this.eventAggregator.subscribe(
+        `${AuthenticationStateEvent.REFRESH}-${this.displayedSolutionEntry.uri}`,
+        async () => {
+          if (this.shouldRefreshOnTokenRefresh) {
+            await this.updateSolution();
+            this.shouldRefreshOnTokenRefresh = false;
+          }
+        },
+      ),
       this.eventAggregator.subscribe(
         environment.events.solutionExplorer.closeAllOpenDiagrams,
         this.closeAllDiagramsEventFunction,
