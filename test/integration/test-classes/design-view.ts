@@ -51,6 +51,14 @@ export class DesignViewClient {
     await this.testClient.clickOn('[data-test-deploy-diagram-button]');
   }
 
+  public async assertDiagramAlreadyExistOnProcessEngine(): Promise<void> {
+    await this.testClient.ensureVisible('[data-test-diagram-already-exist]', VISIBLE_TIMEOUT);
+  }
+
+  public async overwriteExistingDiagram(): Promise<void> {
+    await this.testClient.clickOn('[data-test-diagram-already-exist-deploy-button]');
+  }
+
   // openXMLViewForCurrentDiagram?
   public async openXmlViewFromStatusbar(): Promise<void> {
     await this.testClient.ensureVisible('[data-test-status-bar-xml-view-button]', VISIBLE_TIMEOUT);
