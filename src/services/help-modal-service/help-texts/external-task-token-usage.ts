@@ -43,21 +43,20 @@ export const ExternalTaskTokenUsage: HelpText = {
 
   3. Custom Topics:
 
-      To use dynamic topics for external task workers, you can customize the topic using the token.
-      For example, we have a task that returns an access token.
+    Sometimes it is useful to control which workers are able to execute certain tasks, e.g. dealing with sensitive information.
 
-      If we adjust the topic with the access token, only an external task worker who knows the access token can process the task.
-      To use the access token, your topic might look like this:
+    We can implement this use case by assigning a secret to our token und using a "dynamic topic" for the external task.
 
-      Topic: \`'MY_TOPIC_' + token.current.accessToken\`
+    To use the secret, your topic might look like this:
 
-      Payload:
-      \`\`\`javascript
-      {
-        currentToken: token.current
-      }
-      \`\`\`
+    Topic: \`'handle-sensitive-data.' + token.current.mySecret\`
 
-    Note: String operations also work for payloads.
+    If we add the secret to the topic, then only those external task workers which know the secret can subscribe and process the task.
+
+    Please also that you can name these things differently: both the term "secret" as well as the field name \`mySecret\` are arbitrary choices.
+
+    Payload: \`YOUR_PAYLOAD\`
+
+    Please also note: String operations also work for payloads.
    `),
 };
