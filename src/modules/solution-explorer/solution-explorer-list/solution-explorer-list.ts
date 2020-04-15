@@ -395,7 +395,7 @@ export class SolutionExplorerList {
       await solutionEntry.service.openSolution(solutionEntry.uri, solutionEntry.identity);
       this.solutionService.persistSolutionsInLocalStorage();
 
-      this.eventAggregator.publish(AuthenticationStateEvent.LOGIN);
+      this.eventAggregator.publish(`${AuthenticationStateEvent.REFRESH}-${solutionEntry.uri}`);
       return true;
     };
 

@@ -142,6 +142,8 @@ export class SolutionExplorerSolution {
   private httpFetchClient: HttpFetchClient;
   private isPolling: boolean = false;
 
+  private shouldRefreshOnTokenRefresh: boolean = false;
+
   constructor(
     router: Router,
     eventAggregator: EventAggregator,
@@ -223,6 +225,12 @@ export class SolutionExplorerSolution {
           this.solutionEventListenerId = this.displayedSolutionEntry.service.watchSolution(() => {
             this.updateSolution();
           });
+        }
+      }),
+      this.eventAggregator.subscribe(`${AuthenticationStateEvent.REFRESH}-${this.openedSolution.uri}`, async () => {
+        if (this.shouldRefreshOnTokenRefresh) {
+          await this.updateSolution();
+          this.shouldRefreshOnTokenRefresh = false;
         }
       }),
       this.eventAggregator.subscribe(
@@ -393,11 +401,13 @@ export class SolutionExplorerSolution {
     } catch (error) {
       // In the future we can maybe display a small icon indicating the error.
       if (isError(error, UnauthorizedError)) {
+        this.shouldRefreshOnTokenRefresh = true;
         this.authorisationError = true;
         this.sortedDiagramsOfSolutions = [];
         this.openedSolution = undefined;
       } else if (isError(error, ForbiddenError)) {
         if (this.displayedSolutionEntry.isLoggedIn) {
+          this.shouldRefreshOnTokenRefresh = true;
           this.authorisationError = true;
           this.authenticationError = false;
         } else {

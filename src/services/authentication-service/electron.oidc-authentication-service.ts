@@ -9,6 +9,7 @@ import nodeUrl from 'url';
 import {IIdentity} from '@essential-projects/iam_contracts';
 import {IResponse} from '@essential-projects/http_contracts';
 
+import {BrowserWindow} from 'electron';
 import {
   AuthenticationStateEvent,
   IAuthenticationService,
@@ -330,10 +331,55 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
 
       const authWindow = new this.electronRemote.BrowserWindow({show: false});
 
-      authWindow.loadURL(urlToLoad);
+      let executionCancelled: boolean = false;
+      const silentRefreshTimeout = setTimeout(async () => {
+        executionCancelled = true;
+
+        authWindow.close();
+        await this.removeCurrentIdentityServerCookie(authorityUrl);
+        this.removeIdentityServerCookieOfSolution(solutionUri);
+
+        this.stopSilentRefreshing(solutionUri);
+
+        done();
+      }, 5000);
+
+      try {
+        const token = await this.performRefresh(authWindow, urlToLoad);
+
+        if (executionCancelled) {
+          return;
+        }
+
+        clearTimeout(silentRefreshTimeout);
+        refreshCallback(token);
+
+        await this.setCurrentIdentityServerCookieForSolution(solutionUri, authorityUrl);
+        await this.removeCurrentIdentityServerCookie(authorityUrl);
+
+        this.silentRefresh(authorityUrl, solutionUri, token, refreshCallback);
+      } catch {
+        if (executionCancelled) {
+          return;
+        }
+
+        clearTimeout(silentRefreshTimeout);
+
+        await this.removeCurrentIdentityServerCookie(authorityUrl);
+
+        this.stopSilentRefreshing(solutionUri);
+      }
+
+      done();
+    });
+  }
+
+  private performRefresh(authWindow: BrowserWindow, refreshUrl: string): Promise<ITokenObject> {
+    return new Promise((resolve, reject) => {
+      authWindow.loadURL(refreshUrl);
 
       authWindow.on('closed', (): void => {
-        throw new Error('window was closed by user');
+        reject(new Error('window was closed by user'));
       });
 
       authWindow.webContents.on('will-redirect', (event: Electron.Event, url: string): void => {
@@ -342,24 +388,11 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
         }
 
         const redirectCallbackResolved = async (token: ITokenObject): Promise<void> => {
-          await this.setCurrentIdentityServerCookieForSolution(solutionUri, authorityUrl);
-          await this.removeCurrentIdentityServerCookie(authorityUrl);
-
-          done();
-
-          this.silentRefresh(authorityUrl, solutionUri, token, refreshCallback);
+          resolve(token);
         };
 
         const redirectCallbackRejected = async (error: Error): Promise<void> => {
-          if (error.message !== 'User is no longer logged in.') {
-            throw error;
-          }
-
-          await this.removeCurrentIdentityServerCookie(authorityUrl);
-
-          done();
-
-          this.stopSilentRefreshing(solutionUri);
+          reject(error);
         };
 
         this.handleRedirectCallback(url, authWindow, redirectCallbackResolved, redirectCallbackRejected);
@@ -523,6 +556,10 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
     });
 
     if (!identityServerCookie) {
+      return undefined;
+    }
+
+    if (identityServerCookie.length < 1) {
       return undefined;
     }
 
