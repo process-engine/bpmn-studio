@@ -18,14 +18,14 @@
 
 
   <modal show.bind="showOverwriteDiagramModal"
-         header-text="Warning: Diagram already exists!">
+         header-text="Warning: Diagram already exists!" data-test-diagram-already-exist>
     <template replace-part="modal-body">
       The target solution already contains a diagram with that name and ID.<br>
       Are you sure you want to overwrite the deployed diagram with your local version?
     </template>
     <template replace-part="modal-footer">
       <button type="button" class="btn btn-default" data-dismiss="modal" click.delegate="cancelOverwriteModal()">Cancel</button>
-      <button type="button" class="btn btn-primary" data-dismiss="modal" click.delegate="overwriteDiagram()">Deploy</button>
+      <button type="button" class="btn btn-primary" data-dismiss="modal" click.delegate="overwriteDiagram()" data-test-diagram-already-exist-deploy-button>Deploy</button>
     </template>
   </modal>
 </template>
