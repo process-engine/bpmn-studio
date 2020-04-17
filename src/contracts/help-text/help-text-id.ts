@@ -4,4 +4,5 @@ export enum HelpTextId {
   UserTaskUsage = 'usertask-usage',
   ConditionUsage = 'condition-usage',
   TimerStartEventUsage = 'timer-start-event-usage',
+  TimerBoundaryEventUsage = 'timer-boundary-event-usage',
 }

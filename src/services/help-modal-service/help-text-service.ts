@@ -16,6 +16,8 @@ export class HelpTextService {
         return UserTaskUsage;
       case HelpTextId.ConditionUsage:
         return ConditionUsage;
+      case HelpTextId.TimerBoundaryEventUsage:
+        return TimerBoundaryEventUsage;
       case HelpTextId.TimerStartEventUsage:
         return TimerStartEventUsage;
       default:
