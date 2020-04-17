@@ -16,6 +16,8 @@ export class HelpTextService {
         return UserTaskUsage;
       case HelpTextId.ConditionUsage:
         return ConditionUsage;
+      case HelpTextId.TimerStartEventUsage:
+        return TimerStartEventUsage;
       default:
         throw new Error(`Help message with id "${helpTextId}" is unknown.`);
     }
