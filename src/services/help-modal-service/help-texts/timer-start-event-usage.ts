@@ -19,13 +19,10 @@ export const TimerStartEventUsage: HelpText = {
 
   Date- or Duration-based timers will start, as soon as you start the process instance manually.
 
-  Cyclic timers, on the other hand, will be started automatically, by the AtlasEngine's internal \`CronjobService\`.
+  Cyclic timers, on the other hand, will be started automatically.
 
   You only need to deploy the diagram to the AtlasEngine.
   Make sure the start event with the cyclic timer is \`enabled\`.
-
-  The \`CronjobService\` will now add the cronjob attached to the cyclic timer to its internal storage.
-  As soon as the cronjob expires, the process model gets executed automatically.
 
   You can also start a process model with a cyclic timer manually, but if you do so, the process model will start immediately and not wait for the cronjob to expire.
 

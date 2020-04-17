@@ -30,8 +30,8 @@ export const IntermediateTimerEventUsage: HelpText = {
     <img alt="Intermediate Timer Event Example" src="src/resources/images/intermediate_timer_event_example.svg" width="550px">
   </div>
 
-  In this example, an Intermediate Timer Event is triggered, after the \`Do some stuff\` task has finished.
+  In this example, an Intermediate Timer Event is triggered, after the \`Perform work 1\` task has finished.
   It's a duration timer that pauses the process execution for 5 seconds (\`PT5S\`).
-  After the 5 seconds are over, the process execution continues with the \`Do some more stuff\` task.
+  After the 5 seconds are over, the process execution continues with the \`Perform work 2\` task.
   `),
 };
