@@ -10,8 +10,9 @@ import {
   IShape,
   ITimerEventElement,
 } from '@process-engine/bpmn-elements_contracts';
+import {HelpModalService} from '../../../../../../../services/help-modal-service/help-modal-service';
 
-import {IBpmnModdle, ILinting, IPageModel, ISection} from '../../../../../../../contracts';
+import {HelpTextId, IBpmnModdle, ILinting, IPageModel, ISection} from '../../../../../../../contracts/index';
 import environment from '../../../../../../../environment';
 
 enum TimerType {
@@ -20,7 +21,12 @@ enum TimerType {
   Cycle,
 }
 
-@inject(EventAggregator)
+enum TimerEventType {
+  StartEvent = 'bpmn:StartEvent',
+  IntermediateEvent = 'bpmn:IntermediateCatchEvent',
+  BoundaryEvent = 'bpmn:BoundaryEvent',
+}
+@inject(EventAggregator, HelpModalService)
 export class TimerEventSection implements ISection {
   public path: string = '/sections/timer-event/timer-event';
   public canHandleElement: boolean = false;
@@ -28,16 +34,20 @@ export class TimerEventSection implements ISection {
   // eslint-disable-next-line @typescript-eslint/member-naming
   public TimerType: typeof TimerType = TimerType;
   public timerType: TimerType;
-  public isTimerStartEvent: boolean = false;
   @bindable public isEnabled: boolean = true;
+  // eslint-disable-next-line @typescript-eslint/member-naming
+  public TimerEventType: typeof TimerEventType = TimerEventType;
+  public timerEventType: TimerEventType;
 
   private businessObjInPanel: ITimerEventElement;
   private moddle: IBpmnModdle;
   private linter: ILinting;
   private eventAggregator: EventAggregator;
+  private helpModalService: HelpModalService;
 
-  constructor(eventAggregator?: EventAggregator) {
+  constructor(eventAggregator?: EventAggregator, helpModalService?: HelpModalService) {
     this.eventAggregator = eventAggregator;
+    this.helpModalService = helpModalService;
   }
 
   public activate(model: IPageModel): void {
@@ -46,8 +56,7 @@ export class TimerEventSection implements ISection {
     this.moddle = model.modeler.get('moddle');
     this.linter = model.modeler.get('linting');
 
-    this.isTimerStartEvent = this.businessObjInPanel.$type === 'bpmn:StartEvent';
-
+    this.timerEventType = this.getTimerEventType();
     this.timerElement = this.getTimerElement();
 
     this.init();
@@ -68,6 +77,22 @@ export class TimerEventSection implements ISection {
       eventElement.eventDefinitions[0].$type === 'bpmn:TimerEventDefinition';
 
     return elementIsTimerEvent;
+  }
+
+  public showTimerHelpModal(): void {
+    switch (this.timerEventType) {
+      case TimerEventType.StartEvent:
+        this.helpModalService.showHelpModal(HelpTextId.TimerStartEventUsage);
+        break;
+      case TimerEventType.IntermediateEvent:
+        this.helpModalService.showHelpModal(HelpTextId.IntermediateTimerEventUsage);
+        break;
+      case TimerEventType.BoundaryEvent:
+        this.helpModalService.showHelpModal(HelpTextId.TimerBoundaryEventUsage);
+        break;
+      default:
+        break;
+    }
   }
 
   public updateTimerType(): void {
@@ -91,7 +116,7 @@ export class TimerEventSection implements ISection {
         break;
       }
       case TimerType.Cycle: {
-        timerTypeObject = this.isTimerStartEvent ? {timeCycle: moddleElement} : {};
+        timerTypeObject = this.timerEventType === TimerEventType.StartEvent ? {timeCycle: moddleElement} : {};
         break;
       }
       default: {
@@ -125,8 +150,21 @@ export class TimerEventSection implements ISection {
     this.publishDiagramChange();
   }
 
+  private getTimerEventType(): TimerEventType {
+    switch (this.businessObjInPanel.$type) {
+      case TimerEventType.StartEvent:
+        return TimerEventType.StartEvent;
+      case TimerEventType.IntermediateEvent:
+        return TimerEventType.IntermediateEvent;
+      case TimerEventType.BoundaryEvent:
+        return TimerEventType.BoundaryEvent;
+      default:
+        throw new Error('Timer Event is not a StartEvent nor a IntermediateEvent or BoundaryEvent');
+    }
+  }
+
   private init(): void {
-    if (this.isTimerStartEvent) {
+    if (this.timerEventType === TimerEventType.StartEvent) {
       const extensionElementDoesNotExist: boolean = this.businessObjInPanel.extensionElements === undefined;
       if (extensionElementDoesNotExist) {
         this.createExtensionElement();
@@ -150,7 +188,7 @@ export class TimerEventSection implements ISection {
 
     const {timeDate, timeDuration, timeCycle} = this.businessObjInPanel.eventDefinitions[0];
 
-    if (timeCycle !== undefined && this.isTimerStartEvent) {
+    if (timeCycle !== undefined && this.timerEventType === TimerEventType.StartEvent) {
       this.timerType = TimerType.Cycle;
       return;
     }
@@ -175,7 +213,7 @@ export class TimerEventSection implements ISection {
       return timeDate;
     }
 
-    if (timeCycle !== undefined && this.isTimerStartEvent) {
+    if (timeCycle !== undefined && this.timerEventType === TimerEventType.StartEvent) {
       return timeCycle;
     }
 
