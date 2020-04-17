@@ -4,6 +4,7 @@
   <div class="section-panel" id="js-general-timerEvent-section">
     <div class="panel__heading">
       Timer Event
+      <i class="fas fa-info-circle feedback-modal__help-icon" title="Help: How to use timer events" click.delegate="showTimerHelpModal()"></i>
     </div>
     <div class="panel__content">
       <table class="props-table">
@@ -13,7 +14,7 @@
               <option model.bind="undefined">-Choose Option-</option>
               <option model.bind="TimerType.Date">Date</option>
               <option model.bind="TimerType.Duration">Duration</option>
-              <option if.bind="isTimerStartEvent === true" model.bind="TimerType.Cycle">Cycle</option>
+              <option if.bind="timerEventType === TimerEventType.StartEvent" model.bind="TimerType.Cycle">Cycle</option>
             </select>
           </td>
         </tr>

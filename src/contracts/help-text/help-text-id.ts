@@ -3,4 +3,7 @@ export enum HelpTextId {
   ExternalTaskTokenUsage = 'external-task-token-usage',
   UserTaskUsage = 'usertask-usage',
   ConditionUsage = 'condition-usage',
+  TimerStartEventUsage = 'timer-start-event-usage',
+  TimerBoundaryEventUsage = 'timer-boundary-event-usage',
+  IntermediateTimerEventUsage = 'intermediate-timer-event-usage',
 }
