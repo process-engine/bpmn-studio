@@ -17,7 +17,7 @@ export const TimerStartEventUsage: HelpText = {
 
   **How to use it**
 
-  Date- or Duration- timers will start, as soon as you start the process instance manually.
+  Date- or Duration-based timers will start, as soon as you start the process instance manually.
 
   Cyclic timers, on the other hand, will be started automatically, by the AtlasEngine's internal \`CronjobService\`.
 
