@@ -379,7 +379,7 @@ export class ElectronOidcAuthenticationService implements IAuthenticationService
       authWindow.loadURL(refreshUrl);
 
       authWindow.on('closed', (): void => {
-        reject(new Error('window was closed by user'));
+        reject(new Error('window was closed unexpectedly'));
       });
 
       authWindow.webContents.on('will-redirect', (event: Electron.Event, url: string): void => {
