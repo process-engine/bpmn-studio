@@ -85,7 +85,7 @@
         Please select a start event that should be used to start the process.
         <div>
           <select value.bind="diagramDetail.selectedStartEventId" ref="dropdownMenu" class="process-start-event-modal-dialog__dropdown-menu">
-            <option>Select StartEvent</option>
+            <option model.bind="null">Select StartEvent</option>
             <option repeat.for="startEvent of diagramDetail.processesStartEvents" value.bind="startEvent.id">${startEvent.id}</option>
           </select>
         </div>
