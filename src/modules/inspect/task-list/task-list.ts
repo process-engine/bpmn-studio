@@ -270,7 +270,20 @@ export class TaskList {
 
   public openInfoModal(task: TaskListEntry): void {
     this.showTaskInfoModal = true;
-    this.taskInformation = Object.entries(task);
+    const taskInformationObject = this.convertToTaskInformationObject(task);
+    this.taskInformation = Object.entries(taskInformationObject);
+  }
+
+  private convertToTaskInformationObject(task: TaskListEntry): any {
+    return {
+      name: task.name,
+      id: task.id,
+      type: task.taskType,
+      flowNodeInstanceId: task.flowNodeInstanceId,
+      processModelId: task.processModelId,
+      correlationId: task.correlationId,
+      processInstanceId: task.processInstanceId,
+    };
   }
 
   private async setRuntimeSubscriptions(): Promise<void> {
