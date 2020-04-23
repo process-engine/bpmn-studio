@@ -53,6 +53,30 @@ describe('Design View', function foo() {
     await testClient.assertDiagramIsOnProcessEngine();
   });
 
+  it('should deploy a diagram even though it is already deployed', async () => {
+    // Arrange
+    const diagramName = 'receive_task_wait_test';
+    await testClient.startPageLoaded();
+    await testClient.solutionExplorer.openDirectoryAsSolution('fixtures', diagramName);
+    await testClient.assertDiagramIsOnFileSystem();
+    await testClient.designView.deployDiagram();
+    await testClient.assertNavbarTitleIs(diagramName);
+    await testClient.assertDiagramIsOnProcessEngine();
+    await testClient.openStartPage();
+    await testClient.startPageLoaded();
+
+    // Act
+    await testClient.solutionExplorer.openDiagramFromSolution(diagramName, 'fixtures');
+    await testClient.assertDiagramIsOnFileSystem();
+    await testClient.designView.deployDiagram();
+    await testClient.designView.assertDiagramAlreadyExistOnProcessEngine();
+    await testClient.designView.overwriteExistingDiagram();
+
+    // Assert
+    await testClient.assertNavbarTitleIs(diagramName);
+    await testClient.assertDiagramIsOnProcessEngine();
+  });
+
   it('should start a process', async () => {
     const diagramName = 'receive_task_wait_test';
     await testClient.startPageLoaded();
