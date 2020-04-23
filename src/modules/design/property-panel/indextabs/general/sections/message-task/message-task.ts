@@ -13,9 +13,9 @@ import {
   ISection,
 } from '../../../../../../../contracts';
 import environment from '../../../../../../../environment';
-import {GeneralService} from '../../service/general.service';
+import {generateRandomId} from '../../../../../../../services/generate-random-id-module/generate-random-id-module';
 
-@inject(GeneralService, EventAggregator)
+@inject(EventAggregator)
 export class MessageTaskSection implements ISection {
   public path: string = '/sections/message-task/message-task';
   public canHandleElement: boolean = false;
@@ -27,11 +27,9 @@ export class MessageTaskSection implements ISection {
   private linter: ILinting;
   private moddle: IBpmnModdle;
   private modeler: IBpmnModeler;
-  private generalService: GeneralService;
   private eventAggregator: EventAggregator;
 
-  constructor(generalService?: GeneralService, eventAggregator?: EventAggregator) {
-    this.generalService = generalService;
+  constructor(eventAggregator?: EventAggregator) {
     this.eventAggregator = eventAggregator;
   }
 
@@ -78,7 +76,7 @@ export class MessageTaskSection implements ISection {
 
   public addMessage(): void {
     const bpmnMessageProperty: {id: string; name: string} = {
-      id: `Message_${this.generalService.generateRandomId()}`,
+      id: `Message_${generateRandomId()}`,
       name: 'Message Name',
     };
     const bpmnMessage: IMessage = this.moddle.create('bpmn:Message', bpmnMessageProperty);

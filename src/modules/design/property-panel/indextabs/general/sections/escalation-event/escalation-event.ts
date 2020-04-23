@@ -14,9 +14,9 @@ import {
 import {IBpmnModdle, IBpmnModeler, IElementRegistry, IPageModel, ISection} from '../../../../../../../contracts';
 
 import environment from '../../../../../../../environment';
-import {GeneralService} from '../../service/general.service';
+import {generateRandomId} from '../../../../../../../services/generate-random-id-module/generate-random-id-module';
 
-@inject(GeneralService, EventAggregator)
+@inject(EventAggregator)
 export class EscalationEventSection implements ISection {
   public path: string = '/sections/escalation-event/escalation-event';
   public canHandleElement: boolean = false;
@@ -28,12 +28,10 @@ export class EscalationEventSection implements ISection {
   private businessObjInPanel: IEscalationEventElement;
   private moddle: IBpmnModdle;
   private modeler: IBpmnModeler;
-  private generalService: GeneralService;
   private isBoundaryEvent: boolean = true;
   private eventAggregator: EventAggregator;
 
-  constructor(generalService?: GeneralService, eventAggregator?: EventAggregator) {
-    this.generalService = generalService;
+  constructor(eventAggregator?: EventAggregator) {
     this.eventAggregator = eventAggregator;
   }
 
@@ -93,7 +91,7 @@ export class EscalationEventSection implements ISection {
 
   public addEscalation(): void {
     const bpmnEscalationProperty: {id: string; name: string} = {
-      id: `Escalation_${this.generalService.generateRandomId()}`,
+      id: `Escalation_${generateRandomId()}`,
       name: 'Escalation Name',
     };
     const bpmnEscalation: IEscalation = this.moddle.create('bpmn:Escalation', bpmnEscalationProperty);
