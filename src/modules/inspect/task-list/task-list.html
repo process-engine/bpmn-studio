@@ -71,7 +71,8 @@
   </modal>
 
   <modal if.bind="showTaskInfoModal"
-          body-style="overflow: auto;"
+          body-style="overflow: auto; min-height: 320px;"
+          modal-style="max-width: 700px;"
           origin.bind="taskList">
     <template replace-part="modal-header">
       <h3>
@@ -86,7 +87,7 @@
             ${property[0]}
           </td>
           <td>
-            ${property[1]}
+            ${property[1]} <button if.bind="property[1]"class="button btn btn-default btn-sm" title="Copies the value to the clipboard" click.delegate="origin.copyToClipboard(property[1])">Copy</button>
           </td>
         </tr>
       </table>
