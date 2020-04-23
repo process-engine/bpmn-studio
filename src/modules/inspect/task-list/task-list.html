@@ -12,7 +12,7 @@
           <th>Correlation ID</th>
           <th>Process Model ID</th>
           <th>Task Type</th>
-          <th>Task ID</th>
+          <th>Task Name/ID</th>
           <th></th>
         </tr>
         <tr repeat.for="entry of shownTasks" class="task-list-item" id="taskList-${entry.processModelId}">
@@ -27,7 +27,7 @@
           <td>
             ${entry.taskType}
           </td>
-          <td>${entry.id}</td>
+          <td>${entry.name || entry.id}</td>
           <td class="task-list__last-table-cell">
             <button class="btn btn-default task-list-continue-button" click.delegate="continueTask(entry)">Continue</button>
           </td>
