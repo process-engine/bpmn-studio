@@ -9,11 +9,12 @@
         <tr>
           <th>ID</th>
           <td>
-            <input type="text" class="props-input" value.bind="businessObjInPanelId & validateOnChange" change.delegate="updateId()" disabled.bind="!isEditable" data-test-property-panel-element-id>
+            <input type="text" class="props-input" class.bind="validationError ? 'props-input--error' : ''" value.bind="businessObjInPanelId & validateOnChange" change.delegate="updateId()" disabled.bind="!isEditable" data-test-property-panel-element-id>
+            <span if.bind="validationError" class="validation-error__message">${validationErrorMessage}</span>
           </td>
           <td>
             <template if.bind="validationError">
-              <i class="fas fa-times validation_error"></i>
+              <i class="fas fa-times validation-error"></i>
             </template>
           </td>
         </tr>

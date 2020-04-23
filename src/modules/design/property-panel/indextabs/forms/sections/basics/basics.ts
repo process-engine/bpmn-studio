@@ -12,15 +12,9 @@ import {
 } from '@process-engine/bpmn-elements_contracts';
 import {HelpModalService} from '../../../../../../../services/help-modal-service/help-modal-service';
 
-import {
-  HelpTextId,
-  IBpmnModdle,
-  IBpmnModeler,
-  IElementRegistry,
-  IPageModel,
-  ISection,
-} from '../../../../../../../contracts/index';
+import {HelpTextId, IBpmnModdle, IBpmnModeler, IPageModel, ISection} from '../../../../../../../contracts/index';
 import environment from '../../../../../../../environment';
+import {generateRandomId} from '../../../../../../../services/generate-random-id-module/generate-random-id-module';
 
 enum FormfieldTypes {
   string = 'string',
@@ -51,6 +45,7 @@ export class BasicsSection implements ISection {
   public newEnumValueNames: Array<string> = [];
   public booleanDefaultValue: boolean;
   public booleanDefaultValueString: string;
+  public validationErrorMessage: string;
 
   private bpmnModdle: IBpmnModdle;
   private modeler: IBpmnModeler;
@@ -105,7 +100,7 @@ export class BasicsSection implements ISection {
 
   public addEnumValue(): void {
     const enumValue: {id: string; value: string} = {
-      id: `Value_${this.generateRandomId()}`,
+      id: `Value_${generateRandomId()}`,
       value: '',
     };
     const bpmnValue: IEnumValue = this.bpmnModdle.create('camunda:Value', enumValue);
@@ -152,7 +147,7 @@ export class BasicsSection implements ISection {
 
   public async addForm(): Promise<void> {
     const bpmnFormObject: IForm = {
-      id: `Form_${this.generateRandomId()}`,
+      id: `Form_${generateRandomId()}`,
       label: '',
       defaultValue: '',
     };
@@ -268,7 +263,7 @@ export class BasicsSection implements ISection {
     }
 
     const bpmnFormFieldObject: IForm = {
-      id: `Form_${this.generateRandomId()}`,
+      id: `Form_${generateRandomId()}`,
       label: '',
       defaultValue: '',
     };
@@ -434,17 +429,6 @@ export class BasicsSection implements ISection {
     this.businessObjInPanel.extensionElements.values.push(extensionFormElement);
   }
 
-  private generateRandomId(): string {
-    let randomId: string = '';
-    const possible: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-    const randomIdLength: number = 8;
-    for (let i: number = 0; i < randomIdLength; i++) {
-      randomId += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return randomId;
-  }
-
   private validateFormId(event: ValidateEvent): void {
     if (event.type !== 'validate') {
       return;
@@ -458,22 +442,23 @@ export class BasicsSection implements ISection {
 
       if (result.valid === false) {
         this.validationError = true;
-        document.getElementById(result.rule.property.displayName).style.border = '2px solid red';
-      } else {
-        document.getElementById(result.rule.property.displayName).style.border = '';
+        this.validationErrorMessage = result.message;
       }
     }
   }
 
-  private hasFormSameIdAsSelected(forms: Array<IForm>): boolean {
+  private isFormIdUnique(id: string): boolean {
+    const formData = this.getFormDataFromBusinessObject(this.businessObjInPanel);
+    const forms: Array<IForm> = formData.fields;
+
     const unselectedFormWithSameId: IForm = forms.find((form: IForm) => {
-      const formHasSameIdAsSelectedForm: boolean = form.id === this.selectedForm.id;
+      const formHasSameIdAsSelectedForm: boolean = form.id === id;
       const formIsNotSelectedForm: boolean = form !== this.selectedForm;
 
       return formHasSameIdAsSelectedForm && formIsNotSelectedForm;
     });
 
-    return unselectedFormWithSameId !== undefined;
+    return unselectedFormWithSameId === undefined;
   }
 
   private getFormDataFromBusinessObject(businessObject: IModdleElement): IFormElement {
@@ -491,51 +476,17 @@ export class BasicsSection implements ISection {
     });
   }
 
-  private getFormsById(id: string): Array<IShape> {
-    const elementRegistry: IElementRegistry = this.modeler.get('elementRegistry');
-
-    const formsWithId: Array<IShape> = elementRegistry.filter((element: IShape) => {
-      const currentBusinessObject: IModdleElement = element.businessObject;
-
-      const isNoUserTask: boolean = currentBusinessObject.$type !== 'bpmn:UserTask';
-      if (isNoUserTask) {
-        return false;
-      }
-
-      const formData: IFormElement = this.getFormDataFromBusinessObject(currentBusinessObject);
-      if (formData === undefined || formData.fields === undefined) {
-        return false;
-      }
-
-      const forms: Array<IForm> = formData.fields;
-
-      return this.hasFormSameIdAsSelected(forms);
-    });
-
-    const selectedTypeIsBoolean: boolean = this.selectedType === FormfieldTypes.boolean;
-    if (selectedTypeIsBoolean) {
-      this.booleanDefaultValueString = this.selectedForm.defaultValue;
-      this.booleanDefaultValue = this.booleanDefaultValueString === 'true' || this.booleanDefaultValueString === '1';
-    }
-
-    return formsWithId;
-  }
-
-  private formIdIsUnique(id: string): boolean {
-    const formsWithSameId: Array<IShape> = this.getFormsById(id);
-    const isIdUnique: boolean = formsWithSameId.length === 0;
-
-    return isIdUnique;
-  }
-
   private setValidationRules(): void {
     ValidationRules.ensure((form: IForm) => form.id)
       .displayName('formId')
       .required()
       .withMessage('ID cannot be blank.')
       .then()
-      .satisfies((id: string) => this.formIdIsUnique(id))
+      .satisfies((id: string) => this.isFormIdUnique(id))
       .withMessage('ID already exists.')
+      .then()
+      .satisfies((id: string) => !id.includes(' '))
+      .withMessage('ID must not contain spaces.')
       .on(this.selectedForm);
   }
 
