@@ -14,6 +14,7 @@
           <th>Task Type</th>
           <th>Task Name/ID</th>
           <th></th>
+          <th></th>
         </tr>
         <tr repeat.for="entry of shownTasks" class="task-list-item" id="taskList-${entry.processModelId}">
           <td>
@@ -28,6 +29,9 @@
             ${entry.taskType}
           </td>
           <td>${entry.name || entry.id}</td>
+          <td class="task-list__last-table-cell">
+            <button class="btn btn-default task-list-continue-button" click.delegate="openInfoModal(entry)">Info</button>
+          </td>
           <td class="task-list__last-table-cell">
             <button class="btn btn-default task-list-continue-button" click.delegate="continueTask(entry)">Continue</button>
           </td>
@@ -63,6 +67,29 @@
                       close-modal.trigger="closeDynamicUiModal()"
                       active-solution-entry.bind="activeSolutionEntry">
       </task-dynamic-ui>
+    </template>
+  </modal>
+
+  <modal if.bind="showTaskInfoModal"
+          body-style="overflow: auto;"
+          origin.bind="taskList">
+    <template replace-part="modal-header">
+      <h3>
+        Task Information
+      </h3>
+      <btn class="button task-list__close-modal-button task-list__close-task-information-modal-button"><i class="fas fa-times" click.delegate="showTaskInfoModal = false"></i></btn>
+    </template>
+    <template replace-part="modal-body">
+      <table class="table table-striped table-bordered">
+        <tr repeat.for="property of taskInformation" class="task-information__property">
+          <td>
+            ${property[0]}
+          </td>
+          <td>
+            ${property[1]}
+          </td>
+        </tr>
+      </table>
     </template>
   </modal>
 
