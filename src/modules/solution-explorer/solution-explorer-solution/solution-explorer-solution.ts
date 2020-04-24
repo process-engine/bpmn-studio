@@ -522,18 +522,18 @@ export class SolutionExplorerSolution {
   public async startRenamingOfDiagram(diagram: IDiagram, event: Event): Promise<void> {
     event.stopPropagation();
 
-    if (await this.isDiagramDetailViewOfDiagramOpen(diagram.uri)) {
-      const messageTitle: string = '<h4 class="toast-message__headline">Not supported while opened.</h4>';
-      const messageBody: string =
-        'Renaming of opened diagrams is currently not supported. Please switch to another diagram and try again.';
-      const message: string = `${messageTitle}\n${messageBody}`;
+    // if (await this.isDiagramDetailViewOfDiagramOpen(diagram.uri)) {
+    //   const messageTitle: string = '<h4 class="toast-message__headline">Not supported while opened.</h4>';
+    //   const messageBody: string =
+    //     'Renaming of opened diagrams is currently not supported. Please switch to another diagram and try again.';
+    //   const message: string = `${messageTitle}\n${messageBody}`;
 
-      this.notificationService.showNotification(NotificationType.INFO, message, {
-        toastClass: 'toast-not-allowed-renaming-or-deleting',
-      });
+    //   this.notificationService.showNotification(NotificationType.INFO, message, {
+    //     toastClass: 'toast-not-allowed-renaming-or-deleting',
+    //   });
 
-      return;
-    }
+    //   return;
+    // }
 
     if (this.isCurrentlyRenamingDiagram) {
       return;
@@ -1352,17 +1352,45 @@ export class SolutionExplorerSolution {
         this.diagramRenamingState.currentDiagramInputValue,
       );
 
-      const diagramHasState: boolean =
-        this.openDiagramStateService.loadDiagramState(this.currentlyRenamingDiagram.uri) !== null;
-      if (diagramHasState) {
+      const diagramState: IDiagramState = this.openDiagramStateService.loadDiagramState(
+        this.currentlyRenamingDiagram.uri,
+      );
+      if (diagramState != null) {
+        this.openDiagramService.unwatchFile(this.currentlyRenamingDiagram.uri);
         this.openDiagramStateService.setDiagramChange(this.currentlyRenamingDiagram.uri, {change: 'rename'});
+
+        if (!diagramState.metadata.isChanged) {
+          // this.openDiagramStateService.
+          // diese unwatchen geht nicht und man bekommt die benachrichtugng dass renamed wurde
+          this.solutionService.unwatchSolution(this.solutionEventListenerId);
+          this.globalSolutionService.removeOpenDiagramByUri(this.currentlyRenamingDiagram.uri);
+          // this.openDiagramService.unwatchSolution(this.solutionEventListenerId);
+          await this.openDiagramService.closeDiagram(this.currentlyRenamingDiagram);
+
+          const diagramUriToOpen = this.currentlyRenamingDiagram.uri.replace(
+            this.currentlyRenamingDiagram.name,
+            this.diagramRenamingState.currentDiagramInputValue,
+          );
+          const renamedDiagram = await this.openDiagramService.openDiagramFromSolution(
+            diagramUriToOpen,
+            this.displayedSolutionEntry.identity,
+          );
+          this.globalSolutionService.addOpenDiagram(renamedDiagram);
+
+          if (this.router.currentInstruction.config.name === 'design') {
+            await this.router.navigateToRoute('design', {
+              diagramName: renamedDiagram.name,
+              diagramUri: renamedDiagram.uri,
+              solutionUri: this.displayedSolutionEntry.uri,
+            });
+          }
+        }
       }
     } catch (error) {
       this.notificationService.showNotification(NotificationType.WARNING, error.message);
 
       return false;
     }
-
     return true;
   }
 
