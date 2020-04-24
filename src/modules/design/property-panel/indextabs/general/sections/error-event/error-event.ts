@@ -78,8 +78,13 @@ export class ErrorEventSection implements ISection {
     const errorElement: IErrorEventDefinition = this.businessObjInPanel.eventDefinitions[0];
 
     errorElement.errorRef = this.selectedError;
-    if (!this.isEndEvent) {
+    const errorMessageExistOnError = this.selectedError.$attrs['camunda:errorMessage'] != null;
+    if (errorMessageExistOnError) {
+      this.errorMessageVariable = this.selectedError.$attrs['camunda:errorMessage'];
+    } else {
       this.errorMessageVariable = errorElement.errorMessageVariable;
+      this.selectedError.$attrs['camunda:errorMessage'] = this.errorMessageVariable;
+      delete errorElement.errorMessageVariable;
     }
     this.publishDiagramChange();
 
@@ -101,8 +106,8 @@ export class ErrorEventSection implements ISection {
   }
 
   public updateErrorMessage(): void {
-    const errorElement: IErrorEventDefinition = this.businessObjInPanel.eventDefinitions[0];
-    errorElement.errorMessageVariable = this.errorMessageVariable;
+    const selectedError: IError = this.getSlectedError();
+    selectedError.$attrs['camunda:errorMessage'] = this.errorMessageVariable;
     this.publishDiagramChange();
   }
 
@@ -185,7 +190,14 @@ export class ErrorEventSection implements ISection {
         return error.id === this.selectedId;
       });
 
-      this.errorMessageVariable = errorElement.errorMessageVariable;
+      const errorMessageExistOnError = this.selectedError.$attrs['camunda:errorMessage'] != null;
+      if (errorMessageExistOnError) {
+        this.errorMessageVariable = this.selectedError.$attrs['camunda:errorMessage'];
+      } else {
+        this.errorMessageVariable = errorElement.errorMessageVariable;
+        this.selectedError.$attrs['camunda:errorMessage'] = this.errorMessageVariable;
+        delete errorElement.errorMessageVariable;
+      }
     } else {
       this.selectedError = null;
       this.selectedId = null;
