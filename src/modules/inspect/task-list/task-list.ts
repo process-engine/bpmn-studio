@@ -284,10 +284,10 @@ export class TaskList {
       name: task.name,
       id: task.id,
       type: task.taskType,
-      flowNodeInstanceId: task.flowNodeInstanceId,
-      processModelId: task.processModelId,
-      correlationId: task.correlationId,
-      processInstanceId: task.processInstanceId,
+      'Flownode Instance ID': task.flowNodeInstanceId,
+      'Process Model ID': task.processModelId,
+      'Correlation ID': task.correlationId,
+      'Process Instance ID': task.processInstanceId,
     };
   }
 
