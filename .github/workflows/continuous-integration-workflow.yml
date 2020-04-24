@@ -189,7 +189,7 @@ jobs:
       shell: powershell
 
     - name: Build the Electron App
-      run: npm run electron-build-windows
+      run: npm run electron-build-windows-installer
 
     - name: Run the Tests
       run: npm test
@@ -198,7 +198,6 @@ jobs:
       run: |
         mkdir dist_electron_windows
         copy-item .\dist\electron\bpmn-studio-setup-**.exe .\dist_electron_windows\
-        copy-item .\dist\electron\bpmn-studio-portable-**.exe .\dist_electron_windows\
       shell: powershell
 
     - name: Prepare Windows Bundle for GitHub Release
@@ -316,7 +315,6 @@ jobs:
     - name: Upload to GitHub
       run: |
         ./node_modules/.bin/ci_tools update-github-release \
-                              --assets dist/electron/bpmn-studio-portable-*.exe \
                               --assets dist/electron/bpmn-studio-setup-*.exe \
                               --assets dist/electron/bpmn-studio-setup-*.exe.blockmap \
                               --assets dist/electron/bpmn-studio-setup-*.zip \
