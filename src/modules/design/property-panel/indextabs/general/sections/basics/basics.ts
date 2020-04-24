@@ -215,7 +215,6 @@ export class BasicsSection implements ISection {
         continue;
       }
       if (result.valid === false) {
-        console.log(result);
         this.validationError = true;
         this.validationErrorMessage = result.message;
       }
