@@ -274,11 +274,6 @@ export class TaskList {
     this.taskInformation = Object.entries(taskInformationObject);
   }
 
-  public async copyToClipboard(text: string): Promise<void> {
-    console.log(text);
-    await navigator.clipboard.writeText(text);
-  }
-
   private convertToTaskInformationObject(task: TaskListEntry): any {
     return {
       name: task.name,
