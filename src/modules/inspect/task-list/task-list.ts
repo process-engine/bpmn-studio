@@ -38,11 +38,13 @@ export class TaskList {
   public paginationShowsLoading: boolean;
 
   public showDynamicUiModal: boolean = false;
+  public showTaskInfoModal: boolean = false;
   @bindable public processModelId: string;
   @bindable public taskId: string;
   @bindable public processInstanceId: string;
   @bindable public correlationId: string;
 
+  public taskInformation: Array<[string, string]>;
   private activeSolutionUri: string;
   private dashboardService: IDashboardService;
   private router: Router;
@@ -264,6 +266,24 @@ export class TaskList {
     } else {
       this.getTasks = this.getAllTasks;
     }
+  }
+
+  public openInfoModal(task: TaskListEntry): void {
+    this.showTaskInfoModal = true;
+    const taskInformationObject = this.convertToTaskInformationObject(task);
+    this.taskInformation = Object.entries(taskInformationObject);
+  }
+
+  private convertToTaskInformationObject(task: TaskListEntry): any {
+    return {
+      name: task.name,
+      id: task.id,
+      type: task.taskType,
+      'Flownode Instance ID': task.flowNodeInstanceId,
+      'Process Model ID': task.processModelId,
+      'Correlation ID': task.correlationId,
+      'Process Instance ID': task.processInstanceId,
+    };
   }
 
   private async setRuntimeSubscriptions(): Promise<void> {

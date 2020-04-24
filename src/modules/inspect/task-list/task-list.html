@@ -12,7 +12,7 @@
           <th>Correlation ID</th>
           <th>Process Model ID</th>
           <th>Task Type</th>
-          <th>Task ID</th>
+          <th>Task Name (ID)</th>
           <th></th>
         </tr>
         <tr repeat.for="entry of shownTasks" class="task-list-item" id="taskList-${entry.processModelId}">
@@ -21,49 +21,97 @@
           </td>
           <td>
             <a route-href="route: design; params.bind: { diagramName: entry.processModelId,
-                                          solutionUri: activeSolutionEntry.uri, view: 'detail' }"
-                class="task-list-item-modelname">${entry.processModelId}</a>
+              solutionUri: activeSolutionEntry.uri, view: 'detail' }"
+              class="task-list-item-modelname">
+              ${entry.processModelId}
+            </a>
           </td>
           <td>
             ${entry.taskType}
           </td>
-          <td>${entry.id}</td>
+          <td>
+            ${entry.name || '-'} <span class="text-muted">(${entry.id})</span>
+          </td>
           <td class="task-list__last-table-cell">
-            <button class="btn btn-default task-list-continue-button" click.delegate="continueTask(entry)">Continue</button>
+            <button class="btn btn-default task-list-continue-button" click.delegate="openInfoModal(entry)">
+              Details
+            </button>
+            <button class="btn btn-default task-list-continue-button" click.delegate="continueTask(entry)">
+              Continue
+            </button>
           </td>
         </tr>
       </table>
+
       <div if.bind="totalItems > pageSize" class="col-md-12 col-xs-12 pagination">
-        <pagination view-model.ref="pagination" current-page.two-way="currentPage" per-page.to-view="pageSize" items.to-view="totalItems" max-pages-to-display.to-view="paginationSize" content-is-async.bind="true" is-loading.two-way="paginationShowsLoading"></pagination>
+        <pagination
+          view-model.ref="pagination"
+          current-page.two-way="currentPage"
+          per-page.to-view="pageSize"
+          items.to-view="totalItems"
+          max-pages-to-display.to-view="paginationSize"
+          content-is-async.bind="true"
+          is-loading.two-way="paginationShowsLoading">
+        </pagination>
       </div>
     </template>
     <template if.bind="initialLoadingFinished && (!tasks || tasks.length === 0)">
-      <span if.bind="showError" class="task-list__no-tasks-text task-list__no-tasks-text--error ">There was an error while receiving the tasks.</span>
+      <span if.bind="showError" class="task-list__no-tasks-text task-list__no-tasks-text--error">
+        There was an error while receiving the tasks.
+      </span>
       <span else class="task-list__no-tasks-text">No tasks found for this user.</span>
     </template>
     <div if.bind="!initialLoadingFinished" class="container">
-      <img src="src/resources/images/gears.svg" class="loading-spinner">
+      <img src="src/resources/images/gears.svg" class="loading-spinner" />
     </div>
   </div>
 
   <modal if.bind="showDynamicUiModal"
-        css="display: ${showDynamicUiModal ? 'block' : 'none'};"
-        body-style="overflow: auto;"
-        origin.bind="taskList">
+    css="display: ${showDynamicUiModal ? 'block' : 'none'};"
+    body-style="overflow: auto;"
+    origin.bind="taskList">
     <template replace-part="modal-header">
-      <btn class="button task-list__close-modal-button task-list__close-dynamic-ui-modal-button"><i class="fas fa-times" click.delegate="closeDynamicUiModal()"></i></btn>
+      <btn class="button task-list__close-modal-button task-list__close-dynamic-ui-modal-button">
+        <i class="fas fa-times" click.delegate="closeDynamicUiModal()"></i>
+      </btn>
     </template>
     <template replace-part="modal-body">
-      <task-dynamic-ui view-model.ref="origin.dynamicUi"
-                      correlation-id.bind="correlationId"
-                      process-instance-id.bind="processInstanceId"
-                      process-model-id.bind="processModelId"
-                      task-id.bind="taskId"
-                      is-modal="true"
-                      close-modal.trigger="closeDynamicUiModal()"
-                      active-solution-entry.bind="activeSolutionEntry">
+      <task-dynamic-ui
+        view-model.ref="origin.dynamicUi"
+        correlation-id.bind="correlationId"
+        process-instance-id.bind="processInstanceId"
+        process-model-id.bind="processModelId"
+        task-id.bind="taskId"
+        is-modal="true"
+        close-modal.trigger="closeDynamicUiModal()"
+        active-solution-entry.bind="activeSolutionEntry">
       </task-dynamic-ui>
     </template>
   </modal>
 
+  <modal if.bind="showTaskInfoModal"
+        body-style="overflow: auto; min-height: 320px;"
+        modal-style="max-width: 700px;"
+        origin.bind="taskList">
+    <template replace-part="modal-header">
+      <h3>
+        Task & Process Instance Details
+      </h3>
+      <btn class="button task-list__close-modal-button task-list__close-task-information-modal-button">
+        <i class="fas fa-times" click.delegate="showTaskInfoModal = false"></i>
+      </btn>
+    </template>
+    <template replace-part="modal-body">
+      <table class="table table-striped table-bordered">
+        <tr repeat.for="property of taskInformation" class="task-information__property">
+          <td>
+            ${property[0]}
+          </td>
+          <td>
+            ${property[1]}
+          </td>
+        </tr>
+      </table>
+    </template>
+  </modal>
 </template>
