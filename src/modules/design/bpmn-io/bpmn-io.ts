@@ -442,7 +442,7 @@ export class BpmnIo {
       this.savedXml = await this.convertXml(newValue);
 
       if (this.solutionIsRemote) {
-        this.importXmlIntoViewer(this.xml);
+        await this.importXmlIntoViewer(this.xml);
       }
 
       if (this.diagramHasState(this.diagramUri)) {
@@ -524,12 +524,12 @@ export class BpmnIo {
         this.propertyPanelViewModel.selectPreviouslySelectedOrFirstElement();
       }
 
-      setTimeout(() => {
+      setTimeout(async () => {
         this.viewer.attachTo(this.canvasModel);
 
         const xmlIsNotEmpty: boolean = this.xml !== undefined && this.xml !== null;
         if (xmlIsNotEmpty) {
-          this.importXmlIntoViewer(this.xml);
+          await this.importXmlIntoViewer(this.xml);
         }
 
         this.linting.deactivateLinting();
