@@ -78,9 +78,7 @@ export class ErrorEventSection implements ISection {
     const errorElement: IErrorEventDefinition = this.businessObjInPanel.eventDefinitions[0];
 
     errorElement.errorRef = this.selectedError;
-    if (!this.isEndEvent) {
-      this.errorMessageVariable = errorElement.errorMessageVariable;
-    }
+    this.persistErrorMessageInError(errorElement);
     this.publishDiagramChange();
 
     if (this.linter.lintingActive()) {
@@ -89,20 +87,20 @@ export class ErrorEventSection implements ISection {
   }
 
   public updateErrorName(): void {
-    const selectedError: IError = this.getSlectedError();
+    const selectedError: IError = this.getSelectedError();
     selectedError.name = this.selectedError.name;
     this.publishDiagramChange();
   }
 
   public updateErrorCode(): void {
-    const selectedError: IError = this.getSlectedError();
+    const selectedError: IError = this.getSelectedError();
     selectedError.errorCode = this.selectedError.errorCode;
     this.publishDiagramChange();
   }
 
   public updateErrorMessage(): void {
-    const errorElement: IErrorEventDefinition = this.businessObjInPanel.eventDefinitions[0];
-    errorElement.errorMessageVariable = this.errorMessageVariable;
+    const selectedError: IError = this.getSelectedError();
+    selectedError.$attrs['camunda:errorMessage'] = this.errorMessageVariable;
     this.publishDiagramChange();
   }
 
@@ -185,7 +183,7 @@ export class ErrorEventSection implements ISection {
         return error.id === this.selectedId;
       });
 
-      this.errorMessageVariable = errorElement.errorMessageVariable;
+      this.persistErrorMessageInError(errorElement);
     } else {
       this.selectedError = null;
       this.selectedId = null;
@@ -233,7 +231,7 @@ export class ErrorEventSection implements ISection {
     return errors;
   }
 
-  private getSlectedError(): IError {
+  private getSelectedError(): IError {
     const rootElements: Array<IModdleElement> = this.modeler._definitions.rootElements;
     const selectedError: IError = rootElements.find((element: IModdleElement) => {
       const isSelectedError: boolean = element.$type === 'bpmn:Error' && element.id === this.selectedId;
@@ -256,5 +254,16 @@ export class ErrorEventSection implements ISection {
 
   private publishDiagramChange(): void {
     this.eventAggregator.publish(environment.events.diagramChange);
+  }
+
+  private persistErrorMessageInError(errorElement: IErrorEventDefinition): void {
+    const errorMessageExistOnError = this.selectedError.$attrs['camunda:errorMessage'] != null;
+    if (errorMessageExistOnError) {
+      this.errorMessageVariable = this.selectedError.$attrs['camunda:errorMessage'];
+    } else {
+      this.errorMessageVariable = errorElement.errorMessageVariable;
+      this.selectedError.$attrs['camunda:errorMessage'] = this.errorMessageVariable;
+      delete errorElement.errorMessageVariable;
+    }
   }
 }
