@@ -522,19 +522,6 @@ export class SolutionExplorerSolution {
   public async startRenamingOfDiagram(diagram: IDiagram, event: Event): Promise<void> {
     event.stopPropagation();
 
-    if (await this.isDiagramDetailViewOfDiagramOpen(diagram.uri)) {
-      const messageTitle: string = '<h4 class="toast-message__headline">Not supported while opened.</h4>';
-      const messageBody: string =
-        'Renaming of opened diagrams is currently not supported. Please switch to another diagram and try again.';
-      const message: string = `${messageTitle}\n${messageBody}`;
-
-      this.notificationService.showNotification(NotificationType.INFO, message, {
-        toastClass: 'toast-not-allowed-renaming-or-deleting',
-      });
-
-      return;
-    }
-
     if (this.isCurrentlyRenamingDiagram) {
       return;
     }
@@ -1347,22 +1334,45 @@ export class SolutionExplorerSolution {
     }
 
     try {
+      const diagramState: IDiagramState = this.openDiagramStateService.loadDiagramState(
+        this.currentlyRenamingDiagram.uri,
+      );
+
+      if (diagramState != null) {
+        this.openDiagramStateService.setDiagramChange(this.currentlyRenamingDiagram.uri, {change: 'rename'});
+      }
+
       await this.solutionService.renameDiagram(
         this.currentlyRenamingDiagram,
         this.diagramRenamingState.currentDiagramInputValue,
       );
 
-      const diagramHasState: boolean =
-        this.openDiagramStateService.loadDiagramState(this.currentlyRenamingDiagram.uri) !== null;
-      if (diagramHasState) {
-        this.openDiagramStateService.setDiagramChange(this.currentlyRenamingDiagram.uri, {change: 'rename'});
+      const newDiagram = await this.openDiagramService.renameDiagram(
+        this.currentlyRenamingDiagram,
+        this.diagramRenamingState.currentDiagramInputValue,
+      );
+
+      if (newDiagram) {
+        this.globalSolutionService.removeOpenDiagramByUri(this.currentlyRenamingDiagram.uri);
+        this.globalSolutionService.addOpenDiagram(newDiagram);
+      }
+
+      const showRenamedDiagram =
+        this.router.currentInstruction.params.diagramName === this.currentlyRenamingDiagram.name &&
+        this.router.currentInstruction.config.name === 'design';
+
+      if (showRenamedDiagram) {
+        await this.router.navigateToRoute('design', {
+          diagramName: newDiagram.name,
+          diagramUri: newDiagram.uri,
+          solutionUri: this.displayedSolutionEntry.uri,
+        });
       }
     } catch (error) {
       this.notificationService.showNotification(NotificationType.WARNING, error.message);
 
       return false;
     }
-
     return true;
   }
 
