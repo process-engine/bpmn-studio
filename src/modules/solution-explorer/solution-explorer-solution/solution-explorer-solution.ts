@@ -1347,44 +1347,39 @@ export class SolutionExplorerSolution {
     }
 
     try {
+      const diagramState: IDiagramState = this.openDiagramStateService.loadDiagramState(
+        this.currentlyRenamingDiagram.uri,
+      );
+
+      if (diagramState != null) {
+        this.openDiagramStateService.setDiagramChange(this.currentlyRenamingDiagram.uri, {change: 'rename'});
+      }
+
       await this.solutionService.renameDiagram(
         this.currentlyRenamingDiagram,
         this.diagramRenamingState.currentDiagramInputValue,
       );
 
-      const diagramState: IDiagramState = this.openDiagramStateService.loadDiagramState(
-        this.currentlyRenamingDiagram.uri,
+      const newDiagram = await this.openDiagramService.renameDiagram(
+        this.currentlyRenamingDiagram,
+        this.diagramRenamingState.currentDiagramInputValue,
       );
-      if (diagramState != null) {
-        this.openDiagramService.unwatchFile(this.currentlyRenamingDiagram.uri);
-        this.openDiagramStateService.setDiagramChange(this.currentlyRenamingDiagram.uri, {change: 'rename'});
 
-        if (!diagramState.metadata.isChanged) {
-          // this.openDiagramStateService.
-          // diese unwatchen geht nicht und man bekommt die benachrichtugng dass renamed wurde
-          this.solutionService.unwatchSolution(this.solutionEventListenerId);
-          this.globalSolutionService.removeOpenDiagramByUri(this.currentlyRenamingDiagram.uri);
-          // this.openDiagramService.unwatchSolution(this.solutionEventListenerId);
-          await this.openDiagramService.closeDiagram(this.currentlyRenamingDiagram);
+      if (newDiagram) {
+        this.globalSolutionService.removeOpenDiagramByUri(this.currentlyRenamingDiagram.uri);
+        this.globalSolutionService.addOpenDiagram(newDiagram);
+      }
 
-          const diagramUriToOpen = this.currentlyRenamingDiagram.uri.replace(
-            this.currentlyRenamingDiagram.name,
-            this.diagramRenamingState.currentDiagramInputValue,
-          );
-          const renamedDiagram = await this.openDiagramService.openDiagramFromSolution(
-            diagramUriToOpen,
-            this.displayedSolutionEntry.identity,
-          );
-          this.globalSolutionService.addOpenDiagram(renamedDiagram);
+      const showRenamedDiagram =
+        this.router.currentInstruction.params.diagramName === this.currentlyRenamingDiagram.name &&
+        this.router.currentInstruction.config.name === 'design';
 
-          if (this.router.currentInstruction.config.name === 'design') {
-            await this.router.navigateToRoute('design', {
-              diagramName: renamedDiagram.name,
-              diagramUri: renamedDiagram.uri,
-              solutionUri: this.displayedSolutionEntry.uri,
-            });
-          }
-        }
+      if (showRenamedDiagram) {
+        await this.router.navigateToRoute('design', {
+          diagramName: newDiagram.name,
+          diagramUri: newDiagram.uri,
+          solutionUri: this.displayedSolutionEntry.uri,
+        });
       }
     } catch (error) {
       this.notificationService.showNotification(NotificationType.WARNING, error.message);
