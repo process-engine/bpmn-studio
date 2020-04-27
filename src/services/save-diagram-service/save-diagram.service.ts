@@ -111,7 +111,7 @@ export class SaveDiagramService {
     solutionToSaveTo: ISolutionEntry,
     diagramToSave: IDiagram,
     xml: string,
-    path?: string,
+    savePath?: string,
   ): Promise<void> {
     const isRemoteSolution: boolean = solutionIsRemoteSolution(diagramToSave.uri);
     if (isRemoteSolution || this.isSaving) {
@@ -120,11 +120,11 @@ export class SaveDiagramService {
 
     this.isSaving = true;
 
-    const pathIsSet: boolean = path !== undefined;
+    const pathIsSet: boolean = savePath !== undefined;
 
     let pathToSaveTo: string;
     try {
-      pathToSaveTo = pathIsSet ? path : await this.getPathToSaveTo();
+      pathToSaveTo = pathIsSet ? savePath : await this.getPathToSaveTo();
     } catch (error) {
       this.isSaving = false;
 
@@ -133,7 +133,7 @@ export class SaveDiagramService {
           NotificationType.ERROR,
           'The filename must be a valid QName \n <a href="https://en.wikipedia.org/wiki/QName" target="_blank"><u>Click here for more information</u></a>',
         );
-        await this.saveDiagramAs(solutionToSaveTo, diagramToSave, xml, path);
+        await this.saveDiagramAs(solutionToSaveTo, diagramToSave, xml, savePath);
         return;
       }
 
@@ -182,9 +182,9 @@ export class SaveDiagramService {
       if (previousDiagramHasState) {
         previousDiagramsState.metadata.change = diagramChange;
 
-        this.openDiagramStateService.updateDiagramState(path, previousDiagramsState);
+        this.openDiagramStateService.updateDiagramState(savePath, previousDiagramsState);
       } else {
-        this.openDiagramStateService.saveDiagramState(path, diagram.xml, undefined, undefined, false);
+        this.openDiagramStateService.saveDiagramState(savePath, diagram.xml, undefined, undefined, false);
       }
     } catch (error) {
       this.notificationService.showNotification(NotificationType.ERROR, `Unable to save the file: ${error}.`);
