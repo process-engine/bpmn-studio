@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 import {EventAggregator} from 'aurelia-event-aggregator';
 import {inject} from 'aurelia-framework';
 import {Router} from 'aurelia-router';
@@ -126,6 +128,15 @@ export class SaveDiagramService {
     } catch (error) {
       this.isSaving = false;
 
+      if (error.message === 'Not QName valid') {
+        this.notificationService.showNonDisappearingNotification(
+          NotificationType.ERROR,
+          'The filename must be a valid QName \n <a href="https://en.wikipedia.org/wiki/QName" target="_blank"><u>Click here for more information</u></a>',
+        );
+        await this.saveDiagramAs(solutionToSaveTo, diagramToSave, xml, path);
+        return;
+      }
+
       throw error;
     }
 
@@ -224,8 +235,16 @@ export class SaveDiagramService {
 
           return;
         }
+        const diagramName = path.basename(savePath, '.bpmn');
+        const qNameRegex: RegExp = /^([a-z][\w-.]*:)?[a-z_][\w-.]*$/i;
 
-        resolve(savePath);
+        const diagramNameIsValid = qNameRegex.test(diagramName);
+
+        if (diagramNameIsValid) {
+          resolve(savePath);
+        } else {
+          reject(new Error('Not QName valid'));
+        }
       });
 
       this.ipcRenderer.send('open_save-diagram-as_dialog');
