@@ -9,10 +9,15 @@
           <th>Process ID</th>
           <td>
             <div class="called-process-selection">
-              <input class="called-process-selection__input props-input" type="text" list="diagrams" value.bind="selectedProcessId" change.delegate="updateCalledDiagram()" disabled.bind="!isEditable"}>
-              <datalist id="diagrams">
-                <option repeat.for="diagramNameWithProcessId of diagramNamesWithProcessIds" value="${diagramNameWithProcessId.processId}">Filename: ${diagramNameWithProcessId.diagramName}</option>
-              </datalist>
+              <div class="btn-group called-process-selection__input__dropdown">
+                <input class="called-process-selection__input props-input" type="text" value.bind="selectedProcessId" change.delegate="updateCalledDiagram()" disabled.bind="!isEditable"}>
+                <button type="button" class="btn btn-sm btn-secondary dropdown-toggle dropdown-toggle-split dropdown__button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <i class="fas fa-angle-down"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu--scrollable">
+                  <li repeat.for="diagramNameWithProcessId of diagramNamesWithProcessIds" value="${diagramNameWithProcessId.processId}" class="dropdown-item" click.delegate="updateCalledDiagram(diagramNameWithProcessId.processId)"><span>${diagramNameWithProcessId.processId}</span> <span class="text-muted filename">Filename: ${diagramNameWithProcessId.diagramName}</span></li>
+                </ul>
+              </div>
             </div>
           </td>
         </tr>
@@ -20,10 +25,15 @@
           <th>StartEvent</th>
           <td>
             <div class="called-process-selection">
-            <input class="called-process-selection__input props-input" type="text" list="start-events" value.bind="selectedStartEvent" change.delegate="selectedStartEventChanged" disabled.bind="!isEditable">
-              <datalist id="start-events">
-                <option repeat.for="startEventIdWithDiagramName of startEventIdsWithDiagramNames" value="${startEventIdWithDiagramName.startEventId}">Filename: ${startEventIdWithDiagramName.diagramName}</option>
-              </datalist>
+              <div class="btn-group called-process-selection__input__dropdown">
+                <input class="called-process-selection__input props-input" type="text" list="start-events" value.bind="selectedStartEvent" change.delegate="selectedStartEventChanged" disabled.bind="!isEditable">
+                <button type="button" class="btn btn-sm btn-secondary dropdown-toggle dropdown-toggle-split dropdown__button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <i class="fas fa-angle-down"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu--scrollable">
+                  <li repeat.for="startEventIdWithDiagramName of startEventIdsWithDiagramNames" value="${startEventIdWithDiagramName.startEventId}" class="dropdown-item" click.delegate="selectedStartEvent = startEventIdWithDiagramName.startEventId"><span>${startEventIdWithDiagramName.startEventId}</span> <span class="text-muted filename">Filename: ${startEventIdWithDiagramName.diagramName}</span></li>
+                </ul>
+              </div>
             </div>
           </td>
         </tr>

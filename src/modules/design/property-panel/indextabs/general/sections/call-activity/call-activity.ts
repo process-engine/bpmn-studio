@@ -227,7 +227,11 @@ export class CallActivitySection implements ISection {
     propertiesElement.values.push(bpmnProperty);
   }
 
-  public async updateCalledDiagram(): Promise<void> {
+  public async updateCalledDiagram(processId?: string): Promise<void> {
+    if (processId) {
+      this.selectedProcessId = processId;
+    }
+
     try {
       this.startEventIdsWithDiagramNames = await this.getAllStartEventsForProcessId(this.selectedProcessId);
     } catch (error) {
