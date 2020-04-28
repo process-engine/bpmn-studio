@@ -66,7 +66,11 @@
 }
 
 .log-table__message-column {
-  width: calc(100% - 600px);
+  width: calc(100% - 800px);
+}
+
+.log-table__details-column {
+  width: 150px;
 }
 
 .log-table__empty-message {
@@ -75,4 +79,14 @@
   top: 50%;
   transform: translate(-50%, -50%);
   user-select: none;
+}
+
+.table-message-textarea {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  height: 120px;
+  max-height: 120px;
+  border: none;
+  resize: none;
+  width: 495px;
 }

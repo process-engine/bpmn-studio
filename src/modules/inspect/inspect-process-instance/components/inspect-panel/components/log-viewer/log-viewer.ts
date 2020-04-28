@@ -4,10 +4,9 @@ import {DataModels} from '@process-engine/management_api_contracts';
 
 import {ILogSortSettings, ISolutionEntry, LogSortProperty} from '../../../../../../../contracts/index';
 import {getBeautifiedDate} from '../../../../../../../services/date-service/date.service';
-import {NotificationService} from '../../../../../../../services/notification-service/notification.service';
 import {IInspectProcessInstanceService} from '../../../../contracts';
 
-@inject('NotificationService', 'InspectProcessInstanceService')
+@inject('InspectProcessInstanceService')
 export class LogViewer {
   @bindable public log: Array<DataModels.Logging.LogEntry>;
   @bindable public processInstance: DataModels.Correlations.ProcessInstance;
@@ -19,13 +18,33 @@ export class LogViewer {
     sortProperty: LogSortProperty.Time,
   };
 
-  private notificationService: NotificationService;
+  public showLogEntryModal: boolean = false;
+  public logInformation: Array<[string, string]>;
+
   private inspectProcessInstanceService: IInspectProcessInstanceService;
 
-  constructor(notificationService: NotificationService, inspectProcessInstanceService: IInspectProcessInstanceService) {
-    this.notificationService = notificationService;
+  constructor(inspectProcessInstanceService: IInspectProcessInstanceService) {
     this.inspectProcessInstanceService = inspectProcessInstanceService;
   }
+
+  public openLogEntryModal(logEntry: DataModels.Logging.LogEntry): void {
+    console.log(logEntry);
+    // const logInformationObject = this.convertToLogInformationObject(logEntry);
+    this.logInformation = Object.entries(logEntry);
+    this.showLogEntryModal = true;
+  }
+
+  // private convertToTaskInformationObject(task: TaskListEntry): any {
+  //   return {
+  //     name: task.name,
+  //     id: task.id,
+  //     type: task.taskType,
+  //     'Flownode Instance ID': task.flowNodeInstanceId,
+  //     'Process Model ID': task.processModelId,
+  //     'Correlation ID': task.correlationId,
+  //     'Process Instance ID': task.processInstanceId,
+  //   };
+  // }
 
   public async processInstanceChanged(): Promise<void> {
     const noProcessInstanceSet: boolean = this.processInstance === undefined;

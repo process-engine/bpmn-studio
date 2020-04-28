@@ -20,6 +20,7 @@
           <th class="log-table__headline log-table__message-column" click.delegate="changeSortProperty(logSortProperty.Message)">
             Message <i if.bind="sortSettings.sortProperty === logSortProperty.Message" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
+          <th class="log-table__headline log-table__details-column"></th>
         </tr>
       </thead class="log-table__header">
       <tbody class="log-table__body">
@@ -29,8 +30,43 @@
           <td class="log-table__table-entry log-table__flow-node-instance-id-column">${logEntry.flowNodeInstanceId || '-'}</td>
           <td class="log-table__table-entry log-table__log-level-column">${logEntry.logLevel.toUpperCase()}</td>
           <td class="log-table__table-entry log-table__message-column">${logEntry.message}</td>
+          <td class="log-table__table-entry log-table__details-column">
+            <button class="btn btn-default task-list-continue-button" click.delegate="openLogEntryModal(logEntry)">
+              Details
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
   </div>
+
+  <modal if.bind="showLogEntryModal"
+          body-style="overflow: auto; min-height: 320px;"
+          modal-style="max-width: 700px;"
+          origin.bind="taskList">
+    <template replace-part="modal-header">
+      <h3>
+        Log Details
+      </h3>
+      <btn class="button task-list__close-modal-button task-list__close-task-information-modal-button">
+        <i class="fas fa-times" click.delegate="showLogEntryModal = false"></i>
+      </btn>
+    </template>
+    <template replace-part="modal-body">
+      <table class="table table-striped table-bordered">
+        <tr repeat.for="property of logInformation" class="task-information__property">
+          <td>
+            ${property[0]}
+          </td>
+          <td>
+            <textarea if.bind="property[0] === 'message'" class="table-message-textarea" value.bind="property[1]">
+            </textarea>
+            <span else>
+              ${property[1]}
+            </span>
+          </td>
+        </tr>
+      </table>
+    </template>
+  </modal>
 </template>
