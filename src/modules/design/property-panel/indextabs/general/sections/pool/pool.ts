@@ -18,6 +18,7 @@ export class PoolSection implements ISection {
   @bindable public processIdCheckboxChecked: boolean = false;
   public showModal: boolean = false;
   public showProcessIdWarningModal: boolean = false;
+  public validationErrorMessage: string;
 
   private modeler: IBpmnModeler;
   private previousProcessRefId: string;
@@ -116,9 +117,7 @@ export class PoolSection implements ISection {
       }
       if (result.valid === false) {
         this.validationError = true;
-        document.getElementById(result.rule.property.displayName).style.border = '2px solid red';
-      } else {
-        document.getElementById(result.rule.property.displayName).style.border = '';
+        this.validationErrorMessage = result.message;
       }
     }
   }
@@ -159,16 +158,28 @@ export class PoolSection implements ISection {
     return this.modeler._definitions.id !== id;
   }
 
+  private isIdQnameValid(id: string): boolean {
+    const qNameRegex: RegExp = /^([a-z][\w-.]*:)?[a-z_][\w-.]*$/i;
+
+    return qNameRegex.test(id);
+  }
+
   private setValidationRules(): void {
     ValidationRules.ensure((poolSection: PoolSection) => poolSection.processRefId)
       .displayName('processId')
       .required()
-      .withMessage('Process-ID cannot be blank.')
+      .withMessage('ID cannot be blank.')
       .then()
       .satisfies(
         (id: string) => this.formIdIsUnique(id) && this.areRootElementIdsUnique(id) && this.isDefinitionIdUnique(id),
       )
-      .withMessage('Process-ID already exists.')
+      .withMessage('ID already exists.')
+      .then()
+      .satisfies((id: string) => !id.includes(' '))
+      .withMessage('ID must not contain spaces.')
+      .then()
+      .satisfies((id: string) => this.isIdQnameValid(id))
+      .withMessage('ID must be a valid QName.')
       .on(this);
   }
 

@@ -21,9 +21,9 @@ import {
 } from '../../../../../../../contracts';
 
 import environment from '../../../../../../../environment';
-import {GeneralService} from '../../service/general.service';
+import {generateRandomId} from '../../../../../../../services/generate-random-id-module/generate-random-id-module';
 
-@inject(GeneralService, EventAggregator)
+@inject(EventAggregator)
 export class MessageEventSection implements ISection {
   public path: string = '/sections/message-event/message-event';
   public canHandleElement: boolean = false;
@@ -35,11 +35,9 @@ export class MessageEventSection implements ISection {
   private moddle: IBpmnModdle;
   private modeler: IBpmnModeler;
   private linter: ILinting;
-  private generalService: GeneralService;
   private eventAggregator: EventAggregator;
 
-  constructor(generalService?: GeneralService, eventAggregator?: EventAggregator) {
-    this.generalService = generalService;
+  constructor(eventAggregator?: EventAggregator) {
     this.eventAggregator = eventAggregator;
   }
 
@@ -88,7 +86,7 @@ export class MessageEventSection implements ISection {
 
   public addMessage(): void {
     const bpmnMessageProperty: {id: string; name: string} = {
-      id: `Message_${this.generalService.generateRandomId()}`,
+      id: `Message_${generateRandomId()}`,
       name: 'Message Name',
     };
     const bpmnMessage: IMessage = this.moddle.create('bpmn:Message', bpmnMessageProperty);

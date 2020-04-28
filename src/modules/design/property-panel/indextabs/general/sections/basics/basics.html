@@ -9,17 +9,21 @@
         <tr>
           <th>ID</th>
           <td>
-            <input type="text" class="props-input" value.bind="businessObjInPanelId & validateOnChange" change.delegate="updateId()" disabled.bind="!isEditable" data-test-property-panel-element-id>
+            <input type="text" class="props-input" class.bind="validationError ? 'props-input--error' : ''" value.bind="businessObjInPanelId & validateOnChange" change.delegate="updateId()" disabled.bind="!isEditable" data-test-property-panel-element-id>
+            <span if.bind="validationError" class="validation-error__message">${validationErrorMessage}</span>
           </td>
           <td>
             <template if.bind="validationError">
-              <i class="fas fa-times validation_error"></i>
+              <i class="fas fa-times validation-error"></i>
             </template>
           </td>
         </tr>
         <tr>
-          <th>Name</th>
-          <td>
+          <th>${businessObjInPanel.$type === 'bpmn:Group' ? 'Category Value' : 'Name'}</th>
+          <td if.bind="businessObjInPanel.$type === 'bpmn:Group'">
+            <input type="text" class="props-input" value.bind="businessObjInPanel.categoryValueRef.value" change.delegate="updateValue()" disabled.bind="!isEditable" data-test-property-panel-element-name>
+          </td>
+          <td else>
             <input type="text" class="props-input" value.bind="businessObjInPanel.name" change.delegate="updateName()" disabled.bind="!isEditable" data-test-property-panel-element-name>
           </td>
         </tr>

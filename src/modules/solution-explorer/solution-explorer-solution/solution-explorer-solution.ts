@@ -1573,6 +1573,13 @@ export class SolutionExplorerSolution {
         return diagramWithUriDoesNotExist;
       })
       .withMessage('A diagram with that name already exists.')
+      .then()
+      .satisfies((input) => {
+        const qNameRegex: RegExp = /^([a-z][\w-.]*:)?[a-z_][\w-.]*$/i;
+
+        return qNameRegex.test(input);
+      })
+      .withMessage('Input must be a valid QName.')
       .on(this.diagramRenamingState)
       .on(this.diagramCreationState);
   }

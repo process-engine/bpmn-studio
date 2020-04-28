@@ -52,6 +52,10 @@
   text-overflow: ellipsis;
 }
 
+.props-input--error {
+  border: 2px solid red;
+}
+
 .props-input:disabled {
   pointer-events: none;
   opacity: 0.5;
@@ -125,4 +129,19 @@
   pointer-events: none;
   opacity: 0.2;
   color: darkgrey;
+}
+
+.validation-error {
+  position: relative;
+  display: inline-block;
+  margin-left: 5px;
+  top: -5px;
+  z-index: 0;
+  opacity: 1;
+  color: red;
+  font-size: 16px;
+}
+
+.validation-error__message {
+  color: red;
 }

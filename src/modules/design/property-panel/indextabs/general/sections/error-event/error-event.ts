@@ -20,9 +20,9 @@ import {
   ISection,
 } from '../../../../../../../contracts';
 import environment from '../../../../../../../environment';
-import {GeneralService} from '../../service/general.service';
+import {generateRandomId} from '../../../../../../../services/generate-random-id-module/generate-random-id-module';
 
-@inject(GeneralService, EventAggregator)
+@inject(EventAggregator)
 export class ErrorEventSection implements ISection {
   public path: string = '/sections/error-event/error-event';
   public canHandleElement: boolean = false;
@@ -36,11 +36,9 @@ export class ErrorEventSection implements ISection {
   private moddle: IBpmnModdle;
   private modeler: IBpmnModeler;
   private linter: ILinting;
-  private generalService: GeneralService;
   private eventAggregator: EventAggregator;
 
-  constructor(generalService?: GeneralService, eventAggregator?: EventAggregator) {
-    this.generalService = generalService;
+  constructor(eventAggregator?: EventAggregator) {
     this.eventAggregator = eventAggregator;
   }
 
@@ -106,7 +104,7 @@ export class ErrorEventSection implements ISection {
 
   public async addError(): Promise<void> {
     const bpmnErrorObject: {id: string; name: string} = {
-      id: `Error_${this.generalService.generateRandomId()}`,
+      id: `Error_${generateRandomId()}`,
       name: 'Error Name',
     };
     const bpmnError: IError = this.moddle.create('bpmn:Error', bpmnErrorObject);

@@ -27,6 +27,7 @@ export class BasicsSection implements ISection {
   public showModal: boolean = false;
   public elementType: string;
   public showUnsupportedFlag: boolean = false;
+  public validationErrorMessage: string;
 
   public docsInput: HTMLElement;
 
@@ -124,6 +125,12 @@ export class BasicsSection implements ISection {
     this.publishDiagramChange();
   }
 
+  public updateValue(): void {
+    this.modeling.updateLabel(this.elementInPanel, this.businessObjInPanel.categoryValueRef.value);
+
+    this.publishDiagramChange();
+  }
+
   public updateId(): void {
     this.validationController.validate();
 
@@ -209,10 +216,7 @@ export class BasicsSection implements ISection {
       }
       if (result.valid === false) {
         this.validationError = true;
-        (document.querySelector('[data-test-property-panel-element-id]') as HTMLInputElement).style.border =
-          '2px solid red';
-      } else {
-        (document.querySelector('[data-test-property-panel-element-id]') as HTMLInputElement).style.border = '';
+        this.validationErrorMessage = result.message;
       }
     }
   }
@@ -258,6 +262,12 @@ export class BasicsSection implements ISection {
     return this.modeler._definitions.id !== id;
   }
 
+  private isIdQnameValid(id: string): boolean {
+    const qNameRegex: RegExp = /^([a-z][\w-.]*:)?[a-z_][\w-.]*$/i;
+
+    return qNameRegex.test(id);
+  }
+
   private setValidationRules(): void {
     ValidationRules.ensure((basicsSection: BasicsSection) => basicsSection.businessObjInPanelId)
       .displayName('elementId')
@@ -270,6 +280,9 @@ export class BasicsSection implements ISection {
         (id: string) => this.formIdIsUnique(id) && this.areRootElementIdsUnique(id) && this.isDefinitionIdUnique(id),
       )
       .withMessage('ID already exists.')
+      .then()
+      .satisfies((id: string) => this.isIdQnameValid(id))
+      .withMessage('ID must be a valid QName.')
       .on(this);
   }
 
