@@ -64,21 +64,34 @@
         <tr>
           <td class="log-information__property">Message</td>
           <td>
-            <textarea class="table-message-textarea" value.bind="logEntryForModal.message" readonly></textarea>
+            <pre class="table-pretag table-pretag--message"> ${logEntryForModal.message}</pre>
           </td>
         </tr>
         <tr>
           <td class="log-information__property">Token Payload</td>
           <td>
-            <textarea class="table-message-textarea" value.bind="getStringifiedObject(logEntryForModal.tokenPayload)" readonly></textarea>
+            <pre class="table-pretag table-pretag--message">${getStringifiedObject(logEntryForModal.tokenPayload)}</pre>
           </td>
         </tr>
-        <tr>
-          <td class="log-information__property">Error</td>
-          <td>
-            <textarea class="table-message-textarea" value.bind="getStringifiedObject(logEntryForModal.error)" readonly></textarea>
-          </td>
-        </tr>
+          <tr>
+            <td class="log-information__property">Error Name</td>
+            <td>${logEntryForModal.error.name || '-'}</td>
+          </tr>
+          <tr>
+            <td class="log-information__property">Error Message</td>
+            <td>${logEntryForModal.error.message || '-'}</td>
+          </tr>
+          <tr>
+            <td class="log-information__property">Error Code</td>
+            <td>${logEntryForModal.error.code || '-'}</td>
+          </tr>
+          <tr>
+            <td class="log-information__property">Error Info</td>
+            <td>
+              <pre if.bind="typeof logEntryForModal.error.additionalInformation === 'string'" class="table-pretag">${logEntryForModal.error.additionalInformation}</pre>
+              <pre else class="table-pretag">${getStringifiedObject(logEntryForModal.error.additionalInformation) || '-'}</pre>
+            </td>
+          </tr>
         <tr>
           <td class="log-information__property">Flownode Instance ID</td>
           <td>${logEntryForModal.flowNodeInstanceId || '-'}</td>

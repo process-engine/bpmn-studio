@@ -91,6 +91,16 @@
   background: inherit;
 }
 
+.table-pretag {
+  height: 80px;
+  width: 495px;
+  max-height: 120px;
+}
+
+.table-pretag--message {
+  height: 50px;
+}
+
 .log-viewer__close-modal-button {
   position: absolute;
   top: 20px;
