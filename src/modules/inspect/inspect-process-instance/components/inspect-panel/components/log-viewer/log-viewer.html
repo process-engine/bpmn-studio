@@ -53,17 +53,55 @@
     </template>
     <template replace-part="modal-body">
       <table class="table table-striped table-bordered">
-        <tr repeat.for="property of logInformation">
-          <td class="log-information__property">
-            ${property[0]}
-          </td>
+        <tr>
+          <td class="log-information__property">Timestamp</td>
+          <td>${getDateStringFromTimestamp(logEntryForModal.timeStamp)}</td>
+        </tr>
+        <tr>
+          <td class="log-information__property">Log Level</td>
+          <td class="log-information__property">${logEntryForModal.logLevel}</td>
+        </tr>
+        <tr>
+          <td class="log-information__property">Message</td>
           <td>
-            <textarea if.bind="property[0] === 'message' || property[0] === 'Token Payload' || property[0] === 'error'" class="table-message-textarea" value.bind="property[1]" readonly>
-            </textarea>
-            <span else>
-              ${property[1] || '-'}
-            </span>
+            <textarea class="table-message-textarea" value.bind="logEntryForModal.message" readonly></textarea>
           </td>
+        </tr>
+        <tr>
+          <td class="log-information__property">Token Payload</td>
+          <td>
+            <textarea class="table-message-textarea" value.bind="getStringyfiedObject(logEntryForModal.tokenPayload)" readonly></textarea>
+          </td>
+        </tr>
+        <tr>
+          <td class="log-information__property">Error</td>
+          <td>
+            <textarea class="table-message-textarea" value.bind="getStringyfiedObject(logEntryForModal.error)" readonly></textarea>
+          </td>
+        </tr>
+        <tr>
+          <td class="log-information__property">Flownode Instance ID</td>
+          <td>${logEntryForModal.flowNodeInstanceId || '-'}</td>
+        </tr>
+        <tr>
+          <td class="log-information__property">Flownode ID</td>
+          <td>${logEntryForModal.flowNodeId || '-'}</td>
+        </tr>
+        <tr>
+          <td class="log-information__property">Process Model ID</td>
+          <td>${logEntryForModal.processModelId}</td>
+        </tr>
+        <tr>
+          <td class="log-information__property">Process Instance ID</td>
+          <td>${logEntryForModal.processInstanceId}</td>
+        </tr>
+        <tr>
+          <td class="log-information__property">Correlation ID</td>
+          <td>${logEntryForModal.correlationId}</td>
+        </tr>
+        <tr>
+          <td class="log-information__property">Event Name</td>
+          <td class="log-information__property">${logEntryForModal.measuredAt}</td>
         </tr>
       </table>
     </template>

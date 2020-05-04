@@ -19,7 +19,7 @@ export class LogViewer {
   };
 
   public showLogEntryModal: boolean = false;
-  public logInformation: Array<[string, string]>;
+  public logEntryForModal: DataModels.Logging.LogEntry;
 
   private inspectProcessInstanceService: IInspectProcessInstanceService;
 
@@ -28,25 +28,12 @@ export class LogViewer {
   }
 
   public openLogEntryModal(logEntry: DataModels.Logging.LogEntry): void {
-    const logInformationObject = this.convertToLogInformationObject(logEntry);
-    this.logInformation = Object.entries(logInformationObject);
+    this.logEntryForModal = logEntry;
     this.showLogEntryModal = true;
   }
 
-  private convertToLogInformationObject(logEntry: DataModels.Logging.LogEntry): any {
-    return {
-      'Time Stamp': logEntry.timeStamp,
-      'Log Level': logEntry.logLevel.toUpperCase(),
-      message: logEntry.message,
-      'Token Payload': JSON.stringify(logEntry.tokenPayload, null, 2),
-      error: JSON.stringify(logEntry.error, null, 2),
-      'Flownode Instance ID': logEntry.flowNodeInstanceId,
-      'Flownode ID': logEntry.flowNodeId,
-      'Process Model ID': logEntry.processModelId,
-      'Process Instance ID': logEntry.processInstanceId,
-      'Correlation ID': logEntry.correlationId,
-      'Measured At': logEntry.measuredAt,
-    };
+  public getStringyfiedObject(object: any): string {
+    return JSON.stringify(object, null, 2);
   }
 
   public async processInstanceChanged(): Promise<void> {
