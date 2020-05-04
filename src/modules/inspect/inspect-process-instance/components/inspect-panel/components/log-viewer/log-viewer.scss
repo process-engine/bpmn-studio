@@ -90,3 +90,13 @@
   border: none;
   background: inherit;
 }
+
+.log-viewer__close-modal-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.log-information__property {
+  text-transform: capitalize;
+}

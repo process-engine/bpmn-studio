@@ -47,14 +47,14 @@
       <h3>
         Log Details
       </h3>
-      <btn class="button task-list__close-modal-button task-list__close-task-information-modal-button">
+      <btn class="button log-viewer__close-modal-button">
         <i class="fas fa-times" click.delegate="showLogEntryModal = false"></i>
       </btn>
     </template>
     <template replace-part="modal-body">
       <table class="table table-striped table-bordered">
         <tr repeat.for="property of logInformation">
-          <td class="task-information__property">
+          <td class="log-information__property">
             ${property[0]}
           </td>
           <td>
