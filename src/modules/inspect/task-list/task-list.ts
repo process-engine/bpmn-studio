@@ -44,7 +44,7 @@ export class TaskList {
   @bindable public processInstanceId: string;
   @bindable public correlationId: string;
 
-  public taskInformation: Array<[string, string]>;
+  public taskForModal: TaskListEntry;
   private activeSolutionUri: string;
   private dashboardService: IDashboardService;
   private router: Router;
@@ -269,21 +269,8 @@ export class TaskList {
   }
 
   public openInfoModal(task: TaskListEntry): void {
+    this.taskForModal = task;
     this.showTaskInfoModal = true;
-    const taskInformationObject = this.convertToTaskInformationObject(task);
-    this.taskInformation = Object.entries(taskInformationObject);
-  }
-
-  private convertToTaskInformationObject(task: TaskListEntry): any {
-    return {
-      name: task.name,
-      id: task.id,
-      type: task.taskType,
-      'Flownode Instance ID': task.flowNodeInstanceId,
-      'Process Model ID': task.processModelId,
-      'Correlation ID': task.correlationId,
-      'Process Instance ID': task.processInstanceId,
-    };
   }
 
   private async setRuntimeSubscriptions(): Promise<void> {

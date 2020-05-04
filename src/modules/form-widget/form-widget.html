@@ -3,6 +3,6 @@
   <template if.bind="userTaskConfig">
     <template repeat.for="field of userTaskConfig.formFields">
       <compose view-model="../dynamic-ui-${getFieldControl(field)}-element/dynamic-ui-${getFieldControl(field)}-element" model.bind="field"></compose>
-    </template>  
-  </template>          
+    </template>
+  </template>
 </template>
