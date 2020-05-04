@@ -36,16 +36,16 @@ export class LogViewer {
   private convertToLogInformationObject(logEntry: DataModels.Logging.LogEntry): any {
     return {
       'Time Stamp': logEntry.timeStamp,
-      'Log Level': logEntry.logLevel.toUpperCase(),
+      'Event Name': logEntry.measuredAt,
       message: logEntry.message,
-      'Token Payload': JSON.stringify(logEntry.tokenPayload, null, 2),
-      error: JSON.stringify(logEntry.error, null, 2),
-      'Flownode Instance ID': logEntry.flowNodeInstanceId,
-      'Flownode ID': logEntry.flowNodeId,
+      'Correlation ID': logEntry.correlationId,
       'Process Model ID': logEntry.processModelId,
       'Process Instance ID': logEntry.processInstanceId,
-      'Correlation ID': logEntry.correlationId,
-      'Measured At': logEntry.measuredAt,
+      'Flownode ID': logEntry.flowNodeId,
+      'Flownode Instance ID': logEntry.flowNodeInstanceId,
+      'Token Payload': JSON.stringify(logEntry.tokenPayload, null, 2),
+      error: JSON.stringify(logEntry.error, null, 2),
+      'Log Level': logEntry.logLevel.toUpperCase(),
     };
   }
 
