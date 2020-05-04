@@ -32,7 +32,7 @@ export class LogViewer {
     this.showLogEntryModal = true;
   }
 
-  public getStringyfiedObject(object: any): string {
+  public getStringifiedObject(object: any): string {
     return JSON.stringify(object, null, 2);
   }
 
