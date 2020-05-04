@@ -82,11 +82,11 @@
 }
 
 .table-message-textarea {
+  width: 495px;
+  height: 50px;
+  max-height: 120px;
   margin-top: 0px;
   margin-bottom: 0px;
-  height: 120px;
-  max-height: 120px;
   border: none;
-  resize: none;
-  width: 495px;
+  background: inherit;
 }

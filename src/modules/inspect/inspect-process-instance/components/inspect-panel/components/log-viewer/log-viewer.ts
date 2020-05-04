@@ -28,23 +28,26 @@ export class LogViewer {
   }
 
   public openLogEntryModal(logEntry: DataModels.Logging.LogEntry): void {
-    console.log(logEntry);
-    // const logInformationObject = this.convertToLogInformationObject(logEntry);
-    this.logInformation = Object.entries(logEntry);
+    const logInformationObject = this.convertToLogInformationObject(logEntry);
+    this.logInformation = Object.entries(logInformationObject);
     this.showLogEntryModal = true;
   }
 
-  // private convertToTaskInformationObject(task: TaskListEntry): any {
-  //   return {
-  //     name: task.name,
-  //     id: task.id,
-  //     type: task.taskType,
-  //     'Flownode Instance ID': task.flowNodeInstanceId,
-  //     'Process Model ID': task.processModelId,
-  //     'Correlation ID': task.correlationId,
-  //     'Process Instance ID': task.processInstanceId,
-  //   };
-  // }
+  private convertToLogInformationObject(logEntry: DataModels.Logging.LogEntry): any {
+    return {
+      'Time Stamp': logEntry.timeStamp,
+      'Log Level': logEntry.logLevel.toUpperCase(),
+      message: logEntry.message,
+      'Token Payload': JSON.stringify(logEntry.tokenPayload, null, 2),
+      error: JSON.stringify(logEntry.error, null, 2),
+      'Flownode Instance ID': logEntry.flowNodeInstanceId,
+      'Flownode ID': logEntry.flowNodeId,
+      'Process Model ID': logEntry.processModelId,
+      'Process Instance ID': logEntry.processInstanceId,
+      'Correlation ID': logEntry.correlationId,
+      'Measured At': logEntry.measuredAt,
+    };
+  }
 
   public async processInstanceChanged(): Promise<void> {
     const noProcessInstanceSet: boolean = this.processInstance === undefined;
