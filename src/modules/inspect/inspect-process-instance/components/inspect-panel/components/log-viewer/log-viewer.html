@@ -42,7 +42,7 @@
 
   <modal if.bind="showLogEntryModal"
           body-style="overflow: auto; min-height: 320px;"
-          modal-style="max-width: 700px; top: 5%;">
+          modal-style="top: 10%; height: 77%; max-height: 90%; max-width: 700px;">
     <template replace-part="modal-header">
       <h3>
         Log Details
@@ -64,13 +64,13 @@
         <tr>
           <td class="log-information__property">Message</td>
           <td>
-            <pre class="table-pretag table-pretag--message"> ${logEntryForModal.message}</pre>
+            ${logEntryForModal.message}
           </td>
         </tr>
         <tr>
           <td class="log-information__property">Token Payload</td>
           <td>
-            <pre class="table-pretag table-pretag--message">${getStringifiedObject(logEntryForModal.tokenPayload)}</pre>
+            <pre class="table-pretag">${getStringifiedObject(logEntryForModal.tokenPayload)}</pre>
           </td>
         </tr>
           <tr>
