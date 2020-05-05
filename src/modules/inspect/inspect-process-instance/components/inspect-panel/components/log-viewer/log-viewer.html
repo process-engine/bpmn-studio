@@ -59,13 +59,11 @@
         </tr>
         <tr>
           <td class="log-information__property">Log Level</td>
-          <td class="log-information__property">${logEntryForModal.logLevel}</td>
+          <td>${logEntryForModal.logLevel}</td>
         </tr>
         <tr>
           <td class="log-information__property">Message</td>
-          <td>
-            ${logEntryForModal.message}
-          </td>
+          <td>${logEntryForModal.message}</td>
         </tr>
         <tr>
           <td class="log-information__property">Token Payload</td>
@@ -73,25 +71,25 @@
             <pre class="table-pretag">${getStringifiedObject(logEntryForModal.tokenPayload)}</pre>
           </td>
         </tr>
-          <tr>
-            <td class="log-information__property">Error Name</td>
-            <td>${logEntryForModal.error.name || '-'}</td>
-          </tr>
-          <tr>
-            <td class="log-information__property">Error Message</td>
-            <td>${logEntryForModal.error.message || '-'}</td>
-          </tr>
-          <tr>
-            <td class="log-information__property">Error Code</td>
-            <td>${logEntryForModal.error.code || '-'}</td>
-          </tr>
-          <tr>
-            <td class="log-information__property">Error Info</td>
-            <td>
-              <pre if.bind="typeof logEntryForModal.error.additionalInformation === 'string'" class="table-pretag">${logEntryForModal.error.additionalInformation}</pre>
-              <pre else class="table-pretag">${getStringifiedObject(logEntryForModal.error.additionalInformation) || '-'}</pre>
-            </td>
-          </tr>
+        <tr>
+          <td class="log-information__property">Error Name</td>
+          <td>${logEntryForModal.error.name || '-'}</td>
+        </tr>
+        <tr>
+          <td class="log-information__property">Error Message</td>
+          <td>${logEntryForModal.error.message || '-'}</td>
+        </tr>
+        <tr>
+          <td class="log-information__property">Error Code</td>
+          <td>${logEntryForModal.error.code || '-'}</td>
+        </tr>
+        <tr>
+          <td class="log-information__property">Error Info</td>
+          <td>
+            <pre if.bind="typeof logEntryForModal.error.additionalInformation === 'string'" class="table-pretag">${logEntryForModal.error.additionalInformation}</pre>
+            <pre else class="table-pretag">${getStringifiedObject(logEntryForModal.error.additionalInformation) || '-'}</pre>
+          </td>
+        </tr>
         <tr>
           <td class="log-information__property">Flownode Instance ID</td>
           <td>${logEntryForModal.flowNodeInstanceId || '-'}</td>
@@ -114,7 +112,7 @@
         </tr>
         <tr>
           <td class="log-information__property">Event Name</td>
-          <td class="log-information__property">${logEntryForModal.measuredAt}</td>
+          <td>${logEntryForModal.measuredAt}</td>
         </tr>
       </table>
     </template>
