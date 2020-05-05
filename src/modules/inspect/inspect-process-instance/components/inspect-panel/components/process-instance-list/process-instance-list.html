@@ -4,8 +4,8 @@
   <div class="process-instance-container">
     <h3 if.bind="processInstances.length === 0" class="process-instance-table__empty-message">No Process Instances found.</h3>
      <table else class="table table-striped table-hover process-instance-table">
-      <thead>
-        <tr class="process-instance-table__headlines">
+      <thead class="process-instance-table__head">
+        <tr class="process-instance-table__table-row">
           <th class="process-instance-table__headline" click.delegate="changeSortProperty(processInstanceListSortProperty.StartedAt)">
             Started at <i if.bind="sortSettings.sortProperty === processInstanceListSortProperty.StartedAt && showSortOption" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
