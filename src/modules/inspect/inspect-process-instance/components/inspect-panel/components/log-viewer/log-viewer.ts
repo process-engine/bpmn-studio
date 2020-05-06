@@ -4,10 +4,9 @@ import {DataModels} from '@process-engine/management_api_contracts';
 
 import {ILogSortSettings, ISolutionEntry, LogSortProperty} from '../../../../../../../contracts/index';
 import {getBeautifiedDate} from '../../../../../../../services/date-service/date.service';
-import {NotificationService} from '../../../../../../../services/notification-service/notification.service';
 import {IInspectProcessInstanceService} from '../../../../contracts';
 
-@inject('NotificationService', 'InspectProcessInstanceService')
+@inject('InspectProcessInstanceService')
 export class LogViewer {
   @bindable public log: Array<DataModels.Logging.LogEntry>;
   @bindable public processInstance: DataModels.Correlations.ProcessInstance;
@@ -19,12 +18,22 @@ export class LogViewer {
     sortProperty: LogSortProperty.Time,
   };
 
-  private notificationService: NotificationService;
+  public showLogEntryModal: boolean = false;
+  public logEntryForModal: DataModels.Logging.LogEntry;
+
   private inspectProcessInstanceService: IInspectProcessInstanceService;
 
-  constructor(notificationService: NotificationService, inspectProcessInstanceService: IInspectProcessInstanceService) {
-    this.notificationService = notificationService;
+  constructor(inspectProcessInstanceService: IInspectProcessInstanceService) {
     this.inspectProcessInstanceService = inspectProcessInstanceService;
+  }
+
+  public openLogEntryModal(logEntry: DataModels.Logging.LogEntry): void {
+    this.logEntryForModal = logEntry;
+    this.showLogEntryModal = true;
+  }
+
+  public getStringifiedObject(object: any): string {
+    return JSON.stringify(object, null, 2);
   }
 
   public async processInstanceChanged(): Promise<void> {

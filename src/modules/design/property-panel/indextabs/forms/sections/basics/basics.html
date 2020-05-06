@@ -39,12 +39,13 @@
         <tr>
           <th>ID</th>
           <td>
-            <input type="text" class="props-input" id="formId" value.bind="selectedForm.id & validateOnChange" placeholder="ID" change.delegate="updateId()" disabled.bind="!isEditable">
+            <input type="text" class="props-input" class.bind="validationError ? 'props-input--error' : ''" id="formId" value.bind="selectedForm.id & validateOnChange" placeholder="ID" change.delegate="updateId()" disabled.bind="!isEditable">
+            <span if.bind="validationError" class="validation-error__message">${validationErrorMessage}</span>
           </td>
           <td>
             <div show.bind="isFormSelected">
               <template if.bind="validationError">
-                <i class="fas fa-times validation_error"></i>
+                <i class="fas fa-times validation-error"></i>
               </template>
             </div>
           </td>

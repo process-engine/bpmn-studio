@@ -11,11 +11,6 @@
   user-select: text;
 }
 
-.process-instance-table__headlines {
-  display: flex;
-  width: 100%;
-}
-
 .process-instance-table__headline {
   width: 34%;
   padding: 8px;
@@ -38,15 +33,20 @@
   white-space: nowrap;
 }
 
+.process-instance-table__head {
+  display: block;
+}
+
 .process-instance-table__body {
   display: block;
-  height: 100%;
+  height: calc(100% - 45px);
   overflow: auto;
 }
 
 .process-instance-table__table-row {
-  display: flex;
+  display: table;
   width: 100%;
+  table-layout: fixed;
 }
 
 .process-instance-table__table-row--instance-to-select {

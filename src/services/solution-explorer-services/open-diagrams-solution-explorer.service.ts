@@ -273,7 +273,31 @@ export class OpenDiagramsSolutionExplorerService implements ISolutionExplorerSer
   }
 
   public renameDiagram(diagram: IDiagram, newName: string): Promise<IDiagram> {
-    throw new Error('Method not supported.');
+    const diagramState = this.openDiagramStateService.loadDiagramState(diagram.uri);
+    if (diagramState == null) {
+      return undefined;
+    }
+
+    const newDiagramUri = diagram.uri.replace(diagram.name, newName);
+    this.openDiagramStateService.saveDiagramState(
+      newDiagramUri,
+      diagramState.data.xml,
+      diagramState.metadata.location,
+      diagramState.metadata.selectedElements,
+      diagramState.metadata.isChanged,
+      diagramState.metadata.change,
+    );
+
+    this.openDiagramStateService.deleteDiagramState(diagram.uri);
+
+    const indexOfOpenedDiagram = this.findIndexOfDiagramWithURI(diagram.uri);
+    const openedDiagram = this.openedDiagrams[indexOfOpenedDiagram];
+
+    openedDiagram.id = openedDiagram.id.replace(diagram.name, newName);
+    openedDiagram.name = newName;
+    openedDiagram.uri = openedDiagram.uri.replace(diagram.name, newName);
+
+    return Promise.resolve(openedDiagram);
   }
 
   public deleteDiagram(diagram: IDiagram): Promise<void> {

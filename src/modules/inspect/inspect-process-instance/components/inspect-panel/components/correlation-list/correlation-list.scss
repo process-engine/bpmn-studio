@@ -11,11 +11,6 @@
   user-select: text;
 }
 
-.correlation-table__headlines {
-  display: flex;
-  width: 100%;
-}
-
 .correlation-table__headline {
   width: 34%;
   padding: 8px;
@@ -38,15 +33,20 @@
   white-space: nowrap;
 }
 
+.correlation-table__head {
+  display: block;
+}
+
 .correlation-table__body {
   display: block;
-  height: 100%;
+  height: calc(100% - 45px);
   overflow: auto;
 }
 
 .correlation-table__table-row {
-  display: flex;
+  display: table;
   width: 100%;
+  table-layout: fixed;
 }
 
 .correlation-table__table-row--instance-to-select {

@@ -38,11 +38,13 @@ export class TaskList {
   public paginationShowsLoading: boolean;
 
   public showDynamicUiModal: boolean = false;
+  public showTaskInfoModal: boolean = false;
   @bindable public processModelId: string;
   @bindable public taskId: string;
   @bindable public processInstanceId: string;
   @bindable public correlationId: string;
 
+  public taskForModal: TaskListEntry;
   private activeSolutionUri: string;
   private dashboardService: IDashboardService;
   private router: Router;
@@ -264,6 +266,11 @@ export class TaskList {
     } else {
       this.getTasks = this.getAllTasks;
     }
+  }
+
+  public openInfoModal(task: TaskListEntry): void {
+    this.taskForModal = task;
+    this.showTaskInfoModal = true;
   }
 
   private async setRuntimeSubscriptions(): Promise<void> {

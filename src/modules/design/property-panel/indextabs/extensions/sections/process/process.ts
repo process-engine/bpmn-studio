@@ -32,6 +32,10 @@ export class ProcessSection {
   }
 
   public activate(model: IPageModel): void {
+    if (!model) {
+      return;
+    }
+
     this.businessObjInPanel = model.elementInPanel.businessObject.participants[0];
     this.moddle = model.modeler.get('moddle');
     this.reloadProperties();

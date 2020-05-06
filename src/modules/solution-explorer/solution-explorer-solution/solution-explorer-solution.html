@@ -67,10 +67,10 @@
 
           <div class="diagram-entry__actions">
             <button
-              class.bind="activeDiagramUri !== diagram.uri ? 'button' : 'button button--disabled'"
+              class="button"
               if.bind="canRenameDiagram"
               click.delegate="startRenamingOfDiagram(diagram, $event)"
-              title.bind="activeDiagramUri !== diagram.uri ? 'Rename the diagram' : 'The diagram is currently open, it cant be renamed.'">
+              title="Rename the diagram">
 
               <i class="fa fa-pencil-alt"></i>
             </button>

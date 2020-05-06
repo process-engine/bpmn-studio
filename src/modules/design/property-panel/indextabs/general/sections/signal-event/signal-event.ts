@@ -20,9 +20,9 @@ import {
   ISection,
 } from '../../../../../../../contracts';
 import environment from '../../../../../../../environment';
-import {GeneralService} from '../../service/general.service';
+import {generateRandomId} from '../../../../../../../services/generate-random-id-module/generate-random-id-module';
 
-@inject(GeneralService, EventAggregator)
+@inject(EventAggregator)
 export class SignalEventSection implements ISection {
   public path: string = '/sections/signal-event/signal-event';
   public canHandleElement: boolean = false;
@@ -34,11 +34,9 @@ export class SignalEventSection implements ISection {
   private moddle: IBpmnModdle;
   private modeler: IBpmnModeler;
   private linter: ILinting;
-  private generalService: GeneralService;
   private eventAggregator: EventAggregator;
 
-  constructor(generalService?: GeneralService, eventAggregator?: EventAggregator) {
-    this.generalService = generalService;
+  constructor(eventAggregator?: EventAggregator) {
     this.eventAggregator = eventAggregator;
   }
 
@@ -95,7 +93,7 @@ export class SignalEventSection implements ISection {
 
   public addSignal(): void {
     const bpmnSignalProperty: {id: string; name: string} = {
-      id: `Signal_${this.generalService.generateRandomId()}`,
+      id: `Signal_${generateRandomId()}`,
       name: 'Signal Name',
     };
     const bpmnSignal: ISignal = this.moddle.create('bpmn:Signal', bpmnSignalProperty);

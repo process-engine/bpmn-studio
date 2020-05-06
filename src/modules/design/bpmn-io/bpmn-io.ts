@@ -4,7 +4,7 @@
 import {EventAggregator, Subscription} from 'aurelia-event-aggregator';
 import {bindable, bindingMode, inject, observable} from 'aurelia-framework';
 
-import {IModdleElement, IPropertiesElement, IShape} from '@process-engine/bpmn-elements_contracts';
+import {IShape} from '@process-engine/bpmn-elements_contracts';
 import * as bundle from '@process-engine/bpmn-js-custom-bundle';
 import * as bpmnlintConfig from '@process-engine/bpmn-lint_rules';
 
@@ -125,17 +125,6 @@ export class BpmnIo {
 
     this.linting = this.modeler.get('linting');
 
-    /**
-     * Subscribe to the "elements.paste.rejected"-event to show a helpful
-     * message to the user.
-     */
-    this.modeler.on('elements.paste.rejected', () => {
-      this.notificationService.showNotification(
-        NotificationType.INFO,
-        'In order to paste an element you have to place your cursor outside of the element.',
-      );
-    });
-
     this.addRemoveWithBackspaceKeyboardListener();
 
     /**
@@ -186,17 +175,6 @@ export class BpmnIo {
       },
       1,
     );
-
-    this.modeler.on('element.paste', (event: IInternalEvent) => {
-      if (!this.solutionIsRemote) {
-        const elementToPasteIsUserTask: boolean = event.descriptor.type === 'bpmn:UserTask';
-        if (elementToPasteIsUserTask) {
-          return this.renameFormFields(event);
-        }
-      }
-
-      return false;
-    });
 
     this.diagramPrintService = new DiagramPrintService();
     this.diagramExportService = new DiagramExportService();
@@ -464,7 +442,7 @@ export class BpmnIo {
       this.savedXml = await this.convertXml(newValue);
 
       if (this.solutionIsRemote) {
-        this.importXmlIntoViewer(this.xml);
+        await this.importXmlIntoViewer(this.xml);
       }
 
       if (this.diagramHasState(this.diagramUri)) {
@@ -546,12 +524,12 @@ export class BpmnIo {
         this.propertyPanelViewModel.selectPreviouslySelectedOrFirstElement();
       }
 
-      setTimeout(() => {
+      setTimeout(async () => {
         this.viewer.attachTo(this.canvasModel);
 
         const xmlIsNotEmpty: boolean = this.xml !== undefined && this.xml !== null;
         if (xmlIsNotEmpty) {
-          this.importXmlIntoViewer(this.xml);
+          await this.importXmlIntoViewer(this.xml);
         }
 
         this.linting.deactivateLinting();
@@ -842,37 +820,6 @@ export class BpmnIo {
     } else if (modelerDiagramIsVisible) {
       modelerCanvas.zoom('fit-viewport', 'auto');
     }
-  }
-
-  private renameFormFields(event: IInternalEvent): IInternalEvent {
-    const allFields: Array<IPropertiesElement> = event.descriptor.businessObject.extensionElements.values;
-
-    const formDataObject: IPropertiesElement = allFields.find((field: IModdleElement) => {
-      return field.$type === 'camunda:FormData';
-    });
-
-    const noFieldsSpecified: boolean = formDataObject.fields === undefined || formDataObject.fields === null;
-    if (noFieldsSpecified) {
-      return undefined;
-    }
-
-    formDataObject.fields.forEach((formField: IModdleElement) => {
-      formField.id = `Form_${this.generateRandomId()}`;
-    });
-
-    return event;
-  }
-
-  private generateRandomId(): string {
-    let randomId: string = '';
-    const possible: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-    const randomIdLength: number = 8;
-    for (let i: number = 0; i < randomIdLength; i++) {
-      randomId += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-
-    return randomId;
   }
 
   private setNewPropertyPanelWidthFromMousePosition(mousePosition: number): void {
