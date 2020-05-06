@@ -12,11 +12,6 @@
   user-select: text;
 }
 
-.log-table__headlines {
-  display: flex;
-  width: 100%;
-}
-
 .log-table__headline {
   padding: 8px;
   overflow: hidden;
@@ -29,13 +24,18 @@
 
 .log-table__body {
   display: block;
-  height: 100%;
+  height: calc(100% - 40px);
   overflow: auto;
 }
 
+.log-table__head {
+  display: block;
+}
+
 .log-table__table-row {
-  display: flex;
+  display: table;
   width: 100%;
+  table-layout: fixed;
 }
 
 .log-table__table-entry {
@@ -65,8 +65,8 @@
   width: 200px;
 }
 
-.log-table__message-column {
-  width: calc(100% - 600px);
+.log-table__details-column {
+  width: 100px;
 }
 
 .log-table__empty-message {
@@ -75,4 +75,18 @@
   top: 50%;
   transform: translate(-50%, -50%);
   user-select: none;
+}
+
+.table-pretag {
+  width: 495px;
+}
+
+.log-viewer__close-modal-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.log-information__property {
+  text-transform: capitalize;
 }

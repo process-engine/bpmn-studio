@@ -3,8 +3,8 @@
   <div class="log-viewer">
     <h3 if.bind="log.length === 0" class="log-table__empty-message">No logs for this correlation available.</h3>
     <table else class="table table-striped table-hover log-table">
-      <thead>
-        <tr class="log-table__headlines">
+      <thead class="log-table__head">
+        <tr class="log-table__table-row">
           <th class="log-table__headline log-table__time-column" click.delegate="changeSortProperty(logSortProperty.Time)">
             Time <i if.bind="sortSettings.sortProperty === logSortProperty.Time" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
@@ -17,20 +17,104 @@
           <th class="log-table__headline log-table__log-level-column" click.delegate="changeSortProperty(logSortProperty.LogLevel)">
             Level <i if.bind="sortSettings.sortProperty === logSortProperty.LogLevel" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
-          <th class="log-table__headline log-table__message-column" click.delegate="changeSortProperty(logSortProperty.Message)">
+          <th class="log-table__headline" click.delegate="changeSortProperty(logSortProperty.Message)">
             Message <i if.bind="sortSettings.sortProperty === logSortProperty.Message" class.bind="sortSettings.ascending ? 'fas fa-caret-up' : ' fas fa-caret-down'"></i>
           </th>
+          <th class="log-table__headline log-table__details-column"></th>
         </tr>
-      </thead class="log-table__header">
+      </thead>
       <tbody class="log-table__body">
         <tr class="log-table__table-row" repeat.for="logEntry of sortedLog">
           <td class="log-table__table-entry log-table__time-column">${getDateStringFromTimestamp(logEntry.timeStamp)}</td>
           <td class="log-table__table-entry log-table__flow-node-id-column">${logEntry.flowNodeId || '-'}</td>
           <td class="log-table__table-entry log-table__flow-node-instance-id-column">${logEntry.flowNodeInstanceId || '-'}</td>
           <td class="log-table__table-entry log-table__log-level-column">${logEntry.logLevel.toUpperCase()}</td>
-          <td class="log-table__table-entry log-table__message-column">${logEntry.message}</td>
+          <td class="log-table__table-entry">${logEntry.message}</td>
+          <td class="log-table__table-entry log-table__details-column">
+            <button class="btn btn-default task-list-continue-button" click.delegate="openLogEntryModal(logEntry)">
+              Details
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
   </div>
+
+  <modal if.bind="showLogEntryModal"
+          body-style="overflow: auto; min-height: 320px;"
+          modal-style="top: 10%; height: 77%; max-height: 90%; max-width: 700px;">
+    <template replace-part="modal-header">
+      <h3>
+        Log Details
+      </h3>
+      <btn class="button log-viewer__close-modal-button">
+        <i class="fas fa-times" click.delegate="showLogEntryModal = false"></i>
+      </btn>
+    </template>
+    <template replace-part="modal-body">
+      <table class="table table-striped table-bordered">
+        <tr>
+          <td class="log-information__property">Timestamp</td>
+          <td>${getDateStringFromTimestamp(logEntryForModal.timeStamp)}</td>
+        </tr>
+        <tr>
+          <td class="log-information__property">Log Level</td>
+          <td>${logEntryForModal.logLevel}</td>
+        </tr>
+        <tr>
+          <td class="log-information__property">Message</td>
+          <td>${logEntryForModal.message}</td>
+        </tr>
+        <tr>
+          <td class="log-information__property">Token Payload</td>
+          <td>
+            <pre class="table-pretag">${getStringifiedObject(logEntryForModal.tokenPayload)}</pre>
+          </td>
+        </tr>
+        <tr>
+          <td class="log-information__property">Error Name</td>
+          <td>${logEntryForModal.error.name || '-'}</td>
+        </tr>
+        <tr>
+          <td class="log-information__property">Error Message</td>
+          <td>${logEntryForModal.error.message || '-'}</td>
+        </tr>
+        <tr>
+          <td class="log-information__property">Error Code</td>
+          <td>${logEntryForModal.error.code || '-'}</td>
+        </tr>
+        <tr>
+          <td class="log-information__property">Error Info</td>
+          <td>
+            <pre if.bind="typeof logEntryForModal.error.additionalInformation === 'string'" class="table-pretag">${logEntryForModal.error.additionalInformation}</pre>
+            <pre else class="table-pretag">${getStringifiedObject(logEntryForModal.error.additionalInformation) || '-'}</pre>
+          </td>
+        </tr>
+        <tr>
+          <td class="log-information__property">Flownode Instance ID</td>
+          <td>${logEntryForModal.flowNodeInstanceId || '-'}</td>
+        </tr>
+        <tr>
+          <td class="log-information__property">Flownode ID</td>
+          <td>${logEntryForModal.flowNodeId || '-'}</td>
+        </tr>
+        <tr>
+          <td class="log-information__property">Process Model ID</td>
+          <td>${logEntryForModal.processModelId}</td>
+        </tr>
+        <tr>
+          <td class="log-information__property">Process Instance ID</td>
+          <td>${logEntryForModal.processInstanceId}</td>
+        </tr>
+        <tr>
+          <td class="log-information__property">Correlation ID</td>
+          <td>${logEntryForModal.correlationId}</td>
+        </tr>
+        <tr>
+          <td class="log-information__property">Event Name</td>
+          <td>${logEntryForModal.measuredAt}</td>
+        </tr>
+      </table>
+    </template>
+  </modal>
 </template>
