@@ -75,6 +75,14 @@ router-view {
   color: #333;
 }
 
+.btn-default:hover:enabled {
+  background-color: #eee;
+}
+
+.btn-default:not(:disabled):focus {
+  border-color: black;
+}
+
 .btn-primary,
 .btn-primary:disabled {
   background: #5d8a3c;
@@ -88,10 +96,6 @@ router-view {
 }
 .btn-primary:not(:disabled):not(.disabled):active:focus {
   box-shadow: 0 0 0 0.2rem rgba(95, 142, 20, 0.5);
-}
-
-.btn-default:hover:enabled {
-  background-color: #eee;
 }
 
 .btn:focus {
