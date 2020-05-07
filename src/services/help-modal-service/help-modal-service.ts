@@ -26,13 +26,14 @@ export class HelpModalService {
     const node = document.createElement('div');
 
     const removeModalFn = (): void => {
+      document.removeEventListener('focusin', this.focusEventListener);
       document.body.removeChild(node);
     };
 
     const helpText = this.helpTextService.getHelpTextById(helpTextId);
 
     node.innerHTML = `
-<div class="modal show show-modal" tabindex="-1" role="dialog">
+<div class="modal show show-modal" tabindex="-1" role="dialog" id="help-modal">
   <div class="modal-dialog modal-style" style="display: flex; top: 10%; max-height: 80%;" role="document">
     <div class="modal-content" style="height: unset;">
       <div class="modal-header">
@@ -46,6 +47,16 @@ export class HelpModalService {
 <div class="modal-backdrop fade in"></div>`;
 
     document.body.appendChild(node);
+    document.addEventListener('focusin', this.focusEventListener);
     document.getElementById('help-modal-close-button').onclick = removeModalFn;
   }
+
+  private focusEventListener = (event): void => {
+    const helpModalElement = document.getElementById('help-modal');
+    const focussedElementIsInModalOrTheModal = helpModalElement.contains(event.target);
+
+    if (!focussedElementIsInModalOrTheModal) {
+      helpModalElement.focus();
+    }
+  };
 }
