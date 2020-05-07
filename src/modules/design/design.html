@@ -31,7 +31,7 @@
       </div>
     </div>
 
-    <modal show.bind="showSaveForStartModal"
+    <modal if.bind="showSaveForStartModal"
           header-text="Document Contains Changes"
           body-text="Your process has unsaved changes. Save changes to diagram before starting the process?">
       <template replace-part="modal-footer">
@@ -40,7 +40,7 @@
       </template>
     </modal>
 
-    <modal show.bind="showStartWithOptionsModal"
+    <modal if.bind="showStartWithOptionsModal"
           header-text="Start Options"
           body-text="Your process has unsaved changes. Save changes to diagram before starting the process?"
           origin.bind="design">
@@ -77,7 +77,7 @@
       </template>
     </modal>
 
-    <modal show.bind="showStartEventModal"
+    <modal if.bind="showStartEventModal"
           header-text="Select initial StartEvent"
           body-text="Your process has unsaved changes. Save changes to diagram before starting the process?">
       <template replace-part="modal-body">
@@ -96,7 +96,7 @@
       </template>
     </modal>
 
-    <modal show.bind="showSelectDiagramModal"
+    <modal if.bind="showSelectDiagramModal"
           header-text="Choose a Diagram"
           id="js-chooseDiagram-modal">
       <template replace-part="modal-body">

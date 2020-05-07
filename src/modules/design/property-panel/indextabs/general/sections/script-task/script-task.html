@@ -19,7 +19,7 @@
     </div>
   </div>
 
-  <modal show.bind="showModal"
+  <modal if.bind="showModal"
          header-text="Editing: Script Task">
     <template replace-part="modal-body" autofocus>
       <textarea class="form-control script-task" value.bind="businessObjInPanel.script" change.delegate="updateScript()" rows="10" aria-multiline="true" autofocus wrap="soft" disabled.bind="!isEditable"></textarea>

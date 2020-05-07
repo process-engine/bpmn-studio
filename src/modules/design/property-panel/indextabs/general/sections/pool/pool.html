@@ -35,7 +35,7 @@
     </div>
   </div>
 
-  <modal show.bind="showModal"
+  <modal if.bind="showModal"
          header-text="Warning: Editing Process ID">
     <template replace-part="modal-body">
       Changing a process ID can potentially break your deployments! Only perform this action if you know what you are doing!
