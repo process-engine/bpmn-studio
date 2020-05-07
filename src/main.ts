@@ -32,7 +32,7 @@ export function configure(aurelia: Aurelia): void {
 
   aurelia.use
     .standardConfiguration()
-    .globalResources('modules/custom_elements/modal/modal.html')
+    .feature('modules/custom_elements/modal')
     .feature('modules/fetch-http-client')
     .feature('services/dynamic-ui-service')
     .feature('services/notification-service')
