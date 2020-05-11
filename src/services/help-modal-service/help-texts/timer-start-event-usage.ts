@@ -15,7 +15,7 @@ export const TimerStartEventUsage: HelpText = {
 
     For example:
       * \`2030-12-06\` - waits untill the 6th  December 2030
-      * \`2030-12-06T19\` - waits untill the 6th of December 2030 at 19:15
+      * \`2030-12-06T19:15\` - waits untill the 6th of December 2030 at 19:15
 
 
   * \`Duration\`: It's the amount of time that the event should wait. The duration must be specified according to the <a href="https://en.wikipedia.org/wiki/ISO_8601#Durations" target="_blank">ISO 8601 duration standard</a>.
@@ -23,7 +23,7 @@ export const TimerStartEventUsage: HelpText = {
     For example:
       * \`PT5S\` - waits 5 seconds
       * \`PT12H\` - waits 12 hours
-      * \`token.current\` - uses the value of the token
+      * \`token.current\` - uses the value of the current process token
 
 
   * \`Cycle\`: Uses a <a href="https://en.wikipedia.org/wiki/Cron#Overview" target="_blank">crontab syntax</a> to start new process instances from this Start Event periodically.
