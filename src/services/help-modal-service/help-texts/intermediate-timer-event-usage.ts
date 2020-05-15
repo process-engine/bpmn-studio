@@ -32,7 +32,7 @@ export const IntermediateTimerEventUsage: HelpText = {
 
 
   * For a \`Duration\` timer,  it's the amount of time that the event should wait.
-  The duration must be specified according to the <a href="https://en.wikipedia.org/wiki/ISO_8601#Durations" target="_blank">ISO 8601 duration standard</a>.
+    The duration must be specified according to the <a href="https://en.wikipedia.org/wiki/ISO_8601#Durations" target="_blank">ISO 8601 duration standard</a>.
 
     For example:
       * \`PT5S\` - waits 5 seconds
