@@ -16,6 +16,7 @@ export const TimerBoundaryEventUsage: HelpText = {
     The date must be specified according to the <a href="https://en.wikipedia.org/wiki/ISO_8601#Dates" target="_blank">ISO 8601 date standard</a>
     and may also include a time according to the <a href="https://en.wikipedia.org/wiki/ISO_8601#Times" target="_blank">ISO 8601 time standard</a>.
     To do so, <a href="https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations" target="_blank">the letter "T" must be used as a delimiter</a>.
+    If a time is specified, a time zone according to the <a href="https://en.wikipedia.org/wiki/ISO_8601#Times" target="_blank">ISO 8601 timezone standard</a> can also be specified.
 
     For example:
       * \`2030-12-06\` - waits untill the 6th of December 2030
