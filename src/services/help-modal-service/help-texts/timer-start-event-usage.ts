@@ -17,7 +17,7 @@ export const TimerStartEventUsage: HelpText = {
     To do so, <a href="https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations" target="_blank">the letter "T" must be used as a delimiter</a>.
 
     For example:
-      * \`2030-12-06\` - waits untill the 6th  December 2030
+      * \`2030-12-06\` - waits untill the 6th of December 2030
       * \`2030-12-06T19:15\` - waits untill the 6th of December 2030 at 19:15
 
 
