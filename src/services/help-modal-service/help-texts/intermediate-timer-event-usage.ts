@@ -30,6 +30,7 @@ export const IntermediateTimerEventUsage: HelpText = {
     For example:
       * \`2030-12-06\` - waits untill the 6th of December 2030
       * \`2030-12-06T19:15\` - waits untill the 6th of December 2030 at 19:15
+      * \`2030-12-06T19:15+02:00\` - waits untill the 6th of December 2030 at 19:15 (CEST or UTC+2)
 
 
   * For a \`Duration\` timer,  it's the amount of time that the event should wait.

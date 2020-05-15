@@ -20,6 +20,7 @@ export const TimerStartEventUsage: HelpText = {
     For example:
       * \`2030-12-06\` - waits untill the 6th of December 2030
       * \`2030-12-06T19:15\` - waits untill the 6th of December 2030 at 19:15
+      * \`2030-12-06T19:15+02:00\` - waits untill the 6th of December 2030 at 19:15 (CEST or UTC+2)
 
 
   * \`Duration\`: It's the amount of time that the event should wait. The duration must be specified according to the <a href="https://en.wikipedia.org/wiki/ISO_8601#Durations" target="_blank">ISO 8601 duration standard</a>.
