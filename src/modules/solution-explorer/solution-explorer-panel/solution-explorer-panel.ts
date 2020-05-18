@@ -270,7 +270,11 @@ export class SolutionExplorerPanel {
     this.updateDefaultRemoteSolutions();
   }
 
-  public removeSolutionFromHistory(solutionUri: string): void {
+  public removeSolutionFromHistory(solutionUri: string, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+
     this.removeSolutionFromSolutionHistroy(solutionUri);
   }
 
