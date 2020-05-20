@@ -164,9 +164,7 @@ export class BpmnIo {
     this.modeler.on(
       'import.done',
       () => {
-        if (!this.diagramHasState(this.diagramUri)) {
-          this.fitDiagramToViewport();
-        }
+        this.fitDiagramToViewport();
 
         if (!this.solutionIsRemote) {
           this.validateDiagram();
@@ -373,6 +371,12 @@ export class BpmnIo {
 
         keyboard.unbind();
       }),
+
+      this.eventAggregator.subscribe(environment.events.bpmnio.fitViewport, () => {
+        setTimeout(() => {
+          this.fitDiagramToViewport(true);
+        }, 0);
+      }),
     ];
 
     const previousPropertyPanelWidth: string = window.localStorage.getItem('propertyPanelWidth');
@@ -512,9 +516,7 @@ export class BpmnIo {
         });
 
         this.viewer.on('import.done', () => {
-          if (!this.diagramHasState(this.diagramUri)) {
-            this.fitDiagramToViewport();
-          }
+          this.fitDiagramToViewport();
         });
       }
 
@@ -587,13 +589,7 @@ export class BpmnIo {
     const xml: string = diagramState.data.xml;
     await this.importXmlIntoModeler(xml);
 
-    const viewbox: IViewbox = diagramState.metadata.location;
-    const viewboxIsSet: boolean = viewbox !== undefined;
-    if (viewboxIsSet) {
-      this.modeler.get('canvas').viewbox(viewbox);
-    } else {
-      this.fitDiagramToViewport();
-    }
+    this.fitDiagramToViewport();
   }
 
   private async validateDiagram(): Promise<void> {
@@ -804,7 +800,7 @@ export class BpmnIo {
     });
   }
 
-  private fitDiagramToViewport(): void {
+  private fitDiagramToViewport(force: boolean = false): void {
     const modelerCanvas: ICanvas = this.modeler.get('canvas');
     const modelerViewbox: IViewbox = modelerCanvas.viewbox();
     const modelerDiagramIsVisible: boolean = modelerViewbox.height > 0 && modelerViewbox.width > 0;
@@ -814,11 +810,19 @@ export class BpmnIo {
       const viewerViewbox: IViewbox = viewerCanvas.viewbox();
       const viewerDiagramIsVisible: boolean = viewerViewbox.height > 0 && viewerViewbox.width > 0;
 
-      if (viewerDiagramIsVisible) {
+      if (viewerDiagramIsVisible || force) {
         viewerCanvas.zoom('fit-viewport', 'auto');
       }
-    } else if (modelerDiagramIsVisible) {
-      modelerCanvas.zoom('fit-viewport', 'auto');
+    } else if (modelerDiagramIsVisible || force) {
+      const diagramState: IDiagramState = this.loadDiagramState(this.diagramUri);
+
+      const viewbox: IViewbox = diagramState.metadata.location;
+      const viewboxIsSet: boolean = viewbox !== undefined;
+      if (viewboxIsSet) {
+        modelerCanvas.viewbox(viewbox);
+      } else {
+        modelerCanvas.zoom('fit-viewport', 'auto');
+      }
     }
   }
 

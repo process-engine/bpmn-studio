@@ -151,13 +151,14 @@ export class Design {
     this.routeView = routeParameters.view;
 
     if (routeViewIsDetail) {
-      this.showDetail = true;
       this.showXML = false;
       this.showDiff = false;
-      this.showPropertyPanelButton = true;
       this.showDiffDestinationButton = false;
+      this.showDetail = true;
+      this.showPropertyPanelButton = true;
 
       this.eventAggregator.publish(environment.events.bpmnio.bindKeyboard);
+      this.eventAggregator.publish(environment.events.bpmnio.fitViewport);
     } else if (routeViewIsXML) {
       this.showDetail = false;
       this.showXML = true;
