@@ -82,7 +82,7 @@
           <h5 if.bind="remoteSolution.version !== undefined">
             <span class="badge badge-secondary remote-solution-badge" class.bind="getBadgeForVersion(remoteSolution.version)">${getVersionNameForVersion(remoteSolution.version)}</span>
           </h5>
-          <button if.bind="remoteSolution.version === undefined" class="button remote-solution-list__close-button" click.delegate="removeSolutionFromHistory(remoteSolution.uri)">
+          <button if.bind="remoteSolution.version === undefined" class="button remote-solution-list__close-button" click.delegate="removeSolutionFromHistory(remoteSolution.uri, $event)">
             <i class="fas fa-times"></i>
           </button>
         </div>

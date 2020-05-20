@@ -84,6 +84,7 @@ export default {
       propertyPanelActive: 'design:propertypanel:active',
       bindKeyboard: 'design:keyboard:bind',
       unbindKeyboard: 'design:keyboard:unbind',
+      fitViewport: 'design:detailview:fitviewport',
     },
     diffView: {
       changeDiffMode: 'diffview:diffmode:change',

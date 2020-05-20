@@ -37,7 +37,7 @@
     </div>
   </div>
 
-  <modal show.bind="showModal"
+  <modal if.bind="showModal"
          header-text="Editing: Docs">
     <template replace-part="modal-body" autofocus>
       <textarea class="form-control docs" value.bind="elementDocumentation" change.delegate="updateDocumentation()" rows="10" aria-multiline="true" autofocus wrap="soft" disabled.bind="!isEditable"></textarea>

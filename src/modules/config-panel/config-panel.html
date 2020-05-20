@@ -22,11 +22,9 @@
     <button class="btn btn-default" click.delegate="cancelUpdate()">Cancel</button>
     <button class="btn btn-primary" click.delegate="updateSettings()" disabled.bind="!uriIsValid || uriIsEmpty">Save</button>
   </div>
-  <modal show.bind="showRestartModal"
-         header-text="BPMN Studio needs to restart">
-    <template replace-part="modal-body">
-      A restart is required in order to apply the changes.
-    </template>
+  <modal if.bind="showRestartModal"
+         header-text="BPMN Studio needs to restart"
+         body-text="A restart is required in order to apply the changes.">
     <template replace-part="modal-footer">
       <button type="button" class="btn btn-default" data-dismiss="modal" click.delegate="restartLater()">Restart later (manually)</button>
       <button type="button" class="btn btn-primary" data-dismiss="modal" click.delegate="restartNow()">Restart now</button>

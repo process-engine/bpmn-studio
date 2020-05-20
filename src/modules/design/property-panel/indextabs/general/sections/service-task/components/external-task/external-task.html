@@ -22,7 +22,7 @@
     </div>
   </div>
 
-  <modal show.bind="showModal"
+  <modal if.bind="showModal"
          header-text="Editing: Payload">
     <template replace-part="modal-body" autofocus>
       <textarea class="form-control payload" value.bind="selectedPayload" change.delegate="payloadChanged()" rows="10" aria-multiline="true" autofocus wrap="soft" disabled.bind="!model.isEditable"></textarea>
