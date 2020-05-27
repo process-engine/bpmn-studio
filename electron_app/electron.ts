@@ -844,6 +844,9 @@ async function startInternalProcessEngine(): Promise<any> {
 
   console.log(`Internal ProcessEngine starting on port ${port}.`);
 
+  // The forked runtime process gets these environments too.
+  process.env.httpServer__port = `${port}`;
+  process.env.iam__allowAnonymousRootAccess = 'true';
 
   const processEngineStatusListeners = [];
   let internalProcessEngineStatus;
