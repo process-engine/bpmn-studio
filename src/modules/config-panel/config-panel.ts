@@ -50,7 +50,14 @@ export class ConfigPanel {
     const internalSolutionUri: string = window.localStorage.getItem('InternalProcessEngineRoute');
 
     this.internalSolution = this.solutionService.getSolutionEntryForUri(internalSolutionUri);
-    this.authority = this.internalSolution.authority;
+
+    let authority = this.internalSolution.authority;
+    if (!authority) {
+      const config = await this.getIamServiceConfig();
+      authority = config.iam.baseUrl;
+    }
+
+    this.authority = authority;
   }
 
   public async updateSettings(): Promise<void> {
@@ -118,8 +125,8 @@ export class ConfigPanel {
   private async saveNewAuthority(): Promise<void> {
     const iamServiceConfig = await this.getIamServiceConfig();
 
-    iamServiceConfig.basePath = this.authority;
-    iamServiceConfig.claimPath = `${this.authority}claims/ensure`;
+    iamServiceConfig.iam.baseUrl = this.authority;
+    iamServiceConfig.iam.claimUrl = `${this.authority}claims/ensure`;
 
     const configPath: string = await this.getIamServiceConfigPath();
     fs.writeFileSync(configPath, JSON.stringify(iamServiceConfig, null, 2));
@@ -133,7 +140,7 @@ export class ConfigPanel {
   }
 
   private async getIamServiceConfigPath(): Promise<string> {
-    const pathToJson: string = 'config/sqlite/iam/iam_service.json';
+    const pathToJson: string = 'configs/sqlite.json';
 
     let iamServiceConfigPath: string;
 
