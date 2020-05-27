@@ -848,6 +848,10 @@ async function startInternalProcessEngine(): Promise<any> {
   process.env.httpServer__port = `${port}`;
   process.env.iam__allowAnonymousRootAccess = 'true';
 
+  if (!releaseChannel.isDev()) {
+    process.env.CONFIG_PATH = path.join(__dirname, '..', '..', '..', '..', '..', 'configs', 'sqlite.json');
+  }
+
   const processEngineStatusListeners = [];
   let internalProcessEngineStatus;
   let internalProcessEngineStartupError;
