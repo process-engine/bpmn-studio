@@ -1,16 +1,23 @@
+import {EventAggregator} from 'aurelia-event-aggregator';
+import {inject} from 'aurelia-framework';
+
 import marked from 'marked';
 import * as hljs from 'highlight.js';
 
 import {HelpTextId} from '../../contracts/index';
 import {HelpTextService} from './help-text-service';
+import environment from '../../environment';
 
+@inject(EventAggregator)
 export class HelpModalService {
   public showModal = false;
 
   private helpTextService: HelpTextService;
+  private eventAggregator: EventAggregator;
 
-  constructor() {
+  constructor(eventAggregator: EventAggregator) {
     this.helpTextService = new HelpTextService();
+    this.eventAggregator = eventAggregator;
 
     marked.setOptions({
       renderer: new marked.Renderer(),
@@ -28,6 +35,7 @@ export class HelpModalService {
     const removeModalFn = (): void => {
       document.removeEventListener('focusin', this.focusEventListener);
       document.body.removeChild(node);
+      this.eventAggregator.publish(environment.events.bpmnio.bindKeyboard);
     };
 
     const helpText = this.helpTextService.getHelpTextById(helpTextId);
@@ -46,6 +54,7 @@ export class HelpModalService {
 </div>
 <div class="modal-backdrop fade in"></div>`;
 
+    this.eventAggregator.publish(environment.events.bpmnio.unbindKeyboard);
     document.body.appendChild(node);
     document.addEventListener('focusin', this.focusEventListener);
     document.getElementById('help-modal-close-button').onclick = removeModalFn;
