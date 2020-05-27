@@ -350,7 +350,7 @@
     ],
     "copyFiles": {
       "src/resources/images/default-avatar.png": "src/resources/images",
-      "node_modules/@atlas-engine/fullstack_server/config/sqlite/**/*": "config/sqlite",
+      "node_modules/@atlas-engine/fullstack_server/configs/sqlite.json": "configs/",
       "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.ttf": "dist/web/@fortawesome/fontawesome-free/webfonts",
       "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff": "dist/web/@fortawesome/fontawesome-free/webfonts",
       "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2": "dist/web/@fortawesome/fontawesome-free/webfonts",
