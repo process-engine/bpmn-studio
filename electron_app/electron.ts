@@ -834,15 +834,6 @@ function getAboutWindowInfo(): AboutWindowInfo {
 }
 
 async function startInternalProcessEngine(): Promise<any> {
-  const devUserDataFolderPath = path.join(__dirname, '..', 'userData');
-  const prodUserDataFolderPath = app.getPath('userData');
-
-  const userDataFolderPath = releaseChannel.isDev() ? devUserDataFolderPath : prodUserDataFolderPath;
-
-  if (!releaseChannel.isDev()) {
-    process.env.CONFIG_PATH = path.join(__dirname, '..', '..', '..', '..', '..', 'config');
-  }
-
   const configForGetPort = {
     port: getPortListByVersion(releaseChannel.getVersion()),
     host: '0.0.0.0',
@@ -853,25 +844,6 @@ async function startInternalProcessEngine(): Promise<any> {
 
   console.log(`Internal ProcessEngine starting on port ${port}.`);
 
-  process.env.http__http_extension__server__port = `${port}`;
-
-  const processEngineDatabaseFolderName = getProcessEngineDatabaseFolderName();
-
-  process.env.process_engine__process_model_repository__storage = path.join(
-    userDataFolderPath,
-    processEngineDatabaseFolderName,
-    'process_model.sqlite',
-  );
-  process.env.process_engine__flow_node_instance_repository__storage = path.join(
-    userDataFolderPath,
-    processEngineDatabaseFolderName,
-    'flow_node_instance.sqlite',
-  );
-  process.env.process_engine__timer_repository__storage = path.join(
-    userDataFolderPath,
-    processEngineDatabaseFolderName,
-    'timer.sqlite',
-  );
 
   const processEngineStatusListeners = [];
   let internalProcessEngineStatus;
