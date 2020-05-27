@@ -6,7 +6,7 @@ asar: false
 extraFiles:
   - filter:
       - build/**
-      - config/**
+      - configs/**
 nsis:
   perMachine: false
   oneClick: false
