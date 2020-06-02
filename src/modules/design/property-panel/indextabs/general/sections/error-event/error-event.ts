@@ -98,7 +98,7 @@ export class ErrorEventSection implements ISection {
 
   public updateErrorMessage(): void {
     const selectedError: IError = this.getSelectedError();
-    selectedError.$attrs['camunda:errorMessage'] = this.errorMessageVariable;
+    selectedError.errorMessage = this.errorMessageVariable;
     this.publishDiagramChange();
   }
 
@@ -255,12 +255,12 @@ export class ErrorEventSection implements ISection {
   }
 
   private persistErrorMessageInError(errorElement: IErrorEventDefinition): void {
-    const errorMessageExistOnError = this.selectedError.$attrs['camunda:errorMessage'] != null;
+    const errorMessageExistOnError = this.selectedError.errorMessage != null;
     if (errorMessageExistOnError) {
-      this.errorMessageVariable = this.selectedError.$attrs['camunda:errorMessage'];
-    } else {
+      this.errorMessageVariable = this.selectedError.errorMessage;
+    } else if (errorElement.errorMessageVariable) {
       this.errorMessageVariable = errorElement.errorMessageVariable;
-      this.selectedError.$attrs['camunda:errorMessage'] = this.errorMessageVariable;
+      this.selectedError.errorMessage = this.errorMessageVariable;
       delete errorElement.errorMessageVariable;
     }
   }
