@@ -99,7 +99,7 @@
     "@essential-projects/eslint-config": "^1.2.3",
     "@essential-projects/http_contracts": "^2.5.0",
     "@essential-projects/iam_contracts": "^3.6.3",
-    "@process-engine/bpmn-elements_contracts": "feature~fix_handling_error-messages",
+    "@process-engine/bpmn-elements_contracts": "2.1.0-alpha.5",
     "@process-engine/management_api_contracts": "13.2.0",
     "@process-engine/solutionexplorer.contracts": "1.2.0",
     "@process-engine/solutionexplorer.repository.contracts": "4.5.0",
