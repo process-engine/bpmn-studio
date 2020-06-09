@@ -96,7 +96,7 @@
   },
   "peerDependencies": {},
   "devDependencies": {
-    "@essential-projects/eslint-config": "^1.2.3",
+    "@essential-projects/eslint-config": "1.2.3",
     "@essential-projects/http_contracts": "^2.5.0",
     "@essential-projects/iam_contracts": "^3.6.3",
     "@process-engine/bpmn-elements_contracts": "2.1.0-beta.2",
