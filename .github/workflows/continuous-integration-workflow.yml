@@ -54,7 +54,7 @@ jobs:
       run: |
         cat package.json
         npm ci
-        ./node_modules/.bin/ci_tools npm-install-only --except-on-primary-branches @process-engine/ @essential-projects/
+
     - run: npm run lint
 
   build_and_test_linux:
