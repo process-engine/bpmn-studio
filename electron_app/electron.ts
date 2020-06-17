@@ -29,7 +29,7 @@ import {version as currentStudioVersion} from '../package.json';
 import {getPortListByVersion} from '../src/services/default-ports-module/default-ports.module';
 import {FeedbackData} from '../src/contracts';
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+// eslint-disable-next-line
 import electron = require('electron');
 
 const ipcMain: IpcMain = electron.ipcMain;

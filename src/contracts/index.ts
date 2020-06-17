@@ -19,7 +19,7 @@ export * from './propertypanel/index';
 export * from './form-fields/index';
 export * from './user-input-validation/index';
 export * from './inspect-process-instance/index';
-export * from './solution-explorer';
+export * from './solution-explorer/index';
 export * from './navigation/index';
 export * from './diagram/index';
 export * from './constants';
