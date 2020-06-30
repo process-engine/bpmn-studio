@@ -45,18 +45,13 @@ export class GeneralRepository {
     return startEvents;
   }
 
-  private importXmlIntoModeler(modeler: IBpmnModeler, xml: string): Promise<void> {
-    return new Promise((resolve: Function, reject: Function): void => {
-      modeler.importXML(xml, (error: Error) => {
-        const errorOccured: boolean = error !== undefined;
-        if (errorOccured) {
-          reject();
+  private async importXmlIntoModeler(modeler: IBpmnModeler, xml: string): Promise<void> {
+    try {
+      await modeler.importXML(xml);
 
-          return;
-        }
-
-        resolve();
-      });
-    });
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
 }

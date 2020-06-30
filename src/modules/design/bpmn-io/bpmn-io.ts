@@ -646,23 +646,16 @@ export class BpmnIo {
   }
 
   public async getXML(): Promise<string> {
-    const returnPromise: Promise<string> = new Promise((resolve: Function, reject: Function): void => {
-      const xmlSaveOptions: IBpmnXmlSaveOptions = {
-        format: true,
-      };
+    const xmlSaveOptions: IBpmnXmlSaveOptions = {
+      format: true,
+    };
 
-      this.modeler.saveXML(xmlSaveOptions, (error: Error, result: string) => {
-        if (error) {
-          reject(error);
-
-          return;
-        }
-
-        resolve(result);
-      });
-    });
-
-    return returnPromise;
+    try {
+      const {xml} = await this.modeler.saveXML(xmlSaveOptions);
+      return Promise.resolve(xml);
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
 
   public toggleLinter(): void {
@@ -746,58 +739,46 @@ export class BpmnIo {
     return unformattedSaveXml === unformattedXml;
   }
 
-  private importXmlIntoModeler(xml: string): Promise<void> {
-    return new Promise((resolve: Function, reject: Function): void => {
-      this.modeler.importXML(xml, (error: Error) => {
-        const errorOccured: boolean = error !== undefined;
-        if (errorOccured) {
-          reject();
+  private async importXmlIntoModeler(xml: string): Promise<void> {
+    try {
+      const result = await this.modeler.importXML(xml);
+      const {warnings} = result;
+      if (warnings.length !== 0) {
+        console.warn(warnings);
+      }
 
-          return;
-        }
-
-        resolve();
-      });
-    });
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(
+        new Error(`ERROR: failed to import xml\n\nError given:\n\n${JSON.stringify(error)}\n\nXML given:\n\n${xml}`),
+      );
+    }
   }
 
-  private importXmlIntoViewer(xml: string): Promise<void> {
-    return new Promise((resolve: Function, reject: Function): void => {
-      this.viewer.importXML(xml, (error: Error) => {
-        const errorOccured: boolean = error !== undefined;
-        if (errorOccured) {
-          reject();
+  private async importXmlIntoViewer(xml: string): Promise<void> {
+    try {
+      const result = await this.viewer.importXML(xml);
+      const {warnings} = result;
+      if (warnings.length !== 0) {
+        console.warn(warnings);
+      }
 
-          return;
-        }
-
-        resolve();
-      });
-    });
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(
+        new Error(`ERROR: failed to import xml\n\nError given:\n\n${JSON.stringify(error)}\n\nXML given:\n\n${xml}`),
+      );
+    }
   }
 
-  private convertXml(xml: string): Promise<string> {
-    return new Promise((resolve: Function, reject: Function): void => {
-      this.diagramConverter.importXML(xml, (importError: Error) => {
-        const importErrorOccured: boolean = importError !== undefined;
-        if (importErrorOccured) {
-          reject(importError);
-
-          return;
-        }
-
-        this.diagramConverter.saveXML({format: true}, (exportError: Error, convertedXml: string) => {
-          const exportErrorOccured: boolean = exportError !== undefined;
-          if (exportErrorOccured) {
-            reject(exportError);
-
-            return;
-          }
-
-          resolve(convertedXml);
-        });
-      });
-    });
+  private async convertXml(xml: string): Promise<string> {
+    try {
+      await this.diagramConverter.importXML(xml);
+      const {xml: convertedXml} = await this.diagramConverter.saveXML({format: true});
+      return Promise.resolve(convertedXml);
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
 
   private fitDiagramToViewport(force: boolean = false): void {
@@ -1029,26 +1010,13 @@ export class BpmnIo {
   };
 
   private async getSVG(): Promise<string> {
-    const returnPromise: Promise<string> = new Promise((resolve: Function, reject: Function): void => {
-      if (this.solutionIsRemote) {
-        this.viewer.saveSVG({}, (error: Error, result: string) => {
-          if (error) {
-            reject(error);
-          }
+    const bpmnInstanceToUse = this.solutionIsRemote ? this.viewer : this.modeler;
 
-          resolve(result);
-        });
-      } else {
-        this.modeler.saveSVG({}, (error: Error, result: string) => {
-          if (error) {
-            reject(error);
-          }
-
-          resolve(result);
-        });
-      }
-    });
-
-    return returnPromise;
+    try {
+      const {svg} = await bpmnInstanceToUse.saveSVG({});
+      return Promise.resolve(svg);
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
 }

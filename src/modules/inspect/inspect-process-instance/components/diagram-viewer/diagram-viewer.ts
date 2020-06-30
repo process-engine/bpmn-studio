@@ -273,33 +273,21 @@ export class DiagramViewer {
       return undefined;
     }
 
-    const xmlImportPromise: Promise<void> = new Promise((resolve: Function, reject: Function): void => {
-      this.diagramViewer.importXML(xml, (importXmlError: Error) => {
-        if (importXmlError) {
-          reject(importXmlError);
-
-          return;
-        }
-
-        resolve();
-      });
-    });
-
-    return xmlImportPromise;
+    try {
+      await this.diagramViewer.importXML(xml);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
 
   private async getSVG(): Promise<string> {
-    const returnPromise: Promise<string> = new Promise((resolve: Function, reject: Function): void => {
-      this.diagramViewer.saveSVG({format: true}, (error: Error, result: string) => {
-        if (error) {
-          reject(error);
-        }
-
-        resolve(result);
-      });
-    });
-
-    return returnPromise;
+    try {
+      const {svg} = await this.diagramViewer.saveSVG({format: true});
+      return Promise.resolve(svg);
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
 
   private handleArrowKeyInput: EventListenerOrEventListenerObject = (event: KeyboardEvent): void => {

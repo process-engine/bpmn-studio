@@ -636,38 +636,25 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
   }
 
   private async importXmlIntoDiagramModeler(diagramModeler: IBpmnModeler, xml: string): Promise<void> {
-    const xmlImportPromise: Promise<void> = new Promise((resolve: Function, reject: Function): void => {
-      diagramModeler.importXML(xml, (importXmlError: Error) => {
-        if (importXmlError) {
-          reject(importXmlError);
-
-          return;
-        }
-        resolve();
-      });
-    });
-
-    return xmlImportPromise;
+    try {
+      await diagramModeler.importXML(xml);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
 
   private async exportXmlFromDiagramModeler(diagramModeler: IBpmnModeler): Promise<string> {
-    const saveXmlPromise: Promise<string> = new Promise((resolve: Function, reject: Function): void => {
-      const xmlSaveOptions: IBpmnXmlSaveOptions = {
-        format: true,
-      };
+    const xmlSaveOptions: IBpmnXmlSaveOptions = {
+      format: true,
+    };
 
-      diagramModeler.saveXML(xmlSaveOptions, async (saveXmlError: Error, xml: string) => {
-        if (saveXmlError) {
-          reject(saveXmlError);
-
-          return;
-        }
-
-        resolve(xml);
-      });
-    });
-
-    return saveXmlPromise;
+    try {
+      const {xml} = await diagramModeler.saveXML(xmlSaveOptions);
+      return Promise.resolve(xml);
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
 
   private colorizeElements(modeling: IModeling, elements: Array<IShape>, color: IColorPickerColor): void {

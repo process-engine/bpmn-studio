@@ -326,19 +326,12 @@ export class HeatmapService implements IHeatmapService {
   }
 
   private async getXmlFromModeler(modeler: IBpmnModeler): Promise<string> {
-    const saveXmlPromise: Promise<string> = new Promise((resolve: Function, reject: Function): void => {
-      modeler.saveXML({format: true}, async (saveXmlError: Error, xml: string) => {
-        if (saveXmlError) {
-          reject(saveXmlError);
-
-          return;
-        }
-
-        resolve(xml);
-      });
-    });
-
-    return saveXmlPromise;
+    try {
+      const {xml} = await modeler.saveXML({format: true});
+      return Promise.resolve(xml);
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
 
   private getMedianRunTimeForAssociation(association: IConnection): number {
@@ -365,13 +358,13 @@ export class HeatmapService implements IHeatmapService {
           element.id,
         );
 
-        const elementActiveTokensForProcessModel: Array<
-          DataModels.Kpi.ActiveToken
-        > = activeTokenList.activeTokens.filter((token: DataModels.Kpi.ActiveToken) => {
-          const tokenIsInProcessModel: boolean = token.processModelId === processModelId;
+        const elementActiveTokensForProcessModel: Array<DataModels.Kpi.ActiveToken> = activeTokenList.activeTokens.filter(
+          (token: DataModels.Kpi.ActiveToken) => {
+            const tokenIsInProcessModel: boolean = token.processModelId === processModelId;
 
-          return tokenIsInProcessModel;
-        });
+            return tokenIsInProcessModel;
+          },
+        );
 
         return {
           activeTokens: elementActiveTokensForProcessModel,
@@ -384,13 +377,13 @@ export class HeatmapService implements IHeatmapService {
       promisesForElements,
     );
 
-    const filteredActiveTokenListArray: Array<
-      DataModels.Kpi.ActiveTokenList
-    > = activeTokenListArrayForAllElements.filter((element: DataModels.Kpi.ActiveTokenList) => {
-      const arrayIsNotEmpty: boolean = element.totalCount !== 0;
+    const filteredActiveTokenListArray: Array<DataModels.Kpi.ActiveTokenList> = activeTokenListArrayForAllElements.filter(
+      (element: DataModels.Kpi.ActiveTokenList) => {
+        const arrayIsNotEmpty: boolean = element.totalCount !== 0;
 
-      return arrayIsNotEmpty;
-    });
+        return arrayIsNotEmpty;
+      },
+    );
 
     return filteredActiveTokenListArray;
   }

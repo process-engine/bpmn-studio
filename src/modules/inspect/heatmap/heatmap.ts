@@ -124,16 +124,13 @@ export class Heatmap {
     this.fitDiagramToViewport();
   }
 
-  private pushXmlToBpmnModeler(xml: string, modeler: IBpmnModeler): Promise<void> {
-    return new Promise((resolve: Function, reject: Function): void => {
-      modeler.importXML(xml, (importXmlError: Error) => {
-        if (importXmlError) {
-          reject(importXmlError);
-          return;
-        }
-        resolve();
-      });
-    });
+  private async pushXmlToBpmnModeler(xml: string, modeler: IBpmnModeler): Promise<void> {
+    try {
+      await modeler.importXML(xml);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
 
   private fitDiagramToViewport(): void {

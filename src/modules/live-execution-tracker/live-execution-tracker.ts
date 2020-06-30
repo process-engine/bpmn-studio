@@ -854,19 +854,13 @@ export class LiveExecutionTracker {
       return undefined;
     }
 
-    const xmlImportPromise: Promise<void> = new Promise((resolve: Function, reject: Function): void => {
-      this.diagramViewer.importXML(xml, (importXmlError: Error) => {
-        if (importXmlError) {
-          reject(importXmlError);
+    try {
+      await this.diagramViewer.importXML(xml);
 
-          return;
-        }
-
-        resolve();
-      });
-    });
-
-    return xmlImportPromise;
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
 
   private getElementIdByOverlayHtmlId(overlayHtmlId: string): string {
@@ -884,38 +878,26 @@ export class LiveExecutionTracker {
       return undefined;
     }
 
-    const xmlImportPromise: Promise<void> = new Promise((resolve: Function, reject: Function): void => {
-      this.diagramPreviewViewer.importXML(xml, (importXmlError: Error) => {
-        if (importXmlError) {
-          reject(importXmlError);
+    try {
+      await this.diagramPreviewViewer.importXML(xml);
 
-          return;
-        }
-        resolve();
-      });
-    });
-
-    return xmlImportPromise;
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
 
   private async exportXmlFromDiagramViewer(): Promise<string> {
-    const saveXmlPromise: Promise<string> = new Promise((resolve: Function, reject: Function): void => {
-      const xmlSaveOptions: IBpmnXmlSaveOptions = {
-        format: true,
-      };
+    const xmlSaveOptions: IBpmnXmlSaveOptions = {
+      format: true,
+    };
 
-      this.diagramViewer.saveXML(xmlSaveOptions, async (saveXmlError: Error, xml: string) => {
-        if (saveXmlError) {
-          reject(saveXmlError);
-
-          return;
-        }
-
-        resolve(xml);
-      });
-    });
-
-    return saveXmlPromise;
+    try {
+      const {xml} = await this.diagramViewer.saveXML(xmlSaveOptions);
+      return Promise.resolve(xml);
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
 
   private async handleElementColorization(): Promise<void> {

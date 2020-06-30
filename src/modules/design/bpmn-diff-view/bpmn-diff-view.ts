@@ -334,17 +334,15 @@ export class BpmnDiffView {
   }
 
   private async getDefintionsFromXml(xml: string): Promise<any> {
-    return new Promise((resolve: Function, reject: Function): void => {
-      const moddle: IBpmnModdle = this.diffModeler.get('moddle');
+    const moddle: IBpmnModdle = this.diffModeler.get('moddle');
 
-      moddle.fromXML(xml, (error: Error, definitions: IDefinition) => {
-        if (error) {
-          reject(error);
-        }
+    try {
+      const {rootElement: definitions} = await moddle.fromXML(xml);
 
-        resolve(definitions);
-      });
-    });
+      return Promise.resolve(definitions);
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
 
   private getChangeListEntriesFromChanges(
@@ -564,21 +562,13 @@ export class BpmnDiffView {
       return undefined;
     }
 
-    const xmlImportPromise: Promise<void> = new Promise((resolve: Function, reject: Function): void => {
-      viewer.importXML(xml, (importXmlError: Error) => {
-        if (importXmlError) {
-          reject(importXmlError);
-
-          return;
-        }
-
-        this.fitDiagramToViewport(viewer);
-
-        resolve();
-      });
-    });
-
-    return xmlImportPromise;
+    try {
+      await viewer.importXML(xml);
+      this.fitDiagramToViewport(viewer);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
 
   private fitDiagramToViewport(viewer: IBpmnModeler): void {
@@ -592,23 +582,16 @@ export class BpmnDiffView {
   }
 
   private async exportXml(modeler: IBpmnModeler): Promise<string> {
-    const exportXmlPromise: Promise<string> = new Promise((resolve: Function, reject: Function): void => {
-      const xmlSaveOptions: IBpmnXmlSaveOptions = {
-        format: true,
-      };
+    const xmlSaveOptions: IBpmnXmlSaveOptions = {
+      format: true,
+    };
 
-      modeler.saveXML(xmlSaveOptions, async (saveXmlError: Error, xml: string) => {
-        if (saveXmlError) {
-          reject(saveXmlError);
-
-          return;
-        }
-
-        resolve(xml);
-      });
-    });
-
-    return exportXmlPromise;
+    try {
+      const {xml} = await modeler.saveXML(xmlSaveOptions);
+      return Promise.resolve(xml);
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
 
   private createNewViewer(): IBpmnModeler {
