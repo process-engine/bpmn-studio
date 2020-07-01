@@ -74,7 +74,7 @@ export class Heatmap {
       },
     });
 
-    await this.pushXmlToBpmnModeler(this.activeDiagram.xml, this.modeler);
+    await this.modeler.importXML(this.activeDiagram.xml);
 
     const elementRegistry: IElementRegistry = this.modeler.get('elementRegistry');
     /*
@@ -105,7 +105,7 @@ export class Heatmap {
       additionalModules: [bundle.ZoomScrollModule, bundle.MoveCanvasModule, bundle.MiniMap],
     });
 
-    await this.pushXmlToBpmnModeler(xml, this.viewer);
+    await this.viewer.importXML(xml);
 
     const overlays: IOverlayManager = this.viewer.get('overlays');
 
@@ -122,10 +122,6 @@ export class Heatmap {
     }
 
     this.fitDiagramToViewport();
-  }
-
-  private async pushXmlToBpmnModeler(xml: string, modeler: IBpmnModeler): Promise<void> {
-    await modeler.importXML(xml);
   }
 
   private fitDiagramToViewport(): void {

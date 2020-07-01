@@ -36,16 +36,12 @@ export class GeneralRepository {
       },
     });
 
-    await this.importXmlIntoModeler(modeler, diagram.xml);
+    await modeler.importXML(diagram.xml);
 
     const elementRegistry: IElementRegistry = modeler.get('elementRegistry');
 
     const startEvents = elementRegistry.filter((element: IShape) => element.type === 'bpmn:StartEvent');
 
     return startEvents;
-  }
-
-  private async importXmlIntoModeler(modeler: IBpmnModeler, xml: string): Promise<void> {
-    await modeler.importXML(xml);
   }
 }

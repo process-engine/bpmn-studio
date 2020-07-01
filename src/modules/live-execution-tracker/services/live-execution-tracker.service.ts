@@ -452,7 +452,7 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
     const modeling: IModeling = diagramModeler.get('modeling');
     const elementRegistry: IElementRegistry = diagramModeler.get('elementRegistry');
 
-    await this.importXmlIntoDiagramModeler(diagramModeler, xml);
+    await diagramModeler.importXML(xml);
 
     const elementsWithColor: Array<IShape> = elementRegistry.filter((element: IShape): boolean => {
       const elementHasFillColor: boolean = element.businessObject.di.fill !== undefined;
@@ -488,7 +488,7 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
   ): Promise<string> {
     const diagramModeler: IBpmnModeler = new bundle.modeler();
 
-    await this.importXmlIntoDiagramModeler(diagramModeler, xml);
+    await diagramModeler.importXML(xml);
 
     const modeling = diagramModeler.get('modeling');
     const elementRegistry = diagramModeler.get('elementRegistry');
@@ -633,10 +633,6 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
     });
 
     return callActivities;
-  }
-
-  private async importXmlIntoDiagramModeler(diagramModeler: IBpmnModeler, xml: string): Promise<void> {
-    await diagramModeler.importXML(xml);
   }
 
   private async exportXmlFromDiagramModeler(diagramModeler: IBpmnModeler): Promise<string> {
