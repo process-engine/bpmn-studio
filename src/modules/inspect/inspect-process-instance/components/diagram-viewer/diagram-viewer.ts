@@ -270,7 +270,7 @@ export class DiagramViewer {
         'The xml could not be loaded. Please try to reopen the Inspect Process Instance view.';
       this.notificationService.showNotification(NotificationType.ERROR, notificationMessage);
 
-      return undefined;
+      return;
     }
 
     await this.diagramViewer.importXML(xml);

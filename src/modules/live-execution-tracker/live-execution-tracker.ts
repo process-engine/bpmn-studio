@@ -851,11 +851,10 @@ export class LiveExecutionTracker {
 
       this.notificationService.showNotification(NotificationType.ERROR, xmlCouldNotBeLoadedMessage);
 
-      return undefined;
+      return;
     }
 
     await this.diagramViewer.importXML(xml);
-
   }
 
   private getElementIdByOverlayHtmlId(overlayHtmlId: string): string {
@@ -870,11 +869,10 @@ export class LiveExecutionTracker {
 
       this.notificationService.showNotification(NotificationType.ERROR, xmlCouldNotBeLoadedMessage);
 
-      return undefined;
+      return;
     }
 
     await this.diagramPreviewViewer.importXML(xml);
-
   }
 
   private async exportXmlFromDiagramViewer(): Promise<string> {
