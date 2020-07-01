@@ -273,21 +273,12 @@ export class DiagramViewer {
       return undefined;
     }
 
-    try {
-      await this.diagramViewer.importXML(xml);
-      return Promise.resolve();
-    } catch (error) {
-      return Promise.reject(error);
-    }
+    await this.diagramViewer.importXML(xml);
   }
 
   private async getSVG(): Promise<string> {
-    try {
-      const {svg} = await this.diagramViewer.saveSVG({format: true});
-      return Promise.resolve(svg);
-    } catch (error) {
-      return Promise.reject(error);
-    }
+    const {svg} = await this.diagramViewer.saveSVG({format: true});
+    return svg;
   }
 
   private handleArrowKeyInput: EventListenerOrEventListenerObject = (event: KeyboardEvent): void => {

@@ -559,16 +559,11 @@ export class BpmnDiffView {
         'The xml could not be loaded. Please try to reopen the Diff View or reload the Detail View.';
       this.notificationService.showNotification(NotificationType.ERROR, notificationMessage);
 
-      return undefined;
+      return;
     }
 
-    try {
-      await viewer.importXML(xml);
-      this.fitDiagramToViewport(viewer);
-      return Promise.resolve();
-    } catch (error) {
-      return Promise.reject(error);
-    }
+    await viewer.importXML(xml);
+    this.fitDiagramToViewport(viewer);
   }
 
   private fitDiagramToViewport(viewer: IBpmnModeler): void {
@@ -586,12 +581,9 @@ export class BpmnDiffView {
       format: true,
     };
 
-    try {
-      const {xml} = await modeler.saveXML(xmlSaveOptions);
-      return Promise.resolve(xml);
-    } catch (error) {
-      return Promise.reject(error);
-    }
+    const {xml} = await modeler.saveXML(xmlSaveOptions);
+
+    return xml;
   }
 
   private createNewViewer(): IBpmnModeler {

@@ -46,12 +46,6 @@ export class GeneralRepository {
   }
 
   private async importXmlIntoModeler(modeler: IBpmnModeler, xml: string): Promise<void> {
-    try {
-      await modeler.importXML(xml);
-
-      return Promise.resolve();
-    } catch (error) {
-      return Promise.reject(error);
-    }
+    await modeler.importXML(xml);
   }
 }

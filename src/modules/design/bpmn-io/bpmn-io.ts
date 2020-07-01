@@ -650,12 +650,9 @@ export class BpmnIo {
       format: true,
     };
 
-    try {
-      const {xml} = await this.modeler.saveXML(xmlSaveOptions);
-      return Promise.resolve(xml);
-    } catch (error) {
-      return Promise.reject(error);
-    }
+    const {xml} = await this.modeler.saveXML(xmlSaveOptions);
+
+    return xml;
   }
 
   public toggleLinter(): void {
@@ -747,11 +744,8 @@ export class BpmnIo {
         console.warn(warnings);
       }
 
-      return Promise.resolve();
     } catch (error) {
-      return Promise.reject(
-        new Error(`ERROR: failed to import xml\n\nError given:\n\n${JSON.stringify(error)}\n\nXML given:\n\n${xml}`),
-      );
+      throw new Error(`ERROR: failed to import xml\n\nError given:\n\n${JSON.stringify(error)}\n\nXML given:\n\n${xml}`);
     }
   }
 
@@ -763,22 +757,16 @@ export class BpmnIo {
         console.warn(warnings);
       }
 
-      return Promise.resolve();
     } catch (error) {
-      return Promise.reject(
-        new Error(`ERROR: failed to import xml\n\nError given:\n\n${JSON.stringify(error)}\n\nXML given:\n\n${xml}`),
-      );
+      throw new Error(`ERROR: failed to import xml\n\nError given:\n\n${JSON.stringify(error)}\n\nXML given:\n\n${xml}`);
     }
   }
 
   private async convertXml(xml: string): Promise<string> {
-    try {
-      await this.diagramConverter.importXML(xml);
-      const {xml: convertedXml} = await this.diagramConverter.saveXML({format: true});
-      return Promise.resolve(convertedXml);
-    } catch (error) {
-      return Promise.reject(error);
-    }
+    await this.diagramConverter.importXML(xml);
+    const {xml: convertedXml} = await this.diagramConverter.saveXML({format: true});
+
+    return convertedXml;
   }
 
   private fitDiagramToViewport(force: boolean = false): void {
@@ -1012,11 +1000,7 @@ export class BpmnIo {
   private async getSVG(): Promise<string> {
     const bpmnInstanceToUse = this.solutionIsRemote ? this.viewer : this.modeler;
 
-    try {
-      const {svg} = await bpmnInstanceToUse.saveSVG({});
-      return Promise.resolve(svg);
-    } catch (error) {
-      return Promise.reject(error);
-    }
+    const {svg} = await bpmnInstanceToUse.saveSVG({});
+    return svg;
   }
 }

@@ -636,12 +636,7 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
   }
 
   private async importXmlIntoDiagramModeler(diagramModeler: IBpmnModeler, xml: string): Promise<void> {
-    try {
-      await diagramModeler.importXML(xml);
-      return Promise.resolve();
-    } catch (error) {
-      return Promise.reject(error);
-    }
+    await diagramModeler.importXML(xml);
   }
 
   private async exportXmlFromDiagramModeler(diagramModeler: IBpmnModeler): Promise<string> {
@@ -649,12 +644,8 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
       format: true,
     };
 
-    try {
-      const {xml} = await diagramModeler.saveXML(xmlSaveOptions);
-      return Promise.resolve(xml);
-    } catch (error) {
-      return Promise.reject(error);
-    }
+    const {xml} = await diagramModeler.saveXML(xmlSaveOptions);
+    return xml;
   }
 
   private colorizeElements(modeling: IModeling, elements: Array<IShape>, color: IColorPickerColor): void {

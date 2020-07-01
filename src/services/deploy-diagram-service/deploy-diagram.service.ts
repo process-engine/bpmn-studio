@@ -115,20 +115,16 @@ export class DeployDiagramService {
   }
 
   private async getProcessModelIdForXml(xml: string): Promise<string> {
-    try {
-      const {rootElement: definitions} = await this.moddle.fromXML(xml);
+    const {rootElement: definitions} = await this.moddle.fromXML(xml);
 
-      const rootElements: Array<IModdleElement> = definitions.rootElements;
+    const rootElements: Array<IModdleElement> = definitions.rootElements;
 
-      const processModel: IModdleElement = rootElements.find((definition: IModdleElement) => {
-        return definition.$type === 'bpmn:Process';
+    const processModel: IModdleElement = rootElements.find((definition: IModdleElement) => {
+      return definition.$type === 'bpmn:Process';
       });
-      const processModelId: string = processModel.id;
+    const processModelId: string = processModel.id;
 
-      return Promise.resolve(processModelId);
-    } catch (error) {
-      return Promise.reject(error);
-    }
+    return processModelId;
   }
 
   private async diagramIsAlreadyDeployed(solution: ISolutionEntry, processModelId: string): Promise<boolean> {

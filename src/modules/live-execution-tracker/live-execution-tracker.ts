@@ -854,13 +854,8 @@ export class LiveExecutionTracker {
       return undefined;
     }
 
-    try {
-      await this.diagramViewer.importXML(xml);
+    await this.diagramViewer.importXML(xml);
 
-      return Promise.resolve();
-    } catch (error) {
-      return Promise.reject(error);
-    }
   }
 
   private getElementIdByOverlayHtmlId(overlayHtmlId: string): string {
@@ -878,13 +873,8 @@ export class LiveExecutionTracker {
       return undefined;
     }
 
-    try {
-      await this.diagramPreviewViewer.importXML(xml);
+    await this.diagramPreviewViewer.importXML(xml);
 
-      return Promise.resolve();
-    } catch (error) {
-      return Promise.reject(error);
-    }
   }
 
   private async exportXmlFromDiagramViewer(): Promise<string> {
@@ -892,12 +882,8 @@ export class LiveExecutionTracker {
       format: true,
     };
 
-    try {
-      const {xml} = await this.diagramViewer.saveXML(xmlSaveOptions);
-      return Promise.resolve(xml);
-    } catch (error) {
-      return Promise.reject(error);
-    }
+    const {xml} = await this.diagramViewer.saveXML(xmlSaveOptions);
+    return xml;
   }
 
   private async handleElementColorization(): Promise<void> {

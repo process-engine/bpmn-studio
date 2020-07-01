@@ -326,12 +326,8 @@ export class HeatmapService implements IHeatmapService {
   }
 
   private async getXmlFromModeler(modeler: IBpmnModeler): Promise<string> {
-    try {
-      const {xml} = await modeler.saveXML({format: true});
-      return Promise.resolve(xml);
-    } catch (error) {
-      return Promise.reject(error);
-    }
+    const {xml} = await modeler.saveXML({format: true});
+    return xml;
   }
 
   private getMedianRunTimeForAssociation(association: IConnection): number {
