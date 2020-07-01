@@ -91,7 +91,7 @@ export class SignalEventSection implements ISection {
     this.publishDiagramChange();
   }
 
-  public addSignal(): void {
+  public async addSignal(): Promise<void> {
     const bpmnSignalProperty: {id: string; name: string} = {
       id: `Signal_${generateRandomId()}`,
       name: 'Signal Name',
@@ -100,15 +100,15 @@ export class SignalEventSection implements ISection {
 
     this.modeler._definitions.rootElements.push(bpmnSignal);
 
-    this.moddle.toXML(this.modeler._definitions.rootElements, (toXMLError: Error, xmlStrUpdated: string) => {
-      this.modeler.importXML(xmlStrUpdated, async (importXMLError: Error) => {
-        await this.refreshSignals();
-        await this.setBusinessObj();
-        this.selectedId = bpmnSignal.id;
-        this.selectedSignal = bpmnSignal;
-        this.updateSignal();
-      });
-    });
+    const {xml: xmlStrUpdated} = await this.moddle.toXML(this.modeler._definitions.rootElements);
+
+    await this.modeler.importXML(xmlStrUpdated);
+    await this.refreshSignals();
+    this.setBusinessObj();
+    this.selectedId = bpmnSignal.id;
+    this.selectedSignal = bpmnSignal;
+    this.updateSignal();
+
     this.publishDiagramChange();
   }
 

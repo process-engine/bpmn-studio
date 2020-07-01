@@ -75,7 +75,7 @@ export class PropertyPanel {
     this.selectPreviouslySelectedOrFirstElement();
   }
 
-  public selectPreviouslySelectedOrFirstElement(): void {
+  public async selectPreviouslySelectedOrFirstElement(): Promise<void> {
     const diagramState: IDiagramState = this.openDiagramStateService.loadDiagramState(this.diagramUri);
 
     const noSelectedElementState: boolean =
@@ -84,7 +84,7 @@ export class PropertyPanel {
       diagramState.metadata.selectedElements.length === 0;
 
     if (noSelectedElementState) {
-      this.setFirstElement();
+      await this.setFirstElement();
 
       return;
     }
@@ -94,34 +94,34 @@ export class PropertyPanel {
     this.selectElementById(selectedElementId);
   }
 
-  private setFirstElement(): void {
+  private async setFirstElement(): Promise<void> {
     let firstElement: IModdleElement;
 
-    this.moddle.fromXML(this.xml, (err: Error, definitions: IDefinition): void => {
-      const process: IModdleElement = definitions.rootElements.find((element: IModdleElement) => {
-        return element.$type === 'bpmn:Process';
+    const {rootElement: definitions} = await this.moddle.fromXML(this.xml);
+
+    const process: IModdleElement = definitions.rootElements.find((element: IModdleElement) => {
+      return element.$type === 'bpmn:Process';
+    });
+
+    const processHasFlowElements: boolean = process.flowElements !== undefined && process.flowElements !== null;
+
+    if (processHasFlowElements) {
+      firstElement = process.flowElements.find((element: IModdleElement) => {
+        return element.$type === 'bpmn:StartEvent';
       });
 
-      const processHasFlowElements: boolean = process.flowElements !== undefined && process.flowElements !== null;
-
-      if (processHasFlowElements) {
-        firstElement = process.flowElements.find((element: IModdleElement) => {
-          return element.$type === 'bpmn:StartEvent';
-        });
-
-        if (firstElement === undefined || firstElement === null) {
-          firstElement = process.flowElements[0];
-        }
-      } else if (this.processHasLanes(process)) {
-        firstElement = process.laneSets[0].lanes[0];
+      if (firstElement === undefined || firstElement === null) {
+        firstElement = process.flowElements[0];
       }
+    } else if (this.processHasLanes(process)) {
+      firstElement = process.laneSets[0].lanes[0];
+    }
 
-      if (!firstElement) {
-        firstElement = process;
-      }
+    if (!firstElement) {
+      firstElement = process;
+    }
 
-      this.selectElementById(firstElement.id);
-    });
+    this.selectElementById(firstElement.id);
   }
 
   private selectElementById(elementId: string): void {

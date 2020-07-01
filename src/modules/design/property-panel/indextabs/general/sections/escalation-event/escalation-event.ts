@@ -89,7 +89,7 @@ export class EscalationEventSection implements ISection {
     this.publishDiagramChange();
   }
 
-  public addEscalation(): void {
+  public async addEscalation(): Promise<void> {
     const bpmnEscalationProperty: {id: string; name: string} = {
       id: `Escalation_${generateRandomId()}`,
       name: 'Escalation Name',
@@ -98,15 +98,14 @@ export class EscalationEventSection implements ISection {
 
     this.modeler._definitions.rootElements.push(bpmnEscalation);
 
-    this.moddle.toXML(this.modeler._definitions.rootElements, (toXMLError: Error, xmlStrUpdated: string) => {
-      this.modeler.importXML(xmlStrUpdated, async (importXMLError: Error) => {
-        await this.refreshEscalations();
-        await this.setBusinessObject();
-        this.selectedId = bpmnEscalation.id;
-        this.selectedEscalation = bpmnEscalation;
-        this.updateEscalation();
-      });
-    });
+    const {xml: xmlStrUpdated} = await this.moddle.toXML(this.modeler._definitions.rootElements);
+    await this.modeler.importXML(xmlStrUpdated);
+    await this.refreshEscalations();
+    await this.setBusinessObject();
+    this.selectedId = bpmnEscalation.id;
+    this.selectedEscalation = bpmnEscalation;
+    this.updateEscalation();
+
     this.publishDiagramChange();
   }
 

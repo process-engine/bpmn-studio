@@ -452,7 +452,7 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
     const modeling: IModeling = diagramModeler.get('modeling');
     const elementRegistry: IElementRegistry = diagramModeler.get('elementRegistry');
 
-    await this.importXmlIntoDiagramModeler(diagramModeler, xml);
+    await diagramModeler.importXML(xml);
 
     const elementsWithColor: Array<IShape> = elementRegistry.filter((element: IShape): boolean => {
       const elementHasFillColor: boolean = element.businessObject.di.fill !== undefined;
@@ -488,7 +488,7 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
   ): Promise<string> {
     const diagramModeler: IBpmnModeler = new bundle.modeler();
 
-    await this.importXmlIntoDiagramModeler(diagramModeler, xml);
+    await diagramModeler.importXML(xml);
 
     const modeling = diagramModeler.get('modeling');
     const elementRegistry = diagramModeler.get('elementRegistry');
@@ -635,39 +635,13 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
     return callActivities;
   }
 
-  private async importXmlIntoDiagramModeler(diagramModeler: IBpmnModeler, xml: string): Promise<void> {
-    const xmlImportPromise: Promise<void> = new Promise((resolve: Function, reject: Function): void => {
-      diagramModeler.importXML(xml, (importXmlError: Error) => {
-        if (importXmlError) {
-          reject(importXmlError);
-
-          return;
-        }
-        resolve();
-      });
-    });
-
-    return xmlImportPromise;
-  }
-
   private async exportXmlFromDiagramModeler(diagramModeler: IBpmnModeler): Promise<string> {
-    const saveXmlPromise: Promise<string> = new Promise((resolve: Function, reject: Function): void => {
-      const xmlSaveOptions: IBpmnXmlSaveOptions = {
-        format: true,
-      };
+    const xmlSaveOptions: IBpmnXmlSaveOptions = {
+      format: true,
+    };
 
-      diagramModeler.saveXML(xmlSaveOptions, async (saveXmlError: Error, xml: string) => {
-        if (saveXmlError) {
-          reject(saveXmlError);
-
-          return;
-        }
-
-        resolve(xml);
-      });
-    });
-
-    return saveXmlPromise;
+    const {xml} = await diagramModeler.saveXML(xmlSaveOptions);
+    return xml;
   }
 
   private colorizeElements(modeling: IModeling, elements: Array<IShape>, color: IColorPickerColor): void {

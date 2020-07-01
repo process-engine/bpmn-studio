@@ -36,27 +36,12 @@ export class GeneralRepository {
       },
     });
 
-    await this.importXmlIntoModeler(modeler, diagram.xml);
+    await modeler.importXML(diagram.xml);
 
     const elementRegistry: IElementRegistry = modeler.get('elementRegistry');
 
     const startEvents = elementRegistry.filter((element: IShape) => element.type === 'bpmn:StartEvent');
 
     return startEvents;
-  }
-
-  private importXmlIntoModeler(modeler: IBpmnModeler, xml: string): Promise<void> {
-    return new Promise((resolve: Function, reject: Function): void => {
-      modeler.importXML(xml, (error: Error) => {
-        const errorOccured: boolean = error !== undefined;
-        if (errorOccured) {
-          reject();
-
-          return;
-        }
-
-        resolve();
-      });
-    });
   }
 }

@@ -4,7 +4,7 @@ import {IDefinition, IIds} from './index';
 
 export interface IBpmnModdle {
   ids: IIds;
-  fromXML(xml: string, callback: (err: Error, definitions: IDefinition) => void): void;
+  fromXML(xml: string): Promise<any>;
   create(name: string, attributes: object): IModdleElement;
-  toXML(definitions: IDefinition, callback: (err: Error, xmlStrUpdated: string) => void): void;
+  toXML(definitions: IDefinition): Promise<any>;
 }

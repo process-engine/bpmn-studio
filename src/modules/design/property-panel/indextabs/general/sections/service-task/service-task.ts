@@ -32,6 +32,10 @@ export class ServiceTaskSection implements ISection {
   }
 
   public activate(model: IPageModel): void {
+    if (model == null) {
+      return;
+    }
+
     this.serviceTaskService = new ServiceTaskService(model);
 
     this.businessObjInPanel = model.elementInPanel.businessObject;
