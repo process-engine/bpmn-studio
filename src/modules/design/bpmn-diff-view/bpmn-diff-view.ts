@@ -336,13 +336,9 @@ export class BpmnDiffView {
   private async getDefintionsFromXml(xml: string): Promise<any> {
     const moddle: IBpmnModdle = this.diffModeler.get('moddle');
 
-    try {
-      const {rootElement: definitions} = await moddle.fromXML(xml);
+    const {rootElement: definitions} = await moddle.fromXML(xml);
 
-      return Promise.resolve(definitions);
-    } catch (error) {
-      return Promise.reject(error);
-    }
+    return definitions;
   }
 
   private getChangeListEntriesFromChanges(
