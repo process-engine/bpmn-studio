@@ -270,36 +270,15 @@ export class DiagramViewer {
         'The xml could not be loaded. Please try to reopen the Inspect Process Instance view.';
       this.notificationService.showNotification(NotificationType.ERROR, notificationMessage);
 
-      return undefined;
+      return;
     }
 
-    const xmlImportPromise: Promise<void> = new Promise((resolve: Function, reject: Function): void => {
-      this.diagramViewer.importXML(xml, (importXmlError: Error) => {
-        if (importXmlError) {
-          reject(importXmlError);
-
-          return;
-        }
-
-        resolve();
-      });
-    });
-
-    return xmlImportPromise;
+    await this.diagramViewer.importXML(xml);
   }
 
   private async getSVG(): Promise<string> {
-    const returnPromise: Promise<string> = new Promise((resolve: Function, reject: Function): void => {
-      this.diagramViewer.saveSVG({format: true}, (error: Error, result: string) => {
-        if (error) {
-          reject(error);
-        }
-
-        resolve(result);
-      });
-    });
-
-    return returnPromise;
+    const {svg} = await this.diagramViewer.saveSVG({format: true});
+    return svg;
   }
 
   private handleArrowKeyInput: EventListenerOrEventListenerObject = (event: KeyboardEvent): void => {

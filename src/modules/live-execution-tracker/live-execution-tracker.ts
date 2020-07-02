@@ -851,22 +851,10 @@ export class LiveExecutionTracker {
 
       this.notificationService.showNotification(NotificationType.ERROR, xmlCouldNotBeLoadedMessage);
 
-      return undefined;
+      return;
     }
 
-    const xmlImportPromise: Promise<void> = new Promise((resolve: Function, reject: Function): void => {
-      this.diagramViewer.importXML(xml, (importXmlError: Error) => {
-        if (importXmlError) {
-          reject(importXmlError);
-
-          return;
-        }
-
-        resolve();
-      });
-    });
-
-    return xmlImportPromise;
+    await this.diagramViewer.importXML(xml);
   }
 
   private getElementIdByOverlayHtmlId(overlayHtmlId: string): string {
@@ -881,41 +869,19 @@ export class LiveExecutionTracker {
 
       this.notificationService.showNotification(NotificationType.ERROR, xmlCouldNotBeLoadedMessage);
 
-      return undefined;
+      return;
     }
 
-    const xmlImportPromise: Promise<void> = new Promise((resolve: Function, reject: Function): void => {
-      this.diagramPreviewViewer.importXML(xml, (importXmlError: Error) => {
-        if (importXmlError) {
-          reject(importXmlError);
-
-          return;
-        }
-        resolve();
-      });
-    });
-
-    return xmlImportPromise;
+    await this.diagramPreviewViewer.importXML(xml);
   }
 
   private async exportXmlFromDiagramViewer(): Promise<string> {
-    const saveXmlPromise: Promise<string> = new Promise((resolve: Function, reject: Function): void => {
-      const xmlSaveOptions: IBpmnXmlSaveOptions = {
-        format: true,
-      };
+    const xmlSaveOptions: IBpmnXmlSaveOptions = {
+      format: true,
+    };
 
-      this.diagramViewer.saveXML(xmlSaveOptions, async (saveXmlError: Error, xml: string) => {
-        if (saveXmlError) {
-          reject(saveXmlError);
-
-          return;
-        }
-
-        resolve(xml);
-      });
-    });
-
-    return saveXmlPromise;
+    const {xml} = await this.diagramViewer.saveXML(xmlSaveOptions);
+    return xml;
   }
 
   private async handleElementColorization(): Promise<void> {

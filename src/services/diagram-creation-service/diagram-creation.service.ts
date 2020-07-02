@@ -44,15 +44,14 @@ export class DiagramCreationService implements IDiagramCreationService {
       },
     });
 
-    modeler.importXML(xml, (error: Error) => {
-      const errorOccured: boolean = error !== undefined;
-      if (errorOccured) {
-        this.notificationService.showNotification(NotificationType.ERROR, `Failed to copy diagram. ${error.message}`);
-      }
-    });
+    try {
+      await modeler.importXML(xml);
+    } catch (error) {
+      this.notificationService.showNotification(NotificationType.ERROR, `Failed to copy diagram. ${error.message}`);
+    }
 
     const promise: Promise<string> = new Promise((resolve: Function, reject: Function): void => {
-      modeler.on('import.done', () => {
+      modeler.on('import.done', async () => {
         // eslint-disable-next-line no-underscore-dangle
         const rootElements: Array<IModdleElement> = modeler._definitions.rootElements;
         const process: IProcessRef = rootElements.find((element: IModdleElement) => {
@@ -70,21 +69,16 @@ export class DiagramCreationService implements IDiagramCreationService {
         participant.name = name;
         participant.processRef = process;
 
-        modeler.saveXML({}, (error: Error, result: string) => {
-          const errorOccured: boolean = error !== undefined;
-          if (errorOccured) {
-            this.notificationService.showNotification(
-              NotificationType.ERROR,
-              `Failed to copy the diagram. Cause: ${error.message}`,
-            );
-
-            reject(error);
-
-            return;
-          }
-
-          resolve(result);
-        });
+        try {
+          const {xml: xmlFromModeler} = await modeler.saveXML({});
+          resolve(xmlFromModeler);
+        } catch (error) {
+          this.notificationService.showNotification(
+            NotificationType.ERROR,
+            `Failed to copy the diagram. Cause: ${error.message}`,
+          );
+          reject(error);
+        }
       });
     });
 

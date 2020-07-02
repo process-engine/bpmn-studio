@@ -84,7 +84,7 @@ export class MessageEventSection implements ISection {
     this.publishDiagramChange();
   }
 
-  public addMessage(): void {
+  public async addMessage(): Promise<void> {
     const bpmnMessageProperty: {id: string; name: string} = {
       id: `Message_${generateRandomId()}`,
       name: 'Message Name',
@@ -93,15 +93,14 @@ export class MessageEventSection implements ISection {
 
     this.modeler._definitions.rootElements.push(bpmnMessage);
 
-    this.moddle.toXML(this.modeler._definitions.rootElements, (toXMLError: Error, xmlStrUpdated: string) => {
-      this.modeler.importXML(xmlStrUpdated, async (importXMLError: Error) => {
-        await this.refreshMessages();
-        await this.setBusinessObj();
+    const {xml: xmlStrUpdated} = await this.moddle.toXML(this.modeler._definitions.rootElements);
+    await this.modeler.importXML(xmlStrUpdated);
+    await this.refreshMessages();
+    await this.setBusinessObj();
 
-        this.selectedId = bpmnMessage.id;
-        this.updateMessage();
-      });
-    });
+    this.selectedId = bpmnMessage.id;
+    this.updateMessage();
+
     this.publishDiagramChange();
   }
 

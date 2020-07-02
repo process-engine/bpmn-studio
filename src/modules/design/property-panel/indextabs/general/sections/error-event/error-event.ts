@@ -111,15 +111,14 @@ export class ErrorEventSection implements ISection {
 
     this.modeler._definitions.rootElements.push(bpmnError);
 
-    this.moddle.toXML(this.modeler._definitions, (toXMLError: Error, xmlStrUpdated: string) => {
-      this.modeler.importXML(xmlStrUpdated, async (importXMLError: Error) => {
-        await this.refreshErrors();
-        await this.setBusinessObject();
-        this.selectedId = bpmnError.id;
-        this.selectedError = bpmnError;
-        this.updateError();
-      });
-    });
+    const {xml: xmlStrUpdated} = await this.moddle.toXML(this.modeler._definitions);
+    await this.modeler.importXML(xmlStrUpdated);
+    await this.refreshErrors();
+    this.setBusinessObject();
+    this.selectedId = bpmnError.id;
+    this.selectedError = bpmnError;
+    this.updateError();
+
     this.publishDiagramChange();
   }
 
