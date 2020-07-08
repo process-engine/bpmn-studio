@@ -43,7 +43,6 @@ export class UntypedTaskSection implements ISection {
       return false;
     }
 
-    console.log(element);
     return element.businessObject.$type === 'bpmn:Task';
   }
 
