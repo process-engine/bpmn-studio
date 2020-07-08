@@ -1,0 +1,19 @@
+<template>
+  <require from="./untyped-task.css"></require>
+  <require from="../../../../styles/sections.css"></require>
+  <div class="section-panel">
+    <div class="panel__heading">
+      Breakpoint
+    </div>
+    <div class="panel__content">
+      <table class="props-table">
+        <tr>
+          <th>Enabled</th>
+          <td>
+            <input type="checkbox" class="props-input" checked.bind="enabled" disabled.bind="!isEditable">
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</template>
