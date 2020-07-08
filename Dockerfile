@@ -12,7 +12,7 @@ WORKDIR /bpmn-studio
 
 ADD 'bpmn-studio.tar.gz' ./
 
-RUN npm run electron-rebuild-sqlite-forced && \
+RUN npm install sqlite3 && \
     npm prune --production && \
     npm link --only=production && \
     cd node_modules/@atlas-engine/fullstack_server && \

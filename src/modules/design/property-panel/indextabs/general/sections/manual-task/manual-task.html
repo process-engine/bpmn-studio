@@ -1,0 +1,19 @@
+<template>
+  <require from="./manual-task.css"></require>
+  <require from="../../../../styles/sections.css"></require>
+  <div class="section-panel">
+    <div class="panel__heading">
+      Requires Confirmation
+    </div>
+    <div class="panel__content">
+      <table class="props-table">
+        <tr>
+          <th>Confirmation</th>
+          <td>
+            <input type="checkbox" class="props-input" checked.bind="requiresConfirmation" disabled.bind="!isEditable">
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</template>
