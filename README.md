@@ -230,10 +230,6 @@ Die folgenden Skripte, werden in unserem Tooling verwendet:
 
   Baut die Electron-Anwendung für Windows.
 
-* `electron-rebuild`
-
-  Baut alle nativen Abhängigkeiten.
-
 * `test`
 
   Führt die Spectron Tests für das BPMN Studio in Electron aus.
