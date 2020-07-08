@@ -51,4 +51,3 @@ fi
 # Build all modules
 echo "Building..."
 npm run build
-npm run electron-rebuild
