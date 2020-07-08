@@ -81,11 +81,11 @@ jobs:
       run: npm test
 
     - name: Create Tarball
-      #if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
+      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
       run: npm run create-tarball
 
     - name: Stash Tarball
-      #if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
+      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
       uses: actions/upload-artifact@master
       with:
         name: bpmn-studio_tar
