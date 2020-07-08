@@ -356,7 +356,7 @@ jobs:
     name: "Build & Publish Docker Image"
     needs: prepare_and_tag_version
     runs-on: ubuntu-18.04
-    #if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
 
     steps:
     - uses: actions/checkout@v1
@@ -377,7 +377,7 @@ jobs:
       run: npm ci
 
     - name: Build Docker Image
-      #if: github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
+      if: github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
       run: |
         VERSION="$(./node_modules/.bin/ci_tools get-version)"
         docker build --build-arg NODE_IMAGE_VERSION=10-alpine \
