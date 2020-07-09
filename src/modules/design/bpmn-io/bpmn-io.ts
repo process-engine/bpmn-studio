@@ -743,9 +743,10 @@ export class BpmnIo {
       if (warnings.length !== 0) {
         console.warn(warnings);
       }
-
     } catch (error) {
-      throw new Error(`ERROR: failed to import xml\n\nError given:\n\n${JSON.stringify(error)}\n\nXML given:\n\n${xml}`);
+      throw new Error(
+        `ERROR: failed to import xml\n\nError given:\n\n${JSON.stringify(error)}\n\nXML given:\n\n${xml}`,
+      );
     }
   }
 
@@ -756,9 +757,10 @@ export class BpmnIo {
       if (warnings.length !== 0) {
         console.warn(warnings);
       }
-
     } catch (error) {
-      throw new Error(`ERROR: failed to import xml\n\nError given:\n\n${JSON.stringify(error)}\n\nXML given:\n\n${xml}`);
+      throw new Error(
+        `ERROR: failed to import xml\n\nError given:\n\n${JSON.stringify(error)}\n\nXML given:\n\n${xml}`,
+      );
     }
   }
 
@@ -785,8 +787,8 @@ export class BpmnIo {
     } else if (modelerDiagramIsVisible || force) {
       const diagramState: IDiagramState = this.loadDiagramState(this.diagramUri);
 
-      const viewbox: IViewbox = diagramState.metadata.location;
-      const viewboxIsSet: boolean = viewbox !== undefined;
+      const viewbox: IViewbox = diagramState?.metadata?.location;
+      const viewboxIsSet: boolean = viewbox != null;
       if (viewboxIsSet) {
         modelerCanvas.viewbox(viewbox);
       } else {
