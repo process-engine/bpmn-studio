@@ -1,4 +1,4 @@
-import uuid from 'node-uuid';
+import * as uuid from 'uuid';
 
 import {IShape} from '@process-engine/bpmn-elements_contracts';
 
