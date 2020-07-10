@@ -776,6 +776,9 @@ export class SolutionExplorerSolution {
   }
 
   private closeAllDiagramsEventFunction: Function = async (): Promise<void> => {
+    if (this.displayedSolutionEntry.isOpenDiagram === false) {
+      return;
+    }
     const currentlyOpenDiagrams: Array<IDiagram> = [...this.openedDiagrams];
 
     await this.closeMultipleDiagrams(currentlyOpenDiagrams);
