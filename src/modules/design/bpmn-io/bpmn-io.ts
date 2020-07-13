@@ -781,7 +781,7 @@ export class BpmnIo {
       const viewerViewbox: IViewbox = viewerCanvas.viewbox();
       const viewerDiagramIsVisible: boolean = viewerViewbox.height > 0 && viewerViewbox.width > 0;
 
-      if (viewerDiagramIsVisible || force) {
+      if (viewerDiagramIsVisible) {
         viewerCanvas.zoom('fit-viewport', 'auto');
       }
     } else if (modelerDiagramIsVisible || force) {
