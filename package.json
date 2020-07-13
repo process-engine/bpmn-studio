@@ -125,7 +125,7 @@
     "cross-env": "^6.0.3",
     "debounce": "^1.2.0",
     "debug": "^4.1.1",
-    "electron": "7.1.8",
+    "electron": "7.2.4",
     "electron-builder": "21.2.0",
     "eslint": "^6.7.2",
     "event-stream": "4.0.1",
