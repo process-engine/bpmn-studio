@@ -331,9 +331,9 @@
             "main": "socket.io"
           },
           {
-            "name": "node-uuid",
-            "path": "../node_modules/node-uuid",
-            "main": "uuid.js"
+            "name": "uuid",
+            "path": "../node_modules/uuid/dist/esm-browser",
+            "main": "index.js"
           },
           {
             "name": "@essential-projects/event_aggregator_contracts",

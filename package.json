@@ -82,7 +82,6 @@
     "moment": "2.24.0",
     "node-abi": "2.13.0",
     "node-fetch": "2.6.0",
-    "node-uuid": "1.4.8",
     "open": "7.0.0",
     "print-js": "1.0.63",
     "proxy-polyfill": "0.3.0",
@@ -90,7 +89,8 @@
     "semver": "^6.3.0",
     "socket.io-client": "2.3.0",
     "spectrum-colorpicker": "1.8.0",
-    "sqlite3": "5.0.0"
+    "sqlite3": "5.0.0",
+    "uuid": "^8.2.0"
   },
   "peerDependencies": {},
   "devDependencies": {
