@@ -148,7 +148,6 @@ export class Design {
     const routeViewIsDetail: boolean = routeParameters.view === 'detail';
     const routeViewIsXML: boolean = routeParameters.view === 'xml';
     const routeViewIsDiff: boolean = routeParameters.view === 'diff';
-    this.routeView = routeParameters.view;
 
     if (routeViewIsDetail) {
       this.showXML = false;
@@ -158,7 +157,9 @@ export class Design {
       this.showPropertyPanelButton = true;
 
       this.eventAggregator.publish(environment.events.bpmnio.bindKeyboard);
-      this.eventAggregator.publish(environment.events.bpmnio.fitViewport);
+      if (this.routeView === 'diff' || this.routeView === 'xml') {
+        this.eventAggregator.publish(environment.events.bpmnio.fitViewport);
+      }
     } else if (routeViewIsXML) {
       this.showDetail = false;
       this.showXML = true;
@@ -180,6 +181,8 @@ export class Design {
 
       this.showDiffView();
     }
+
+    this.routeView = routeParameters.view;
 
     this.eventAggregator.publish(environment.events.navBar.noValidationError);
   }
