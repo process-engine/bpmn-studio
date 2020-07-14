@@ -38,6 +38,7 @@ import {DiagramExportService, DiagramPrintService} from './services/index';
 import {UserConfigService} from '../../../services/user-config-service/user-config.service';
 import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 import {isRunningInElectron} from '../../../services/is-running-in-electron-module/is-running-in-electron.module';
+import {getValidXml} from '../../../services/xml-id-validation-module/xml-id-validation-module';
 
 const sideBarRightSize: number = 35;
 
@@ -741,6 +742,25 @@ export class BpmnIo {
       const result = await this.modeler.importXML(xml);
       const {warnings} = result;
       if (warnings.length !== 0) {
+        const illegalIdErrors = warnings.filter((warning) => {
+          return warning.error?.message?.startsWith('illegal ID');
+        });
+
+        if (illegalIdErrors.length > 0) {
+          const validationResult = getValidXml(xml, illegalIdErrors);
+          this.xml = validationResult.xml;
+          await this.modeler.importXML(this.xml);
+
+          if (!this.solutionIsRemote) {
+            this.eventAggregator.publish(
+              environment.events.bpmnio.showIncompatibleDiagramModal,
+              validationResult.renamedIds,
+            );
+          }
+        }
+      }
+
+      if (warnings.length !== 0) {
         console.warn(warnings);
       }
     } catch (error) {
@@ -755,7 +775,14 @@ export class BpmnIo {
       const result = await this.viewer.importXML(xml);
       const {warnings} = result;
       if (warnings.length !== 0) {
-        console.warn(warnings);
+        const illegalIdErrors = warnings.filter((warning) => {
+          return warning.error?.message?.startsWith('illegal ID');
+        });
+
+        if (illegalIdErrors.length > 0) {
+          const {xml: newXml} = getValidXml(xml, illegalIdErrors);
+          await this.importXmlIntoViewer(newXml);
+        }
       }
     } catch (error) {
       throw new Error(
