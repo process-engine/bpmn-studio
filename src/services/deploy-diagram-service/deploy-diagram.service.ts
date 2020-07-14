@@ -121,7 +121,7 @@ export class DeployDiagramService {
 
     const processModel: IModdleElement = rootElements.find((definition: IModdleElement) => {
       return definition.$type === 'bpmn:Process';
-      });
+    });
     const processModelId: string = processModel.id;
 
     return processModelId;
