@@ -103,6 +103,10 @@ export class PropertyPanel {
       return element.$type === 'bpmn:Process';
     });
 
+    if (process == null) {
+      return;
+    }
+
     const processHasFlowElements: boolean = process.flowElements !== undefined && process.flowElements !== null;
 
     if (processHasFlowElements) {
