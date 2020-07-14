@@ -32,6 +32,7 @@ import environment from '../../environment';
 import {NotificationService} from '../../services/notification-service/notification.service';
 import {TaskDynamicUi} from '../task-dynamic-ui/task-dynamic-ui';
 import {ILiveExecutionTrackerService, RequestError} from './contracts/index';
+import {getValidXml} from '../../services/xml-id-validation-module/xml-id-validation-module';
 
 type RouteParameters = {
   diagramName: string;
@@ -854,7 +855,18 @@ export class LiveExecutionTracker {
       return;
     }
 
-    await this.diagramViewer.importXML(xml);
+    const result = await this.diagramViewer.importXML(xml);
+    const {warnings} = result;
+    if (warnings.length !== 0) {
+      const illegalIdErrors = warnings.filter((warning) => {
+        return warning.error?.message?.startsWith('illegal ID');
+      });
+
+      if (illegalIdErrors.length > 0) {
+        const {xml: newXml} = getValidXml(xml, illegalIdErrors);
+        await this.importXmlIntoDiagramViewer(newXml);
+      }
+    }
   }
 
   private getElementIdByOverlayHtmlId(overlayHtmlId: string): string {
@@ -872,7 +884,18 @@ export class LiveExecutionTracker {
       return;
     }
 
-    await this.diagramPreviewViewer.importXML(xml);
+    const result = await this.diagramPreviewViewer.importXML(xml);
+    const {warnings} = result;
+    if (warnings.length !== 0) {
+      const illegalIdErrors = warnings.filter((warning) => {
+        return warning.error?.message?.startsWith('illegal ID');
+      });
+
+      if (illegalIdErrors.length > 0) {
+        const {xml: newXml} = getValidXml(xml, illegalIdErrors);
+        await this.importXmlIntoDiagramPreviewViewer(newXml);
+      }
+    }
   }
 
   private async exportXmlFromDiagramViewer(): Promise<string> {
@@ -908,6 +931,7 @@ export class LiveExecutionTracker {
         const message: string = `Could not colorize XML: ${error}`;
 
         this.notificationService.showNotification(NotificationType.ERROR, message);
+        console.error(error);
       }
 
       return undefined;
