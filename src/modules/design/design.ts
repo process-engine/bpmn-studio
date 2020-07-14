@@ -46,12 +46,14 @@ export class Design {
   public propertyPanelShown: boolean = false;
   public showPropertyPanelButton: boolean = true;
   public showDiffDestinationButton: boolean = false;
+  public showIncompatibleWarning: boolean = false;
   public design: Design = this;
 
   public diagramDetail: DiagramDetail;
   public filteredSolutions: Array<ISolution> = [];
   public diagramArray: Array<IDiagram | object> = [];
   public selectedDiagram: DiagramWithSolution;
+  public renamedIds: Array<any> = [];
 
   private eventAggregator: EventAggregator;
   private notificationService: NotificationService;
@@ -213,6 +215,10 @@ export class Design {
         this.xmlForDiff = newXml;
         this.activeDiagram.xml = newXml;
       }),
+      this.eventAggregator.subscribe(environment.events.bpmnio.showIncompatibleDiagramModal, (renamedIds) => {
+        this.renamedIds = renamedIds;
+        this.showIncompatibleWarning = true;
+      }),
     ];
 
     if (isRunningInElectron()) {
@@ -243,6 +249,11 @@ export class Design {
     this.eventAggregator.publish(environment.events.diffView.setDiffDestination, [diffDestination, diagramName]);
 
     this.showSelectDiagramModal = false;
+  }
+
+  public async saveUnsavedChangesToFixIncompatibility(): Promise<void> {
+    await this.diagramDetail.saveDiagram();
+    this.showIncompatibleWarning = false;
   }
 
   public async openSelectDiagramModal(): Promise<void> {
