@@ -1,6 +1,6 @@
 import {inject} from 'aurelia-framework';
 
-import uuid from 'node-uuid';
+import * as uuid from 'uuid';
 
 import {IModdleElement, IProcessRef} from '@process-engine/bpmn-elements_contracts';
 import * as bundle from '@process-engine/bpmn-js-custom-bundle';

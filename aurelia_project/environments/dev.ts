@@ -85,6 +85,7 @@ export default {
       bindKeyboard: 'design:keyboard:bind',
       unbindKeyboard: 'design:keyboard:unbind',
       fitViewport: 'design:detailview:fitviewport',
+      showIncompatibleDiagramModal: 'design:incompatiblediagram',
     },
     diffView: {
       changeDiffMode: 'diffview:diffmode:change',

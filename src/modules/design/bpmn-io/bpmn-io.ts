@@ -38,6 +38,7 @@ import {DiagramExportService, DiagramPrintService} from './services/index';
 import {UserConfigService} from '../../../services/user-config-service/user-config.service';
 import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 import {isRunningInElectron} from '../../../services/is-running-in-electron-module/is-running-in-electron.module';
+import {getIllegalIdErrors, getValidXml} from '../../../services/xml-id-validation-module/xml-id-validation-module';
 
 const sideBarRightSize: number = 35;
 
@@ -740,12 +741,28 @@ export class BpmnIo {
     try {
       const result = await this.modeler.importXML(xml);
       const {warnings} = result;
+
+      const illegalIdErrors = getIllegalIdErrors(warnings);
+      if (illegalIdErrors.length > 0) {
+        const validationResult = getValidXml(xml, illegalIdErrors);
+        this.xml = validationResult.xml;
+        await this.modeler.importXML(this.xml);
+
+        if (!this.solutionIsRemote) {
+          this.eventAggregator.publish(
+            environment.events.bpmnio.showIncompatibleDiagramModal,
+            validationResult.renamedIds,
+          );
+        }
+      }
+
       if (warnings.length !== 0) {
         console.warn(warnings);
       }
-
     } catch (error) {
-      throw new Error(`ERROR: failed to import xml\n\nError given:\n\n${JSON.stringify(error)}\n\nXML given:\n\n${xml}`);
+      throw new Error(
+        `ERROR: failed to import xml\n\nError given:\n\n${JSON.stringify(error)}\n\nXML given:\n\n${xml}`,
+      );
     }
   }
 
@@ -753,12 +770,16 @@ export class BpmnIo {
     try {
       const result = await this.viewer.importXML(xml);
       const {warnings} = result;
-      if (warnings.length !== 0) {
-        console.warn(warnings);
-      }
 
+      const illegalIdErrors = getIllegalIdErrors(warnings);
+      if (illegalIdErrors.length > 0) {
+        const {xml: newXml} = getValidXml(xml, illegalIdErrors);
+        await this.importXmlIntoViewer(newXml);
+      }
     } catch (error) {
-      throw new Error(`ERROR: failed to import xml\n\nError given:\n\n${JSON.stringify(error)}\n\nXML given:\n\n${xml}`);
+      throw new Error(
+        `ERROR: failed to import xml\n\nError given:\n\n${JSON.stringify(error)}\n\nXML given:\n\n${xml}`,
+      );
     }
   }
 
@@ -779,14 +800,14 @@ export class BpmnIo {
       const viewerViewbox: IViewbox = viewerCanvas.viewbox();
       const viewerDiagramIsVisible: boolean = viewerViewbox.height > 0 && viewerViewbox.width > 0;
 
-      if (viewerDiagramIsVisible || force) {
+      if (viewerDiagramIsVisible) {
         viewerCanvas.zoom('fit-viewport', 'auto');
       }
     } else if (modelerDiagramIsVisible || force) {
       const diagramState: IDiagramState = this.loadDiagramState(this.diagramUri);
 
-      const viewbox: IViewbox = diagramState.metadata.location;
-      const viewboxIsSet: boolean = viewbox !== undefined;
+      const viewbox: IViewbox = diagramState?.metadata?.location;
+      const viewboxIsSet: boolean = viewbox != null;
       if (viewboxIsSet) {
         modelerCanvas.viewbox(viewbox);
       } else {

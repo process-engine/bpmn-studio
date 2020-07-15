@@ -110,5 +110,23 @@
         <button type="button" class="btn btn-primary" data-dismiss="modal" id="js-choose-diagram" click.delegate="setDiffDestination(selectedDiagram.solutionUri, selectedDiagram.diagram.name)">Compare</button>
       </template>
     </modal>
+
+    <modal if.bind="showIncompatibleWarning"
+          header-text="Incompatible Diagram">
+      <template replace-part="modal-body">
+        <p>The given diagram contains IDs, that are not QName compliant. Since BPMN Studio only supports QName compliant IDs, the affected IDs were adjusted accordingly.</p>
+
+        <div>
+          <span>The following IDs were renamed:</span>
+          <ul>
+            <li repeat.for="renamedId of renamedIds"><code>${renamedId.previousId}</code> to <code>${renamedId.newId}</code></li>
+          </ul>
+        </div>
+      </template>
+      <template replace-part="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" click.delegate="saveUnsavedChangesToFixIncompatibility()">Save and show diagram</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" click.delegate="showIncompatibleWarning = false">Show diagram</button>
+      </template>
+    </modal>
   </div>
 </template>

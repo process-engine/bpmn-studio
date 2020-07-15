@@ -15,6 +15,7 @@ import {
 
 import {IFlowNodeAssociation, IHeatmapService} from './contracts';
 import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
+import {getIllegalIdErrors, getValidXml} from '../../../services/xml-id-validation-module/xml-id-validation-module';
 
 @inject('HeatmapService')
 export class Heatmap {
@@ -74,7 +75,14 @@ export class Heatmap {
       },
     });
 
-    await this.modeler.importXML(this.activeDiagram.xml);
+    const result = await this.modeler.importXML(this.activeDiagram.xml);
+    const {warnings} = result;
+
+    const illegalIdErrors = getIllegalIdErrors(warnings);
+    if (illegalIdErrors.length > 0) {
+      const {xml: newXml} = getValidXml(this.activeDiagram.xml, illegalIdErrors);
+      await this.modeler.importXML(newXml);
+    }
 
     const elementRegistry: IElementRegistry = this.modeler.get('elementRegistry');
     /*

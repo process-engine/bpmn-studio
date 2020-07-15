@@ -51,6 +51,10 @@ export class TimerEventSection implements ISection {
   }
 
   public activate(model: IPageModel): void {
+    if (!model) {
+      return;
+    }
+
     this.businessObjInPanel = model.elementInPanel.businessObject as ITimerEventElement;
 
     this.moddle = model.modeler.get('moddle');
@@ -143,9 +147,13 @@ export class TimerEventSection implements ISection {
     this.updateLinterWhenActive();
   }
 
-  public isEnabledChanged(): void {
+  public enabledChanged(): void {
     const enabledProperty: IProperty = this.getProperty('enabled');
-    enabledProperty.value = this.isEnabled.toString();
+    if (enabledProperty == null) {
+      this.createProperty('enabled');
+    }
+
+    this.getProperty('enabled').value = this.isEnabled.toString();
 
     this.publishDiagramChange();
   }
@@ -177,13 +185,7 @@ export class TimerEventSection implements ISection {
 
       const enabledProperty: IProperty = this.getProperty('enabled');
 
-      const enabledPropertyExists: boolean = enabledProperty !== undefined;
-      if (enabledPropertyExists) {
-        this.isEnabled = enabledProperty.value === 'true';
-      } else {
-        this.createProperty('enabled');
-        this.getProperty('enabled').value = 'true';
-      }
+      this.isEnabled = enabledProperty ? enabledProperty.value === 'true' : false;
     }
 
     const {timeDate, timeDuration, timeCycle} = this.businessObjInPanel.eventDefinitions[0];
