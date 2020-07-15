@@ -114,7 +114,7 @@
     <modal if.bind="showIncompatibleWarning"
           header-text="Incompatible Diagram">
       <template replace-part="modal-body">
-        <p>The given diagram was incompatible because it contained IDs that were not QName compliant. BPMN Studio has automatically changed these incompatible IDs to compatible IDs. These changes have been not been saved to disk yet. You can save them at your discretion.</p>
+        <p>The given diagram contains IDs, that are not QName compliant. Since BPMN Studio only supports QName compliant IDs, the affected IDs were adjusted accordingly.</p>
 
         <div>
           <span>The following IDs were renamed:</span>
