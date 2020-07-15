@@ -1,13 +1,19 @@
 export function getValidXml(xml: string, illegalIdErrors: Array<any>): any {
   let newXml = xml;
   const renamedIds: Array<any> = [];
-  for (const idError of illegalIdErrors) {
-    const errorId = idError.error.message.substring(12, idError.error.message.length - 1);
+  for (const illegalIdError of illegalIdErrors) {
+    /**
+     * The error message e.g. looks like "illegal ID <Auf Rückmeldung warten>"
+     *  We need to get the ID between the "<>" characters. It starts after the first 12 characters.
+     */
+    const idStartIndex = 12;
+    const idEndIndex = illegalIdError.error.message.length - 1;
+    const idWhichCausedTheError = illegalIdError.error.message.substring(idStartIndex, idEndIndex);
     const qNameRegex: RegExp = /^([a-z][\w-.]*:)?[a-z_][\w-.]*$/i;
 
-    const invalidChars = getInvalidCharacters(errorId);
+    const invalidChars = getInvalidCharacters(idWhichCausedTheError);
 
-    let newId = errorId;
+    let newId = idWhichCausedTheError;
     for (const invalidChar of invalidChars) {
       newId = newId.replace(invalidChar, '_');
     }
@@ -23,12 +29,12 @@ export function getValidXml(xml: string, illegalIdErrors: Array<any>): any {
     }
 
     if (qNameRegex.test(newId)) {
-      const escapedRegexString = escapeRegExp(errorId);
+      const escapedRegexString = escapeRegExp(idWhichCausedTheError);
       const idRegex = new RegExp(`"${escapedRegexString}"`, 'g');
       newXml = newXml.replace(idRegex, `"${newId}"`);
 
       renamedIds.push({
-        previousId: errorId,
+        previousId: idWhichCausedTheError,
         newId: newId,
       });
     }
