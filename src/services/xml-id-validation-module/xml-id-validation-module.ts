@@ -42,8 +42,8 @@ export function getValidXml(xml: string, illegalIdErrors: Array<any>): any {
 
     if (qNameRegex.test(newId)) {
       const escapedRegexString = escapeRegExp(idWhichCausedTheError);
-      const idRegex = new RegExp(`"${escapedRegexString}"`, 'g');
-      newXml = newXml.replace(idRegex, `"${newId}"`);
+      const idRegex = new RegExp(`(id|Ref)="${escapedRegexString}"`, 'g');
+      newXml = newXml.replace(idRegex, `$1="${newId}"`);
 
       renamedIds.push({
         previousId: idWhichCausedTheError,
