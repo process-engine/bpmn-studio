@@ -1,3 +1,15 @@
+export function getIllegalIdErrors(warnings: Array<any>): Array<any> {
+  if (warnings.length !== 0) {
+    const illegalIdErrors = warnings.filter((warning) => {
+      return warning.error?.message?.startsWith('illegal ID');
+    });
+
+    return illegalIdErrors;
+  }
+
+  return [];
+}
+
 export function getValidXml(xml: string, illegalIdErrors: Array<any>): any {
   let newXml = xml;
   const renamedIds: Array<any> = [];

@@ -35,7 +35,7 @@ import environment from '../../../environment';
 import {ElementNameService} from '../../../services/elementname-service/elementname.service';
 import {NotificationService} from '../../../services/notification-service/notification.service';
 import {SolutionService} from '../../../services/solution-service/solution.service';
-import {getValidXml} from '../../../services/xml-id-validation-module/xml-id-validation-module';
+import {getIllegalIdErrors, getValidXml} from '../../../services/xml-id-validation-module/xml-id-validation-module';
 
 @inject('NotificationService', EventAggregator, 'SolutionService')
 export class BpmnDiffView {
@@ -561,17 +561,14 @@ export class BpmnDiffView {
 
     const result = await viewer.importXML(xml);
     const {warnings} = result;
-    if (warnings.length !== 0) {
-      const illegalIdErrors = warnings.filter((warning) => {
-        return warning.error?.message?.startsWith('illegal ID');
-      });
 
-      if (illegalIdErrors.length > 0) {
-        const {xml: newXml} = getValidXml(xml, illegalIdErrors);
-        await this.importXml(newXml, viewer);
-        return;
-      }
+    const illegalIdErrors = getIllegalIdErrors(warnings);
+    if (illegalIdErrors.length > 0) {
+      const {xml: newXml} = getValidXml(xml, illegalIdErrors);
+      await this.importXml(newXml, viewer);
+      return;
     }
+
     this.fitDiagramToViewport(viewer);
   }
 

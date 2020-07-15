@@ -18,7 +18,7 @@ import {
 import {ILiveExecutionTrackerRepository, ILiveExecutionTrackerService} from '../contracts/index';
 import {createLiveExecutionTrackerRepository} from '../repositories/live-execution-tracker-repository-factory';
 import environment from '../../../environment';
-import {getValidXml} from '../../../services/xml-id-validation-module/xml-id-validation-module';
+import {getIllegalIdErrors, getValidXml} from '../../../services/xml-id-validation-module/xml-id-validation-module';
 
 export class LiveExecutionTrackerService implements ILiveExecutionTrackerService {
   private liveExecutionTrackerRepository: ILiveExecutionTrackerRepository;
@@ -491,21 +491,18 @@ export class LiveExecutionTrackerService implements ILiveExecutionTrackerService
 
     const result = await diagramModeler.importXML(xml);
     const {warnings} = result;
-    if (warnings.length !== 0) {
-      const illegalIdErrors = warnings.filter((warning) => {
-        return warning.error?.message?.startsWith('illegal ID');
-      });
 
-      if (illegalIdErrors.length > 0) {
-        const {xml: newXml} = getValidXml(xml, illegalIdErrors);
-        return this.getColorizedDiagram(
-          identity,
-          newXml,
-          processInstanceId,
-          processEngineSupportsGettingFlowNodeInstances,
-        );
-      }
+    const illegalIdErrors = getIllegalIdErrors(warnings);
+    if (illegalIdErrors.length > 0) {
+      const {xml: newXml} = getValidXml(xml, illegalIdErrors);
+      return this.getColorizedDiagram(
+        identity,
+        newXml,
+        processInstanceId,
+        processEngineSupportsGettingFlowNodeInstances,
+      );
     }
+
     const modeling = diagramModeler.get('modeling');
     const elementRegistry = diagramModeler.get('elementRegistry');
 
