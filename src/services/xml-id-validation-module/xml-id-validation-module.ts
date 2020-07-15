@@ -2,7 +2,7 @@ export function getValidXml(xml: string, illegalIdErrors: Array<any>): any {
   let newXml = xml;
   const renamedIds: Array<any> = [];
   for (const idError of illegalIdErrors) {
-    const errorId = (idError.error.message as string).substring(12, idError.error.message.length - 1);
+    const errorId = idError.error.message.substring(12, idError.error.message.length - 1);
     const qNameRegex: RegExp = /^([a-z][\w-.]*:)?[a-z_][\w-.]*$/i;
 
     const invalidChars = getInvalidCharacters(errorId);
