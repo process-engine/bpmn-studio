@@ -66,10 +66,12 @@ export class NavBar {
     this.solutionExplorerIsActive = window.localStorage.getItem('SolutionExplorerVisibility') === 'true';
 
     const isMac: boolean = this.checkIfCurrentPlatformIsMac();
-    if (this.ipcRenderer && isMac) {
-      this.ipcRenderer.on('toggle-fullscreen', (uselessEvent, showFullscreen) => {
-        this.showLeftMarginInNavbar = !showFullscreen;
-      });
+    if (this.ipcRenderer) {
+      if (isMac) {
+        this.ipcRenderer.on('toggle-fullscreen', (uselessEvent, showFullscreen) => {
+          this.showLeftMarginInNavbar = !showFullscreen;
+        });
+      }
 
       this.ipcRenderer.on('menubar__start_close_diagram', this.closeDiagramOrStudioEventFunction);
     }
