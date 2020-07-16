@@ -711,13 +711,13 @@ function getEditMenu(): MenuItem {
 }
 
 function getWindowMenu(): MenuItem {
+  const isMac = process.platform === 'darwin';
+
   const submenuOptions: Array<MenuItemConstructorOptions> = [
     {
       role: 'minimize',
     },
-    {
-      role: 'close',
-    },
+    isMac ? {role: 'close'} : {role: 'quit'},
     {
       type: 'separator',
     },
