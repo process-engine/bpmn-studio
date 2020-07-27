@@ -10,4 +10,7 @@
 .payload {
   min-height: 55px;
   max-height: 400px;
+  min-width: 470px;
+  max-width: 100%;
+  resize: both;
 }
