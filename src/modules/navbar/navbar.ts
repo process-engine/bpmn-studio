@@ -435,6 +435,7 @@ export class NavBar {
     const noDiagramIsActive: boolean = this.activeDiagram === undefined;
     if (noDiagramIsActive) {
       this.ipcRenderer.send('close_bpmn-studio');
+      return;
     }
 
     if (solutionIsRemoteSolution(this.activeSolutionEntry.uri)) {
