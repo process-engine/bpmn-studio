@@ -216,7 +216,16 @@ export class Design {
         this.activeDiagram.xml = newXml;
       }),
       this.eventAggregator.subscribe(environment.events.bpmnio.showIncompatibleDiagramModal, (renamedIds) => {
-        this.renamedIds = renamedIds;
+        for (const renamedId of renamedIds) {
+          const idExistInRenamedIds = this.renamedIds.some(
+            (id) => id.previousId === renamedId.previousId && id.newId === renamedId.newId,
+          );
+          if (idExistInRenamedIds) {
+            continue;
+          }
+
+          this.renamedIds.push(renamedId);
+        }
         this.showIncompatibleWarning = true;
       }),
     ];
@@ -254,6 +263,12 @@ export class Design {
   public async saveUnsavedChangesToFixIncompatibility(): Promise<void> {
     await this.diagramDetail.saveDiagram();
     this.showIncompatibleWarning = false;
+    this.renamedIds = [];
+  }
+
+  public closeIncompatibilityModal(): void {
+    this.showIncompatibleWarning = false;
+    this.renamedIds = [];
   }
 
   public async openSelectDiagramModal(): Promise<void> {
