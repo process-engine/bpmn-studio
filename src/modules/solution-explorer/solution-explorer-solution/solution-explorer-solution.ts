@@ -991,6 +991,10 @@ export class SolutionExplorerSolution {
   }
 
   private async closeOpenDiagram(diagramToClose: IDiagram): Promise<void> {
+    if (!this.displayedSolutionEntry.isOpenDiagram) {
+      return;
+    }
+
     const openDiagramService: OpenDiagramsSolutionExplorerService = this
       .solutionService as OpenDiagramsSolutionExplorerService;
 
