@@ -490,6 +490,14 @@ export class SolutionExplorerSolution {
       event.stopPropagation();
     }
 
+    if (diagram == null) {
+      return undefined;
+    }
+
+    if (!this.displayedSolutionEntry.isOpenDiagram) {
+      return undefined;
+    }
+
     const diagramState: IDiagramState = this.openDiagramStateService.loadDiagramState(diagram.uri);
     const diagramHasUnsavedChanges: boolean = diagramState !== null && diagramState.metadata.isChanged;
 
