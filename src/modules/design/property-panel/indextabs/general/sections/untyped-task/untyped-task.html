@@ -10,7 +10,7 @@
         <tr>
           <th>Enabled</th>
           <td>
-            <input type="checkbox" class="props-input" checked.bind="enabled" disabled.bind="!isEditable">
+            <input type="checkbox" class="props-input" checked.bind="enabled" change.delegate="enabledChange()" disabled.bind="!isEditable">
           </td>
         </tr>
       </table>

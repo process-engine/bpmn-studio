@@ -34,6 +34,8 @@ export class ManualTaskSection implements ISection {
 
     if (requiresConfirmationProperty != null) {
       this.requiresConfirmation = requiresConfirmationProperty.value === 'true';
+    } else {
+      this.requiresConfirmation = true;
     }
   }
 
@@ -85,7 +87,7 @@ export class ManualTaskSection implements ISection {
     return property;
   }
 
-  private requiresConfirmationChanged(): void {
+  private requiresConfirmationChange(): void {
     const extensionElementDoesNotExist: boolean = this.businessObjInPanel.extensionElements === undefined;
     if (extensionElementDoesNotExist) {
       this.createExtensionElement();
