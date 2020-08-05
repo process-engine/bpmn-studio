@@ -10,7 +10,7 @@
         <tr>
           <th>Confirmation</th>
           <td>
-            <input type="checkbox" class="props-input" checked.bind="requiresConfirmation" disabled.bind="!isEditable">
+            <input type="checkbox" class="props-input" checked.bind="requiresConfirmation" change.delegate="requiresConfirmationChange()" disabled.bind="!isEditable">
           </td>
         </tr>
       </table>
