@@ -746,7 +746,7 @@ export class BpmnIo {
       if (illegalIdErrors.length > 0) {
         const validationResult = getValidXml(xml, illegalIdErrors);
         this.xml = validationResult.xml;
-        await this.modeler.importXML(this.xml);
+        await this.importXmlIntoModeler(this.xml);
 
         if (!this.solutionIsRemote) {
           this.eventAggregator.publish(

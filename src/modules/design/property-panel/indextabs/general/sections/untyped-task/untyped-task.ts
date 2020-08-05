@@ -34,6 +34,8 @@ export class UntypedTaskSection implements ISection {
 
     if (enabledProperty != null) {
       this.enabled = enabledProperty.value === 'true';
+    } else {
+      this.enabled = true;
     }
   }
 
@@ -84,7 +86,7 @@ export class UntypedTaskSection implements ISection {
     return property;
   }
 
-  private enabledChanged(): void {
+  private enabledChange(): void {
     const extensionElementDoesNotExist: boolean = this.businessObjInPanel.extensionElements === undefined;
     if (extensionElementDoesNotExist) {
       this.createExtensionElement();

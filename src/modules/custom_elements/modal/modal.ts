@@ -13,16 +13,17 @@ export class ModalCustomElement {
 
   private modalRef: HTMLDivElement;
 
-  public attached(): void {
+  public bind(): void {
     document.addEventListener('focusin', this.focusEventListener);
   }
 
-  public detached(): void {
+  public unbind(): void {
     document.removeEventListener('focusin', this.focusEventListener);
   }
 
   private focusEventListener = (event): void => {
-    const focussedElementIsInModalOrTheModal = this.modalRef.contains(event.target);
+    const focussedElementIsInModalOrTheModal =
+      this.modalRef.contains(event.target) || event.target.className.includes('modal show show-modal');
 
     if (!focussedElementIsInModalOrTheModal) {
       this.modalRef.focus();

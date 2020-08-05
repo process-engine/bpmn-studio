@@ -8,6 +8,7 @@ import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 
 import {IBpmnModeler, IDiagramCreationService, NotificationType} from '../../contracts/index';
 import {NotificationService} from '../notification-service/notification.service';
+import {getIllegalIdErrors, getValidXml} from '../xml-id-validation-module/xml-id-validation-module';
 
 @inject('NotificationService')
 export class DiagramCreationService implements IDiagramCreationService {
@@ -19,6 +20,7 @@ export class DiagramCreationService implements IDiagramCreationService {
 
   public async createNewDiagram(solutionBaseUri: string, withName: string, xml?: string): Promise<IDiagram> {
     const processName: string = withName.trim();
+
     const diagramUri: string = `${solutionBaseUri}/${processName}.bpmn`;
 
     const xmlGiven: boolean = xml !== undefined;
@@ -45,44 +47,57 @@ export class DiagramCreationService implements IDiagramCreationService {
     });
 
     try {
-      await modeler.importXML(xml);
+      const result = await modeler.importXML(xml);
+
+      const {warnings} = result;
+
+      const illegalIdErrors = getIllegalIdErrors(warnings);
+      if (illegalIdErrors.length > 0) {
+        const {xml: newXml} = getValidXml(xml, illegalIdErrors);
+        return this.renameDiagram(newXml, name);
+      }
     } catch (error) {
       this.notificationService.showNotification(NotificationType.ERROR, `Failed to copy diagram. ${error.message}`);
+      return undefined;
     }
 
-    const promise: Promise<string> = new Promise((resolve: Function, reject: Function): void => {
-      modeler.on('import.done', async () => {
-        // eslint-disable-next-line no-underscore-dangle
-        const rootElements: Array<IModdleElement> = modeler._definitions.rootElements;
-        const process: IProcessRef = rootElements.find((element: IModdleElement) => {
-          return element.$type === 'bpmn:Process';
-        }) as IProcessRef;
+    // eslint-disable-next-line no-underscore-dangle
+    const rootElements: Array<IModdleElement> = modeler._definitions.rootElements;
+    const process: IProcessRef = rootElements.find((element: IModdleElement) => {
+      return element.$type === 'bpmn:Process';
+    }) as IProcessRef;
 
-        process.id = name;
-        process.name = name;
+    process.id = name;
+    process.name = name;
 
-        const collaboration: IModdleElement = rootElements.find((element: IModdleElement) => {
-          return element.$type === 'bpmn:Collaboration';
-        });
-        const participant: IModdleElement = collaboration.participants[0];
-
-        participant.name = name;
-        participant.processRef = process;
-
-        try {
-          const {xml: xmlFromModeler} = await modeler.saveXML({});
-          resolve(xmlFromModeler);
-        } catch (error) {
-          this.notificationService.showNotification(
-            NotificationType.ERROR,
-            `Failed to copy the diagram. Cause: ${error.message}`,
-          );
-          reject(error);
-        }
-      });
+    const collaboration: IModdleElement = rootElements.find((element: IModdleElement) => {
+      return element.$type === 'bpmn:Collaboration';
     });
+    const participant: IModdleElement = collaboration.participants[0];
 
-    return promise;
+    participant.name = name;
+    participant.processRef = process;
+
+    try {
+      const {xml: xmlFromModeler} = await modeler.saveXML({format: true});
+
+      const result = await modeler.importXML(xmlFromModeler);
+      const {warnings} = result;
+
+      const illegalIdErrors = getIllegalIdErrors(warnings);
+      if (illegalIdErrors.length > 0) {
+        const {xml: newXml} = getValidXml(xmlFromModeler, illegalIdErrors);
+        return newXml;
+      }
+
+      return xmlFromModeler;
+    } catch (error) {
+      this.notificationService.showNotification(
+        NotificationType.ERROR,
+        `Failed to copy the diagram. Cause: ${error.message}`,
+      );
+      return error;
+    }
   }
 
   private getInitialProcessXML(processModelId: string): string {
