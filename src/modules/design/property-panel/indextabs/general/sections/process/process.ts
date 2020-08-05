@@ -22,10 +22,8 @@ export class ProcessSection implements ISection {
     if (!model) {
       return;
     }
-    // eslint-disable-next-line no-underscore-dangle
-    this.businessObjInPanel = model.modeler._definitions.rootElements.find((rootElement: IModdleElement) => {
-      return rootElement.$type === 'bpmn:Process';
-    });
+
+    this.businessObjInPanel = model.elementInPanel.businessObject.processRef;
   }
 
   public isSuitableForElement(element: IShape): boolean {
@@ -34,7 +32,7 @@ export class ProcessSection implements ISection {
       return false;
     }
 
-    const elementIsRoot: boolean = element.businessObject.$type === 'bpmn:Collaboration';
+    const elementIsRoot: boolean = element.businessObject.$type === 'bpmn:Participant';
 
     return elementIsRoot;
   }
