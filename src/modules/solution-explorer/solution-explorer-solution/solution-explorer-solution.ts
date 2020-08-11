@@ -33,6 +33,7 @@ import {SaveDiagramService} from '../../../services/save-diagram-service/save-di
 import {HttpFetchClient} from '../../fetch-http-client/http-fetch-client';
 import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 import {isRunningInElectron} from '../../../services/is-running-in-electron-module/is-running-in-electron.module';
+import {getInvalidCharacters} from '../../../services/xml-id-validation-module/xml-id-validation-module';
 
 const ENTER_KEY: string = 'Enter';
 const ESCAPE_KEY: string = 'Escape';
@@ -589,8 +590,14 @@ export class SolutionExplorerSolution {
       return diagram.name !== newName;
     };
 
+    const invalidCharacters = getInvalidCharacters(this.diagramInContextMenu.name);
+    let currentDiagramName = this.diagramInContextMenu.name;
+    for (const invalidCharacter of invalidCharacters) {
+      currentDiagramName = currentDiagramName.replace(invalidCharacter, '_');
+    }
+
     while (newNameFound === false) {
-      newName = `${this.diagramInContextMenu.name} (${diagramNumber})`;
+      newName = `${currentDiagramName}_${diagramNumber}`;
 
       newNameFound = this.openedDiagrams.every(isDiagramNameNotEqualToNewName);
 
