@@ -65,7 +65,7 @@ function escapeRegExp(string): string {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function getInvalidCharacters(input: string): Array<string> {
+export function getInvalidCharacters(input: string): Array<string> {
   const qNameValidationRegex: RegExp = /^[\w-.]/i;
   const inputLetters: Array<string> = input.split('');
   const invalidCharacters: Array<string> = inputLetters.filter((letter: string) => {
