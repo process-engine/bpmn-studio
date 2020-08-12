@@ -33,6 +33,7 @@ import {SaveDiagramService} from '../../../services/save-diagram-service/save-di
 import {HttpFetchClient} from '../../fetch-http-client/http-fetch-client';
 import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 import {isRunningInElectron} from '../../../services/is-running-in-electron-module/is-running-in-electron.module';
+import {getInvalidCharacters} from '../../../services/xml-id-validation-module/xml-id-validation-module';
 
 const ENTER_KEY: string = 'Enter';
 const ESCAPE_KEY: string = 'Escape';
@@ -125,8 +126,6 @@ export class SolutionExplorerSolution {
   };
 
   private refreshTimeoutTask: NodeJS.Timer;
-
-  private diagramValidationRegExpList: Array<RegExp> = [/^[a-z0-9]/i, /^[._ -]/i, /^[äöüß]/i];
 
   private currentlyRenamingDiagram: IDiagram | null = null;
   private isAttached: boolean = false;
@@ -589,8 +588,14 @@ export class SolutionExplorerSolution {
       return diagram.name !== newName;
     };
 
+    const invalidCharacters = getInvalidCharacters(this.diagramInContextMenu.name);
+    let currentDiagramName = this.diagramInContextMenu.name;
+    for (const invalidCharacter of invalidCharacters) {
+      currentDiagramName = currentDiagramName.replace(invalidCharacter, '_');
+    }
+
     while (newNameFound === false) {
-      newName = `${this.diagramInContextMenu.name} (${diagramNumber})`;
+      newName = `${currentDiagramName}_${diagramNumber}`;
 
       newNameFound = this.openedDiagrams.every(isDiagramNameNotEqualToNewName);
 
@@ -1076,64 +1081,37 @@ export class SolutionExplorerSolution {
    *
    */
   private setInvalidCharacterMessage(errors: Array<ValidateResult>): void {
-    const invalidCharacterString: string = 'Your diagram contains at least one invalid-character: ';
+    const defaultErrorText = 'The diagram name contains the following illegal characters: ';
 
-    for (const currentError of this.validationController.errors) {
-      const validationErrorIsInvalidCharacter: boolean = currentError.message.startsWith(invalidCharacterString);
+    for (const currentError of errors) {
+      const validationErrorIsQname = currentError.message === defaultErrorText;
 
-      if (validationErrorIsInvalidCharacter) {
-        const inputToValidate: string = currentError.message.replace(invalidCharacterString, '');
+      if (validationErrorIsQname) {
+        const inputToValidate: string = currentError.object.currentDiagramInputValue;
+        const invalidCharacters = getInvalidCharacters(inputToValidate);
 
-        const invalidCharacters: Array<string> = this.getInvalidCharacters(inputToValidate);
+        const filteredInvalidCharacters: Array<string> = invalidCharacters.filter(
+          (current: string, index: number): boolean => {
+            return invalidCharacters.indexOf(current) === index;
+          },
+        );
 
-        currentError.message = this.getInvalidCharacterErrorMessage(invalidCharacters);
+        // Replaces the commas between the invalid characters by a space to increase readability.
+        const invalidCharacterString: string = `${filteredInvalidCharacters}`.replace(/(.)./g, '$1 ');
+
+        const invalidWhitespace = filteredInvalidCharacters.some((character) => character.match(/\s/i) != null);
+        const invalidFirstCharacterRegex: RegExp = /^[\d-.:]/i;
+        const invalidFirstCharacter = inputToValidate.match(invalidFirstCharacterRegex);
+
+        if (invalidWhitespace) {
+          currentError.message = 'The diagram name contains at least one illegal whitespace character.';
+        } else if (invalidFirstCharacter) {
+          currentError.message = `Illegal first character in diagram name: ${inputToValidate.substr(0, 1)}`;
+        } else {
+          currentError.message = `${defaultErrorText} ${invalidCharacterString}`;
+        }
       }
     }
-  }
-
-  /**
-   *  Searches in the given input string for all invalid characters and returns
-   *  them as a char array.
-   *
-   * @param input input that contains invalid characters.
-   * @param returns An array that contains all invalid characters.
-   */
-  private getInvalidCharacters(input: string): Array<string> {
-    const inputLetters: Array<string> = input.split('');
-    const invalidCharacters: Array<string> = inputLetters.filter((letter: string) => {
-      const rules: Array<RegExp> = Object.values(this.diagramValidationRegExpList);
-      const letterIsInvalid: boolean = !rules.some((regExp: RegExp) => {
-        return letter.match(regExp) !== null;
-      });
-
-      return letterIsInvalid;
-    });
-
-    return invalidCharacters;
-  }
-
-  /**
-   * Build an error message which lists all invalid characters.
-   *
-   * @param invalidCharacters An array that contains all detected invalid
-   * characters.
-   * @return A string with an error message that contains all invalid characters
-   * of a diagram name.
-   */
-  private getInvalidCharacterErrorMessage(invalidCharacters: Array<string>): string {
-    // This filters all duplicate invalid characters so that the list contains each character only once.
-    const filteredInvalidCharacters: Array<string> = invalidCharacters.filter(
-      (current: string, index: number): boolean => {
-        return invalidCharacters.indexOf(current) === index;
-      },
-    );
-
-    const messagePrefix: string = 'Your diagram contains at least one invalid-character: ';
-
-    // Replaces the commas between the invalid characters by a space to increase readability.
-    const invalidCharacterString: string = `${filteredInvalidCharacters}`.replace(/(.)./g, '$1 ');
-
-    return `${messagePrefix} ${invalidCharacterString}`;
   }
 
   private async openNewDiagram(): Promise<void> {
@@ -1515,38 +1493,12 @@ export class SolutionExplorerSolution {
     ValidationRules.ensure((state: IDiagramNameInputState) => state.currentDiagramInputValue)
       .required()
       .withMessage('Diagram name cannot be blank.')
-      .satisfies((input: string) => {
-        const inputIsNotEmpty: boolean = input !== undefined;
+      .satisfies((input) => {
+        const qNameRegex: RegExp = /^([a-z][\w-.]*:)?[a-z_][\w-.]*$/i;
 
-        const inputAsCharArray: Array<string> = inputIsNotEmpty ? input.split('') : [];
-
-        const diagramNamePassesNameChecks: boolean = inputAsCharArray.every((letter: string) => {
-          // tslint:disable-next-line:typedef
-          const letterMatches = (regExp: RegExp): boolean => regExp.test(letter);
-
-          return this.diagramValidationRegExpList.some(letterMatches);
-        });
-
-        return diagramNamePassesNameChecks;
+        return qNameRegex.test(input);
       })
-      // eslint-disable-next-line quotes
-      .withMessage(`Your diagram contains at least one invalid-character: \${$value}`)
-      .satisfies((input: string) => {
-        const inputIsNotEmpty: boolean = input !== undefined;
-
-        const diagramDoesNotStartWithWhitespace: boolean = inputIsNotEmpty ? !/^\s/.test(input) : true;
-
-        return diagramDoesNotStartWithWhitespace;
-      })
-      .withMessage('The diagram name cannot start with a whitespace character.')
-      .satisfies((input: string) => {
-        const inputIsNotEmpty: boolean = input !== undefined;
-
-        const diagramDoesNotEndWithWhitespace: boolean = inputIsNotEmpty ? !/\s+$/.test(input) : true;
-
-        return diagramDoesNotEndWithWhitespace;
-      })
-      .withMessage('The diagram name cannot end with a whitespace character.')
+      .withMessage('The diagram name contains the following illegal characters: ')
       .then()
       .satisfies(async (input: string) => {
         const diagramNameIsUnchanged: boolean =
@@ -1573,13 +1525,6 @@ export class SolutionExplorerSolution {
         return diagramWithUriDoesNotExist;
       })
       .withMessage('A diagram with that name already exists.')
-      .then()
-      .satisfies((input) => {
-        const qNameRegex: RegExp = /^([a-z][\w-.]*:)?[a-z_][\w-.]*$/i;
-
-        return qNameRegex.test(input);
-      })
-      .withMessage('Input must be a valid QName.')
       .on(this.diagramRenamingState)
       .on(this.diagramCreationState);
   }
