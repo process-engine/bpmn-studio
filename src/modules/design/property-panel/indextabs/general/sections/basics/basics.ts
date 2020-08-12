@@ -28,6 +28,7 @@ export class BasicsSection implements ISection {
   public elementType: string;
   public showUnsupportedFlag: boolean = false;
   public validationErrorMessage: string;
+  public notSupportedText: string = 'Not supported by internal ProcessEngine';
 
   public docsInput: HTMLElement;
 
@@ -150,6 +151,12 @@ export class BasicsSection implements ISection {
 
     const typeOfSelectedElement: string = this.businessObjInPanel.$type;
     this.elementType = this.humanizeElementType(typeOfSelectedElement);
+
+    if (typeOfSelectedElement === 'bpmn:EventBasedGateway') {
+      this.notSupportedText = 'Supported by AtlasEngine 10.1 and higher';
+    } else {
+      this.notSupportedText = 'Not supported by internal ProcessEngine';
+    }
 
     this.showUnsupportedFlag = !this.isCurrentBPMNElementSupported();
 
