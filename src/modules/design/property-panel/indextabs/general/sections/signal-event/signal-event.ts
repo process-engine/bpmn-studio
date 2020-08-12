@@ -100,7 +100,7 @@ export class SignalEventSection implements ISection {
 
     this.modeler._definitions.rootElements.push(bpmnSignal);
 
-    const {xml: xmlStrUpdated} = await this.moddle.toXML(this.modeler._definitions.rootElements);
+    const {xml: xmlStrUpdated} = await this.moddle.toXML(this.modeler._definitions);
 
     await this.modeler.importXML(xmlStrUpdated);
     await this.refreshSignals();
