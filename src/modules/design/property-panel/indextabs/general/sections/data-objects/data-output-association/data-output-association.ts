@@ -36,6 +36,10 @@ export class DataOutputAssociationSection implements ISection {
   }
 
   public activate(model: IPageModel): void {
+    if (!model) {
+      return;
+    }
+
     this.moddle = model.modeler.get('moddle');
 
     this.businessObjInPanel = model.elementInPanel.businessObject;
