@@ -16,8 +16,8 @@ import environment from '../../../../../../../../environment';
 import {HelpModalService} from '../../../../../../../../services/help-modal-service/help-modal-service';
 
 @inject(EventAggregator, HelpModalService)
-export class OutputAssociationSection implements ISection {
-  public path: string = '/sections/data-objects/output-association/output-association';
+export class DataOutputAssociationSection implements ISection {
+  public path: string = '/sections/data-objects/data-output-association/data-output-association';
   public canHandleElement: boolean = false;
   public businessObjInPanel: IScriptTaskElement;
 

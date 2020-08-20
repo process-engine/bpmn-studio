@@ -6,8 +6,8 @@ import {HelpTextId, ISection} from '../../../../../../../../contracts/index';
 import {HelpModalService} from '../../../../../../../../services/help-modal-service/help-modal-service';
 
 @inject(HelpModalService)
-export class InputAssociationSection implements ISection {
-  public path: string = '/sections/data-objects/input-association/input-association';
+export class DataInputAssociationSection implements ISection {
+  public path: string = '/sections/data-objects/data-input-association/data-input-association';
   public canHandleElement: boolean = false;
 
   private helpModalService: HelpModalService;

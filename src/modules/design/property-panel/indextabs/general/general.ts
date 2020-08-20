@@ -19,8 +19,8 @@ import {LinkEventSection} from './sections/link-event/link-event';
 import {ExclusiveGatewaySection} from './sections/exclusive-gateway/exclusive-gateway';
 import {UntypedTaskSection} from './sections/untyped-task/untyped-task';
 import {ManualTaskSection} from './sections/manual-task/manual-task';
-import {OutputAssociationSection} from './sections/data-objects/output-association/output-association';
-import {InputAssociationSection} from './sections/data-objects/input-association/input-association';
+import {DataOutputAssociationSection} from './sections/data-objects/data-output-association/data-output-association';
+import {DataInputAssociationSection} from './sections/data-objects/data-input-association/data-input-association';
 import {DataObjectsSection} from './sections/data-objects/data-objects';
 
 export class General implements IIndextab {
@@ -46,8 +46,8 @@ export class General implements IIndextab {
   public untypedTaskSection: ISection = new UntypedTaskSection();
   public manualTaskSection: ISection = new ManualTaskSection();
   public dataObjectsSection: ISection = new DataObjectsSection();
-  public inputAssociationSection: ISection = new InputAssociationSection();
-  public outputAssociationSection: ISection = new OutputAssociationSection();
+  public dataInputAssociationSection: ISection = new DataInputAssociationSection();
+  public dataOutputAssociationSection: ISection = new DataOutputAssociationSection();
 
   public sections: Array<ISection> = [
     this.basicsSection,
@@ -69,8 +69,8 @@ export class General implements IIndextab {
     this.untypedTaskSection,
     this.manualTaskSection,
     this.dataObjectsSection,
-    this.inputAssociationSection,
-    this.outputAssociationSection,
+    this.dataInputAssociationSection,
+    this.dataOutputAssociationSection,
   ];
 
   public canHandleElement: boolean = true;
