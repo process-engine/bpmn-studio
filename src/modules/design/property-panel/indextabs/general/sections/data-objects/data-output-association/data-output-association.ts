@@ -63,8 +63,6 @@ export class DataOutputAssociationSection implements ISection {
   }
 
   public updateDataSource(): void {
-    this.publishDiagramChange();
-
     const dataSourceProperty = this.getDataSourceProperty();
     if (dataSourceProperty != null) {
       dataSourceProperty.value = this.dataSource;
@@ -96,6 +94,8 @@ export class DataOutputAssociationSection implements ISection {
 
       propertiesElement.values.push(property);
     }
+
+    this.publishDiagramChange();
   }
 
   public showDataObjectsHelpModal(): void {
