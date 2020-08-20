@@ -1,0 +1,33 @@
+<template>
+  <require from="./data-output-association.css"></require>
+  <require from="../../../../../styles/sections.css"></require>
+  <div class="section-panel">
+    <div class="panel__heading">Data Output Association
+      <i class="fas fa-info-circle feedback-modal__help-icon" title="Help: How to use Data Objects" click.delegate="showDataObjectsHelpModal()"></i>
+    </div>
+    <div class="panel__content">
+      <p class="data-output-association-information-text">This is a Data Output Association from a Flow Node (event or task) to a Data Object. <a class="data-output-association-enlarge-link" click.delegate="showDataObjectsHelpModal()">Click here for more information...</a> </p>
+      <table class="props-table">
+        <tr>
+          <th>Data Source
+            <a class="data-output-association-enlarge-link" click.delegate="showModal = true"><small class="data-output-association-enlarge-text">Enlarge</small></a>
+          </th>
+          <td>
+            <textarea class="props-input-textarea data-source-input" ref="dataSourceInput" value.bind="dataSource" change.delegate="updateDataSource()" disabled.bind="!isEditable"></textarea>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <modal if.bind="showModal"
+         header-text="Editing: Data Source"
+         modal-style="width: max-content; max-width: 90%;">
+    <template replace-part="modal-body" autofocus>
+      <textarea class="form-control data-output-association" value.bind="dataSource" change.delegate="updateDataSource()" rows="10" aria-multiline="true" autofocus wrap="soft" disabled.bind="!isEditable"></textarea>
+    </template>
+    <template replace-part="modal-footer">
+      <button type="button" class="btn btn-primary" data-dismiss="modal" click.delegate="showModal = false">Okay</button>
+    </template>
+  </modal>
+</template>

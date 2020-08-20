@@ -1,3 +1,4 @@
+import {DataObjectsUsage} from './help-texts/data-objects-usage';
 import {IntermediateTimerEventUsage} from './help-texts/intermediate-timer-event-usage';
 import {TimerBoundaryEventUsage} from './help-texts/timer-boundary-event-usage';
 import {UserTaskUsage} from './help-texts/usertask-usage';
@@ -25,6 +26,8 @@ export class HelpTextService {
         return TimerStartEventUsage;
       case HelpTextId.IntermediateTimerEventUsage:
         return IntermediateTimerEventUsage;
+      case HelpTextId.DataObjectsUsage:
+        return DataObjectsUsage;
       default:
         throw new Error(`Help message with id "${helpTextId}" is unknown.`);
     }
