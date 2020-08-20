@@ -65,5 +65,16 @@ export const DataObjectsUsage: HelpText = {
 
   Here we have an External Service Task which gets its values for topic and payload from the DataObject \`MyDataObject_1\`.
 
+  **DataObjects and Sub Processes**
+
+  You can also use DataObjects in a SubProcess.
+
+  <div style="text-align: left; overflow-y: auto;">
+    <img alt="DataObjects Subprocess" src="src/resources/images/data_objects_sub_process.png" width="450px">
+  </div>
+
+  Keep in mind that DataObjects contained in a SubProcess are only available to the FlowNodes contained within that SubProcess.
+
+  FlowNodes outside the SubProcess ***cannot*** access these DataObjects.
    `),
 };
