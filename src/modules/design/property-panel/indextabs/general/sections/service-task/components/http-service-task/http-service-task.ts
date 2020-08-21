@@ -115,7 +115,12 @@ export class HttpServiceTask {
   }
 
   private fillVariablesFromParam(params: string): void {
-    const parsedParams = JSON.parse(params);
+    let parsedParams = {};
+    try {
+      parsedParams = JSON.parse(params);
+    } catch {
+      // Do nothing
+    }
     this.selectedHttpUrl = parsedParams[0];
     this.selectedHttpBody =
       typeof parsedParams[1] === 'object' ? JSON.stringify(parsedParams[1], null, 2) : parsedParams[1];
