@@ -14,6 +14,8 @@ import {
 import {DataModels} from '@process-engine/management_api_contracts';
 import {IDiagram} from '@process-engine/solutionexplorer.contracts';
 
+import * as JSON5 from 'json5';
+
 import {
   DeployResult,
   IElementRegistry,
@@ -377,7 +379,7 @@ export class DiagramDetail {
   private getInitialTokenValues(token: any): any {
     try {
       // If successful, the token is an object
-      return JSON.parse(token);
+      return JSON5.parse(token);
     } catch (error) {
       // If an error occurs, the token is something else.
       return token;
@@ -436,14 +438,7 @@ export class DiagramDetail {
         return;
       }
 
-      const initialToken: string = untrimmedInitialToken.replace('StartToken:', '').trim();
-
-      /**
-       * This Regex replaces all single quotes with double quotes and adds double
-       * quotes to non quotet keys.
-       * This way we make sure that JSON.parse() can handle the given string.
-       */
-      this.initialToken = initialToken.replace(/(\s*?{\s*?|\s*?,\s*?)(['"])?([a-zA-Z0-9]+)(['"])?:/g, '$1"$3":');
+      this.initialToken = untrimmedInitialToken.replace('StartToken:', '').trim();
 
       return;
     }
