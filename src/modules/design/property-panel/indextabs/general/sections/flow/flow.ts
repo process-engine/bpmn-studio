@@ -24,6 +24,10 @@ export class FlowSection implements ISection {
   }
 
   public activate(model: IPageModel): void {
+    if (model == null) {
+      return;
+    }
+
     this.businessObjInPanel = model.elementInPanel.businessObject;
     this.moddle = model.modeler.get('moddle');
 

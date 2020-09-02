@@ -62,6 +62,10 @@ export class CallActivitySection implements ISection {
   }
 
   public async activate(model: IPageModel): Promise<void> {
+    if (model == null) {
+      return;
+    }
+
     this.moddle = model.modeler.get('moddle');
     this.activeSolutionUri = this.router.currentInstruction.queryParams.solutionUri;
     this.businessObjInPanel = model.elementInPanel.businessObject;

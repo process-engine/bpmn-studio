@@ -32,7 +32,7 @@ export class ProcessSection {
   }
 
   public activate(model: IPageModel): void {
-    if (!model) {
+    if (model == null) {
       return;
     }
 

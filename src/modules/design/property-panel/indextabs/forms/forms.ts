@@ -22,7 +22,7 @@ export class Forms implements IIndextab {
      * This is necessary because since v1.12.0 of aurelia-templating-resources there is a bug
      * which triggers the activate function although the form section is already detached.
      */
-    if (model === undefined) {
+    if (model == null) {
       return;
     }
 
@@ -31,7 +31,7 @@ export class Forms implements IIndextab {
   }
 
   public isSuitableForElement(element: IShape): boolean {
-    if (element === undefined || element === null) {
+    if (element == null) {
       return false;
     }
 

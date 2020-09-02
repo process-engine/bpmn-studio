@@ -1,0 +1,28 @@
+.data-output-association-enlarge-link {
+  display: block;
+  color: #007bff !important;
+}
+
+.data-output-association-enlarge-link:hover {
+  text-decoration: underline !important;
+}
+
+.data-output-association-enlarge-text:hover {
+  text-decoration: underline;
+}
+
+.data-output-association {
+  min-height: 55px;
+  max-height: 400px;
+  min-width: 470px;
+  max-width: 100%;
+  resize: both;
+}
+
+.data-source-input {
+  height: 100px !important;
+}
+
+.data-output-association-information-text {
+  color: #a5a5a5;
+}

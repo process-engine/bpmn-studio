@@ -5,7 +5,6 @@ import {IModdleElement, IShape} from '@process-engine/bpmn-elements_contracts';
 import {
   IBpmnModdle,
   IBpmnModeler,
-  IDefinition,
   IDiagramState,
   IElementRegistry,
   IEvent,

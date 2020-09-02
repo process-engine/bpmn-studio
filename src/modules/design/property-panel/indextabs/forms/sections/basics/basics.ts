@@ -67,6 +67,10 @@ export class BasicsSection implements ISection {
   }
 
   public activate(model: IPageModel): void {
+    if (model == null) {
+      return;
+    }
+
     this.businessObjInPanel = model.elementInPanel.businessObject;
 
     this.modeler = model.modeler;

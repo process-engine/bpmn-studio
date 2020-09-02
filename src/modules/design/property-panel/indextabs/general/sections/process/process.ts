@@ -19,7 +19,7 @@ export class ProcessSection implements ISection {
   }
 
   public activate(model: IPageModel): void {
-    if (!model) {
+    if (model == null) {
       return;
     }
 

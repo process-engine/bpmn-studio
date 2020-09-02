@@ -34,6 +34,10 @@ export class MessageTaskSection implements ISection {
   }
 
   public async activate(model: IPageModel): Promise<void> {
+    if (model == null) {
+      return;
+    }
+
     this.businessObjInPanel = model.elementInPanel.businessObject;
 
     this.moddle = model.modeler.get('moddle');
@@ -83,7 +87,7 @@ export class MessageTaskSection implements ISection {
 
     this.modeler._definitions.rootElements.push(bpmnMessage);
 
-    const {xml: xmlStrUpdated} = await this.moddle.toXML(this.modeler._definitions.rootElements);
+    const {xml: xmlStrUpdated} = await this.moddle.toXML(this.modeler._definitions);
 
     await this.modeler.importXML(xmlStrUpdated);
     await this.refreshMessages();

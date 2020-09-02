@@ -36,6 +36,10 @@ export class EscalationEventSection implements ISection {
   }
 
   public async activate(model: IPageModel): Promise<void> {
+    if (model == null) {
+      return;
+    }
+
     this.businessObjInPanel = model.elementInPanel.businessObject as IEscalationEventElement;
 
     this.moddle = model.modeler.get('moddle');
@@ -98,7 +102,7 @@ export class EscalationEventSection implements ISection {
 
     this.modeler._definitions.rootElements.push(bpmnEscalation);
 
-    const {xml: xmlStrUpdated} = await this.moddle.toXML(this.modeler._definitions.rootElements);
+    const {xml: xmlStrUpdated} = await this.moddle.toXML(this.modeler._definitions);
     await this.modeler.importXML(xmlStrUpdated);
     await this.refreshEscalations();
     await this.setBusinessObject();

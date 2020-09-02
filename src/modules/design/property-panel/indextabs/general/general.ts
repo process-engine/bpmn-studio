@@ -1,6 +1,6 @@
 import {IShape} from '@process-engine/bpmn-elements_contracts';
 
-import {IIndextab, ISection} from '../../../../../contracts';
+import {IBpmnModeler, IIndextab, IPageModel, ISection} from '../../../../../contracts';
 import {BasicsSection} from './sections/basics/basics';
 import {CallActivitySection} from './sections/call-activity/call-activity';
 import {ConditionalEventSection} from './sections/conditional-event/conditional-event';
@@ -19,10 +19,16 @@ import {LinkEventSection} from './sections/link-event/link-event';
 import {ExclusiveGatewaySection} from './sections/exclusive-gateway/exclusive-gateway';
 import {UntypedTaskSection} from './sections/untyped-task/untyped-task';
 import {ManualTaskSection} from './sections/manual-task/manual-task';
+import {DataOutputAssociationSection} from './sections/data-objects/data-output-association/data-output-association';
+import {DataInputAssociationSection} from './sections/data-objects/data-input-association/data-input-association';
+import {DataObjectsSection} from './sections/data-objects/data-objects';
 
 export class General implements IIndextab {
   public title: string = 'General';
   public path: string = '/indextabs/general/general';
+
+  public modeler: IBpmnModeler;
+  public elementInPanel: IShape;
 
   public basicsSection: ISection = new BasicsSection();
   public poolSection: ISection = new PoolSection();
@@ -42,6 +48,9 @@ export class General implements IIndextab {
   public exclusiveGatewaySection: ISection = new ExclusiveGatewaySection();
   public untypedTaskSection: ISection = new UntypedTaskSection();
   public manualTaskSection: ISection = new ManualTaskSection();
+  public dataObjectsSection: ISection = new DataObjectsSection();
+  public dataInputAssociationSection: ISection = new DataInputAssociationSection();
+  public dataOutputAssociationSection: ISection = new DataOutputAssociationSection();
 
   public sections: Array<ISection> = [
     this.basicsSection,
@@ -62,11 +71,31 @@ export class General implements IIndextab {
     this.exclusiveGatewaySection,
     this.untypedTaskSection,
     this.manualTaskSection,
+    this.dataObjectsSection,
+    this.dataInputAssociationSection,
+    this.dataOutputAssociationSection,
   ];
 
   public canHandleElement: boolean = true;
 
+  public activate(model: IPageModel): void {
+    /*
+     * This is necessary because since v1.12.0 of aurelia-templating-resources there is a bug
+     * which triggers the activate function although the form section is already detached.
+     */
+    if (model == null) {
+      return;
+    }
+
+    this.elementInPanel = model.elementInPanel;
+    this.modeler = model.modeler;
+  }
+
   public isSuitableForElement(element: IShape): boolean {
+    if (element == null) {
+      return false;
+    }
+
     this.sections.forEach((section: ISection) => {
       section.canHandleElement = section.isSuitableForElement(element);
     });

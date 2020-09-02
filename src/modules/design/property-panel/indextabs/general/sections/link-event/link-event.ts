@@ -20,6 +20,10 @@ export class LinkEventSection implements ISection {
   }
 
   public activate(model: IPageModel): void {
+    if (model == null) {
+      return;
+    }
+
     this.businessObjInPanel = model.elementInPanel.businessObject as ILinkEventElement;
     this.linkEventName = this.businessObjInPanel.eventDefinitions[0].name || '';
   }
