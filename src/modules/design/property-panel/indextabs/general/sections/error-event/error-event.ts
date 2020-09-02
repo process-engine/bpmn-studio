@@ -43,6 +43,10 @@ export class ErrorEventSection implements ISection {
   }
 
   public async activate(model: IPageModel): Promise<void> {
+    if (model == null) {
+      return;
+    }
+
     this.businessObjInPanel = model.elementInPanel.businessObject as IErrorEventElement;
 
     this.moddle = model.modeler.get('moddle');

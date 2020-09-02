@@ -49,6 +49,10 @@ export class BasicsSection implements ISection {
   }
 
   public activate(model: IPageModel): void {
+    if (model == null) {
+      return;
+    }
+
     if (this.validationError) {
       this.businessObjInPanelId = this.previousProcessRefId;
       this.validationController.validate();

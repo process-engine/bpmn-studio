@@ -33,6 +33,10 @@ export class PoolSection implements ISection {
   }
 
   public activate(model: IPageModel): void {
+    if (model == null) {
+      return;
+    }
+
     const noProcessReferencePresent: boolean = model.elementInPanel.businessObject.processRef === undefined;
     if (noProcessReferencePresent) {
       return;

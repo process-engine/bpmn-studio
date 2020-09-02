@@ -26,6 +26,10 @@ export class ScriptTaskSection implements ISection {
   }
 
   public activate(model: IPageModel): void {
+    if (model == null) {
+      return;
+    }
+
     this.businessObjInPanel = model.elementInPanel.businessObject;
   }
 

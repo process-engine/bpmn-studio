@@ -34,6 +34,10 @@ export class MessageTaskSection implements ISection {
   }
 
   public async activate(model: IPageModel): Promise<void> {
+    if (model == null) {
+      return;
+    }
+
     this.businessObjInPanel = model.elementInPanel.businessObject;
 
     this.moddle = model.modeler.get('moddle');
