@@ -25,6 +25,10 @@ export class ConditionalEventSection implements ISection {
   }
 
   public activate(model: IPageModel): void {
+    if (model == null) {
+      return;
+    }
+
     this.moddle = model.modeler.get('moddle');
     this.linter = model.modeler.get('linting');
     this.businessObjInPanel = model.elementInPanel.businessObject as IConditionalEventElement;

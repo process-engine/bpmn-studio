@@ -27,6 +27,10 @@ export class UntypedTaskSection implements ISection {
   }
 
   public activate(model: IPageModel): void {
+    if (model == null) {
+      return;
+    }
+
     this.moddle = model.modeler.get('moddle');
     this.businessObjInPanel = model.elementInPanel.businessObject;
 
