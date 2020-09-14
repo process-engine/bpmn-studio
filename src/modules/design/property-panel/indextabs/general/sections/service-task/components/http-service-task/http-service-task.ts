@@ -91,7 +91,7 @@ export class HttpServiceTask {
     const params = [];
     params.push(this.selectedHttpUrl);
     if (this.selectedHttpBody) {
-      params.push(this.tryParse(this.selectedHttpBody));
+      params.push(this.selectedHttpBody);
     }
     if (this.selectedHttpBody && (this.selectedHttpContentType || this.selectedHttpAuth)) {
       params.push({
@@ -102,29 +102,71 @@ export class HttpServiceTask {
       });
     }
 
-    return JSON.stringify(params);
-  }
+    let returnValue = `[${JSON.stringify(params[0])}`;
 
-  private tryParse(value): any {
-    try {
-      const parsedValue = JSON.parse(value);
-      return parsedValue;
-    } catch (error) {
-      return value;
+    if (params[1] != null) {
+      if (params[1].startsWith('{') && params[1].endsWith('}')) {
+        returnValue += `, ${params[1]}`;
+      } else {
+        returnValue += `, ${JSON.stringify(params[1])}`;
+      }
     }
+
+    if (params[2] != null) {
+      returnValue += `, ${JSON.stringify(params[2])}`;
+    }
+
+    returnValue += ']';
+
+    return returnValue;
   }
 
   private fillVariablesFromParam(params: string): void {
     let parsedParams = {};
     try {
       parsedParams = JSON.parse(params);
+      this.selectedHttpUrl = parsedParams[0];
+      this.selectedHttpBody =
+        typeof parsedParams[1] === 'object' ? JSON.stringify(parsedParams[1], null, 2) : parsedParams[1];
+      this.selectedHttpContentType = parsedParams[2]?.headers['Content-Type'];
+      this.selectedHttpAuth = parsedParams[2]?.headers.Authorization;
     } catch {
-      // Do nothing
+      const stringParams = params.trim();
+
+      const indexOfFirstComma = stringParams.indexOf(',');
+      const url = stringParams
+        .substring(0, indexOfFirstComma)
+        .replace(/"/g, '')
+        .replace('[', '');
+      this.selectedHttpUrl = url;
+
+      const indexOfFirstOpenBraket = stringParams.indexOf('{');
+      let body = stringParams.substr(indexOfFirstOpenBraket);
+      const indexOfClosingBraket = body.indexOf('},') === -1 ? body.indexOf(']') : body.indexOf('},');
+      if (indexOfClosingBraket === -1) {
+        return;
+      }
+
+      body = body.substring(0, indexOfClosingBraket + 1);
+
+      if (body.endsWith(']')) {
+        body = body.replace(']', '');
+      }
+      this.selectedHttpBody = body;
+
+      let headers = stringParams.replace(url, '').replace(body, '');
+      const startIndexOfHeaders = headers.indexOf('{');
+      const endIndexOfHeader = headers.lastIndexOf('}');
+
+      if (startIndexOfHeaders === -1 || endIndexOfHeader === -1) {
+        return;
+      }
+
+      headers = headers.substr(startIndexOfHeaders, endIndexOfHeader).replace(']', '');
+      const headersObject = JSON.parse(headers);
+
+      this.selectedHttpContentType = headersObject.headers['Content-Type'];
+      this.selectedHttpAuth = headersObject.headers.Authorization;
     }
-    this.selectedHttpUrl = parsedParams[0];
-    this.selectedHttpBody =
-      typeof parsedParams[1] === 'object' ? JSON.stringify(parsedParams[1], null, 2) : parsedParams[1];
-    this.selectedHttpContentType = parsedParams[2]?.headers['Content-Type'];
-    this.selectedHttpAuth = parsedParams[2]?.headers.Authorization;
   }
 }
