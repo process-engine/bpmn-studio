@@ -142,7 +142,7 @@ export class HttpServiceTask {
 
       const indexOfFirstOpenBraket = stringParams.indexOf('{');
       let body = stringParams.substr(indexOfFirstOpenBraket);
-      const indexOfClosingBraket = body.indexOf('},') === -1 ? body.indexOf(']') : body.indexOf('},');
+      const indexOfClosingBraket = body.lastIndexOf('},') === -1 ? body.lastIndexOf(']') : body.lastIndexOf('},');
       if (indexOfClosingBraket === -1) {
         return;
       }
