@@ -82,7 +82,7 @@
     "minimist": "^1.2.0",
     "moment": "2.24.0",
     "node-abi": "2.13.0",
-    "node-fetch": "2.6.0",
+    "node-fetch": "2.6.1",
     "open": "7.0.0",
     "print-js": "1.0.63",
     "proxy-polyfill": "0.3.0",

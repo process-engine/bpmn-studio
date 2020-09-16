@@ -91,7 +91,7 @@ export class HttpServiceTask {
     const params = [];
     params.push(this.selectedHttpUrl);
     if (this.selectedHttpBody) {
-      params.push(this.tryParse(this.selectedHttpBody));
+      params.push(this.selectedHttpBody);
     }
     if (this.selectedHttpBody && (this.selectedHttpContentType || this.selectedHttpAuth)) {
       params.push({
@@ -102,29 +102,79 @@ export class HttpServiceTask {
       });
     }
 
-    return JSON.stringify(params);
-  }
+    let returnValue = `[${JSON.stringify(params[0])}`;
 
-  private tryParse(value): any {
-    try {
-      const parsedValue = JSON.parse(value);
-      return parsedValue;
-    } catch (error) {
-      return value;
+    if (params[1] != null) {
+      if (params[1].startsWith('{') && params[1].endsWith('}')) {
+        returnValue += `, ${params[1]}`;
+      } else {
+        returnValue += `, ${JSON.stringify(params[1])}`;
+      }
     }
+
+    if (params[2] != null) {
+      returnValue += `, ${JSON.stringify(params[2])}`;
+    }
+
+    returnValue += ']';
+
+    return returnValue;
   }
 
   private fillVariablesFromParam(params: string): void {
     let parsedParams = {};
     try {
       parsedParams = JSON.parse(params);
+      this.selectedHttpUrl = parsedParams[0];
+      this.selectedHttpBody =
+        typeof parsedParams[1] === 'object' ? JSON.stringify(parsedParams[1], null, 2) : parsedParams[1];
+      this.selectedHttpContentType = parsedParams[2]?.headers['Content-Type'];
+      this.selectedHttpAuth = parsedParams[2]?.headers.Authorization;
     } catch {
-      // Do nothing
+      let stringParams = params.trim();
+
+      const hasHeaders = stringParams.includes('{"headers');
+      let headers = '';
+      if (hasHeaders) {
+        const indexOfHeaders = stringParams.indexOf('{"headers"');
+        headers = stringParams.substring(indexOfHeaders).replace(/]$/g, '');
+        try {
+          const parsedHeaders = JSON.parse(headers);
+          this.selectedHttpContentType = parsedHeaders.headers['Content-Type'];
+          this.selectedHttpAuth = parsedHeaders.headers.Authorization;
+        } catch {
+          // do nothing
+        }
+        stringParams = stringParams.substring(0, indexOfHeaders);
+      }
+
+      const hasBody = stringParams.includes(',');
+      let newBody = '';
+      if (hasBody) {
+        const indexOfComma = stringParams.indexOf(',');
+        newBody = stringParams
+          .substring(indexOfComma)
+          .trim()
+          .replace(/,$/g, '');
+        newBody = newBody.replace(/^,/, '').trim();
+
+        const isPossibleObject = newBody.startsWith('{') && newBody.endsWith('}');
+        if (!isPossibleObject) {
+          newBody = newBody.replace(/]$/g, '').replace(/^"|"$/g, '');
+        }
+
+        this.selectedHttpBody = newBody;
+        stringParams = stringParams.substring(0, indexOfComma);
+      }
+
+      const noCommaInStringParams = !stringParams.includes(',');
+      if (noCommaInStringParams) {
+        this.selectedHttpUrl = stringParams
+          .replace('[', '')
+          .replace(/]$/g, '')
+          .replace(/"/g, '')
+          .trim();
+      }
     }
-    this.selectedHttpUrl = parsedParams[0];
-    this.selectedHttpBody =
-      typeof parsedParams[1] === 'object' ? JSON.stringify(parsedParams[1], null, 2) : parsedParams[1];
-    this.selectedHttpContentType = parsedParams[2]?.headers['Content-Type'];
-    this.selectedHttpAuth = parsedParams[2]?.headers.Authorization;
   }
 }
