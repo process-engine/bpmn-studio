@@ -131,42 +131,50 @@ export class HttpServiceTask {
       this.selectedHttpContentType = parsedParams[2]?.headers['Content-Type'];
       this.selectedHttpAuth = parsedParams[2]?.headers.Authorization;
     } catch {
-      const stringParams = params.trim();
+      let stringParams = params.trim();
 
-      const indexOfFirstComma = stringParams.indexOf(',');
-      const url = stringParams
-        .substring(0, indexOfFirstComma)
-        .replace(/"/g, '')
-        .replace('[', '');
-      this.selectedHttpUrl = url;
-
-      const indexOfFirstOpenBraket = stringParams.indexOf('{');
-      let body = stringParams.substr(indexOfFirstOpenBraket);
-      const indexOfClosingBraket = body.lastIndexOf('},') === -1 ? body.lastIndexOf(']') : body.lastIndexOf('},');
-      if (indexOfClosingBraket === -1) {
-        return;
+      const hasHeaders = stringParams.includes('{"headers');
+      let headers = '';
+      if (hasHeaders) {
+        const indexOfHeaders = stringParams.indexOf('{"headers"');
+        headers = stringParams.substring(indexOfHeaders).replace(/]$/g, '');
+        try {
+          const parsedHeaders = JSON.parse(headers);
+          this.selectedHttpContentType = parsedHeaders.headers['Content-Type'];
+          this.selectedHttpAuth = parsedHeaders.headers.Authorization;
+        } catch {
+          // do nothing
+        }
+        stringParams = stringParams.substring(0, indexOfHeaders);
       }
 
-      body = body.substring(0, indexOfClosingBraket + 1);
+      const hasBody = stringParams.includes(',');
+      let newBody = '';
+      if (hasBody) {
+        const indexOfComma = stringParams.indexOf(',');
+        newBody = stringParams
+          .substring(indexOfComma)
+          .trim()
+          .replace(/,$/g, '');
+        newBody = newBody.replace(/^,/, '').trim();
 
-      if (body.endsWith(']')) {
-        body = body.replace(']', '');
+        const isPossibleObject = newBody.startsWith('{') && newBody.endsWith('}');
+        if (!isPossibleObject) {
+          newBody = newBody.replace(/]$/g, '').replace(/^"|"$/g, '');
+        }
+
+        this.selectedHttpBody = newBody;
+        stringParams = stringParams.substring(0, indexOfComma);
       }
-      this.selectedHttpBody = body;
 
-      let headers = stringParams.replace(url, '').replace(body, '');
-      const startIndexOfHeaders = headers.indexOf('{');
-      const endIndexOfHeader = headers.lastIndexOf('}');
-
-      if (startIndexOfHeaders === -1 || endIndexOfHeader === -1) {
-        return;
+      const noCommaInStringParams = !stringParams.includes(',');
+      if (noCommaInStringParams) {
+        this.selectedHttpUrl = stringParams
+          .replace('[', '')
+          .replace(/]$/g, '')
+          .replace(/"/g, '')
+          .trim();
       }
-
-      headers = headers.substr(startIndexOfHeaders, endIndexOfHeader).replace(']', '');
-      const headersObject = JSON.parse(headers);
-
-      this.selectedHttpContentType = headersObject.headers['Content-Type'];
-      this.selectedHttpAuth = headersObject.headers.Authorization;
     }
   }
 }
