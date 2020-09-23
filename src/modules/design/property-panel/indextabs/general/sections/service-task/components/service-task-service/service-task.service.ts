@@ -108,4 +108,16 @@ export class ServiceTaskService {
       this.businessObjInPanel.extensionElements.values === undefined
     );
   }
+
+  public updateOrCreateProperty(propertyName: string, value: string): void {
+    const property = this.getProperty(propertyName);
+
+    if (property == null) {
+      const newProperty = this.createProperty(propertyName);
+      newProperty.value = value;
+      return;
+    }
+
+    property.value = value;
+  }
 }
