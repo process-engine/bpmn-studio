@@ -76,3 +76,35 @@ export function getInvalidCharacters(input: string): Array<string> {
 
   return invalidCharacters;
 }
+
+export function tryToFindIllegalIdsAndGenerateError(xml: string): Array<any> {
+  const qNameRegex: RegExp = /^([a-z][\w-.]*:)?[a-z_][\w-.]*$/i;
+
+  const idRegex: RegExp = /id="([^"]*)"/gm;
+  const allIdParts = xml.match(idRegex);
+
+  if (allIdParts != null) {
+    const mappedIds = allIdParts.map((idString) => {
+      const id = idString.replace('id="', '').replace(/"$/g, '');
+
+      return id;
+    });
+
+    const filteredInvalidIds = mappedIds.filter((id) => {
+      const isInvalid = !qNameRegex.test(id);
+      return isInvalid;
+    });
+
+    return [
+      ...filteredInvalidIds.map((invalidId) => {
+        return {
+          error: {
+            message: `illegal ID <${invalidId}>`,
+          },
+        };
+      }),
+    ];
+  }
+
+  return [];
+}
