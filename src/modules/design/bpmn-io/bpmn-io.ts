@@ -38,7 +38,11 @@ import {DiagramExportService, DiagramPrintService} from './services/index';
 import {UserConfigService} from '../../../services/user-config-service/user-config.service';
 import {solutionIsRemoteSolution} from '../../../services/solution-is-remote-solution-module/solution-is-remote-solution.module';
 import {isRunningInElectron} from '../../../services/is-running-in-electron-module/is-running-in-electron.module';
-import {getIllegalIdErrors, getValidXml} from '../../../services/xml-id-validation-module/xml-id-validation-module';
+import {
+  getIllegalIdErrors,
+  getValidXml,
+  tryToFindIllegalIdsAndGenerateError,
+} from '../../../services/xml-id-validation-module/xml-id-validation-module';
 
 const sideBarRightSize: number = 35;
 
@@ -744,25 +748,33 @@ export class BpmnIo {
 
       const illegalIdErrors = getIllegalIdErrors(warnings);
       if (illegalIdErrors.length > 0) {
-        const validationResult = getValidXml(xml, illegalIdErrors);
-        this.xml = validationResult.xml;
-        await this.importXmlIntoModeler(this.xml);
-
-        if (!this.solutionIsRemote) {
-          this.eventAggregator.publish(
-            environment.events.bpmnio.showIncompatibleDiagramModal,
-            validationResult.renamedIds,
-          );
-        }
+        await this.resolveIllegalIdErrors(xml, illegalIdErrors);
       }
 
       if (warnings.length !== 0) {
         console.warn(warnings);
       }
     } catch (error) {
-      throw new Error(
-        `ERROR: failed to import xml\n\nError given:\n\n${JSON.stringify(error)}\n\nXML given:\n\n${xml}`,
-      );
+      if (error.message === 'no diagram to display') {
+        const illegalIdErrors = tryToFindIllegalIdsAndGenerateError(xml);
+        if (illegalIdErrors.length > 0) {
+          await this.resolveIllegalIdErrors(xml, illegalIdErrors);
+        }
+      } else {
+        throw new Error(
+          `ERROR: failed to import xml\n\nError given:\n\n${JSON.stringify(error)}\n\nXML given:\n\n${xml}`,
+        );
+      }
+    }
+  }
+
+  private async resolveIllegalIdErrors(xml, illegalIdErrors): Promise<void> {
+    const validationResult = getValidXml(xml, illegalIdErrors);
+    this.xml = validationResult.xml;
+    await this.importXmlIntoModeler(this.xml);
+
+    if (!this.solutionIsRemote) {
+      this.eventAggregator.publish(environment.events.bpmnio.showIncompatibleDiagramModal, validationResult.renamedIds);
     }
   }
 
@@ -784,7 +796,20 @@ export class BpmnIo {
   }
 
   private async convertXml(xml: string): Promise<string> {
-    await this.diagramConverter.importXML(xml);
+    try {
+      await this.diagramConverter.importXML(xml);
+    } catch (error) {
+      if (error.message === 'no diagram to display') {
+        const illegalIdErrors = tryToFindIllegalIdsAndGenerateError(xml);
+        if (illegalIdErrors.length > 0) {
+          const validationResult = getValidXml(xml, illegalIdErrors);
+          const newXml = validationResult.xml;
+          await this.convertXml(newXml);
+        }
+      } else {
+        throw error;
+      }
+    }
     const {xml: convertedXml} = await this.diagramConverter.saveXML({format: true});
 
     return convertedXml;
