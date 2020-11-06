@@ -940,7 +940,7 @@ async function startInternalProcessEngine(): Promise<any> {
 
 async function startRuntime(): Promise<void> {
   return new Promise((resolve: Function, reject: Function): void => {
-    const sqlitePath = getProcessEngineDatabaseFolder();
+    const sqlitePath = getSqlitePath();
     const logFilepath = getProcessEngineLogFolder();
 
     const pathToRuntime = path.join(
@@ -987,6 +987,16 @@ function getProcessEngineLogFolder(): string {
 
 function getProcessEngineLogFolderName(): string {
   return 'process_engine_logs';
+}
+
+function getSqlitePath(): string {
+  const configPath = !releaseChannel.isDev()
+    ? path.join(__dirname, '..', '..', '..', '..', '..', 'configs', 'sqlite.json')
+    : path.join(__dirname, '..', '..', '..', 'configs', 'sqlite.json');
+
+  const config = JSON.parse(fs.readFileSync(configPath, {encoding: 'utf8'}));
+
+  return path.join(getProcessEngineDatabaseFolder(), config.database.storage);
 }
 
 function getProcessEngineDatabaseFolder(): string {
