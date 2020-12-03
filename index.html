@@ -27,6 +27,13 @@
         if (window.require) {
           window.nodeRequire = require;
           delete window.require;
+
+          try {
+            const screenRecorder = window.nodeRequire('./dist/test-integration/test/integration/modules/screen-recorder.js')
+            new screenRecorder.ScreenRecorder();
+          } catch {
+            // if the file does not exist, do nothing
+          }
         }
 
         // in an electron-environment, we musn't try to load umd-modules via window.module

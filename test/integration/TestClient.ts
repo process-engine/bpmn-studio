@@ -3,7 +3,7 @@
 import path from 'path';
 import os from 'os';
 import {exec} from 'child_process';
-import fs from 'fs';
+import fs from 'fs-extra';
 
 import {AppConstructorOptions, Application} from 'spectron';
 import assert from 'assert';
@@ -11,6 +11,7 @@ import {IIdentity} from '@essential-projects/iam_contracts';
 
 import {SolutionExplorer} from './test-classes/solution-explorer';
 import {DesignViewClient} from './test-classes/design-view';
+import {callExposedFunction} from '../../src/services/expose-functionality-module/expose-functionality.module';
 
 function getUserConfigFolder(): string {
   const userHomeDir = os.homedir();
@@ -29,17 +30,27 @@ const TESTS_FOLDER_PATH = path.join(getUserConfigFolder(), 'bpmn-studio-tests');
 const DATABASE_PATH = path.join(TESTS_FOLDER_PATH, 'process_engine_databases');
 const SAVE_DIAGRAM_DIR = path.join(TESTS_FOLDER_PATH, 'saved_diagrams');
 const VISIBLE_TIMEOUT = 40000;
-const REMOVE_COMMAND = process.platform === 'win32' ? 'rmdir /s /q' : 'rm -rf';
+const REMOVE_COMMAND_DIR = process.platform === 'win32' ? 'rmdir /s /q' : 'rm -rf';
+const REMOVE_COMMAND_FILE = process.platform === 'win32' ? 'del /f' : 'rm -f';
 
 export class TestClient {
   public solutionExplorer: SolutionExplorer = new SolutionExplorer(this);
   public designView: DesignViewClient = new DesignViewClient(this, SAVE_DIAGRAM_DIR);
   public creatingFirstDiagram: boolean = true;
 
+  private startDate: string;
   private app: Application;
 
   constructor(applicationArgs: AppConstructorOptions) {
     this.app = new Application(applicationArgs);
+    // eslint-disable-next-line newline-per-chained-call
+    this.startDate = new Date().toISOString().replace(/:/g, '-');
+  }
+
+  public getVideoFilePathForTest(test: Mocha.Test): string {
+    const testName = test.title.replace(/\s/g, '-');
+    const suiteName = test.parent.title.replace(/\s/g, '-');
+    return `test-results/${this.startDate}_${suiteName}_${testName}.webm`;
   }
 
   public async startSpectronApp(): Promise<any> {
@@ -51,8 +62,41 @@ export class TestClient {
     await this.app.browserWindow.isVisible();
   }
 
+  public async startRecording(filepath: string): Promise<void> {
+    await callExposedFunction(this.webdriverClient, 'startRecording', filepath);
+  }
+
+  public async cancelRecording(): Promise<void> {
+    await callExposedFunction(this.webdriverClient, 'cancelRecording');
+  }
+
+  public async stopRecordingAndSave(): Promise<void> {
+    await callExposedFunction(this.webdriverClient, 'stopRecordingAndSave');
+  }
+
   public async startPageLoaded(): Promise<void> {
     await this.ensureVisible('[data-test-start-page]', VISIBLE_TIMEOUT);
+  }
+
+  public async removeUnneededVideos(filePath: string): Promise<void> {
+    try {
+      const filePathToUse = `${filePath.replace('.webm', '*.webm')}`;
+
+      if (process.platform === 'win32') {
+        const filesToDelete = fs.readdirSync(path.dirname(filePathToUse), {encoding: 'utf8'}).filter((file) => {
+          const lastIndexOfMinus = filePath.lastIndexOf('-');
+          return file.includes(path.basename(filePath.substr(0, lastIndexOfMinus)));
+        });
+
+        for (const fileToDelete of filesToDelete) {
+          await this.deleteFile(`test-results\\${fileToDelete}`);
+        }
+      } else {
+        await this.execCommand(`${REMOVE_COMMAND_FILE} ${filePathToUse.replace(/"/g, '\\"')}`);
+      }
+    } catch (error) {
+      console.error('Error: removeUnneededVideos', error);
+    }
   }
 
   public async clickOnBpmnElementWithName(name): Promise<void> {
@@ -93,15 +137,19 @@ export class TestClient {
   }
 
   public async removeTestsFolder(): Promise<void> {
-    await this.execCommand(`${REMOVE_COMMAND} ${TESTS_FOLDER_PATH.replace(/\s/g, '\\ ')}`);
+    await this.execCommand(`${REMOVE_COMMAND_DIR} ${TESTS_FOLDER_PATH.replace(/\s/g, '\\ ')}`);
   }
 
   public async clearDatabase(): Promise<void> {
     if (fs.existsSync(DATABASE_PATH)) {
       try {
-        await this.execCommand(`${REMOVE_COMMAND} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
+        if (process.platform === 'win32') {
+          await this.removeWindowsDB(DATABASE_PATH);
+        } else {
+          await this.execCommand(`${REMOVE_COMMAND_DIR} ${DATABASE_PATH.replace(/\s/g, '\\ ')}`);
+        }
       } catch (error) {
-        console.error(error);
+        console.error('Error:clearDatabase ', error);
       }
     }
   }
@@ -109,9 +157,9 @@ export class TestClient {
   public async clearSavedDiagrams(): Promise<void> {
     if (fs.existsSync(SAVE_DIAGRAM_DIR)) {
       try {
-        await this.execCommand(`${REMOVE_COMMAND} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
+        await this.execCommand(`${REMOVE_COMMAND_DIR} ${SAVE_DIAGRAM_DIR.replace(/\s/g, '\\ ')}`);
       } catch (error) {
-        console.error(error);
+        console.error('Error:clearSavedDiagrams ', error);
       }
     }
   }
@@ -274,6 +322,72 @@ export class TestClient {
         }
         return resolve(stdin);
       });
+    });
+  }
+
+  private removeWindowsDB(dbPath): Promise<void> {
+    return new Promise((resolve: Function, reject: Function) => {
+      fs.readdirSync(dbPath).forEach((file, index, arr) => {
+        const fileToDelete = path.join(dbPath, file);
+
+        const deleteFile = (filepath): void =>
+          fs.open(filepath, 'r+', async (err, fd) => {
+            if (err && err.code === 'EBUSY') {
+              deleteFile(filepath);
+            } else if (err && err.code === 'ENOENT') {
+              if (index === arr.length - 1) {
+                fs.rmdirSync(dbPath);
+                resolve();
+              }
+            } else {
+              fs.close(fd, () => {
+                fs.unlink(filepath, async (unlinkErr) => {
+                  if (unlinkErr) {
+                    deleteFile(filepath);
+                  } else if (index === arr.length - 1) {
+                    try {
+                      fs.rmdirSync(dbPath);
+                      resolve();
+                    } catch (error) {
+                      if (error.code === 'ENOTEMPTY') {
+                        await this.removeWindowsDB(dbPath);
+                        resolve();
+                      }
+                    }
+                  }
+                });
+              });
+            }
+          });
+
+        deleteFile(fileToDelete);
+      });
+    });
+  }
+
+  private async deleteFile(fileToDelete): Promise<void> {
+    return new Promise((resolve: Function, reject: Function) => {
+      const deleteIt = (filepath): void => {
+        fs.open(filepath, 'r+', async (err, fd) => {
+          if (err && err.code === 'EBUSY') {
+            deleteIt(filepath);
+          } else if (err && err.code === 'ENOENT') {
+            resolve();
+          } else {
+            fs.close(fd, () => {
+              fs.unlink(filepath, async (unlinkErr) => {
+                if (unlinkErr) {
+                  deleteIt(filepath);
+                } else {
+                  resolve();
+                }
+              });
+            });
+          }
+        });
+      };
+
+      deleteIt(fileToDelete);
     });
   }
 }

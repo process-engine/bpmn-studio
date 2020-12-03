@@ -80,12 +80,12 @@ export class SolutionExplorerSolution {
   @bindable public cssIconClass: string;
   @bindable public isConnected: boolean;
   @bindable public tooltipText: string;
-  @bindable public peHasStarted: boolean = false;
+  @bindable public processEngineHasStarted: boolean = false;
   public createNewDiagramInput: HTMLInputElement;
   public diagramContextMenu: HTMLElement;
   public showContextMenu: boolean = false;
   public deleteDiagramModal: DeleteDiagramModal;
-  public processEngineRunning: boolean = false;
+  @bindable public processEngineRunning: boolean = false;
 
   public isSavingDiagrams: boolean = false;
   public currentlySavingDiagramName: string = '';
@@ -192,7 +192,7 @@ export class SolutionExplorerSolution {
         this.ipcRenderer.on('internal_processengine_status', async (event: any, status: string, errorLog: string) => {
           if (status === 'success') {
             this.processEngineRunning = true;
-            this.peHasStarted = true;
+            this.processEngineHasStarted = true;
             await this.updateSolution();
 
             this.solutionEventListenerId = this.displayedSolutionEntry.service.watchSolution(() => {

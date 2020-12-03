@@ -23,7 +23,7 @@ let testClient: TestClient;
 
 describe('XML View', function foo() {
   this.slow(10000);
-  this.timeout(15000);
+  this.timeout(40000);
 
   beforeEach(async () => {
     testClient = new TestClient(applicationArgs);
@@ -31,12 +31,23 @@ describe('XML View', function foo() {
     testClient.creatingFirstDiagram = true;
     await testClient.startSpectronApp();
     await testClient.awaitReadiness();
+
+    (this as any).filePath = testClient.getVideoFilePathForTest(this.ctx.currentTest);
+    await testClient.startRecording((this as any).filePath);
   });
 
   afterEach(
     async (): Promise<void> => {
       if (await testClient.isSpectronAppRunning()) {
+        if (this.ctx.currentTest.state === 'failed') {
+          await testClient.stopRecordingAndSave();
+        }
+
         await testClient.stopSpectronApp();
+
+        if (this.ctx.currentTest.state !== 'failed') {
+          await testClient.removeUnneededVideos((this as any).filePath);
+        }
         await testClient.clearDatabase();
         await testClient.clearSavedDiagrams();
       }

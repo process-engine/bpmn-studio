@@ -4,6 +4,7 @@ import {AppConstructorOptions} from 'spectron';
 const isWindows = process.platform === 'win32';
 
 function getApplicationArgs(givenPath: string | null): AppConstructorOptions {
+  const webdriverLogPath = path.join(__dirname, '..', '..', '..', '..', '..', 'test-results', 'logs', 'web-driver');
   const commonArgs = {
     requireName: 'nodeRequire',
     env: {
@@ -12,6 +13,7 @@ function getApplicationArgs(givenPath: string | null): AppConstructorOptions {
     webdriverOptions: {
       deprecationWarnings: false,
     },
+    webdriverLogPath: webdriverLogPath,
   };
 
   if (givenPath != null) {
