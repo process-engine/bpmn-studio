@@ -204,7 +204,7 @@ jobs:
       shell: powershell
 
     - name: Prepare Windows Bundle for GitHub Release
-      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
+      #if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
       run: |
         copy-item .\dist\electron\bpmn-studio-setup-**.exe.blockmap .\dist_electron_windows\
         copy-item .\dist\electron\latest.yml .\dist_electron_windows\
