@@ -310,7 +310,7 @@ jobs:
     - name: Unstash Windows Electron App
       uses: actions/download-artifact@master
       with:
-        name: dist_electron_windows_installer_signed
+        name: dist_electron_windows
         path: "dist/electron"
 
     - name: Install CI Tools
