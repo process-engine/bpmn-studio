@@ -152,7 +152,8 @@ function initializeAutoUpdater(): void {
     const currentVersion = app.getVersion();
     const currentReleaseChannel = new ReleaseChannel(currentVersion);
 
-    const currentVersionIsPrerelease = currentReleaseChannel.isAlpha() || currentReleaseChannel.isBeta();
+    const currentVersionIsPrerelease =
+      currentReleaseChannel.isAlpha() || currentReleaseChannel.isBeta() || currentReleaseChannel.isFeature();
     autoUpdater.allowPrerelease = currentVersionIsPrerelease;
     autoUpdater.channel = currentReleaseChannel.getName();
 
@@ -171,6 +172,10 @@ function initializeAutoUpdater(): void {
       }
 
       if (currentReleaseChannel.isBeta() && !newReleaseChannel.isBeta()) {
+        return;
+      }
+
+      if (currentReleaseChannel.isFeature() && !newReleaseChannel.isFeature()) {
         return;
       }
     }
