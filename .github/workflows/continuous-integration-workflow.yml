@@ -41,6 +41,7 @@ jobs:
     name: "Lint Sources"
     needs: prepare_version
     runs-on: ubuntu-18.04
+    if: false
     steps:
     - uses: actions/checkout@v1
 
@@ -61,6 +62,7 @@ jobs:
     name: "Build & Test (Linux)"
     needs: prepare_version
     runs-on: ubuntu-18.04
+    if: false
     steps:
     - uses: actions/checkout@v1
 
@@ -110,6 +112,7 @@ jobs:
     name: "Build & Test (macOS)"
     needs: prepare_version
     runs-on: macOS-latest
+    if: false
     steps:
     - uses: actions/checkout@v1
     - name: Use Node.js 12.x
@@ -226,7 +229,7 @@ jobs:
 
   prepare_and_tag_version:
     name: "Commit & Tag Version"
-    needs: [build_and_test_linux, build_and_test_macos, build_and_test_windows]
+    needs: [build_and_test_windows]
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v1
@@ -256,6 +259,7 @@ jobs:
     name: "Publish npm Package"
     needs: prepare_and_tag_version
     runs-on: ubuntu-18.04
+    if: false
     steps:
     - uses: actions/checkout@v1
     - name: Use Node.js 12.x
