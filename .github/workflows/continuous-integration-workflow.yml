@@ -237,6 +237,78 @@ jobs:
         commit: true
         token: ${{ secrets.GH_TOKEN }}
 
+  sign_windows_build:
+    name: "Sign Windows Build"
+    needs: ["build_and_test_windows"]
+    #if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
+    runs-on: ["self-hosted", "Windows", "codesigning"]
+
+    steps:
+    - name: Clean up workspace
+      run: |
+        Remove-Item -Path "${{ github.workspace }}\*" -Recurse -Force
+
+    - uses: actions/checkout@v1
+
+    - name: Download Electron Windows app
+      uses: actions/download-artifact@v2
+      with:
+        name: dist_electron_windows
+        path: dist/electron
+
+    - name: Sign Electron Windows app
+      run: |
+        $FileToHash = (Get-ChildItem ".\dist\electron\win-unpacked\BPMN Studio*.exe")[0].FullName
+        Write-Output "Signing $FileToHash"
+        .\build\code-signing\windows\sign-app.ps1 -FilePath $FileToHash
+      env:
+        TOKEN_PASSWORD: ${{ secrets.WINDOWS_SIGNING_TOKEN_PASSWORD }}
+
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '12'
+
+    - name: Install Dependencies
+      run: npm ci
+
+    # It's important to match the package version that was used for building the application.
+    # Otherwise the installer could create broken links because it references the wrong filename which is based on the
+    # release channel.
+    - name: Unstash package.json
+      uses: actions/download-artifact@v2
+      with:
+        name: package_json
+        path: "."
+
+    - name: Pack Electron Windows app
+      run: npm run electron-pack-windows
+
+    - name: Sign Windows installer
+      run: .\build\code-signing\windows\sign-installer.ps1
+      env:
+        TOKEN_PASSWORD: ${{ secrets.WINDOWS_SIGNING_TOKEN_PASSWORD }}
+
+    - name: Verify signature
+      run: |
+        signtool verify /v /pa ".\dist\electron\bpmn-studio-*.exe"
+        signtool verify /v /pa ".\dist\electron\win-unpacked\BPMN Studio*.exe"
+
+    - name: Stage files for upload
+      run: |
+        New-Item -Path upload_staging -ItemType Directory
+        Move-Item `
+          -Path .\dist\electron\bpmn-studio-*.exe, .\dist\electron\bpmn-studio-*.exe.blockmap, .\dist\electron\*.yml `
+          -Destination .\upload_staging
+
+        Write-Output "Files staged for upload:"
+        Get-ChildItem .\upload_staging
+
+    - name: Upload signed Electron Windows app
+      uses: actions/upload-artifact@v2
+      with:
+        name: dist_electron_windows_installer_signed
+        path: upload_staging
+
   prepare_and_tag_version:
     name: "Commit & Tag Version"
     needs: [build_and_test_windows]
