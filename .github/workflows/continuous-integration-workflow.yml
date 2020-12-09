@@ -249,7 +249,7 @@ jobs:
       run: |
         Remove-Item -Path "${{ github.workspace }}\*" -Recurse -Force
 
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
 
     - name: Download Electron Windows app
       uses: actions/download-artifact@v2
