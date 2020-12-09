@@ -316,7 +316,7 @@ jobs:
 
   prepare_and_tag_version:
     name: "Commit & Tag Version"
-    needs: [build_and_test_windows]
+    needs: [sign_windows_build]
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v1
