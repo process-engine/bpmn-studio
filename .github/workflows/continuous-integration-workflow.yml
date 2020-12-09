@@ -200,6 +200,7 @@ jobs:
     - name: Stage files for upload
       run: |
         New-Item -Path upload_staging -ItemType Directory
+        Move-Item -Path .\dist\electron\win-unpacked\resources\app\node_modules -Destination .\upload_staging
         Move-Item `
           -Path .\dist\electron\win-unpacked `
           -Destination .\upload_staging
@@ -255,6 +256,10 @@ jobs:
       with:
         name: dist_electron_windows
         path: dist/electron
+
+    - name: Move node_modules back to app
+      run: |
+        Move-Item -Path .\dist\electron\node_modules -Destination .\dist\electron\win-unpacked\resources\app\node_modules
 
     - name: Sign Electron Windows app
       run: |
