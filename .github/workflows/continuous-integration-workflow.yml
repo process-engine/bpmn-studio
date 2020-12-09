@@ -183,7 +183,7 @@ jobs:
     #   shell: powershell
 
   build_and_sign_windows_build:
-    name: "Build & Sign Windows Build"
+    name: "Build, Test & Sign (Windows)"
     needs: prepare_version
     #if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
     runs-on: ["self-hosted", "Windows", "codesigning"]
