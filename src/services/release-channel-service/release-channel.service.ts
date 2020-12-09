@@ -24,10 +24,6 @@ export default class ReleaseChannel {
     return !this.isDev() && !this.isAlpha() && !this.isBeta();
   }
 
-  public isFeature(): boolean {
-    return this.version.includes('feature');
-  }
-
   public getName(): string {
     if (this.isDev()) {
       return 'dev';
@@ -37,9 +33,6 @@ export default class ReleaseChannel {
     }
     if (this.isBeta()) {
       return 'beta';
-    }
-    if (this.isFeature()) {
-      return 'feature';
     }
 
     return 'stable';
