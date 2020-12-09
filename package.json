@@ -16,7 +16,7 @@
     "electron-build-windows": "npm run electron-build-windows-installer && npm run electron-build-windows-portable",
     "electron-build-windows-installer": "npm run electron-prepare && electron-builder --config build/electron-builder.yml --publish never --windows nsis && npm run electron-cleanup",
     "electron-build-windows-portable": "cross-env IS_PORTABLE_BUILD=true npm run electron-prepare && electron-builder --config build/electron-builder.yml --publish never --windows portable && cross-env IS_PORTABLE_BUILD=true npm run electron-cleanup",
-    "electron-pack-windows": "electron-builder --config build/electron-builder.yml --publish never --windows --prepackaged dist/electron/win-unpacked",
+    "electron-pack-windows": "electron-builder --config build/electron-builder.yml --publish never --windows nsis --prepackaged dist/electron/win-unpacked",
     "electron-build-macos": "npm run electron-prepare && electron-builder --config build/electron-builder.yml --publish never --macos && npm run electron-cleanup",
     "electron-cleanup": "node electron-builder/reset-name-in-package-json.js",
     "electron-prepare": "node electron-builder/set-name-in-package-json.js && npm run build && node electron-builder/prepare-electron-build.js",
