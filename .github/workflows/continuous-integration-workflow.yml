@@ -168,20 +168,6 @@ jobs:
         commit: true
         token: ${{ secrets.GH_TOKEN }}
 
-
-    # - name: Prepare Windows Bundle
-    #   run: |
-    #     mkdir dist_electron_windows
-    #     copy-item .\dist\electron\bpmn-studio-setup-**.exe .\dist_electron_windows\
-    #   shell: powershell
-
-    # - name: Prepare Windows Bundle for GitHub Release
-    #   #if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
-    #   run: |
-    #     copy-item .\dist\electron\bpmn-studio-setup-**.exe.blockmap .\dist_electron_windows\
-    #     copy-item .\dist\electron\latest.yml .\dist_electron_windows\
-    #   shell: powershell
-
   build_and_sign_windows_build:
     name: "Build, Test & Sign (Windows)"
     needs: prepare_version
@@ -249,11 +235,21 @@ jobs:
         signtool verify /v /pa ".\dist\electron\bpmn-studio-*.exe"
         signtool verify /v /pa ".\dist\electron\win-unpacked\BPMN Studio*.exe"
 
-    - name: Stage files for upload
+    - name: Prepare Windows Bundle
       run: |
         New-Item -Path upload_staging -ItemType Directory
         Move-Item `
-          -Path .\dist\electron\bpmn-studio-*.exe, .\dist\electron\bpmn-studio-*.exe.blockmap, .\dist\electron\*.yml `
+          -Path .\dist\electron\bpmn-studio-*.exe `
+          -Destination .\upload_staging
+
+        Write-Output "Files staged for upload:"
+        Get-ChildItem .\upload_staging
+
+    - name: Prepare Windows Bundle for GitHub Release
+      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
+      run: |
+        Move-Item `
+          -Path .\dist\electron\bpmn-studio-*.exe.blockmap, .\dist\electron\*.yml `
           -Destination .\upload_staging
 
         Write-Output "Files staged for upload:"
