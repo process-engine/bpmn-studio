@@ -168,11 +168,31 @@ jobs:
         commit: true
         token: ${{ secrets.GH_TOKEN }}
 
-  build_and_test_windows:
-    name: "Build & Test (Windows)"
+
+    # - name: Prepare Windows Bundle
+    #   run: |
+    #     mkdir dist_electron_windows
+    #     copy-item .\dist\electron\bpmn-studio-setup-**.exe .\dist_electron_windows\
+    #   shell: powershell
+
+    # - name: Prepare Windows Bundle for GitHub Release
+    #   #if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
+    #   run: |
+    #     copy-item .\dist\electron\bpmn-studio-setup-**.exe.blockmap .\dist_electron_windows\
+    #     copy-item .\dist\electron\latest.yml .\dist_electron_windows\
+    #   shell: powershell
+
+  build_and_sign_windows_build:
+    name: "Build & Sign Windows Build"
     needs: prepare_version
-    runs-on: windows-latest
+    #if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
+    runs-on: ["self-hosted", "Windows", "codesigning"]
+
     steps:
+    - name: Clean up workspace
+      run: |
+        Remove-Item -Path "${{ github.workspace }}\*" -Recurse -Force
+
     - uses: actions/checkout@v1
     - name: Use Node.js 12.x
       uses: actions/setup-node@v1
@@ -180,7 +200,7 @@ jobs:
         node-version: 12.x
 
     - name: Unstash package.json
-      uses: actions/download-artifact@master
+      uses: actions/download-artifact@v2
       with:
         name: package_json
         path: "."
@@ -197,36 +217,6 @@ jobs:
     - name: Run the Tests
       run: npm test
 
-    - name: Stage files for upload
-      run: |
-        New-Item -Path upload_staging -ItemType Directory
-        Move-Item -Path .\dist\electron\win-unpacked\resources\app\node_modules -Destination .\upload_staging
-        Move-Item `
-          -Path .\dist\electron\win-unpacked `
-          -Destination .\upload_staging
-
-        Write-Output "Files staged for upload:"
-        Get-ChildItem .\upload_staging
-
-    # - name: Prepare Windows Bundle
-    #   run: |
-    #     mkdir dist_electron_windows
-    #     copy-item .\dist\electron\bpmn-studio-setup-**.exe .\dist_electron_windows\
-    #   shell: powershell
-
-    # - name: Prepare Windows Bundle for GitHub Release
-    #   #if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
-    #   run: |
-    #     copy-item .\dist\electron\bpmn-studio-setup-**.exe.blockmap .\dist_electron_windows\
-    #     copy-item .\dist\electron\latest.yml .\dist_electron_windows\
-    #   shell: powershell
-
-    - uses: actions/upload-artifact@master
-      name: Upload Electron Windows App
-      with:
-        name: dist_electron_windows
-        path: upload_staging
-
     - name: Slack Notification
       uses: homoluctus/slatify@master
       if: always()
@@ -238,29 +228,6 @@ jobs:
         commit: true
         token: ${{ secrets.GH_TOKEN }}
 
-  sign_windows_build:
-    name: "Sign Windows Build"
-    needs: ["build_and_test_windows"]
-    #if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/develop'
-    runs-on: ["self-hosted", "Windows", "codesigning"]
-
-    steps:
-    - name: Clean up workspace
-      run: |
-        Remove-Item -Path "${{ github.workspace }}\*" -Recurse -Force
-
-    - uses: actions/checkout@v2
-
-    - name: Download Electron Windows app
-      uses: actions/download-artifact@v2
-      with:
-        name: dist_electron_windows
-        path: dist/electron
-
-    - name: Move node_modules back to app
-      run: |
-        Move-Item -Path .\dist\electron\node_modules -Destination .\dist\electron\win-unpacked\resources\app\node_modules
-
     - name: Sign Electron Windows app
       run: |
         $FileToHash = (Get-ChildItem ".\dist\electron\win-unpacked\BPMN Studio*.exe")[0].FullName
@@ -268,22 +235,6 @@ jobs:
         .\build\code-signing\windows\sign-app.ps1 -FilePath $FileToHash
       env:
         TOKEN_PASSWORD: ${{ secrets.WINDOWS_SIGNING_TOKEN_PASSWORD }}
-
-    - uses: actions/setup-node@v1
-      with:
-        node-version: '12'
-
-    - name: Install Dependencies
-      run: npm ci
-
-    # It's important to match the package version that was used for building the application.
-    # Otherwise the installer could create broken links because it references the wrong filename which is based on the
-    # release channel.
-    - name: Unstash package.json
-      uses: actions/download-artifact@v2
-      with:
-        name: package_json
-        path: "."
 
     - name: Pack Electron Windows app
       run: npm run electron-pack-windows
@@ -316,7 +267,7 @@ jobs:
 
   prepare_and_tag_version:
     name: "Commit & Tag Version"
-    needs: [sign_windows_build]
+    needs: [build_and_sign_windows_build]
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v1
