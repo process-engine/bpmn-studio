@@ -132,6 +132,8 @@ jobs:
       run: npm run electron-build-macos
       env:
         CSC_LINK: ${{ secrets.CSC_LINK }}
+        APPLE_USERNAME: ${{ secrets.APPLE_USERNAME }}
+        APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
 
     # - name: Run the Tests
     #   run: npm test
