@@ -31,7 +31,7 @@ export const UserTaskUsage: HelpText = {
   - Label: The displayed name of the form field
   - Default Value: The default value of the form field
 
-  The values for \`label\` and \`default value\` can be anything.
+  The values for \`label\` and \`default value\` can be anything except on a Date form field. If it is a date form field, the default value must correspond to the <a href="https://en.wikipedia.org/wiki/ISO_8601#Dates" target="_blank">ISO 8601 date standard</a>.
   However, you can also use token expressions.
 
   **Example:**
