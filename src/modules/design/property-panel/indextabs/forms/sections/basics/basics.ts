@@ -205,6 +205,8 @@ export class BasicsSection implements ISection {
 
     this.setValidationRules();
     this.reloadEnumValues();
+    this.booleanDefaultValueString = this.selectedForm.defaultValue;
+    this.booleanDefaultValue = this.booleanDefaultValueString === 'true';
   }
 
   public updateType(): void {
