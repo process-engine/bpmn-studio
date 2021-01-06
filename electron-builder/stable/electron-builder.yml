@@ -33,3 +33,4 @@ mac:
         - bpmn
       name: BPMN
   artifactName: 'bpmn-studio-setup-${version}.${ext}'
+afterSign: "build/code-signing/mac/notarize.js"
