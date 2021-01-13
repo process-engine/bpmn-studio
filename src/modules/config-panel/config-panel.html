@@ -19,6 +19,16 @@
         </div>
       </div>
     </div>
+    <div class="config-panel__card card ">
+      <div class="card-header">
+        HTTPS Client
+      </div>
+      <div class="card-body">
+        <div class="form-check">
+          <label class="form-check-label"><input type="checkbox" class="form-check-input" checked.bind="allowUnauthorizedCertificates">Trust unauthorized certificates</label>
+        </div>
+      </div>
+    </div>
     <button class="btn btn-default" click.delegate="cancelUpdate()">Cancel</button>
     <button class="btn btn-primary" click.delegate="updateSettings()" disabled.bind="!uriIsValid || uriIsEmpty">Save</button>
   </div>
