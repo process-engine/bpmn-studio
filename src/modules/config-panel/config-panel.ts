@@ -9,23 +9,23 @@ import {IIdentity} from '@essential-projects/iam_contracts';
 
 import {IAuthenticationService} from '../../contracts/authentication/IAuthenticationService';
 import {AuthenticationStateEvent, ISolutionEntry, ISolutionService} from '../../contracts/index';
-import {HttpFetchClient} from '../fetch-http-client/http-fetch-client';
+
 import {
   isRunningAsDevelop,
   isRunningInElectron,
 } from '../../services/is-running-in-electron-module/is-running-in-electron.module';
 
-@inject(Router, 'SolutionService', 'AuthenticationService', EventAggregator, 'HttpFetchClient')
+@inject(Router, 'SolutionService', 'AuthenticationService', EventAggregator)
 export class ConfigPanel {
   public internalSolution: ISolutionEntry;
   public authority: string;
   public showRestartModal: boolean;
+  public rejectUnauthorized: boolean;
 
   private router: Router;
   private solutionService: ISolutionService;
   private authenticationService: IAuthenticationService;
   private eventAggregator: EventAggregator;
-  private httpFetchClient: HttpFetchClient;
   private ipcRenderer: any;
 
   constructor(
@@ -33,13 +33,11 @@ export class ConfigPanel {
     solutionService: ISolutionService,
     authenticationService: IAuthenticationService,
     eventAggregator: EventAggregator,
-    httpFetchClient: HttpFetchClient,
   ) {
     this.router = router;
     this.solutionService = solutionService;
     this.authenticationService = authenticationService;
     this.eventAggregator = eventAggregator;
-    this.httpFetchClient = httpFetchClient;
 
     if (isRunningInElectron()) {
       this.ipcRenderer = (window as any).nodeRequire('electron').ipcRenderer;
@@ -47,13 +45,15 @@ export class ConfigPanel {
   }
 
   public async attached(): Promise<void> {
+    const config = await this.getInternalProcessEngineConfig();
+    this.rejectUnauthorized = !config.httpClient.rejectUnauthorized;
+
     const internalSolutionUri: string = window.localStorage.getItem('InternalProcessEngineRoute');
 
     this.internalSolution = this.solutionService.getSolutionEntryForUri(internalSolutionUri);
 
     let authority = this.internalSolution.authority;
     if (!authority) {
-      const config = await this.getIamServiceConfig();
       authority = config.iam.baseUrl;
     }
 
@@ -89,11 +89,13 @@ export class ConfigPanel {
     }
 
     if (isRunningInElectron()) {
-      const iamServiceConfig = await this.getIamServiceConfig();
+      const config = await this.getInternalProcessEngineConfig();
 
-      const authorityChanged: boolean = iamServiceConfig.basePath !== this.authority;
-      if (authorityChanged) {
+      const authorityChanged = config.basePath !== this.authority;
+      const rejectUnauthorizedChanged = config.httpClient.rejectUnauthorized !== this.rejectUnauthorized;
+      if (authorityChanged || rejectUnauthorizedChanged) {
         await this.saveNewAuthority();
+        await this.saveRejectUnauthorized();
 
         this.showRestartModal = true;
       } else {
@@ -122,36 +124,45 @@ export class ConfigPanel {
     this.router.navigateBack();
   }
 
+  private async saveRejectUnauthorized(): Promise<void> {
+    const config = await this.getInternalProcessEngineConfig();
+
+    config.httpClient.rejectUnauthorized = !this.rejectUnauthorized;
+
+    const configPath: string = await this.getInternalProcessEngineConfigPath();
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+  }
+
   private async saveNewAuthority(): Promise<void> {
-    const iamServiceConfig = await this.getIamServiceConfig();
+    const config = await this.getInternalProcessEngineConfig();
 
-    iamServiceConfig.iam.baseUrl = this.authority;
-    iamServiceConfig.iam.claimUrl = `${this.authority}claims/ensure`;
+    config.iam.baseUrl = this.authority;
+    config.iam.claimUrl = `${this.authority}claims/ensure`;
 
-    const configPath: string = await this.getIamServiceConfigPath();
-    fs.writeFileSync(configPath, JSON.stringify(iamServiceConfig, null, 2));
+    const configPath: string = await this.getInternalProcessEngineConfigPath();
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
   }
 
-  private async getIamServiceConfig(): Promise<any> {
-    const configPath: string = await this.getIamServiceConfigPath();
-    const iamServiceConfig = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+  private async getInternalProcessEngineConfig(): Promise<any> {
+    const configPath: string = await this.getInternalProcessEngineConfigPath();
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
 
-    return iamServiceConfig;
+    return config;
   }
 
-  private async getIamServiceConfigPath(): Promise<string> {
+  private async getInternalProcessEngineConfigPath(): Promise<string> {
     const pathToJson: string = 'configs/sqlite.json';
 
-    let iamServiceConfigPath: string;
+    let internalProcessEngineConfigPath: string;
 
     const isDevelop: boolean = await isRunningAsDevelop();
     if (!isDevelop) {
-      iamServiceConfigPath = path.join(__dirname, '..', '..', pathToJson);
+      internalProcessEngineConfigPath = path.join(__dirname, '..', '..', pathToJson);
     } else {
-      iamServiceConfigPath = path.join(__dirname, pathToJson);
+      internalProcessEngineConfigPath = path.join(__dirname, pathToJson);
     }
 
-    return iamServiceConfigPath;
+    return internalProcessEngineConfigPath;
   }
 
   public get uriIsValid(): boolean {
