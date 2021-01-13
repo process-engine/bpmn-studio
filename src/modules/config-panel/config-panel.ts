@@ -20,7 +20,7 @@ export class ConfigPanel {
   public internalSolution: ISolutionEntry;
   public authority: string;
   public showRestartModal: boolean;
-  public rejectUnauthorized: boolean;
+  public allowUnauthorizedCertificates: boolean;
 
   private router: Router;
   private solutionService: ISolutionService;
@@ -46,7 +46,7 @@ export class ConfigPanel {
 
   public async attached(): Promise<void> {
     const config = await this.getInternalProcessEngineConfig();
-    this.rejectUnauthorized = !config.httpClient.rejectUnauthorized;
+    this.allowUnauthorizedCertificates = config.httpClient.allowUnauthorizedCertificates;
 
     const internalSolutionUri: string = window.localStorage.getItem('InternalProcessEngineRoute');
 
@@ -92,10 +92,10 @@ export class ConfigPanel {
       const config = await this.getInternalProcessEngineConfig();
 
       const authorityChanged = config.basePath !== this.authority;
-      const rejectUnauthorizedChanged = config.httpClient.rejectUnauthorized !== this.rejectUnauthorized;
-      if (authorityChanged || rejectUnauthorizedChanged) {
+      const allowUnauthorizedCertificatesChanged = config.httpClient.allowUnauthorizedCertificates !== this.allowUnauthorizedCertificates;
+      if (authorityChanged || allowUnauthorizedCertificatesChanged) {
         await this.saveNewAuthority();
-        await this.saveRejectUnauthorized();
+        await this.saveAllowUnauthorizedCertificates();
 
         this.showRestartModal = true;
       } else {
@@ -124,10 +124,10 @@ export class ConfigPanel {
     this.router.navigateBack();
   }
 
-  private async saveRejectUnauthorized(): Promise<void> {
+  private async saveAllowUnauthorizedCertificates(): Promise<void> {
     const config = await this.getInternalProcessEngineConfig();
 
-    config.httpClient.rejectUnauthorized = !this.rejectUnauthorized;
+    config.httpClient.allowUnauthorizedCertificates = this.allowUnauthorizedCertificates;
 
     const configPath: string = await this.getInternalProcessEngineConfigPath();
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
