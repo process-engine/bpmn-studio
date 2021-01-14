@@ -21,6 +21,8 @@ export class ConfigPanel {
   public authority: string;
   public showRestartModal: boolean;
   public allowUnauthorizedCertificates: boolean;
+  public certificatesFileInputRef: HTMLInputElement;
+  public additionalCertificates: Array<string> = [];
 
   private router: Router;
   private solutionService: ISolutionService;
@@ -47,6 +49,12 @@ export class ConfigPanel {
   public async attached(): Promise<void> {
     const config = await this.getInternalProcessEngineConfig();
     this.allowUnauthorizedCertificates = config.httpClient.allowUnauthorizedCertificates;
+    const configuredCertificates = config.certs;
+    if (configuredCertificates != null && Array.isArray(configuredCertificates)) {
+      this.additionalCertificates = configuredCertificates;
+    } else if (configuredCertificates != null && typeof configuredCertificates === 'string' && configuredCertificates.trim() !== '') {
+      this.additionalCertificates.push(configuredCertificates);
+    }
 
     const internalSolutionUri: string = window.localStorage.getItem('InternalProcessEngineRoute');
 
@@ -93,9 +101,11 @@ export class ConfigPanel {
 
       const authorityChanged = config.basePath !== this.authority;
       const allowUnauthorizedCertificatesChanged = config.httpClient.allowUnauthorizedCertificates !== this.allowUnauthorizedCertificates;
-      if (authorityChanged || allowUnauthorizedCertificatesChanged) {
+      const additionalCertificatesChanged = JSON.stringify(config) !== JSON.stringify(this.additionalCertificates);
+      if (authorityChanged || allowUnauthorizedCertificatesChanged || additionalCertificatesChanged) {
         await this.saveNewAuthority();
         await this.saveAllowUnauthorizedCertificates();
+        await this.saveAdditionalCertificates();
 
         this.showRestartModal = true;
       } else {
@@ -122,6 +132,33 @@ export class ConfigPanel {
     this.showRestartModal = false;
 
     this.router.navigateBack();
+  }
+
+  private removeCert(certificatePath: string): void {
+    const indexOfCertificate = this.additionalCertificates.indexOf(certificatePath);
+    this.additionalCertificates.splice(indexOfCertificate, 1);
+  }
+
+  private certificatesFileInputChanged(): void {
+    Array.from(this.certificatesFileInputRef.files).forEach((file) => {
+      const certDoesNotExistInList = !this.additionalCertificates.includes(file.path);
+      if (certDoesNotExistInList) {
+        this.additionalCertificates.push(file.path);
+      }
+    });
+  }
+
+  private async saveAdditionalCertificates(): Promise<void> {
+    const config = await this.getInternalProcessEngineConfig();
+
+    if (this.additionalCertificates.length <= 1) {
+      config.certs = this.additionalCertificates[0] ?? '';
+    } else {
+      config.certs = this.additionalCertificates;
+    }
+
+    const configPath: string = await this.getInternalProcessEngineConfigPath();
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
   }
 
   private async saveAllowUnauthorizedCertificates(): Promise<void> {

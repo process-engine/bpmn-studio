@@ -29,6 +29,22 @@
         </div>
       </div>
     </div>
+    <div class="config-panel__card card ">
+      <div class="card-header">
+        Additional certificates to trust
+      </div>
+      <div class="card-body">
+        <p if.bind="additionalCertificates.length === 0">No certificates</p>
+        <ul else>
+          <li repeat.for="cert of additionalCertificates">${cert}
+            <span class="remove-certificate__button" click.delegate="removeCert(cert)" title="Remove the certificate">
+              <i class="fa fa-times"></i>
+            </span>
+          </li>
+        </ul>
+        <input ref="certificatesFileInputRef" type="file" class="form-control-file" multiple accept="application/x-pem-file" change.delegate="certificatesFileInputChanged()">
+      </div>
+    </div>
     <button class="btn btn-default" click.delegate="cancelUpdate()">Cancel</button>
     <button class="btn btn-primary" click.delegate="updateSettings()" disabled.bind="!uriIsValid || uriIsEmpty">Save</button>
   </div>

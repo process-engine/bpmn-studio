@@ -30,3 +30,12 @@
 .config-panel__invalid-uri-message {
   white-space: pre-line;
 }
+
+.remove-certificate__button {
+  opacity: 0.5;
+}
+
+.remove-certificate__button:hover {
+  opacity: 1;
+  cursor: pointer;
+}
