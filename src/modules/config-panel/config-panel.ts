@@ -49,7 +49,7 @@ export class ConfigPanel {
   public async attached(): Promise<void> {
     const config = await this.getInternalProcessEngineConfig();
     this.allowUnauthorizedCertificates = config.httpClient.allowUnauthorizedCertificates;
-    const configuredCertificates = config.certs;
+    const configuredCertificates = config.tls?.trustedCertificates;
     if (configuredCertificates != null && Array.isArray(configuredCertificates)) {
       this.additionalCertificates = configuredCertificates;
     } else if (configuredCertificates != null && typeof configuredCertificates === 'string' && configuredCertificates.trim() !== '') {
@@ -151,10 +151,14 @@ export class ConfigPanel {
   private async saveAdditionalCertificates(): Promise<void> {
     const config = await this.getInternalProcessEngineConfig();
 
+    if (config.tls == null) {
+      config.tls = {};
+    }
+
     if (this.additionalCertificates.length <= 1) {
-      config.certs = this.additionalCertificates[0] ?? '';
+      config.tls.trustedCertificates = this.additionalCertificates[0] ?? '';
     } else {
-      config.certs = this.additionalCertificates;
+      config.tls.trustedCertificates = this.additionalCertificates;
     }
 
     const configPath: string = await this.getInternalProcessEngineConfigPath();
