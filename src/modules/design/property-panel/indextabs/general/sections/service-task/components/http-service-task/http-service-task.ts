@@ -73,7 +73,7 @@ export class HttpServiceTask {
     const property: IProperty = this.serviceTaskService.getProperty('method');
     property.value = this.selectedHttpMethod;
 
-    this.getParamsFromInput();
+    this.serviceTaskService.updateOrCreateProperty('params', this.getParamsFromInput());
     this.publishDiagramChange();
   }
 
@@ -107,10 +107,14 @@ export class HttpServiceTask {
   private getParamsFromInput(): string {
     const params = [];
     params.push(this.selectedHttpUrl);
-    if (this.selectedHttpBody) {
-      params.push(this.selectedHttpBody);
+    if (this.selectedHttpMethod !== 'get' && this.selectedHttpMethod !== 'delete') {
+      if (this.selectedHttpBody) {
+        params.push(this.selectedHttpBody);
+      } else if (this.selectedHttpMethod === 'post' || this.selectedHttpMethod === 'put') {
+        params.push({});
+      }
     }
-    if (this.selectedHttpBody && (this.selectedHttpContentType || this.selectedHttpAuth)) {
+    if (this.selectedHttpContentType || this.selectedHttpAuth) {
       params.push({
         headers: {
           'Content-Type': this.selectedHttpContentType ? this.selectedHttpContentType : undefined,
@@ -122,7 +126,7 @@ export class HttpServiceTask {
     let returnValue = `[${JSON.stringify(params[0])}`;
 
     if (params[1] != null) {
-      if (params[1].startsWith('{') && params[1].endsWith('}')) {
+      if (params[1].toString().startsWith('{') && params[1].toString().endsWith('}')) {
         returnValue += `, ${params[1]}`;
       } else {
         returnValue += `, ${JSON.stringify(params[1])}`;
