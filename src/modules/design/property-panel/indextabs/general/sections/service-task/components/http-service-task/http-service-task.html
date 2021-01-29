@@ -33,14 +33,14 @@
             />
           </td>
         </tr>
-        <tr class.bind="!selectedHttpUrl ? 'props-table__row--disabled' : ''">
+        <tr>
           <th>Body</th>
           <td>
             <textarea
               class="props-input-textarea name-input"
               value.bind="selectedHttpBody"
               change.delegate="selectedHttpParamsChanged()"
-              disabled.bind="!selectedHttpUrl || !model.isEditable"
+              disabled.bind="!model.isEditable"
             ></textarea>
           </td>
         </tr>
