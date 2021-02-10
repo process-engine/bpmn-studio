@@ -21,6 +21,7 @@ export class ConfigPanel {
   public authority: string;
   public showRestartModal: boolean;
   public allowUnauthorizedCertificates: boolean;
+  public showWindowsTrustStoreSwitch: boolean = process.platform === 'win32';
   public useWindowsTrustStore: boolean;
 
   private router: Router;
