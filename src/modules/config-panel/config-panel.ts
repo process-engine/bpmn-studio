@@ -21,6 +21,8 @@ export class ConfigPanel {
   public authority: string;
   public showRestartModal: boolean;
   public allowUnauthorizedCertificates: boolean;
+  public showWindowsTrustStoreSwitch: boolean = process.platform === 'win32';
+  public useWindowsTrustStore: boolean;
 
   private router: Router;
   private solutionService: ISolutionService;
@@ -47,6 +49,7 @@ export class ConfigPanel {
   public async attached(): Promise<void> {
     const config = await this.getInternalProcessEngineConfig();
     this.allowUnauthorizedCertificates = config.httpClient.allowUnauthorizedCertificates;
+    this.useWindowsTrustStore = config.tls.useWindowsTrustStore;
 
     const internalSolutionUri: string = window.localStorage.getItem('InternalProcessEngineRoute');
 
@@ -92,10 +95,14 @@ export class ConfigPanel {
       const config = await this.getInternalProcessEngineConfig();
 
       const authorityChanged = config.basePath !== this.authority;
-      const allowUnauthorizedCertificatesChanged = config.httpClient.allowUnauthorizedCertificates !== this.allowUnauthorizedCertificates;
-      if (authorityChanged || allowUnauthorizedCertificatesChanged) {
+      const allowUnauthorizedCertificatesChanged =
+        config.httpClient.allowUnauthorizedCertificates !== this.allowUnauthorizedCertificates;
+
+      const useWindowsTrustStoreChanged = config.tls.useWindowsTrustStore !== this.useWindowsTrustStore;
+      if (authorityChanged || allowUnauthorizedCertificatesChanged || useWindowsTrustStoreChanged) {
         await this.saveNewAuthority();
         await this.saveAllowUnauthorizedCertificates();
+        await this.saveUseWindowsTrustStore();
 
         this.showRestartModal = true;
       } else {
@@ -128,6 +135,15 @@ export class ConfigPanel {
     const config = await this.getInternalProcessEngineConfig();
 
     config.httpClient.allowUnauthorizedCertificates = this.allowUnauthorizedCertificates;
+
+    const configPath: string = await this.getInternalProcessEngineConfigPath();
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+  }
+
+  private async saveUseWindowsTrustStore(): Promise<void> {
+    const config = await this.getInternalProcessEngineConfig();
+
+    config.tls.useWindowsTrustStore = this.useWindowsTrustStore;
 
     const configPath: string = await this.getInternalProcessEngineConfigPath();
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2));

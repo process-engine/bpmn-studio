@@ -9,12 +9,18 @@
         Authority
       </div>
       <div class="card-body">
-        <input value.bind="authority" class.bind="uriIsValid ? '' : 'uri-input--invalid'" type="text" class="form-control" id="authority">
+        <input
+          value.bind="authority"
+          class.bind="uriIsValid ? '' : 'uri-input--invalid'"
+          type="text"
+          class="form-control"
+          id="authority"
+        />
         <div class="config-panel__card__alert alert alert-danger" if.bind="!uriIsValid" role="alert">
-          <div class="config-panel__invalid-uri-message"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> The entered authority must be a valid uri.
-            To make it valid make sure:
-            - it begins with "http://" or "https://" and
-            - only contains the following characters: a-Z 0-9 - . _ ~ : / ? # [ ] @ ! $ & ' ( ) * + , ; = .
+          <div class="config-panel__invalid-uri-message">
+            <i class="fas fa-exclamation-triangle" aria-hidden="true"></i> The entered authority must be a valid uri. To
+            make it valid make sure: - it begins with "http://" or "https://" and - only contains the following
+            characters: a-Z 0-9 - . _ ~ : / ? # [ ] @ ! $ & ' ( ) * + , ; = .
           </div>
         </div>
       </div>
@@ -25,19 +31,43 @@
       </div>
       <div class="card-body">
         <div class="form-check">
-          <label class="form-check-label"><input type="checkbox" class="form-check-input" checked.bind="allowUnauthorizedCertificates">Trust unauthorized certificates</label>
+          <label class="form-check-label">
+            <input type="checkbox" class="form-check-input" checked.bind="allowUnauthorizedCertificates" />
+            Trust unauthorized certificates
+          </label>
+        </div>
+      </div>
+    </div>
+    <div if.bind="showWindowsTrustStoreSwitch" class="config-panel__card card ">
+      <div class="card-header">
+        TLS
+      </div>
+      <div class="card-body">
+        <div class="form-check">
+          <label class="form-check-label">
+            <input type="checkbox" class="form-check-input" checked.bind="useWindowsTrustStore" />
+            Use Windows Trust Store
+          </label>
         </div>
       </div>
     </div>
     <button class="btn btn-default" click.delegate="cancelUpdate()">Cancel</button>
-    <button class="btn btn-primary" click.delegate="updateSettings()" disabled.bind="!uriIsValid || uriIsEmpty">Save</button>
+    <button class="btn btn-primary" click.delegate="updateSettings()" disabled.bind="!uriIsValid || uriIsEmpty">
+      Save
+    </button>
   </div>
-  <modal if.bind="showRestartModal"
-         header-text="BPMN Studio needs to restart"
-         body-text="A restart is required in order to apply the changes.">
+  <modal
+    if.bind="showRestartModal"
+    header-text="BPMN Studio needs to restart"
+    body-text="A restart is required in order to apply the changes."
+  >
     <template replace-part="modal-footer">
-      <button type="button" class="btn btn-default" data-dismiss="modal" click.delegate="restartLater()">Restart later (manually)</button>
-      <button type="button" class="btn btn-primary" data-dismiss="modal" click.delegate="restartNow()">Restart now</button>
+      <button type="button" class="btn btn-default" data-dismiss="modal" click.delegate="restartLater()">
+        Restart later (manually)
+      </button>
+      <button type="button" class="btn btn-primary" data-dismiss="modal" click.delegate="restartNow()">
+        Restart now
+      </button>
     </template>
   </modal>
 </template>
