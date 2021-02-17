@@ -440,4 +440,4 @@ jobs:
         DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
 
     - name: Push Docker Image
-      run: docker push 5minds/bpmn-studio-bundle
+      run: docker push --all-tags 5minds/bpmn-studio-bundle
