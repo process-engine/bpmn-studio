@@ -954,7 +954,7 @@ async function startRuntime(): Promise<void> {
       'bin',
       'index.js',
     );
-    runtimeProcess = fork(pathToRuntime, [`--sqlitePath=${sqlitePath}`, `--logFilePath=${logFilepath}`], {
+    runtimeProcess = fork(pathToRuntime, [`--sqlite-path=${sqlitePath}`, `--log-file-path=${logFilepath}`], {
       stdio: 'pipe',
     });
 
