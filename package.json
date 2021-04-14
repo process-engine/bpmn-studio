@@ -1,7 +1,7 @@
 {
   "name": "bpmn-studio",
   "description": "An Aurelia application for designing BPMN diagrams, which can also be connected to a process engine to execute these diagrams.",
-  "version": "6.7.0",
+  "version": "6.7.1",
   "author": {
     "name": "process-engine",
     "email": "hello@process-engine.io",
@@ -49,7 +49,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@atlas-engine/fullstack_server": "12.0.1",
+    "@atlas-engine/fullstack_server": "12.0.5",
     "@essential-projects/errors_ts": "^1.6.1",
     "@fortawesome/fontawesome-free": "5.11.2",
     "@process-engine/bpmn-js-custom-bundle": "2.11.0",
